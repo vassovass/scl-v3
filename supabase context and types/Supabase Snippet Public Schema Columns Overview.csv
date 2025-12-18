@@ -1,0 +1,40 @@
+table_name,column_name,data_type,is_nullable,column_default,ordinal_position
+audit_log,id,bigint,NO,null,1
+audit_log,actor_id,uuid,YES,null,2
+audit_log,action,text,NO,null,3
+audit_log,target_id,uuid,YES,null,4
+audit_log,details,jsonb,YES,null,5
+audit_log,created_at,timestamp with time zone,NO,now(),6
+leagues,id,uuid,NO,gen_random_uuid(),1
+leagues,name,text,NO,null,2
+leagues,stepweek_start,text,NO,null,3
+leagues,invite_code,text,NO,null,4
+leagues,owner_id,uuid,NO,null,5
+leagues,created_at,timestamp with time zone,NO,now(),6
+memberships,league_id,uuid,NO,null,1
+memberships,user_id,uuid,NO,null,2
+memberships,role,text,NO,'member'::text,3
+memberships,joined_at,timestamp with time zone,NO,now(),4
+site_settings,key,text,NO,null,1
+site_settings,value,text,NO,null,2
+site_settings,description,text,YES,null,3
+site_settings,updated_at,timestamp with time zone,NO,now(),4
+site_settings,updated_by,uuid,YES,null,5
+submissions,id,uuid,NO,gen_random_uuid(),1
+submissions,league_id,uuid,NO,null,2
+submissions,user_id,uuid,NO,null,3
+submissions,for_date,date,NO,null,4
+submissions,steps,integer,NO,null,5
+submissions,partial,boolean,NO,false,6
+submissions,proof_path,text,YES,null,7
+submissions,verified,boolean,NO,false,8
+submissions,tolerance_used,integer,YES,null,9
+submissions,extracted_km,numeric,YES,null,10
+submissions,extracted_calories,integer,YES,null,11
+submissions,verification_notes,text,YES,null,12
+submissions,created_at,timestamp with time zone,NO,now(),13
+users,id,uuid,NO,auth.uid(),1
+users,display_name,text,YES,null,2
+users,units,text,YES,null,3
+users,created_at,timestamp with time zone,NO,now(),4
+users,is_superadmin,boolean,NO,false,5
