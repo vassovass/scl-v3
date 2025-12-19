@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { SubmissionForm } from "@/components/forms/SubmissionForm";
 
 interface League {
   id: string;
@@ -115,14 +116,8 @@ export default function LeaguePage() {
             Upload a screenshot from your fitness app to verify your step count.
           </p>
 
-          <div className="mt-6 rounded-xl border border-slate-800 bg-slate-900/50 p-8">
-            <p className="text-center text-slate-500">
-              Step submission form will go here.
-              <br />
-              <span className="text-xs">
-                (Copy SubmissionForm component from SCL v2)
-              </span>
-            </p>
+          <div className="mt-6">
+            <SubmissionForm leagueId={leagueId} />
           </div>
         </section>
       </main>
