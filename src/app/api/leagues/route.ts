@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
 import { json, badRequest, unauthorized, serverError } from "@/lib/api";
 
 const createLeagueSchema = z.object({
@@ -61,8 +61,12 @@ export async function POST(request: Request) {
     // Generate invite code
     const invite_code = generateInviteCode();
 
+    // Use admin client to bypass RLS for these operations
+    // This avoids the "infinite recursion" error in the memberships policy
+    const adminClient = createAdminClient();
+
     // Create league
-    const { data: league, error: createError } = await supabase
+    const { data: league, error: createError } = await adminClient
       .from("leagues")
       .insert({
         name,
@@ -77,12 +81,18 @@ export async function POST(request: Request) {
       return serverError(createError.message);
     }
 
-    // Add creator as owner
-    await supabase.from("memberships").insert({
+    // Add creator as owner membership
+    const { error: membershipError } = await adminClient.from("memberships").insert({
       league_id: league.id,
       user_id: user.id,
       role: "owner",
     });
+
+    if (membershipError) {
+      // If membership fails, try to clean up the league
+      await adminClient.from("leagues").delete().eq("id", league.id);
+      return serverError(membershipError.message);
+    }
 
     return json({ league }, { status: 201 });
   } catch (error) {
