@@ -66,14 +66,14 @@ export async function POST(request: Request) {
     const adminClient = createAdminClient();
 
     // Create league
-    // Note: Database constraint expects capitalized day names (Monday/Sunday)
-    const stepweekCapitalized = stepweek_start.charAt(0).toUpperCase() + stepweek_start.slice(1);
+    // Database CHECK constraint requires 'mon' or 'sun' (lowercase 3-letter abbreviations)
+    const stepweekDb = stepweek_start === "monday" ? "mon" : "sun";
 
     const { data: league, error: createError } = await adminClient
       .from("leagues")
       .insert({
         name,
-        stepweek_start: stepweekCapitalized,
+        stepweek_start: stepweekDb,
         invite_code,
         owner_id: user.id,
       })
