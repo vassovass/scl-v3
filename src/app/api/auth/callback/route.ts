@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -10,6 +10,17 @@ export async function GET(request: Request) {
     const supabase = await createServerSupabaseClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      // Sync user to public.users table (required for foreign key constraints)
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const adminClient = createAdminClient();
+        await adminClient.from("users").upsert({
+          id: user.id,
+          display_name: user.user_metadata?.full_name || user.email?.split("@")[0] || null,
+          units: "metric",
+          is_superadmin: false,
+        }, { onConflict: "id" });
+      }
       return NextResponse.redirect(`${origin}${next}`);
     }
   }
