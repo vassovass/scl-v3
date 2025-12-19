@@ -65,6 +65,20 @@ export async function POST(request: Request) {
     // This avoids the "infinite recursion" error in the memberships policy
     const adminClient = createAdminClient();
 
+    // Ensure user exists in public.users table (required for owner_id foreign key)
+    // This handles cases where the user logged in via methods that didn't trigger the callback sync
+    const { error: userSyncError } = await adminClient.from("users").upsert({
+      id: user.id,
+      display_name: user.user_metadata?.full_name || user.email?.split("@")[0] || null,
+      units: "metric",
+      is_superadmin: false,
+    }, { onConflict: "id" });
+
+    if (userSyncError) {
+      console.error("Failed to sync user to public.users:", userSyncError);
+      return serverError("Failed to prepare user account. Please try again.");
+    }
+
     // Create league
     // Database CHECK constraint requires 'mon' or 'sun' (lowercase 3-letter abbreviations)
     const stepweekDb = stepweek_start === "monday" ? "mon" : "sun";
