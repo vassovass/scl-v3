@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
 import { json, badRequest, unauthorized, serverError, notFound } from "@/lib/api";
 
 const joinSchema = z.object({
@@ -25,8 +25,11 @@ export async function POST(request: Request) {
 
     const { invite_code } = parsed.data;
 
+    // Use admin client to bypass RLS infinite recursion
+    const adminClient = createAdminClient();
+
     // Find league
-    const { data: league, error: leagueError } = await supabase
+    const { data: league, error: leagueError } = await adminClient
       .from("leagues")
       .select("id, name")
       .eq("invite_code", invite_code.toUpperCase())
@@ -37,7 +40,7 @@ export async function POST(request: Request) {
     }
 
     // Check if already a member
-    const { data: existing } = await supabase
+    const { data: existing } = await adminClient
       .from("memberships")
       .select("league_id")
       .eq("league_id", league.id)
@@ -48,8 +51,21 @@ export async function POST(request: Request) {
       return badRequest("You are already a member of this league");
     }
 
+    // Ensure user exists in public.users table (required for foreign key)
+    const { error: userSyncError } = await adminClient.from("users").upsert({
+      id: user.id,
+      display_name: user.user_metadata?.full_name || user.email?.split("@")[0] || null,
+      units: "metric",
+      is_superadmin: false,
+    }, { onConflict: "id" });
+
+    if (userSyncError) {
+      console.error("Failed to sync user:", userSyncError);
+      return serverError("Failed to prepare user account. Please try again.");
+    }
+
     // Join league
-    const { error: joinError } = await supabase.from("memberships").insert({
+    const { error: joinError } = await adminClient.from("memberships").insert({
       league_id: league.id,
       user_id: user.id,
       role: "member",

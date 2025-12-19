@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { createClient } from "@/lib/supabase/client";
 
 interface League {
   id: string;
   name: string;
   invite_code: string;
   stepweek_start: string;
+  role?: string;
 }
 
 export default function LeaguePage() {
@@ -26,19 +26,22 @@ export default function LeaguePage() {
     if (!session) return;
 
     const fetchLeague = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from("leagues")
-        .select("id, name, invite_code, stepweek_start")
-        .eq("id", leagueId)
-        .single();
+      try {
+        // Use API route to avoid RLS issues
+        const response = await fetch(`/api/leagues/${leagueId}`);
+        if (!response.ok) {
+          console.error("Error fetching league:", response.statusText);
+          setLoading(false);
+          return;
+        }
 
-      if (error) {
+        const data = await response.json();
+        setLeague(data.league);
+      } catch (error) {
         console.error("Error fetching league:", error);
-      } else {
-        setLeague(data);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchLeague();

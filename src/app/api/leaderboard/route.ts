@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
 import { json, badRequest, unauthorized, forbidden, serverError } from "@/lib/api";
 
 const querySchema = z.object({
@@ -50,8 +50,11 @@ export async function GET(request: Request) {
       return unauthorized();
     }
 
+    // Use admin client to bypass RLS infinite recursion
+    const adminClient = createAdminClient();
+
     // Check membership
-    const { data: membership } = await supabase
+    const { data: membership } = await adminClient
       .from("memberships")
       .select("role")
       .eq("league_id", league_id)

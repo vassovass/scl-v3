@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { createClient } from "@/lib/supabase/client";
 import { Spinner } from "@/components/ui/Spinner";
 
 interface League {
@@ -27,28 +26,28 @@ export default function DashboardPage() {
     if (!session || !user) return;
 
     const fetchLeagues = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from("memberships")
-        .select("role, leagues(id, name)")
-        .eq("user_id", user.id);
+      try {
+        // Use API route to avoid RLS infinite recursion issues
+        const response = await fetch("/api/leagues");
+        if (!response.ok) {
+          console.error("Error fetching leagues:", response.statusText);
+          setLoading(false);
+          return;
+        }
 
-      if (error) {
-        console.error("Error fetching leagues:", error);
-        setLoading(false);
-        return;
-      }
-
-      const mapped = (data || [])
-        .filter((m: any) => m.leagues !== null)
-        .map((m: any) => ({
-          id: m.leagues.id,
-          name: m.leagues.name,
-          role: m.role,
+        const data = await response.json();
+        const mapped = (data.leagues || []).map((league: any) => ({
+          id: league.id,
+          name: league.name,
+          role: league.role,
         }));
 
-      setLeagues(mapped);
-      setLoading(false);
+        setLeagues(mapped);
+      } catch (error) {
+        console.error("Error fetching leagues:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchLeagues();

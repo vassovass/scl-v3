@@ -17,7 +17,10 @@ export async function GET() {
       return unauthorized();
     }
 
-    const { data, error } = await supabase
+    // Use admin client to bypass RLS infinite recursion in memberships policy
+    const adminClient = createAdminClient();
+
+    const { data, error } = await adminClient
       .from("memberships")
       .select("role, leagues(id, name, stepweek_start, invite_code, created_at)")
       .eq("user_id", user.id);
