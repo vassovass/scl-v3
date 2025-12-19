@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { createClient } from "@/lib/supabase/client";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface League {
   id: string;
@@ -15,6 +16,12 @@ export default function DashboardPage() {
   const { user, session, signOut } = useAuth();
   const [leagues, setLeagues] = useState<League[]>([]);
   const [loading, setLoading] = useState(true);
+  const [signingOut, setSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    await signOut();
+  };
 
   useEffect(() => {
     if (!session || !user) return;
@@ -58,10 +65,12 @@ export default function DashboardPage() {
           <div className="flex items-center gap-4">
             <span className="text-sm text-slate-400">{user?.email}</span>
             <button
-              onClick={signOut}
-              className="text-sm text-slate-400 hover:text-slate-200"
+              onClick={handleSignOut}
+              disabled={signingOut}
+              className="flex items-center gap-2 text-sm text-slate-400 hover:text-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
-              Sign out
+              {signingOut && <Spinner size="sm" />}
+              {signingOut ? "Signing out..." : "Sign out"}
             </button>
           </div>
         </div>

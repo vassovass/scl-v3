@@ -9,6 +9,7 @@ function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "/dashboard";
+  const signedOut = searchParams.get("signedOut") === "true";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -66,6 +67,13 @@ function SignInForm() {
       <p className="mt-2 text-center text-sm text-slate-400">
         Welcome back! Enter your credentials.
       </p>
+
+      {/* Success message after sign out */}
+      {signedOut && (
+        <div className="mt-6 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+          ✓ You&apos;ve been signed out successfully
+        </div>
+      )}
 
       {/* Google Sign In */}
       <button

@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { Session, User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 
@@ -8,12 +9,13 @@ interface AuthContextValue {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signOut: () => Promise<void>;
+  signOut: (redirectTo?: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,9 +39,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [supabase]);
 
-  const signOut = async () => {
+  const signOut = async (redirectTo = "/sign-in?signedOut=true") => {
     await supabase.auth.signOut();
     setSession(null);
+    router.push(redirectTo);
   };
 
   const value: AuthContextValue = {
@@ -59,3 +62,4 @@ export function useAuth(): AuthContextValue {
   }
   return context;
 }
+
