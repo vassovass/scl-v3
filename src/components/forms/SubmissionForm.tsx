@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import imageCompression from "browser-image-compression";
 import { apiRequest, ApiError } from "@/lib/api/client";
 
 interface SubmissionFormProps {
@@ -180,20 +181,30 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
             return;
         }
 
-        if (file.size > 5 * 1024 * 1024) {
-            setError("Screenshot must be 5 MB or less");
+        if (file.size > 20 * 1024 * 1024) { // Increased check limit since we compress
+            setError("File too large");
             return;
         }
 
         setSubmitting(true);
 
         try {
+            // Compress image if larger than 2MB
+            let fileToUpload = file;
+            if (file.size > 2 * 1024 * 1024) {
+                fileToUpload = await imageCompression(file, {
+                    maxSizeMB: 2,
+                    maxWidthOrHeight: 1920,
+                    useWebWorker: true,
+                });
+            }
+
             const signed = await apiRequest<SignUploadResponse>("proofs/sign-upload", {
                 method: "POST",
-                body: JSON.stringify({ content_type: file.type }),
+                body: JSON.stringify({ content_type: fileToUpload.type }),
             });
 
-            await uploadToSignedUrl(signed.upload_url, file);
+            await uploadToSignedUrl(signed.upload_url, fileToUpload);
 
             const stepsNumber = parseInt(steps, 10) || 0;
 

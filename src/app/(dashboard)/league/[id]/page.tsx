@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { SubmissionForm } from "@/components/forms/SubmissionForm";
+import { BatchSubmissionForm } from "@/components/forms/BatchSubmissionForm";
 
 interface League {
   id: string;
@@ -37,6 +38,7 @@ export default function LeaguePage() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [expandedSubmissionId, setExpandedSubmissionId] = useState<string | null>(null);
+  const [submissionMode, setSubmissionMode] = useState<"single" | "batch">("single");
 
   // Get dates for current week (last 7 days)
   const getWeekDates = () => {
@@ -187,13 +189,44 @@ export default function LeaguePage() {
 
         {/* Submit Steps Section */}
         <section className="mt-12">
-          <h2 className="text-xl font-semibold text-slate-100">Submit Today&apos;s Steps</h2>
-          <p className="mt-2 text-sm text-slate-400">
-            Upload a screenshot from your fitness app to verify your step count.
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-slate-100">Submit Today&apos;s Steps</h2>
+              <p className="mt-2 text-sm text-slate-400">
+                {submissionMode === "single"
+                  ? "Upload a screenshot to verify your step count."
+                  : "Upload multiple screenshots to auto-extract data."}
+              </p>
+            </div>
+
+            <div className="flex rounded-lg border border-slate-700 bg-slate-800 p-1">
+              <button
+                onClick={() => setSubmissionMode("single")}
+                className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${submissionMode === "single"
+                    ? "bg-sky-600 text-white shadow-sm"
+                    : "text-slate-400 hover:text-slate-200"
+                  }`}
+              >
+                Single Entry
+              </button>
+              <button
+                onClick={() => setSubmissionMode("batch")}
+                className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${submissionMode === "batch"
+                    ? "bg-sky-600 text-white shadow-sm"
+                    : "text-slate-400 hover:text-slate-200"
+                  }`}
+              >
+                Batch Upload
+              </button>
+            </div>
+          </div>
 
           <div className="mt-6">
-            <SubmissionForm leagueId={leagueId} onSubmitted={handleSubmissionComplete} />
+            {submissionMode === "single" ? (
+              <SubmissionForm leagueId={leagueId} onSubmitted={handleSubmissionComplete} />
+            ) : (
+              <BatchSubmissionForm leagueId={leagueId} onSubmitted={handleSubmissionComplete} />
+            )}
           </div>
         </section>
 
