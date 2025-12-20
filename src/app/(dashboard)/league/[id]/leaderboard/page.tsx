@@ -1,12 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { DatePicker } from "@/components/ui/DatePicker";
 
-type Period = "day" | "week" | "month" | "year" | "all" | "custom";
+type PeriodPreset =
+  | "today" | "yesterday"
+  | "this_week" | "last_week"
+  | "this_month" | "last_month"
+  | "last_7_days" | "last_30_days"
+  | "all_time" | "custom";
+
+type SortBy = "steps" | "improvement" | "average" | "streak";
 type VerifiedFilter = "all" | "verified" | "unverified";
 
 interface LeaderboardEntry {
@@ -14,14 +21,42 @@ interface LeaderboardEntry {
   user_id: string;
   display_name: string | null;
   total_steps: number;
-  verified_days?: number;
-  unverified_days?: number;
+  days_submitted: number;
+  average_per_day: number;
+  verified_days: number;
+  unverified_days: number;
+  streak: number;
+  period_b_steps: number | null;
+  improvement_pct: number | null;
+  badges: string[];
 }
 
 interface LeaderboardMeta {
   total_members: number;
   team_total_steps: number;
+  period_a: { start: string; end: string } | null;
+  period_b: { start: string; end: string } | null;
 }
+
+const PERIOD_OPTIONS: { value: PeriodPreset; label: string }[] = [
+  { value: "today", label: "Today" },
+  { value: "yesterday", label: "Yesterday" },
+  { value: "this_week", label: "This Week" },
+  { value: "last_week", label: "Last Week" },
+  { value: "this_month", label: "This Month" },
+  { value: "last_month", label: "Last Month" },
+  { value: "last_7_days", label: "Last 7 Days" },
+  { value: "last_30_days", label: "Last 30 Days" },
+  { value: "all_time", label: "All Time" },
+  { value: "custom", label: "Custom" },
+];
+
+const BADGE_INFO: Record<string, { icon: string; label: string; color: string }> = {
+  leader: { icon: "👑", label: "Leader", color: "text-yellow-400" },
+  most_improved: { icon: "🚀", label: "Most Improved", color: "text-emerald-400" },
+  streak_7: { icon: "🔥", label: "7+ Day Streak", color: "text-orange-400" },
+  streak_3: { icon: "🔥", label: "3+ Day Streak", color: "text-orange-300" },
+};
 
 export default function LeaderboardPage() {
   const params = useParams();
@@ -32,304 +67,292 @@ export default function LeaderboardPage() {
   const [meta, setMeta] = useState<LeaderboardMeta | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [period, setPeriod] = useState<Period>("day");
+
+  // Filters
+  const [period, setPeriod] = useState<PeriodPreset>("this_week");
+  const [periodB, setPeriodB] = useState<PeriodPreset | null>(null);
+  const [comparisonMode, setComparisonMode] = useState(false);
   const [verifiedFilter, setVerifiedFilter] = useState<VerifiedFilter>("all");
+  const [sortBy, setSortBy] = useState<SortBy>("steps");
 
-  // Custom date range
-  const [customStartDate, setCustomStartDate] = useState<string>("");
-  const [customEndDate, setCustomEndDate] = useState<string>("");
+  // Custom dates
+  const [customStartA, setCustomStartA] = useState("");
+  const [customEndA, setCustomEndA] = useState("");
+  const [customStartB, setCustomStartB] = useState("");
+  const [customEndB, setCustomEndB] = useState("");
 
-  // Calculate date range based on period
-  const getDateRange = (p: Period): string[] => {
-    const today = new Date();
-    const dates: string[] = [];
-
-    if (p === "day") {
-      dates.push(today.toISOString().split("T")[0]);
-    } else if (p === "week") {
-      for (let i = 0; i < 7; i++) {
-        const date = new Date(today);
-        date.setDate(today.getDate() - i);
-        dates.push(date.toISOString().split("T")[0]);
-      }
-    } else if (p === "month") {
-      for (let i = 0; i < 30; i++) {
-        const date = new Date(today);
-        date.setDate(today.getDate() - i);
-        dates.push(date.toISOString().split("T")[0]);
-      }
-    } else if (p === "year") {
-      for (let i = 0; i < 365; i++) {
-        const date = new Date(today);
-        date.setDate(today.getDate() - i);
-        dates.push(date.toISOString().split("T")[0]);
-      }
-    } else if (p === "all") {
-      return ["all"];
-    } else if (p === "custom") {
-      return ["custom"];
-    }
-
-    return dates;
-  };
-
-  useEffect(() => {
+  const fetchLeaderboard = useCallback(async () => {
     if (!session) return;
 
-    const fetchLeaderboard = async () => {
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
 
-      try {
-        const dates = getDateRange(period);
-        let url = `/api/leaderboard?league_id=${leagueId}&period=${period}&verified=${verifiedFilter}`;
+    try {
+      let url = `/api/leaderboard?league_id=${leagueId}&period=${period}&verified=${verifiedFilter}&sort_by=${sortBy}`;
 
-        if (period === "custom" && customStartDate && customEndDate) {
-          url += `&start_date=${customStartDate}&end_date=${customEndDate}`;
-        } else if (period !== "custom") {
-          url += `&dates=${dates.join(",")}`;
-        }
-
-        const res = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        });
-
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
-          const errorMsg = data.error || data.message || `Failed to load leaderboard (${res.status})`;
-          setError(errorMsg);
-          setEntries([]);
-          return;
-        }
-
-        const data = await res.json();
-        setEntries(data.leaderboard || []);
-        setMeta(data.meta || null);
-      } catch (err) {
-        console.error("Error fetching leaderboard:", err);
-        setError(err instanceof Error ? err.message : "Failed to load leaderboard");
-      } finally {
-        setLoading(false);
+      if (period === "custom" && customStartA && customEndA) {
+        url += `&start_date=${customStartA}&end_date=${customEndA}`;
       }
-    };
 
-    // Don't fetch if custom period but dates not set
-    if (period === "custom" && (!customStartDate || !customEndDate)) {
+      if (comparisonMode && periodB) {
+        url += `&period_b=${periodB}`;
+        if (periodB === "custom" && customStartB && customEndB) {
+          url += `&start_date_b=${customStartB}&end_date_b=${customEndB}`;
+        }
+      }
+
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || data.message || `Failed (${res.status})`);
+        return;
+      }
+
+      const data = await res.json();
+      setEntries(data.leaderboard || []);
+      setMeta(data.meta || null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load");
+    } finally {
+      setLoading(false);
+    }
+  }, [session, leagueId, period, periodB, verifiedFilter, sortBy, comparisonMode, customStartA, customEndA, customStartB, customEndB]);
+
+  useEffect(() => {
+    if (period === "custom" && (!customStartA || !customEndA)) {
       setLoading(false);
       return;
     }
-
     fetchLeaderboard();
-  }, [session, leagueId, period, verifiedFilter, customStartDate, customEndDate]);
+  }, [fetchLeaderboard, period, customStartA, customEndA]);
 
-  const getPeriodLabel = (p: Period) => {
-    switch (p) {
-      case "day": return "Today";
-      case "week": return "Week";
-      case "month": return "Month";
-      case "year": return "Year";
-      case "all": return "All Time";
-      case "custom": return "Custom";
-    }
-  };
-
-  const handlePeriodChange = (p: Period) => {
-    setPeriod(p);
-    if (p === "custom" && !customStartDate) {
-      // Set default custom range to last 7 days
-      const today = new Date();
-      const weekAgo = new Date(today);
-      weekAgo.setDate(today.getDate() - 7);
-      setCustomEndDate(today.toISOString().slice(0, 10));
-      setCustomStartDate(weekAgo.toISOString().slice(0, 10));
+  const toggleComparison = () => {
+    setComparisonMode(!comparisonMode);
+    if (!comparisonMode && !periodB) {
+      // Auto-select comparison period
+      if (period === "this_week") setPeriodB("last_week");
+      else if (period === "this_month") setPeriodB("last_month");
+      else setPeriodB("last_week");
     }
   };
 
   return (
     <div className="min-h-screen bg-slate-950">
-      {/* Page Title */}
+      {/* Header */}
       <div className="border-b border-slate-800 bg-slate-900/30">
         <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
           <h1 className="text-xl font-bold text-slate-50">Leaderboard</h1>
-          <Link
-            href={`/league/${leagueId}`}
-            className="text-sm text-slate-400 hover:text-slate-300"
-          >
+          <Link href={`/league/${leagueId}`} className="text-sm text-slate-400 hover:text-slate-300">
             ← Back to League
           </Link>
         </div>
       </div>
 
-      {/* Period Tabs */}
-      <div className="border-b border-slate-800">
-        <div className="mx-auto max-w-3xl px-6">
-          <div className="flex gap-1 overflow-x-auto">
-            {(["day", "week", "month", "year", "all", "custom"] as Period[]).map((p) => (
-              <button
-                key={p}
-                onClick={() => handlePeriodChange(p)}
-                className={`px-4 py-3 text-sm font-medium transition border-b-2 -mb-px whitespace-nowrap ${period === p
-                  ? "border-sky-500 text-sky-400"
-                  : "border-transparent text-slate-400 hover:text-slate-300"
-                  }`}
-              >
-                {getPeriodLabel(p)}
-              </button>
-            ))}
+      {/* Period Selection */}
+      <div className="border-b border-slate-800 bg-slate-900/20">
+        <div className="mx-auto max-w-3xl px-6 py-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="text-sm text-slate-400">Period:</label>
+            <select
+              value={period}
+              onChange={(e) => setPeriod(e.target.value as PeriodPreset)}
+              className="rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100"
+              style={{ colorScheme: "dark" }}
+            >
+              {PERIOD_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+
+            <button
+              onClick={toggleComparison}
+              className={`ml-auto px-3 py-1.5 text-sm rounded-md transition ${comparisonMode
+                  ? "bg-sky-600 text-white"
+                  : "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"
+                }`}
+            >
+              {comparisonMode ? "✓ Compare" : "Compare Periods"}
+            </button>
           </div>
+
+          {/* Custom Date Range A */}
+          {period === "custom" && (
+            <div className="mt-4 flex flex-wrap gap-4">
+              <DatePicker value={customStartA} onChange={setCustomStartA} label="From" max={customEndA || undefined} />
+              <DatePicker value={customEndA} onChange={setCustomEndA} label="To" min={customStartA} />
+            </div>
+          )}
+
+          {/* Comparison Period B */}
+          {comparisonMode && (
+            <div className="mt-4 pt-4 border-t border-slate-800">
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="text-sm text-slate-400">Compare to:</label>
+                <select
+                  value={periodB || ""}
+                  onChange={(e) => setPeriodB(e.target.value as PeriodPreset)}
+                  className="rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100"
+                  style={{ colorScheme: "dark" }}
+                >
+                  {PERIOD_OPTIONS.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
+              {periodB === "custom" && (
+                <div className="mt-4 flex flex-wrap gap-4">
+                  <DatePicker value={customStartB} onChange={setCustomStartB} label="From" max={customEndB || undefined} />
+                  <DatePicker value={customEndB} onChange={setCustomEndB} label="To" min={customStartB} />
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Custom Date Range */}
-      {period === "custom" && (
-        <div className="mx-auto max-w-3xl px-6 py-4 border-b border-slate-800">
-          <div className="flex flex-wrap items-end gap-4">
-            <div className="flex-1 min-w-[150px]">
-              <DatePicker
-                value={customStartDate}
-                onChange={setCustomStartDate}
-                label="From"
-                max={customEndDate || new Date().toISOString().slice(0, 10)}
-              />
-            </div>
-            <div className="flex-1 min-w-[150px]">
-              <DatePicker
-                value={customEndDate}
-                onChange={setCustomEndDate}
-                label="To"
-                min={customStartDate}
-                max={new Date().toISOString().slice(0, 10)}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Filters */}
-      <div className="mx-auto max-w-3xl px-6 py-4">
+      {/* Filters Row */}
+      <div className="mx-auto max-w-3xl px-6 py-4 flex flex-wrap items-center gap-4">
+        {/* Sort By */}
         <div className="flex items-center gap-2">
+          <span className="text-xs text-slate-500">Sort:</span>
+          {(["steps", "improvement", "average", "streak"] as SortBy[]).map(s => (
+            <button
+              key={s}
+              onClick={() => setSortBy(s)}
+              className={`px-2 py-1 text-xs rounded-md transition ${sortBy === s
+                  ? "bg-sky-600/20 text-sky-400 border border-sky-600"
+                  : "bg-slate-800 text-slate-400 border border-slate-700"
+                }`}
+            >
+              {s === "steps" ? "Steps" : s === "improvement" ? "Improvement %" : s === "average" ? "Daily Avg" : "Streak"}
+            </button>
+          ))}
+        </div>
+
+        {/* Verified Filter */}
+        <div className="flex items-center gap-2 ml-auto">
           <span className="text-xs text-slate-500">Show:</span>
-          {(["all", "verified", "unverified"] as VerifiedFilter[]).map((f) => (
+          {(["all", "verified", "unverified"] as VerifiedFilter[]).map(f => (
             <button
               key={f}
               onClick={() => setVerifiedFilter(f)}
-              className={`px-3 py-1 text-xs rounded-full transition ${verifiedFilter === f
-                ? "bg-sky-600/20 text-sky-400 border border-sky-600"
-                : "bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-600"
+              className={`px-2 py-1 text-xs rounded-md transition ${verifiedFilter === f
+                  ? "bg-emerald-600/20 text-emerald-400 border border-emerald-600"
+                  : "bg-slate-800 text-slate-400 border border-slate-700"
                 }`}
             >
-              {f === "all" ? "All" : f === "verified" ? "Verified Only" : "Unverified Only"}
+              {f === "all" ? "All" : f === "verified" ? "Verified" : "Unverified"}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Main */}
-      <div className="mx-auto max-w-3xl px-6 py-4">
-        {/* Stats Summary */}
-        {meta && entries.length > 0 && (
-          <div className="mb-6 grid grid-cols-2 gap-4">
-            <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-4 text-center">
-              <p className="text-2xl font-bold text-slate-100">
-                {meta.team_total_steps.toLocaleString()}
-              </p>
-              <p className="text-xs text-slate-400 mt-1">Total Team Steps</p>
+      {/* Stats Summary */}
+      {meta && entries.length > 0 && (
+        <div className="mx-auto max-w-3xl px-6 pb-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-3 text-center">
+              <p className="text-xl font-bold text-slate-100">{meta.team_total_steps.toLocaleString()}</p>
+              <p className="text-xs text-slate-500">Team Total</p>
             </div>
-            <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-4 text-center">
-              <p className="text-2xl font-bold text-slate-100">
-                {meta.total_members}
-              </p>
-              <p className="text-xs text-slate-400 mt-1">Active Members</p>
+            <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-3 text-center">
+              <p className="text-xl font-bold text-slate-100">{meta.total_members}</p>
+              <p className="text-xs text-slate-500">Members</p>
             </div>
+            {meta.period_a && (
+              <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-3 text-center col-span-2">
+                <p className="text-sm text-slate-300">{meta.period_a.start} → {meta.period_a.end}</p>
+                <p className="text-xs text-slate-500">Period</p>
+              </div>
+            )}
           </div>
-        )}
+        </div>
+      )}
 
+      {/* Main Table */}
+      <div className="mx-auto max-w-3xl px-6 py-4">
         {loading ? (
           <div className="text-center text-slate-400 py-12">Loading...</div>
         ) : error ? (
           <div className="rounded-xl border border-rose-800 bg-rose-900/20 p-6 text-center">
             <p className="text-rose-400">{error}</p>
-            <button
-              onClick={() => setPeriod(period)}
-              className="mt-4 text-sm text-slate-400 hover:text-slate-300"
-            >
-              Try again
-            </button>
-          </div>
-        ) : period === "custom" && (!customStartDate || !customEndDate) ? (
-          <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-12 text-center">
-            <p className="text-slate-400">Select a date range above to view the leaderboard.</p>
+            <button onClick={fetchLeaderboard} className="mt-4 text-sm text-slate-400 hover:text-slate-300">Try again</button>
           </div>
         ) : entries.length === 0 ? (
           <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-12 text-center">
             <p className="text-slate-400">No submissions for this period.</p>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-xl border border-slate-800">
-            <table className="w-full">
+          <div className="overflow-x-auto rounded-xl border border-slate-800">
+            <table className="w-full text-sm">
               <thead className="bg-slate-900">
                 <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-slate-400">
-                    Rank
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-slate-400">
-                    Name
-                  </th>
-                  <th className="px-4 py-3 text-right text-sm font-medium text-slate-400">
-                    Steps
-                  </th>
-                  {period !== "day" && (
-                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-400">
-                      Verified
-                    </th>
+                  <th className="px-3 py-3 text-left text-slate-400 font-medium">#</th>
+                  <th className="px-3 py-3 text-left text-slate-400 font-medium">Name</th>
+                  <th className="px-3 py-3 text-right text-slate-400 font-medium">Steps</th>
+                  {comparisonMode && (
+                    <>
+                      <th className="px-3 py-3 text-right text-slate-400 font-medium">Prev</th>
+                      <th className="px-3 py-3 text-right text-slate-400 font-medium">Δ%</th>
+                    </>
                   )}
+                  <th className="px-3 py-3 text-right text-slate-400 font-medium">Avg/Day</th>
+                  <th className="px-3 py-3 text-center text-slate-400 font-medium">🔥</th>
+                  <th className="px-3 py-3 text-center text-slate-400 font-medium">Badges</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
                 {entries.map((entry) => (
                   <tr
                     key={entry.user_id}
-                    className={`hover:bg-slate-900/50 ${entry.user_id === session?.user?.id ? "bg-sky-950/20" : ""
-                      }`}
+                    className={`hover:bg-slate-900/50 ${entry.user_id === session?.user?.id ? "bg-sky-950/20" : ""}`}
                   >
-                    <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${entry.rank === 1
-                          ? "bg-yellow-500/20 text-yellow-400"
-                          : entry.rank === 2
-                            ? "bg-slate-400/20 text-slate-300"
-                            : entry.rank === 3
-                              ? "bg-amber-600/20 text-amber-500"
-                              : "bg-slate-800 text-slate-400"
-                          }`}
-                      >
+                    <td className="px-3 py-3">
+                      <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${entry.rank === 1 ? "bg-yellow-500/20 text-yellow-400" :
+                          entry.rank === 2 ? "bg-slate-400/20 text-slate-300" :
+                            entry.rank === 3 ? "bg-amber-600/20 text-amber-500" :
+                              "bg-slate-800 text-slate-400"
+                        }`}>
                         {entry.rank}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
-                      <span className="text-slate-100">
-                        {entry.display_name || "Anonymous"}
-                      </span>
-                      {entry.user_id === session?.user?.id && (
-                        <span className="ml-2 text-xs text-sky-400">(You)</span>
-                      )}
+                    <td className="px-3 py-3">
+                      <span className="text-slate-100">{entry.display_name || "Anonymous"}</span>
+                      {entry.user_id === session?.user?.id && <span className="ml-1 text-xs text-sky-400">(You)</span>}
                     </td>
-                    <td className="px-4 py-3 text-right font-mono text-slate-100">
+                    <td className="px-3 py-3 text-right font-mono text-slate-100">
                       {entry.total_steps.toLocaleString()}
                     </td>
-                    {period !== "day" && (
-                      <td className="px-4 py-3 text-right">
-                        <span className="text-emerald-400">
-                          {entry.verified_days ?? 0}
-                        </span>
-                        <span className="text-slate-500">/</span>
-                        <span className="text-slate-400">
-                          {(entry.verified_days ?? 0) + (entry.unverified_days ?? 0)}
-                        </span>
-                      </td>
+                    {comparisonMode && (
+                      <>
+                        <td className="px-3 py-3 text-right font-mono text-slate-400">
+                          {entry.period_b_steps?.toLocaleString() ?? "—"}
+                        </td>
+                        <td className="px-3 py-3 text-right">
+                          {entry.improvement_pct !== null ? (
+                            <span className={entry.improvement_pct >= 0 ? "text-emerald-400" : "text-slate-500"}>
+                              {entry.improvement_pct >= 0 ? "+" : ""}{entry.improvement_pct}%
+                            </span>
+                          ) : "—"}
+                        </td>
+                      </>
                     )}
+                    <td className="px-3 py-3 text-right text-slate-400">
+                      {entry.average_per_day.toLocaleString()}
+                    </td>
+                    <td className="px-3 py-3 text-center">
+                      {entry.streak > 0 && <span className="text-orange-400">{entry.streak}</span>}
+                    </td>
+                    <td className="px-3 py-3 text-center">
+                      {entry.badges.map(badge => (
+                        <span key={badge} className={`mr-1 ${BADGE_INFO[badge]?.color || ""}`} title={BADGE_INFO[badge]?.label}>
+                          {BADGE_INFO[badge]?.icon || "🏅"}
+                        </span>
+                      ))}
+                    </td>
                   </tr>
                 ))}
               </tbody>
