@@ -165,11 +165,7 @@ export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFo
             }
         } catch (err) {
             updatedImage.status = "error";
-            updatedImage.error = err instanceof ApiError
-                ? `Error: ${err.status}`
-                : err instanceof Error
-                    ? err.message
-                    : "Unknown error";
+            updatedImage.error = err instanceof Error ? err.message : "Unknown error";
         }
 
         return updatedImage;
@@ -265,10 +261,10 @@ export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFo
                         <div
                             key={img.id}
                             className={`relative rounded-lg border overflow-hidden ${img.status === "error"
-                                    ? "border-rose-600"
-                                    : img.status === "success"
-                                        ? "border-emerald-600"
-                                        : "border-slate-700"
+                                ? "border-rose-600"
+                                : img.status === "success"
+                                    ? "border-emerald-600"
+                                    : "border-slate-700"
                                 }`}
                         >
                             <img

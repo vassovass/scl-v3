@@ -74,7 +74,7 @@ export async function POST(request: Request): Promise<Response> {
         }
 
         // Use extracted date or today's date
-        const forDate = extractedDate || new Date().toISOString().slice(0, 10);
+        const forDate = normalizeDate(extractedDate);
 
         // Create submission with extracted values
         const { data: submission, error: insertError } = await adminClient
@@ -124,4 +124,12 @@ export async function POST(request: Request): Promise<Response> {
         console.error("Batch submission error:", error);
         return serverError(error instanceof Error ? error.message : "Unknown error");
     }
+}
+
+function normalizeDate(dateStr: string | null | undefined): string {
+    if (!dateStr) return new Date().toISOString().slice(0, 10);
+    // Try to parse - handle variable formats if possible, or fallback to today
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return new Date().toISOString().slice(0, 10);
+    return d.toISOString().slice(0, 10);
 }

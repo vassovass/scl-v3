@@ -186,6 +186,30 @@ function evaluateVerdict({
     claimedDate: string;
     extraction: GeminiExtraction;
 }): EvaluationResult {
+    const isAutoExtract = claimedSteps === 0;
+
+    // For auto-extract, we accept whatever is extracted
+    if (isAutoExtract) {
+        const extractedSteps = extraction.steps ?? null;
+        const verified = extractedSteps != null && extractedSteps > 0;
+
+        const notes: string[] = [];
+        if (!verified) {
+            notes.push("Could not extract step count from screenshot.");
+        } else {
+            notes.push(`Auto-extracted ${extractedSteps} steps.`);
+        }
+
+        return {
+            verified,
+            tolerance: 0,
+            difference: 0,
+            notes: notes.join(" "),
+            extractedKm: extraction.km ?? null,
+            extractedCalories: extraction.calories ?? null,
+        };
+    }
+
     const tolerance = Math.max(Math.round(claimedSteps * 0.03), 300);
     const extractedSteps = extraction.steps ?? null;
     const difference = extractedSteps != null ? Math.abs(extractedSteps - claimedSteps) : null;
