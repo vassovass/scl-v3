@@ -222,10 +222,18 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                     onSubmitted();
                 }
             } else {
+                // Verification failed or returned no result - set up retry
+                // This handles cases where Edge Function failed, timed out, or returned an error
                 setStatus("Submission saved! Verification in progress...");
-                if (onSubmitted) {
-                    onSubmitted();
-                }
+                setPendingVerification({
+                    submissionId: response.submission.id,
+                    leagueId,
+                    steps,
+                    forDate: date,
+                    proofPath: signed.path,
+                    retryAt: Date.now() + 3000, // Retry after 3 seconds
+                    attempts: 0,
+                });
             }
         } catch (err) {
             if (err instanceof ApiError) {
@@ -304,7 +312,23 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                 )}
             </div>
 
-            {error && <p className="text-sm text-rose-400">{error}</p>}
+            {error && (
+                <div className="rounded-md border border-rose-700 bg-rose-900/30 p-3">
+                    <div className="flex items-start justify-between gap-2">
+                        <p className="text-sm text-rose-400 break-all whitespace-pre-wrap font-mono">{error}</p>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                navigator.clipboard.writeText(error);
+                            }}
+                            className="shrink-0 rounded px-2 py-1 text-xs text-rose-400 hover:bg-rose-800/50 transition"
+                            title="Copy error message"
+                        >
+                            Copy
+                        </button>
+                    </div>
+                </div>
+            )}
             {status && <p className="text-sm text-sky-400">{status}</p>}
 
             {/* Pending verification status */}
