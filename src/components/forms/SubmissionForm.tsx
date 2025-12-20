@@ -191,12 +191,12 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
 
             // Check if verification was rate limited or failed
             if (response.verification_error) {
-                const { error, message, retry_after, should_retry } = response.verification_error;
+                const { error, message, retry_after } = response.verification_error;
 
                 if (error === "rate_limited" || retry_after) {
-                    const waitTime = retry_after ?? 10;
+                    const waitTime = retry_after ?? 60;
 
-                    // UX: Always show confirm for rate limits now, so user can skip immediately
+                    // UX: Always show confirm dialog for rate limits - user can skip immediately
                     setEstimatedWaitSeconds(waitTime);
                     setShowWaitConfirm(true);
                     setPendingVerification({
@@ -208,16 +208,12 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                         retryAt: Date.now() + waitTime * 1000,
                         attempts: 0,
                     });
-
-                    if (error === "rate_limited") {
-                        setStatus(`Rate limited. Waiting ${waitTime}s...`);
-                    }
+                    // Don't set status here - the dialog is the feedback
                 } else {
-                    // Permanent error or non-rate-limit error (e.g. step mismatch, bad image)
+                    // Permanent error (e.g. internal error, bad image)
                     setPendingVerification(null);
-                    // Use the detailed message from the backend
                     setError(`Verification Failed: ${message}`);
-                    setStatus("Submission saved as Pending (Manual Review Required)");
+                    setStatus("Submission saved but not verified.");
                 }
             } else if (response.verification?.verified !== undefined) {
                 setStatus(response.verification.verified
