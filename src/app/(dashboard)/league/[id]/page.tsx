@@ -79,17 +79,12 @@ export default function LeaguePage() {
 
   return (
     <div className="min-h-screen bg-slate-950">
-      {/* Header */}
-      <header className="border-b border-slate-800 bg-slate-900/50">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="text-slate-400 hover:text-slate-200">
-              ← Back
-            </Link>
-            <h1 className="text-xl font-bold text-slate-50">{league.name}</h1>
-          </div>
+      {/* Page Title */}
+      <div className="border-b border-slate-800 bg-slate-900/30">
+        <div className="mx-auto max-w-5xl px-6 py-4">
+          <h1 className="text-xl font-bold text-slate-50">{league.name}</h1>
         </div>
-      </header>
+      </div>
 
       {/* Main */}
       <main className="mx-auto max-w-5xl px-6 py-12">

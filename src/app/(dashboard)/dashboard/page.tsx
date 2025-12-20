@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { Spinner } from "@/components/ui/Spinner";
 
 interface League {
   id: string;
@@ -12,15 +11,9 @@ interface League {
 }
 
 export default function DashboardPage() {
-  const { user, session, signOut } = useAuth();
+  const { user, session } = useAuth();
   const [leagues, setLeagues] = useState<League[]>([]);
   const [loading, setLoading] = useState(true);
-  const [signingOut, setSigningOut] = useState(false);
-
-  const handleSignOut = async () => {
-    setSigningOut(true);
-    await signOut();
-  };
 
   useEffect(() => {
     if (!session || !user) return;
@@ -55,28 +48,8 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-950">
-      {/* Header */}
-      <header className="border-b border-slate-800 bg-slate-900/50">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <Link href="/dashboard" className="text-xl font-bold text-slate-50">
-            Step<span className="text-sky-500">Count</span>League
-          </Link>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-slate-400">{user?.email}</span>
-            <button
-              onClick={handleSignOut}
-              disabled={signingOut}
-              className="flex items-center gap-2 text-sm text-slate-400 hover:text-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition"
-            >
-              {signingOut && <Spinner size="sm" />}
-              {signingOut ? "Signing out..." : "Sign out"}
-            </button>
-          </div>
-        </div>
-      </header>
-
       {/* Main content */}
-      <main className="mx-auto max-w-5xl px-6 py-12">
+      <div className="mx-auto max-w-5xl px-6 py-12">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-slate-50">Your Leagues</h1>
           <div className="flex gap-3">
@@ -120,7 +93,7 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }

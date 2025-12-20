@@ -47,18 +47,15 @@ export default function JoinLeaguePage() {
 
   return (
     <div className="min-h-screen bg-slate-950">
-      {/* Header */}
-      <header className="border-b border-slate-800 bg-slate-900/50">
-        <div className="mx-auto flex max-w-5xl items-center gap-4 px-6 py-4">
-          <Link href="/dashboard" className="text-slate-400 hover:text-slate-200">
-            ← Back
-          </Link>
+      {/* Page Title */}
+      <div className="border-b border-slate-800 bg-slate-900/30">
+        <div className="mx-auto max-w-5xl px-6 py-4">
           <h1 className="text-xl font-bold text-slate-50">Join a League</h1>
         </div>
-      </header>
+      </div>
 
       {/* Main */}
-      <main className="mx-auto max-w-md px-6 py-12">
+      <div className="mx-auto max-w-md px-6 py-12">
         <p className="text-center text-slate-400">
           Enter the invite code shared by your league admin.
         </p>
@@ -94,7 +91,7 @@ export default function JoinLeaguePage() {
             {loading ? "Joining..." : "Join League"}
           </button>
         </form>
-      </main>
+      </div>
     </div>
   );
 }

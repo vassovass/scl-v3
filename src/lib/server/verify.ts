@@ -18,7 +18,8 @@ export type VerificationResult = {
     data: unknown;
 };
 
-const VERIFY_FUNCTION_NAME = process.env.VERIFY_FUNCTION_NAME ?? "verify-steps";
+// Default to "verify" to match the Supabase Edge Function deployed from SCL v2
+const VERIFY_FUNCTION_NAME = process.env.VERIFY_FUNCTION_NAME ?? "verify";
 const VERIFY_TIMEOUT_MS = parseInt(process.env.VERIFY_TIMEOUT_MS ?? "30000", 10);
 
 function getSupabaseFunctionUrl(functionName: string): string {

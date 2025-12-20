@@ -52,18 +52,15 @@ export default function LeaderboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-950">
-      {/* Header */}
-      <header className="border-b border-slate-800 bg-slate-900/50">
-        <div className="mx-auto flex max-w-5xl items-center gap-4 px-6 py-4">
-          <Link href={`/league/${leagueId}`} className="text-slate-400 hover:text-slate-200">
-            ← Back
-          </Link>
+      {/* Page Title */}
+      <div className="border-b border-slate-800 bg-slate-900/30">
+        <div className="mx-auto max-w-5xl px-6 py-4">
           <h1 className="text-xl font-bold text-slate-50">Leaderboard</h1>
         </div>
-      </header>
+      </div>
 
       {/* Main */}
-      <main className="mx-auto max-w-3xl px-6 py-12">
+      <div className="mx-auto max-w-3xl px-6 py-12">
         {loading ? (
           <div className="text-center text-slate-400">Loading...</div>
         ) : entries.length === 0 ? (
@@ -91,15 +88,14 @@ export default function LeaderboardPage() {
                   <tr key={entry.user_id} className="hover:bg-slate-900/50">
                     <td className="px-4 py-3">
                       <span
-                        className={`inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
-                          entry.rank === 1
-                            ? "bg-yellow-500/20 text-yellow-400"
-                            : entry.rank === 2
+                        className={`inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${entry.rank === 1
+                          ? "bg-yellow-500/20 text-yellow-400"
+                          : entry.rank === 2
                             ? "bg-slate-400/20 text-slate-300"
                             : entry.rank === 3
-                            ? "bg-amber-600/20 text-amber-500"
-                            : "bg-slate-800 text-slate-400"
-                        }`}
+                              ? "bg-amber-600/20 text-amber-500"
+                              : "bg-slate-800 text-slate-400"
+                          }`}
                       >
                         {entry.rank}
                       </span>
@@ -116,7 +112,7 @@ export default function LeaderboardPage() {
             </table>
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }

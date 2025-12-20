@@ -79,25 +79,8 @@ export default function CreateLeaguePage() {
 
     return (
         <div className="min-h-screen bg-slate-950">
-            {/* Header */}
-            <header className="border-b border-slate-800 bg-slate-900/50">
-                <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-                    <div className="flex items-center gap-4">
-                        <Link
-                            href="/dashboard"
-                            className="text-slate-400 hover:text-slate-200 transition"
-                        >
-                            ← Back
-                        </Link>
-                        <Link href="/dashboard" className="text-xl font-bold text-slate-50">
-                            Step<span className="text-sky-500">Count</span>League
-                        </Link>
-                    </div>
-                </div>
-            </header>
-
             {/* Main */}
-            <main className="mx-auto max-w-lg px-6 py-12">
+            <div className="mx-auto max-w-lg px-6 py-12">
                 <div className="text-center">
                     <h1 className="text-2xl font-bold text-slate-50">Create a New League</h1>
                     <p className="mt-2 text-slate-400">
@@ -215,7 +198,7 @@ export default function CreateLeaguePage() {
                         Once created, you&apos;ll get an invite code to share with friends
                     </p>
                 </form>
-            </main>
+            </div>
         </div>
     );
 }
