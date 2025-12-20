@@ -33,11 +33,19 @@ export async function callVerificationFunction(payload: VerificationPayload): Pr
     const timeout = setTimeout(() => abortController.abort(), VERIFY_TIMEOUT_MS);
 
     try {
-        const response = await fetch(getSupabaseFunctionUrl(VERIFY_FUNCTION_NAME), {
+        const functionUrl = getSupabaseFunctionUrl(VERIFY_FUNCTION_NAME);
+        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+        if (!serviceRoleKey) {
+            console.error("SUPABASE_SERVICE_ROLE_KEY is not configured");
+            return { status: 500, ok: false, data: { error: "server_misconfigured", message: "Service role key not configured" } };
+        }
+
+        const response = await fetch(functionUrl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+                Authorization: `Bearer ${serviceRoleKey}`,
                 ...(payload.token ? { "X-Client-Authorization": `Bearer ${payload.token}` } : {}),
             },
             body: JSON.stringify(payload),
@@ -48,9 +56,12 @@ export async function callVerificationFunction(payload: VerificationPayload): Pr
         return { status: response.status, ok: response.ok, data };
     } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
-            return { status: 504, ok: false, data: { error: "verification_timeout" } };
+            return { status: 504, ok: false, data: { error: "verification_timeout", message: "Verification request timed out" } };
         }
-        throw error;
+        // Return structured error instead of throwing
+        const errorMessage = error instanceof Error ? error.message : "Unknown fetch error";
+        console.error("Verification function fetch error:", errorMessage);
+        return { status: 502, ok: false, data: { error: "edge_function_unreachable", message: errorMessage } };
     } finally {
         clearTimeout(timeout);
     }
