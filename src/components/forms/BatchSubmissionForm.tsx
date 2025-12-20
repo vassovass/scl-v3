@@ -13,7 +13,7 @@ interface ImageFile {
     id: string;
     file: File;
     preview: string;
-    status: "pending" | "compressing" | "uploading" | "verifying" | "success" | "error";
+    status: "pending" | "extracting" | "review" | "submitting" | "success" | "error";
     error?: string;
     extractedData?: {
         steps?: number;
@@ -21,11 +21,23 @@ interface ImageFile {
         km?: number;
         calories?: number;
     };
+    // User-edited values (override AI extraction)
+    editedSteps?: number;
+    editedDate?: string;
+    proofPath?: string; // Stored after upload
+    submissionId?: string;
 }
 
 interface SignUploadResponse {
     upload_url: string;
     path: string;
+}
+
+interface ExtractResponse {
+    extracted_steps?: number;
+    extracted_date?: string;
+    extracted_km?: number;
+    extracted_calories?: number;
 }
 
 interface SubmissionResponse {
@@ -37,9 +49,6 @@ interface SubmissionResponse {
         verified: boolean;
         extracted_steps?: number | null;
         extracted_date?: string | null;
-        extracted_km?: number | null;
-        extracted_calories?: number | null;
-        notes?: string;
     };
     verification_error?: {
         error: string;
@@ -61,6 +70,7 @@ export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFo
     const [images, setImages] = useState<ImageFile[]>([]);
     const [processing, setProcessing] = useState(false);
     const [overallStatus, setOverallStatus] = useState<string | null>(null);
+    const [previewImage, setPreviewImage] = useState<string | null>(null); // For modal
 
     const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -89,7 +99,7 @@ export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFo
         }
 
         setImages((prev) => [...prev, ...newImages]);
-        event.target.value = ""; // Reset input for re-selection
+        event.target.value = "";
     }, [images.length]);
 
     const removeImage = useCallback((id: string) => {
@@ -109,94 +119,146 @@ export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFo
         return await imageCompression(file, compressionOptions);
     };
 
-    const processImage = async (image: ImageFile): Promise<ImageFile> => {
-        let updatedImage = { ...image };
-
-        try {
-            // Step 1: Compress if needed
-            updatedImage.status = "compressing";
-            const compressedFile = await compressImage(image.file);
-            updatedImage.file = compressedFile;
-
-            // Step 2: Upload
-            updatedImage.status = "uploading";
-            const signed = await apiRequest<SignUploadResponse>("proofs/sign-upload", {
-                method: "POST",
-                body: JSON.stringify({ content_type: compressedFile.type }),
-            });
-
-            await fetch(signed.upload_url, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": compressedFile.type,
-                    "x-upsert": "true",
-                },
-                body: compressedFile,
-            });
-
-            // Step 3: Submit with auto-extraction (no steps/date needed from user)
-            updatedImage.status = "verifying";
-            const response = await apiRequest<SubmissionResponse>("submissions/batch", {
-                method: "POST",
-                body: JSON.stringify({
-                    league_id: leagueId,
-                    proof_path: signed.path,
-                    auto_extract: true,
-                }),
-            });
-
-            if (response.verification?.verified) {
-                updatedImage.status = "success";
-                updatedImage.extractedData = {
-                    steps: response.verification.extracted_steps ?? undefined,
-                    date: response.verification.extracted_date ?? undefined,
-                    km: response.verification.extracted_km ?? undefined,
-                    calories: response.verification.extracted_calories ?? undefined,
-                };
-            } else if (response.verification_error) {
-                updatedImage.status = "error";
-                updatedImage.error = response.verification_error.message;
-            } else {
-                updatedImage.status = "success";
-                updatedImage.extractedData = {
-                    steps: response.verification?.extracted_steps ?? undefined,
-                    date: response.verification?.extracted_date ?? undefined,
-                };
-            }
-        } catch (err) {
-            updatedImage.status = "error";
-            updatedImage.error = err instanceof Error ? err.message : "Unknown error";
-        }
-
-        return updatedImage;
-    };
-
-    const handleSubmitAll = async () => {
+    // Step 1: Extract data from all images (upload + AI extraction only, no submission yet)
+    const handleExtractAll = async () => {
         if (images.length === 0) return;
 
         setProcessing(true);
-        setOverallStatus("Processing images...");
+        setOverallStatus("Extracting data from images...");
 
-        // Process images sequentially to avoid rate limits
-        const results: ImageFile[] = [];
         for (let i = 0; i < images.length; i++) {
-            setOverallStatus(`Processing image ${i + 1} of ${images.length}...`);
-            const result = await processImage(images[i]);
-            results.push(result);
+            const image = images[i];
+            if (image.status !== "pending") continue;
 
-            // Update UI after each image
-            setImages((prev) =>
-                prev.map((img) => img.id === result.id ? result : img)
-            );
+            setOverallStatus(`Extracting image ${i + 1} of ${images.length}...`);
 
-            // Small delay between images to avoid overwhelming the API
+            try {
+                // Compress
+                const compressedFile = await compressImage(image.file);
+
+                // Upload
+                const signed = await apiRequest<SignUploadResponse>("proofs/sign-upload", {
+                    method: "POST",
+                    body: JSON.stringify({ content_type: compressedFile.type }),
+                });
+
+                await fetch(signed.upload_url, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": compressedFile.type,
+                        "x-upsert": "true",
+                    },
+                    body: compressedFile,
+                });
+
+                // Extract data only (no submission)
+                const extractResponse = await apiRequest<ExtractResponse>("submissions/extract", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        league_id: leagueId,
+                        proof_path: signed.path,
+                    }),
+                });
+
+                setImages((prev) =>
+                    prev.map((img) =>
+                        img.id === image.id
+                            ? {
+                                ...img,
+                                status: "review",
+                                proofPath: signed.path,
+                                extractedData: {
+                                    steps: extractResponse.extracted_steps,
+                                    date: extractResponse.extracted_date,
+                                    km: extractResponse.extracted_km,
+                                    calories: extractResponse.extracted_calories,
+                                },
+                                editedSteps: extractResponse.extracted_steps,
+                                editedDate: extractResponse.extracted_date,
+                            }
+                            : img
+                    )
+                );
+            } catch (err) {
+                setImages((prev) =>
+                    prev.map((img) =>
+                        img.id === image.id
+                            ? {
+                                ...img,
+                                status: "error",
+                                error: err instanceof Error ? err.message : "Extraction failed",
+                            }
+                            : img
+                    )
+                );
+            }
+
+            // Small delay
             if (i < images.length - 1) {
-                await new Promise((resolve) => setTimeout(resolve, 500));
+                await new Promise((resolve) => setTimeout(resolve, 300));
             }
         }
 
-        const successCount = results.filter((r) => r.status === "success").length;
-        const errorCount = results.filter((r) => r.status === "error").length;
+        setOverallStatus("Review extracted data and submit when ready");
+        setProcessing(false);
+    };
+
+    // Step 2: Submit reviewed images
+    const handleSubmitReviewed = async () => {
+        const reviewedImages = images.filter((i) => i.status === "review");
+        if (reviewedImages.length === 0) return;
+
+        setProcessing(true);
+        let successCount = 0;
+        let errorCount = 0;
+
+        for (let i = 0; i < reviewedImages.length; i++) {
+            const image = reviewedImages[i];
+            setOverallStatus(`Submitting ${i + 1} of ${reviewedImages.length}...`);
+
+            try {
+                const response = await apiRequest<SubmissionResponse>("submissions/batch", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        league_id: leagueId,
+                        proof_path: image.proofPath,
+                        steps: image.editedSteps,
+                        date: image.editedDate,
+                        overwrite: true, // Allow overwriting if date already exists
+                    }),
+                });
+
+                setImages((prev) =>
+                    prev.map((img) =>
+                        img.id === image.id
+                            ? {
+                                ...img,
+                                status: "success",
+                                submissionId: response.submission.id,
+                            }
+                            : img
+                    )
+                );
+                successCount++;
+            } catch (err) {
+                setImages((prev) =>
+                    prev.map((img) =>
+                        img.id === image.id
+                            ? {
+                                ...img,
+                                status: "error",
+                                error: err instanceof Error ? err.message : "Submission failed",
+                            }
+                            : img
+                    )
+                );
+                errorCount++;
+            }
+
+            if (i < reviewedImages.length - 1) {
+                await new Promise((resolve) => setTimeout(resolve, 300));
+            }
+        }
 
         setOverallStatus(`Completed: ${successCount} successful, ${errorCount} failed`);
         setProcessing(false);
@@ -206,27 +268,43 @@ export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFo
         }
     };
 
-    const getStatusIcon = (status: ImageFile["status"]) => {
+    const updateEditedValue = (id: string, field: "editedSteps" | "editedDate", value: string) => {
+        setImages((prev) =>
+            prev.map((img) =>
+                img.id === id
+                    ? {
+                        ...img,
+                        [field]: field === "editedSteps" ? parseInt(value, 10) || 0 : value,
+                    }
+                    : img
+            )
+        );
+    };
+
+    const getStatusColor = (status: ImageFile["status"]) => {
         switch (status) {
-            case "pending": return "⏳";
-            case "compressing": return "🗜️";
-            case "uploading": return "⬆️";
-            case "verifying": return "🔍";
-            case "success": return "✅";
-            case "error": return "❌";
+            case "pending": return "border-slate-700";
+            case "extracting": return "border-amber-600";
+            case "review": return "border-sky-600";
+            case "submitting": return "border-amber-600";
+            case "success": return "border-emerald-600";
+            case "error": return "border-rose-600";
         }
     };
 
     const getStatusText = (status: ImageFile["status"]) => {
         switch (status) {
             case "pending": return "Ready";
-            case "compressing": return "Compressing...";
-            case "uploading": return "Uploading...";
-            case "verifying": return "Verifying...";
+            case "extracting": return "Extracting...";
+            case "review": return "Review";
+            case "submitting": return "Submitting...";
             case "success": return "Success";
             case "error": return "Failed";
         }
     };
+
+    const pendingCount = images.filter((i) => i.status === "pending").length;
+    const reviewCount = images.filter((i) => i.status === "review").length;
 
     return (
         <div className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/60 p-4 shadow-lg">
@@ -250,37 +328,34 @@ export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFo
                     className="text-sm text-slate-300 file:mr-3 file:rounded-md file:border-0 file:bg-sky-600 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-sky-500 disabled:opacity-50"
                 />
                 <p className="text-xs text-slate-500">
-                    Images will be auto-compressed to {MAX_FILE_SIZE_MB}MB. AI will extract date and steps.
+                    Images will be auto-compressed. AI extracts date and steps - you can review and edit before submitting.
                 </p>
             </div>
 
-            {/* Image Preview Grid */}
+            {/* Image Grid */}
             {images.length > 0 && (
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {images.map((img) => (
                         <div
                             key={img.id}
-                            className={`relative rounded-lg border overflow-hidden ${img.status === "error"
-                                ? "border-rose-600"
-                                : img.status === "success"
-                                    ? "border-emerald-600"
-                                    : "border-slate-700"
-                                }`}
+                            className={`relative rounded-lg border-2 overflow-hidden ${getStatusColor(img.status)}`}
                         >
-                            <img
-                                src={img.preview}
-                                alt="Preview"
-                                className="h-24 w-full object-cover"
-                            />
-
-                            {/* Status overlay */}
-                            <div className={`absolute inset-0 flex items-center justify-center bg-black/50 ${img.status === "pending" ? "opacity-0" : "opacity-100"
-                                } transition-opacity`}>
-                                <span className="text-lg">{getStatusIcon(img.status)}</span>
-                            </div>
+                            {/* Clickable Image Preview */}
+                            <button
+                                type="button"
+                                onClick={() => setPreviewImage(img.preview)}
+                                className="w-full h-32 overflow-hidden cursor-zoom-in"
+                                title="Click to expand"
+                            >
+                                <img
+                                    src={img.preview}
+                                    alt="Preview"
+                                    className="h-full w-full object-cover hover:opacity-80 transition-opacity"
+                                />
+                            </button>
 
                             {/* Remove button */}
-                            {!processing && img.status === "pending" && (
+                            {!processing && (img.status === "pending" || img.status === "review") && (
                                 <button
                                     onClick={() => removeImage(img.id)}
                                     className="absolute right-1 top-1 rounded-full bg-rose-600 p-1 text-xs text-white hover:bg-rose-500"
@@ -290,21 +365,63 @@ export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFo
                                 </button>
                             )}
 
-                            {/* Status text */}
-                            <div className="bg-slate-800 px-2 py-1 text-center">
-                                <p className="text-xs text-slate-400 truncate">
-                                    {getStatusText(img.status)}
-                                </p>
-                                {img.extractedData?.steps && (
-                                    <p className="text-xs text-emerald-400 font-medium">
-                                        {img.extractedData.steps.toLocaleString()} steps
+                            {/* Status & Data */}
+                            <div className="bg-slate-800 p-2 space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <span className={`text-xs font-medium ${img.status === "success" ? "text-emerald-400" :
+                                            img.status === "error" ? "text-rose-400" :
+                                                img.status === "review" ? "text-sky-400" :
+                                                    "text-slate-400"
+                                        }`}>
+                                        {getStatusText(img.status)}
+                                    </span>
+                                    <span className="text-xs text-slate-500">
+                                        Click image to expand
+                                    </span>
+                                </div>
+
+                                {/* Editable fields (only in review state) */}
+                                {img.status === "review" && (
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-2">
+                                            <label className="text-xs text-slate-400 w-12">Date:</label>
+                                            <input
+                                                type="date"
+                                                value={img.editedDate || ""}
+                                                onChange={(e) => updateEditedValue(img.id, "editedDate", e.target.value)}
+                                                className="flex-1 rounded border border-slate-600 bg-slate-900 px-2 py-1 text-xs text-slate-200"
+                                            />
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <label className="text-xs text-slate-400 w-12">Steps:</label>
+                                            <input
+                                                type="number"
+                                                value={img.editedSteps || ""}
+                                                onChange={(e) => updateEditedValue(img.id, "editedSteps", e.target.value)}
+                                                className="flex-1 rounded border border-slate-600 bg-slate-900 px-2 py-1 text-xs text-slate-200"
+                                            />
+                                        </div>
+                                        {img.extractedData?.steps !== img.editedSteps && (
+                                            <p className="text-xs text-amber-400">
+                                                AI detected: {img.extractedData?.steps?.toLocaleString()} steps
+                                            </p>
+                                        )}
+                                        {img.extractedData?.date !== img.editedDate && (
+                                            <p className="text-xs text-amber-400">
+                                                AI detected: {img.extractedData?.date}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Success display */}
+                                {img.status === "success" && img.editedSteps && (
+                                    <p className="text-xs text-emerald-400">
+                                        {img.editedSteps.toLocaleString()} steps on {img.editedDate}
                                     </p>
                                 )}
-                                {img.extractedData?.date && (
-                                    <p className="text-xs text-slate-500">
-                                        {img.extractedData.date}
-                                    </p>
-                                )}
+
+                                {/* Error display */}
                                 {img.error && (
                                     <p className="text-xs text-rose-400 truncate" title={img.error}>
                                         {img.error}
@@ -321,14 +438,50 @@ export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFo
                 <p className="text-sm text-sky-400">{overallStatus}</p>
             )}
 
-            {/* Submit Button */}
-            <button
-                onClick={handleSubmitAll}
-                disabled={processing || images.length === 0 || images.every((i) => i.status !== "pending")}
-                className="w-full rounded-md bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-                {processing ? "Processing..." : `Submit ${images.filter((i) => i.status === "pending").length} Image${images.filter((i) => i.status === "pending").length !== 1 ? "s" : ""}`}
-            </button>
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+                {pendingCount > 0 && (
+                    <button
+                        onClick={handleExtractAll}
+                        disabled={processing}
+                        className="flex-1 rounded-md bg-amber-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        {processing ? "Extracting..." : `Extract Data (${pendingCount} image${pendingCount !== 1 ? "s" : ""})`}
+                    </button>
+                )}
+
+                {reviewCount > 0 && (
+                    <button
+                        onClick={handleSubmitReviewed}
+                        disabled={processing}
+                        className="flex-1 rounded-md bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        {processing ? "Submitting..." : `Submit (${reviewCount} image${reviewCount !== 1 ? "s" : ""})`}
+                    </button>
+                )}
+            </div>
+
+            {/* Image Preview Modal */}
+            {previewImage && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+                    onClick={() => setPreviewImage(null)}
+                >
+                    <div className="relative max-h-[90vh] max-w-[90vw]">
+                        <img
+                            src={previewImage}
+                            alt="Full preview"
+                            className="max-h-[90vh] max-w-[90vw] object-contain rounded-lg"
+                        />
+                        <button
+                            onClick={() => setPreviewImage(null)}
+                            className="absolute -top-2 -right-2 rounded-full bg-slate-800 p-2 text-white hover:bg-slate-700"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
