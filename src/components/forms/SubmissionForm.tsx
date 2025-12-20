@@ -64,6 +64,9 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
     const [date, setDate] = useState<string>(new Date().toISOString().slice(0, 10));
     const [steps, setSteps] = useState<string>("");
     const [partial, setPartial] = useState<boolean>(false);
+    const [flagged, setFlagged] = useState<boolean>(false);
+    const [flagReason, setFlagReason] = useState<string>("");
+    const [overwrite, setOverwrite] = useState<boolean>(false);
     const [file, setFile] = useState<File | null>(null);
     const [status, setStatus] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -72,6 +75,13 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
     const [estimatedWaitSeconds, setEstimatedWaitSeconds] = useState(0);
     const [showWaitConfirm, setShowWaitConfirm] = useState(false);
     const [verificationDetails, setVerificationDetails] = useState<VerificationDetails | null>(null);
+
+    // Reset overwrite flag when error clears
+    useEffect(() => {
+        if (!error) {
+            setOverwrite(false);
+        }
+    }, [error]);
 
     // Process pending verification with retry logic
     useEffect(() => {
@@ -82,10 +92,9 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
             const waitMs = pendingVerification.retryAt - now;
 
             if (waitMs > 0) {
-                // Update countdown
                 setEstimatedWaitSeconds(Math.ceil(waitMs / 1000));
                 const timer = setTimeout(() => {
-                    setPendingVerification((prev) => prev ? { ...prev } : null); // Trigger re-process
+                    setPendingVerification((prev) => prev ? { ...prev } : null);
                 }, Math.min(waitMs, 1000));
                 return () => clearTimeout(timer);
             }
@@ -112,23 +121,18 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                 }
             } catch (err) {
                 if (err instanceof ApiError && err.status === 429) {
-                    // Rate limited - schedule retry with exponential backoff
-
                     if (pendingVerification.attempts >= MAX_RETRY_ATTEMPTS) {
                         setPendingVerification(null);
-                        setError("Verification quota exhausted. Your submission was saved but verification is pending. Try again in a few minutes.");
+                        setError("Verification quota exhausted. Your submission was saved but verification is pending.");
                         setStatus("Submission saved (verification pending due to API limits).");
                         return;
                     }
 
-                    // Exponential backoff: 5s, 10s, 20s, 40s, 80s
                     const backoffSeconds = BASE_RETRY_SECONDS * Math.pow(2, pendingVerification.attempts);
-                    const cappedBackoff = Math.min(backoffSeconds, 120); // Cap at 2 minutes
+                    const cappedBackoff = Math.min(backoffSeconds, 120);
 
-                    // Always show the skip dialog so user isn't forced to wait
                     setShowWaitConfirm(true);
                     setEstimatedWaitSeconds(cappedBackoff);
-
                     setStatus(`Rate limited (attempt ${pendingVerification.attempts + 1}/${MAX_RETRY_ATTEMPTS}). Waiting ${cappedBackoff}s...`);
                     setPendingVerification({
                         ...pendingVerification,
@@ -136,7 +140,6 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                         attempts: pendingVerification.attempts + 1,
                     });
                 } else {
-                    // Other error - stop retrying
                     setPendingVerification(null);
                     const errorMsg = err instanceof Error ? err.message : "Verification failed";
                     setError(errorMsg);
@@ -145,11 +148,10 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
         };
 
         processVerification();
-    }, [pendingVerification, showWaitConfirm, onSubmitted]);
+    }, [pendingVerification, onSubmitted]);
 
     const handleConfirmWait = () => {
         setShowWaitConfirm(false);
-        // Trigger retry
         if (pendingVerification) {
             setPendingVerification({
                 ...pendingVerification,
@@ -164,7 +166,7 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
         setError(null);
         setStatus("Submission saved. Verification skipped due to API limits - your steps are recorded but not AI-verified.");
         if (onSubmitted) {
-            onSubmitted(); // Still trigger refresh so user sees their submission
+            onSubmitted();
         }
     };
 
@@ -181,15 +183,19 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
             return;
         }
 
-        if (file.size > 20 * 1024 * 1024) { // Increased check limit since we compress
+        if (file.size > 20 * 1024 * 1024) {
             setError("File too large");
+            return;
+        }
+
+        if (flagged && !flagReason.trim()) {
+            setError("Please provide a reason for flagging the extraction as incorrect.");
             return;
         }
 
         setSubmitting(true);
 
         try {
-            // Compress image if larger than 2MB
             let fileToUpload = file;
             if (file.size > 2 * 1024 * 1024) {
                 fileToUpload = await imageCompression(file, {
@@ -216,19 +222,24 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                     steps: stepsNumber,
                     partial,
                     proof_path: signed.path,
+                    flagged,
+                    flag_reason: flagged ? flagReason : null,
+                    overwrite,
                 }),
             });
 
+            // Success - clear form
             setFile(null);
+            setFlagged(false);
+            setFlagReason("");
+            setOverwrite(false);
 
-            // Check if verification was rate limited or failed
+            // Handle verification response
             if (response.verification_error) {
-                const { error, message, retry_after } = response.verification_error;
+                const { error: errCode, message, retry_after } = response.verification_error;
 
-                if (error === "rate_limited" || retry_after) {
+                if (errCode === "rate_limited" || retry_after) {
                     const waitTime = retry_after ?? 60;
-
-                    // UX: Always show confirm dialog for rate limits - user can skip immediately
                     setEstimatedWaitSeconds(waitTime);
                     setShowWaitConfirm(true);
                     setPendingVerification({
@@ -240,9 +251,7 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                         retryAt: Date.now() + waitTime * 1000,
                         attempts: 0,
                     });
-                    // Don't set status here - the dialog is the feedback
                 } else {
-                    // Permanent error (e.g. internal error, bad image)
                     setPendingVerification(null);
                     setError(`Verification Failed: ${message}`);
                     setStatus("Submission saved but not verified.");
@@ -259,14 +268,11 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                     tolerance: v.tolerance_used ?? null,
                     notes: v.notes ?? null,
                 });
-                setStatus(v.verified
-                    ? "Submission verified successfully!"
-                    : null);
+                setStatus(v.verified ? "Submission verified successfully!" : null);
                 if (onSubmitted) {
                     onSubmitted();
                 }
             } else {
-                // No result yet - set up retry loop
                 setStatus("Submission saved! Verification in progress...");
                 setPendingVerification({
                     submissionId: response.submission.id,
@@ -274,13 +280,17 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                     steps: stepsNumber,
                     forDate: date,
                     proofPath: signed.path,
-                    retryAt: Date.now() + 3000, // Retry after 3 seconds
+                    retryAt: Date.now() + 3000,
                     attempts: 0,
                 });
             }
         } catch (err) {
             if (err instanceof ApiError) {
-                setError(parseApiMessage(err.payload) ?? `Request failed (${err.status})`);
+                if (err.status === 409) {
+                    setError("A submission already exists for this date. Check 'Overwrite existing submission' to update it.");
+                } else {
+                    setError(parseApiMessage(err.payload) ?? `Request failed (${err.status})`);
+                }
             } else if (err instanceof Error) {
                 setError(err.message);
             } else {
@@ -324,17 +334,45 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                 />
             </div>
 
-            <div className="flex items-center gap-2">
-                <input
-                    id="submission-partial"
-                    type="checkbox"
-                    checked={partial}
-                    onChange={(e) => setPartial(e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-sky-500 focus:ring-sky-500"
-                />
-                <label htmlFor="submission-partial" className="text-sm text-slate-300">
-                    Mark as partial day
-                </label>
+            <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                    <input
+                        id="submission-partial"
+                        type="checkbox"
+                        checked={partial}
+                        onChange={(e) => setPartial(e.target.checked)}
+                        className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-sky-500 focus:ring-sky-500"
+                    />
+                    <label htmlFor="submission-partial" className="text-sm text-slate-300">
+                        Mark as partial day
+                    </label>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <input
+                        id="submission-flagged"
+                        type="checkbox"
+                        checked={flagged}
+                        onChange={(e) => setFlagged(e.target.checked)}
+                        className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-rose-500 focus:ring-rose-500"
+                    />
+                    <label htmlFor="submission-flagged" className="text-sm text-rose-300">
+                        Image extraction is correct (Flag as incorrect)
+                    </label>
+                </div>
+
+                {flagged && (
+                    <div className="pl-6">
+                        <textarea
+                            value={flagReason}
+                            onChange={(e) => setFlagReason(e.target.value)}
+                            placeholder="Describe what is wrong with the extraction..."
+                            className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:border-rose-500 focus:outline-none"
+                            rows={2}
+                            required={flagged}
+                        />
+                    </div>
+                )}
             </div>
 
             <div className="flex flex-col gap-2">
@@ -371,6 +409,20 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                             Copy
                         </button>
                     </div>
+                    {error.includes("already exists") && (
+                        <div className="mt-2 flex items-center gap-2">
+                            <input
+                                id="submission-overwrite"
+                                type="checkbox"
+                                checked={overwrite}
+                                onChange={(e) => setOverwrite(e.target.checked)}
+                                className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-sky-500 focus:ring-sky-500"
+                            />
+                            <label htmlFor="submission-overwrite" className="text-sm text-sky-300 font-medium cursor-pointer">
+                                Overwrite existing submission
+                            </label>
+                        </div>
+                    )}
                 </div>
             )}
             {status && <p className="text-sm text-sky-400">{status}</p>}

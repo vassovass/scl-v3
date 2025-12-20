@@ -45,43 +45,96 @@ export async function POST(request: Request): Promise<Response> {
         const input = parsed.data;
         const adminClient = createAdminClient();
 
-        // Check membership
-        const { data: membership } = await adminClient
+        // Check membership and backfill limit
+        const { data: membershipData } = await adminClient
             .from("memberships")
-            .select("role")
+            .select("role, league:leagues(backfill_limit)")
             .eq("league_id", input.league_id)
             .eq("user_id", user.id)
             .single();
 
-        if (!membership) {
+        if (!membershipData) {
             return forbidden("You are not a member of this league");
         }
 
-        const { data: submission, error: insertError } = await adminClient
+        // Check backfill limit
+        const league = membershipData.league as unknown as { backfill_limit: number | null };
+        if (league?.backfill_limit !== null && league?.backfill_limit !== undefined) {
+            const limitDays = league.backfill_limit;
+            const submissionDate = new Date(input.date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Calculate difference in days
+            const diffTime = today.getTime() - submissionDate.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays > limitDays) {
+                return badRequest(`This league only allows submissions for the past ${limitDays} day${limitDays === 1 ? '' : 's'}.`);
+            }
+        }
+
+        // Check if submission already exists for this date
+        const { data: existingSubmission } = await adminClient
             .from("submissions")
-            .upsert({
-                league_id: input.league_id,
-                user_id: user.id,
-                for_date: input.date,
-                steps: input.steps,
-                partial: input.partial,
-                proof_path: input.proof_path,
-                // @ts-ignore - columns might not exist yet if migration not run
-                flagged: (input as any).flagged ?? false,
-                flag_reason: (input as any).flag_reason ?? null,
-            }, {
-                onConflict: "league_id, user_id, for_date",
-                ignoreDuplicates: !(body as any).overwrite
-            })
-            .select(submissionSelect)
+            .select("id")
+            .eq("league_id", input.league_id)
+            .eq("user_id", user.id)
+            .eq("for_date", input.date)
             .single();
+
+        const wantsOverwrite = (body as any).overwrite === true;
+
+        if (existingSubmission && !wantsOverwrite) {
+            return jsonError(409, "Submission already exists for this date");
+        }
+
+        // Build submission data
+        const submissionData = {
+            league_id: input.league_id,
+            user_id: user.id,
+            for_date: input.date,
+            steps: input.steps,
+            partial: input.partial,
+            proof_path: input.proof_path,
+            flagged: (body as any).flagged ?? false,
+            flag_reason: (body as any).flag_reason ?? null,
+        };
+
+        let submission;
+        let insertError;
+
+        if (existingSubmission && wantsOverwrite) {
+            // Update existing
+            const result = await adminClient
+                .from("submissions")
+                .update(submissionData)
+                .eq("id", existingSubmission.id)
+                .select(submissionSelect)
+                .single();
+            submission = result.data;
+            insertError = result.error;
+        } else {
+            // Insert new
+            const result = await adminClient
+                .from("submissions")
+                .insert(submissionData)
+                .select(submissionSelect)
+                .single();
+            submission = result.data;
+            insertError = result.error;
+        }
 
         if (insertError) {
             if (insertError.code === "23505") {
                 return jsonError(409, "Submission already exists for this date");
             }
-            console.error("Submission insert error:", insertError);
+            console.error("Submission insert/update error:", insertError);
             return serverError(insertError.message);
+        }
+
+        if (!submission) {
+            return serverError("Failed to create submission");
         }
 
         // Trigger verification (non-blocking, catch errors)
