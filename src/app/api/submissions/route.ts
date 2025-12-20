@@ -57,16 +57,21 @@ export async function POST(request: Request): Promise<Response> {
             return forbidden("You are not a member of this league");
         }
 
-        // Create submission
         const { data: submission, error: insertError } = await adminClient
             .from("submissions")
-            .insert({
+            .upsert({
                 league_id: input.league_id,
                 user_id: user.id,
                 for_date: input.date,
                 steps: input.steps,
                 partial: input.partial,
                 proof_path: input.proof_path,
+                // @ts-ignore - columns might not exist yet if migration not run
+                flagged: (input as any).flagged ?? false,
+                flag_reason: (input as any).flag_reason ?? null,
+            }, {
+                onConflict: "league_id, user_id, for_date",
+                ignoreDuplicates: !(body as any).overwrite
             })
             .select(submissionSelect)
             .single();

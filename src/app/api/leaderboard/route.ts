@@ -66,7 +66,7 @@ export async function GET(request: Request) {
     }
 
     // Call RPC function
-    const { data, error } = await supabase.rpc("leaderboard_period", {
+    const { data, error } = await adminClient.rpc("leaderboard_period", {
       _league_id: league_id,
       _dates: dateList,
       _limit: limit,

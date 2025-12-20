@@ -56,12 +56,9 @@ export default function LeaguePage() {
     if (!session) return;
 
     try {
-      const weekDates = getWeekDates();
-      const from = weekDates[weekDates.length - 1];
-      const to = weekDates[0];
-
+      // Fetch last 20 submissions regardless of date
       const res = await fetch(
-        `/api/submissions?league_id=${leagueId}&user_id=${session.user.id}&from=${from}&to=${to}`,
+        `/api/submissions?league_id=${leagueId}&user_id=${session.user.id}&limit=20`,
         {
           headers: {
             Authorization: `Bearer ${session.access_token}`,
@@ -203,8 +200,8 @@ export default function LeaguePage() {
               <button
                 onClick={() => setSubmissionMode("single")}
                 className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${submissionMode === "single"
-                    ? "bg-sky-600 text-white shadow-sm"
-                    : "text-slate-400 hover:text-slate-200"
+                  ? "bg-sky-600 text-white shadow-sm"
+                  : "text-slate-400 hover:text-slate-200"
                   }`}
               >
                 Single Entry
@@ -212,8 +209,8 @@ export default function LeaguePage() {
               <button
                 onClick={() => setSubmissionMode("batch")}
                 className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${submissionMode === "batch"
-                    ? "bg-sky-600 text-white shadow-sm"
-                    : "text-slate-400 hover:text-slate-200"
+                  ? "bg-sky-600 text-white shadow-sm"
+                  : "text-slate-400 hover:text-slate-200"
                   }`}
               >
                 Batch Upload
