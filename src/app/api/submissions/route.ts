@@ -87,7 +87,6 @@ export async function POST(request: Request): Promise<Response> {
             league_id: input.league_id,
             submission_id: submission.id,
             requester_id: user.id,
-            token: session?.access_token ?? null,
         }).catch((err) => ({
             status: 500,
             ok: false,
