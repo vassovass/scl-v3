@@ -70,7 +70,6 @@ export async function POST(request: Request): Promise<Response> {
             league_id: input.league_id,
             submission_id: input.submission_id,
             requester_id: user.id,
-            token: session?.access_token ?? null,
         });
 
         // If rate limited, return 429 with retry_after
