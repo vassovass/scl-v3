@@ -1,6 +1,13 @@
 /**
- * Server-side helper to call the Supabase Edge Function for AI screenshot verification.
+ * Server-side verification logic - calls Gemini directly from v3.
+ * No dependency on Supabase Edge Functions.
  */
+
+import { createAdminClient } from "@/lib/supabase/server";
+import { callGemini, GeminiExtraction } from "./gemini";
+
+const PROOFS_BUCKET = process.env.PROOFS_BUCKET ?? "proofs";
+const VERIFY_TIMEOUT_MS = parseInt(process.env.VERIFY_TIMEOUT_MS ?? "30000", 10);
 
 export type VerificationPayload = {
     steps: number;
@@ -9,23 +16,32 @@ export type VerificationPayload = {
     requester_id: string;
     league_id?: string;
     submission_id?: string;
-    token?: string | null;
 };
 
 export type VerificationResult = {
     status: number;
     ok: boolean;
-    data: unknown;
+    data: {
+        verified?: boolean;
+        tolerance_used?: number;
+        difference?: number | null;
+        extracted_steps?: number | null;
+        extracted_km?: number | null;
+        extracted_calories?: number | null;
+        notes?: string;
+        error?: string;
+        message?: string;
+        retry_after?: number;
+    };
 };
 
-// Default to "verify" to match the Supabase Edge Function deployed from SCL v2
-const VERIFY_FUNCTION_NAME = process.env.VERIFY_FUNCTION_NAME ?? "verify";
-const VERIFY_TIMEOUT_MS = parseInt(process.env.VERIFY_TIMEOUT_MS ?? "30000", 10);
-
-function getSupabaseFunctionUrl(functionName: string): string {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    // Supabase Edge Functions URL format: https://<project-ref>.supabase.co/functions/v1/<function-name>
-    return `${supabaseUrl}/functions/v1/${functionName}`;
+interface EvaluationResult {
+    verified: boolean;
+    tolerance: number;
+    difference: number | null;
+    notes: string;
+    extractedKm: number | null;
+    extractedCalories: number | null;
 }
 
 export async function callVerificationFunction(payload: VerificationPayload): Promise<VerificationResult> {
@@ -33,44 +49,187 @@ export async function callVerificationFunction(payload: VerificationPayload): Pr
     const timeout = setTimeout(() => abortController.abort(), VERIFY_TIMEOUT_MS);
 
     try {
-        const functionUrl = getSupabaseFunctionUrl(VERIFY_FUNCTION_NAME);
-        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        // Fetch proof image from Supabase Storage
+        const proof = await fetchProof(payload.proof_path);
 
-        if (!serviceRoleKey) {
-            console.error("SUPABASE_SERVICE_ROLE_KEY is not configured");
-            return { status: 500, ok: false, data: { error: "server_misconfigured", message: "Service role key not configured" } };
-        }
-
-        const response = await fetch(functionUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${serviceRoleKey}`,
-                ...(payload.token ? { "X-Client-Authorization": `Bearer ${payload.token}` } : {}),
-            },
-            body: JSON.stringify(payload),
-            signal: abortController.signal,
+        // Call Gemini directly
+        const geminiResult = await callGemini({
+            stepsClaimed: payload.steps,
+            forDate: payload.for_date,
+            imageBase64: proof.base64,
+            mimeType: proof.mimeType,
         });
 
-        const data = await safeJson(response);
-        return { status: response.status, ok: response.ok, data };
-    } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-            return { status: 504, ok: false, data: { error: "verification_timeout", message: "Verification request timed out" } };
+        // Evaluate the result
+        const evaluation = evaluateVerdict({
+            claimedSteps: payload.steps,
+            claimedDate: payload.for_date,
+            extraction: geminiResult.extraction,
+        });
+
+        // Persist to database if we have a submission ID
+        if (payload.submission_id) {
+            await persistVerification({
+                submissionId: payload.submission_id,
+                leagueId: payload.league_id,
+                evaluation,
+                extraction: geminiResult.extraction,
+            });
         }
-        // Return structured error instead of throwing
-        const errorMessage = error instanceof Error ? error.message : "Unknown fetch error";
-        console.error("Verification function fetch error:", errorMessage);
-        return { status: 502, ok: false, data: { error: "edge_function_unreachable", message: errorMessage } };
+
+        return {
+            status: 200,
+            ok: true,
+            data: {
+                verified: evaluation.verified,
+                tolerance_used: evaluation.tolerance,
+                difference: evaluation.difference,
+                extracted_steps: geminiResult.extraction.steps ?? null,
+                extracted_km: evaluation.extractedKm,
+                extracted_calories: evaluation.extractedCalories,
+                notes: evaluation.notes,
+            },
+        };
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        console.error("Verification error:", errorMessage);
+
+        // Check for rate limit errors from Gemini
+        if (errorMessage.includes("429") || errorMessage.includes("RESOURCE_EXHAUSTED")) {
+            return {
+                status: 429,
+                ok: false,
+                data: { error: "rate_limited", retry_after: 60, message: errorMessage },
+            };
+        }
+
+        // Check for timeout
+        if (error instanceof DOMException && error.name === "AbortError") {
+            return {
+                status: 504,
+                ok: false,
+                data: { error: "verification_timeout", message: "Request timed out" },
+            };
+        }
+
+        return {
+            status: 500,
+            ok: false,
+            data: { error: "verification_failed", message: errorMessage },
+        };
     } finally {
         clearTimeout(timeout);
     }
 }
 
-async function safeJson(response: Response): Promise<unknown> {
-    try {
-        return await response.json();
-    } catch {
-        return null;
+async function fetchProof(path: string): Promise<{ base64: string; mimeType: string }> {
+    const adminClient = createAdminClient();
+    const { data, error } = await adminClient.storage.from(PROOFS_BUCKET).download(path);
+
+    if (error || !data) {
+        throw new Error(`Unable to download proof: ${path}`);
+    }
+
+    const base64 = await blobToBase64(data);
+    const mimeType = data.type || guessMimeType(path);
+
+    return { base64, mimeType };
+}
+
+async function blobToBase64(blob: Blob): Promise<string> {
+    const buffer = await blob.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    let binary = "";
+
+    for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+
+    return Buffer.from(binary, "binary").toString("base64");
+}
+
+function guessMimeType(path: string): string {
+    const lower = path.toLowerCase();
+    if (lower.endsWith(".png")) return "image/png";
+    if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
+    if (lower.endsWith(".heic")) return "image/heic";
+    return "application/octet-stream";
+}
+
+function evaluateVerdict({
+    claimedSteps,
+    claimedDate,
+    extraction,
+}: {
+    claimedSteps: number;
+    claimedDate: string;
+    extraction: GeminiExtraction;
+}): EvaluationResult {
+    const tolerance = Math.max(Math.round(claimedSteps * 0.03), 300);
+    const extractedSteps = extraction.steps ?? null;
+    const difference = extractedSteps != null ? Math.abs(extractedSteps - claimedSteps) : null;
+    const verified = extractedSteps != null && difference !== null && difference <= tolerance;
+
+    const notes: string[] = [];
+    if (extractedSteps == null) {
+        notes.push("Could not extract step count from screenshot.");
+    }
+    if (extraction.date && extraction.date !== claimedDate) {
+        notes.push(`Screenshot date ${extraction.date} differs from claimed date ${claimedDate}.`);
+    }
+    if (!verified && extractedSteps != null && difference !== null) {
+        notes.push(`Difference of ${difference} steps exceeds tolerance of ${tolerance}.`);
+    }
+
+    return {
+        verified,
+        tolerance,
+        difference,
+        notes: notes.length > 0 ? notes.join(" ") : (verified ? "Verification succeeded." : "Verification failed."),
+        extractedKm: extraction.km ?? null,
+        extractedCalories: extraction.calories ?? null,
+    };
+}
+
+async function persistVerification({
+    submissionId,
+    leagueId,
+    evaluation,
+    extraction,
+}: {
+    submissionId: string;
+    leagueId?: string;
+    evaluation: EvaluationResult;
+    extraction: GeminiExtraction;
+}): Promise<void> {
+    const adminClient = createAdminClient();
+
+    const notes = [evaluation.notes];
+    if (extraction.steps != null) {
+        notes.push(`Extracted: ${extraction.steps} steps`);
+    }
+    if (extraction.date) {
+        notes.push(`Date: ${extraction.date}`);
+    }
+
+    const { error } = await adminClient
+        .from("submissions")
+        .update({
+            verified: evaluation.verified,
+            tolerance_used: evaluation.tolerance,
+            extracted_km: evaluation.extractedKm,
+            extracted_calories: evaluation.extractedCalories,
+            verification_notes: notes.join(" "),
+        })
+        .eq("id", submissionId);
+
+    if (error) {
+        console.error("Failed to persist verification:", error.message);
+        // Don't throw - verification still succeeded, just logging failed
+    }
+
+    // Also log to audit if needed (optional - skipped for now)
+    if (leagueId) {
+        console.log(`Verification persisted for submission ${submissionId} in league ${leagueId}`);
     }
 }
