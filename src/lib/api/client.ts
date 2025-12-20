@@ -42,10 +42,59 @@ export class ApiError extends Error {
     payload: unknown;
 
     constructor(status: number, payload: unknown) {
-        super(`API request failed with status ${status}`);
+        // Extract meaningful error message from payload
+        const errorMessage = extractErrorMessage(payload, status);
+        super(errorMessage);
         this.status = status;
         this.payload = payload;
     }
+}
+
+/**
+ * Extract a human-readable error message from various payload formats.
+ */
+function extractErrorMessage(payload: unknown, status: number): string {
+    if (!payload) {
+        return `Request failed (${status})`;
+    }
+
+    if (typeof payload === 'string') {
+        return payload;
+    }
+
+    if (typeof payload === 'object') {
+        const obj = payload as Record<string, unknown>;
+
+        // Try common error message field names
+        if (typeof obj.error === 'string') {
+            // Include details if available
+            if (obj.details && typeof obj.details === 'object') {
+                const details = obj.details as Record<string, unknown>;
+                if (typeof details.message === 'string') {
+                    return `${obj.error}: ${details.message}`;
+                }
+                if (typeof details.error === 'string') {
+                    return `${obj.error}: ${details.error}`;
+                }
+            }
+            return obj.error;
+        }
+        if (typeof obj.message === 'string') {
+            return obj.message;
+        }
+        if (typeof obj.detail === 'string') {
+            return obj.detail;
+        }
+
+        // Fallback: stringify the object
+        try {
+            return JSON.stringify(payload);
+        } catch {
+            return `Request failed (${status})`;
+        }
+    }
+
+    return `Request failed (${status})`;
 }
 
 function normalizePath(path: string): string {
