@@ -40,8 +40,8 @@ interface PendingVerification {
     attempts: number;
 }
 
-const MAX_RETRY_ATTEMPTS = 10;
-const MAX_WAIT_SECONDS = 180; // 3 minutes
+const MAX_RETRY_ATTEMPTS = 5; // Reduced from 10 - don't spam the API
+const BASE_RETRY_SECONDS = 5; // Base for exponential backoff
 
 export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
     const [date, setDate] = useState<string>(new Date().toISOString().slice(0, 10));
@@ -94,28 +94,27 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                 }
             } catch (err) {
                 if (err instanceof ApiError && err.status === 429) {
-                    // Rate limited - schedule retry
-                    const payload = err.payload as { retry_after?: number };
-                    const retryAfter = payload?.retry_after ?? 10;
-                    const newWaitSeconds = retryAfter + (pendingVerification.attempts * 5); // Add buffer for each attempt
+                    // Rate limited - schedule retry with exponential backoff
 
                     if (pendingVerification.attempts >= MAX_RETRY_ATTEMPTS) {
                         setPendingVerification(null);
-                        setError("Verification timed out after multiple attempts. Your submission was saved but not verified.");
+                        setError("Verification quota exhausted. Your submission was saved but verification is pending. Try again in a few minutes.");
+                        setStatus("Submission saved (verification pending due to API limits).");
                         return;
                     }
 
-                    // Check if wait exceeds threshold
-                    if (newWaitSeconds > MAX_WAIT_SECONDS && !showWaitConfirm) {
-                        setShowWaitConfirm(true);
-                        setEstimatedWaitSeconds(newWaitSeconds);
-                        return;
-                    }
+                    // Exponential backoff: 5s, 10s, 20s, 40s, 80s
+                    const backoffSeconds = BASE_RETRY_SECONDS * Math.pow(2, pendingVerification.attempts);
+                    const cappedBackoff = Math.min(backoffSeconds, 120); // Cap at 2 minutes
 
-                    setStatus(`Rate limited. Retrying in ${retryAfter} seconds... (attempt ${pendingVerification.attempts + 1})`);
+                    // Always show the skip dialog so user isn't forced to wait
+                    setShowWaitConfirm(true);
+                    setEstimatedWaitSeconds(cappedBackoff);
+
+                    setStatus(`Rate limited (attempt ${pendingVerification.attempts + 1}/${MAX_RETRY_ATTEMPTS}). Waiting ${cappedBackoff}s...`);
                     setPendingVerification({
                         ...pendingVerification,
-                        retryAt: Date.now() + retryAfter * 1000,
+                        retryAt: Date.now() + cappedBackoff * 1000,
                         attempts: pendingVerification.attempts + 1,
                     });
                 } else {
@@ -144,9 +143,11 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
     const handleCancelWait = () => {
         setShowWaitConfirm(false);
         setPendingVerification(null);
-        // If we cancel wait, the submission is still technically saved but not verified.
-        // We can inform the user they can retry manually or it's pending.
-        setStatus("Submission saved as pending. Detailed verification skipped due to rate limits.");
+        setError(null);
+        setStatus("Submission saved. Verification skipped due to API limits - your steps are recorded but not AI-verified.");
+        if (onSubmitted) {
+            onSubmitted(); // Still trigger refresh so user sees their submission
+        }
     };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
