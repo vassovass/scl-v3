@@ -21,6 +21,11 @@ interface SubmissionResponse {
     };
     verification?: {
         verified: boolean;
+        extracted_steps?: number | null;
+        extracted_date?: string | null;
+        difference?: number | null;
+        tolerance_used?: number;
+        notes?: string;
     };
     verification_error?: {
         error: string;
@@ -28,6 +33,17 @@ interface SubmissionResponse {
         retry_after?: number;
         should_retry?: boolean;
     };
+}
+
+interface VerificationDetails {
+    verified: boolean;
+    extractedSteps: number | null;
+    extractedDate: string | null;
+    claimedSteps: number;
+    claimedDate: string;
+    difference: number | null;
+    tolerance: number | null;
+    notes: string | null;
 }
 
 interface PendingVerification {
@@ -54,6 +70,7 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
     const [pendingVerification, setPendingVerification] = useState<PendingVerification | null>(null);
     const [estimatedWaitSeconds, setEstimatedWaitSeconds] = useState(0);
     const [showWaitConfirm, setShowWaitConfirm] = useState(false);
+    const [verificationDetails, setVerificationDetails] = useState<VerificationDetails | null>(null);
 
     // Process pending verification with retry logic
     useEffect(() => {
@@ -156,6 +173,7 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
         setStatus(null);
         setShowWaitConfirm(false);
         setPendingVerification(null);
+        setVerificationDetails(null);
 
         if (!file) {
             setError("Please attach a screenshot");
@@ -217,9 +235,20 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                     setStatus("Submission saved but not verified.");
                 }
             } else if (response.verification?.verified !== undefined) {
-                setStatus(response.verification.verified
+                const v = response.verification;
+                setVerificationDetails({
+                    verified: v.verified,
+                    extractedSteps: v.extracted_steps ?? null,
+                    extractedDate: v.extracted_date ?? null,
+                    claimedSteps: steps,
+                    claimedDate: date,
+                    difference: v.difference ?? null,
+                    tolerance: v.tolerance_used ?? null,
+                    notes: v.notes ?? null,
+                });
+                setStatus(v.verified
                     ? "Submission verified successfully!"
-                    : "Submission received. Verification completed (steps may differ from screenshot).");
+                    : null);
                 if (onSubmitted) {
                     onSubmitted();
                 }
@@ -331,6 +360,111 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                 </div>
             )}
             {status && <p className="text-sm text-sky-400">{status}</p>}
+
+            {/* Verification details feedback */}
+            {verificationDetails && (
+                <div className={`rounded-md border p-4 ${verificationDetails.verified
+                        ? "border-emerald-700 bg-emerald-900/30"
+                        : "border-rose-700 bg-rose-900/30"
+                    }`}>
+                    <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 space-y-2">
+                            {verificationDetails.verified ? (
+                                <p className="text-sm font-medium text-emerald-400">
+                                    ✓ Verification successful
+                                </p>
+                            ) : (
+                                <p className="text-sm font-medium text-rose-400">
+                                    ✗ Verification failed
+                                </p>
+                            )}
+
+                            {/* Step comparison */}
+                            <div className="text-sm space-y-1">
+                                {verificationDetails.extractedSteps !== null ? (
+                                    <p className={verificationDetails.verified ? "text-slate-300" : "text-rose-300"}>
+                                        <span className="text-slate-400">Screenshot shows:</span>{" "}
+                                        <span className="font-semibold">
+                                            {verificationDetails.extractedSteps.toLocaleString()} steps
+                                        </span>
+                                    </p>
+                                ) : (
+                                    <p className="text-amber-400">
+                                        ⚠ Could not detect step count from screenshot
+                                    </p>
+                                )}
+
+                                <p className="text-slate-400">
+                                    You submitted:{" "}
+                                    <span className="text-slate-200 font-semibold">
+                                        {verificationDetails.claimedSteps.toLocaleString()} steps
+                                    </span>
+                                </p>
+
+                                {verificationDetails.difference !== null && verificationDetails.tolerance !== null && (
+                                    <p className="text-slate-500 text-xs mt-1">
+                                        Difference: {verificationDetails.difference.toLocaleString()}
+                                        {" "}(max allowed: {verificationDetails.tolerance.toLocaleString()})
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Date comparison if different */}
+                            {verificationDetails.extractedDate &&
+                                verificationDetails.extractedDate !== verificationDetails.claimedDate && (
+                                    <div className="text-sm mt-2 pt-2 border-t border-slate-700">
+                                        <p className="text-amber-400">
+                                            ⚠ Date mismatch detected
+                                        </p>
+                                        <p className="text-slate-400 mt-1">
+                                            Screenshot date: <span className="text-amber-300 font-medium">{verificationDetails.extractedDate}</span>
+                                            {" "}• Submitted: <span className="text-slate-300">{verificationDetails.claimedDate}</span>
+                                        </p>
+                                    </div>
+                                )}
+
+                            {/* Notes (collapsed by default) */}
+                            {verificationDetails.notes && !verificationDetails.verified && (
+                                <details className="mt-2 text-xs">
+                                    <summary className="text-slate-500 cursor-pointer hover:text-slate-400">
+                                        Technical details
+                                    </summary>
+                                    <p className="mt-1 text-slate-400 bg-slate-800/50 rounded p-2 font-mono">
+                                        {verificationDetails.notes}
+                                    </p>
+                                </details>
+                            )}
+                        </div>
+
+                        {/* Report Issue button for failed verifications */}
+                        {!verificationDetails.verified && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const issueDetails = [
+                                        `Verification Issue Report`,
+                                        `========================`,
+                                        `Date: ${new Date().toISOString()}`,
+                                        ``,
+                                        `Submitted: ${verificationDetails.claimedSteps} steps on ${verificationDetails.claimedDate}`,
+                                        `Detected: ${verificationDetails.extractedSteps ?? 'N/A'} steps`,
+                                        `Detected Date: ${verificationDetails.extractedDate ?? 'N/A'}`,
+                                        `Difference: ${verificationDetails.difference ?? 'N/A'}`,
+                                        `Tolerance: ${verificationDetails.tolerance ?? 'N/A'}`,
+                                        ``,
+                                        `Notes: ${verificationDetails.notes ?? 'None'}`,
+                                    ].join('\n');
+                                    navigator.clipboard.writeText(issueDetails);
+                                    alert('Issue details copied to clipboard! You can paste this in an email or support ticket.');
+                                }}
+                                className="shrink-0 rounded-md border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-slate-700 hover:border-slate-500"
+                            >
+                                📋 Report Issue
+                            </button>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {/* Pending verification status */}
             {pendingVerification && !showWaitConfirm && (

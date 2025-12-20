@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
@@ -21,6 +21,10 @@ interface Submission {
   verified: boolean | null;
   partial: boolean;
   created_at: string;
+  verification_notes?: string | null;
+  tolerance_used?: number | null;
+  extracted_km?: number | null;
+  extracted_calories?: number | null;
 }
 
 export default function LeaguePage() {
@@ -32,6 +36,7 @@ export default function LeaguePage() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [expandedSubmissionId, setExpandedSubmissionId] = useState<string | null>(null);
 
   // Get dates for current week (last 7 days)
   const getWeekDates = () => {
@@ -215,22 +220,78 @@ export default function LeaguePage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800">
-                    {submissions.map((sub) => (
-                      <tr key={sub.id} className="hover:bg-slate-900/50">
-                        <td className="px-4 py-3 text-slate-100">
-                          {formatDate(sub.for_date)}
-                          {sub.partial && (
-                            <span className="ml-2 text-xs text-slate-500">(partial)</span>
+                    {submissions.map((sub) => {
+                      const isExpanded = expandedSubmissionId === sub.id;
+                      const canExpand = sub.verified === false && sub.verification_notes;
+
+                      return (
+                        <React.Fragment key={sub.id}>
+                          <tr
+                            className={`hover:bg-slate-900/50 ${canExpand ? 'cursor-pointer' : ''}`}
+                            onClick={() => {
+                              if (canExpand) {
+                                setExpandedSubmissionId(isExpanded ? null : sub.id);
+                              }
+                            }}
+                          >
+                            <td className="px-4 py-3 text-slate-100">
+                              {formatDate(sub.for_date)}
+                              {sub.partial && (
+                                <span className="ml-2 text-xs text-slate-500">(partial)</span>
+                              )}
+                              {canExpand && (
+                                <span className="ml-2 text-xs text-slate-500">
+                                  {isExpanded ? '▼' : '▶'}
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-right font-mono text-slate-100">
+                              {sub.steps.toLocaleString()}
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              {getVerificationBadge(sub.verified)}
+                            </td>
+                          </tr>
+                          {/* Expanded verification details */}
+                          {isExpanded && sub.verification_notes && (
+                            <tr>
+                              <td colSpan={3} className="bg-slate-900/80 px-4 py-3">
+                                <div className="rounded-md border border-slate-700 bg-slate-800/50 p-3 space-y-2">
+                                  <p className="text-sm font-medium text-slate-300">Verification Details</p>
+                                  <p className="text-sm text-slate-400">{sub.verification_notes}</p>
+                                  {(sub.extracted_km || sub.extracted_calories) && (
+                                    <div className="flex gap-4 text-xs text-slate-500 pt-1">
+                                      {sub.extracted_km && <span>Distance: {sub.extracted_km} km</span>}
+                                      {sub.extracted_calories && <span>Calories: {sub.extracted_calories}</span>}
+                                    </div>
+                                  )}
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      const issueDetails = [
+                                        `Verification Issue Report`,
+                                        `========================`,
+                                        `Date: ${new Date().toISOString()}`,
+                                        `For: ${sub.for_date}`,
+                                        `Steps: ${sub.steps}`,
+                                        ``,
+                                        `Verification Notes:`,
+                                        sub.verification_notes ?? 'None',
+                                      ].join('\n');
+                                      navigator.clipboard.writeText(issueDetails);
+                                      alert('Issue details copied to clipboard!');
+                                    }}
+                                    className="mt-2 rounded-md border border-slate-600 bg-slate-700 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-slate-600"
+                                  >
+                                    📋 Report Issue
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
                           )}
-                        </td>
-                        <td className="px-4 py-3 text-right font-mono text-slate-100">
-                          {sub.steps.toLocaleString()}
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          {getVerificationBadge(sub.verified)}
-                        </td>
-                      </tr>
-                    ))}
+                        </React.Fragment>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

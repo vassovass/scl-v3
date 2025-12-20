@@ -32,6 +32,7 @@ export type VerificationResult = {
         tolerance_used?: number;
         difference?: number | null;
         extracted_steps?: number | null;
+        extracted_date?: string | null;
         extracted_km?: number | null;
         extracted_calories?: number | null;
         notes?: string;
@@ -91,6 +92,7 @@ export async function callVerificationFunction(payload: VerificationPayload): Pr
                 tolerance_used: evaluation.tolerance,
                 difference: evaluation.difference,
                 extracted_steps: geminiResult.extraction.steps ?? null,
+                extracted_date: geminiResult.extraction.date ?? null,
                 extracted_km: evaluation.extractedKm,
                 extracted_calories: evaluation.extractedCalories,
                 notes: evaluation.notes,
