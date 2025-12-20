@@ -61,7 +61,7 @@ const BASE_RETRY_SECONDS = 5; // Base for exponential backoff
 
 export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
     const [date, setDate] = useState<string>(new Date().toISOString().slice(0, 10));
-    const [steps, setSteps] = useState<number>(0);
+    const [steps, setSteps] = useState<string>("");
     const [partial, setPartial] = useState<boolean>(false);
     const [file, setFile] = useState<File | null>(null);
     const [status, setStatus] = useState<string | null>(null);
@@ -195,12 +195,14 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
 
             await uploadToSignedUrl(signed.upload_url, file);
 
+            const stepsNumber = parseInt(steps, 10) || 0;
+
             const response = await apiRequest<SubmissionResponse>("submissions", {
                 method: "POST",
                 body: JSON.stringify({
                     league_id: leagueId,
                     date,
-                    steps,
+                    steps: stepsNumber,
                     partial,
                     proof_path: signed.path,
                 }),
@@ -221,7 +223,7 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                     setPendingVerification({
                         submissionId: response.submission.id,
                         leagueId,
-                        steps,
+                        steps: stepsNumber,
                         forDate: date,
                         proofPath: signed.path,
                         retryAt: Date.now() + waitTime * 1000,
@@ -240,7 +242,7 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                     verified: v.verified,
                     extractedSteps: v.extracted_steps ?? null,
                     extractedDate: v.extracted_date ?? null,
-                    claimedSteps: steps,
+                    claimedSteps: stepsNumber,
                     claimedDate: date,
                     difference: v.difference ?? null,
                     tolerance: v.tolerance_used ?? null,
@@ -258,7 +260,7 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                 setPendingVerification({
                     submissionId: response.submission.id,
                     leagueId,
-                    steps,
+                    steps: stepsNumber,
                     forDate: date,
                     proofPath: signed.path,
                     retryAt: Date.now() + 3000, // Retry after 3 seconds
@@ -302,10 +304,11 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                 <input
                     id="submission-steps"
                     type="number"
-                    min={0}
+                    min={1}
                     value={steps}
-                    onChange={(e) => setSteps(Number(e.target.value))}
-                    className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-slate-50 focus:border-sky-500 focus:outline-none"
+                    onChange={(e) => setSteps(e.target.value)}
+                    placeholder="Enter the step count from your screenshot"
+                    className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-slate-50 placeholder:text-slate-500 focus:border-sky-500 focus:outline-none"
                     required
                 />
             </div>
@@ -364,8 +367,8 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
             {/* Verification details feedback */}
             {verificationDetails && (
                 <div className={`rounded-md border p-4 ${verificationDetails.verified
-                        ? "border-emerald-700 bg-emerald-900/30"
-                        : "border-rose-700 bg-rose-900/30"
+                    ? "border-emerald-700 bg-emerald-900/30"
+                    : "border-rose-700 bg-rose-900/30"
                     }`}>
                     <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 space-y-2">
