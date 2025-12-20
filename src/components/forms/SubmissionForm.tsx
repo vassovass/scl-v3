@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import imageCompression from "browser-image-compression";
 import { apiRequest, ApiError } from "@/lib/api/client";
+import { DatePicker } from "@/components/ui/DatePicker";
 
 interface SubmissionFormProps {
     leagueId: string;
@@ -303,20 +304,12 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/60 p-4 shadow-lg">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                <label className="text-sm font-medium text-slate-300" htmlFor="submission-date">
-                    Date
-                </label>
-                <input
-                    id="submission-date"
-                    type="date"
-                    value={date}
-                    max={new Date().toISOString().slice(0, 10)}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-slate-50 focus:border-sky-500 focus:outline-none"
-                    required
-                />
-            </div>
+            <DatePicker
+                value={date}
+                onChange={setDate}
+                label="Date"
+                required
+            />
 
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <label className="text-sm font-medium text-slate-300" htmlFor="submission-steps">

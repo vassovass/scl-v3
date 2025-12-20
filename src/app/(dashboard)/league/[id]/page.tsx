@@ -38,7 +38,7 @@ export default function LeaguePage() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [expandedSubmissionId, setExpandedSubmissionId] = useState<string | null>(null);
-  const [submissionMode, setSubmissionMode] = useState<"single" | "batch">("single");
+  const [submissionMode, setSubmissionMode] = useState<"single" | "batch">("batch");
 
   // Get dates for current week (last 7 days)
   const getWeekDates = () => {

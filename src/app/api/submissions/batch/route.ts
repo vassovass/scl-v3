@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
 import { json, badRequest, unauthorized, forbidden, serverError, jsonError } from "@/lib/api";
 import { callVerificationFunction } from "@/lib/server/verify";
+import { normalizeExtractedDate } from "@/lib/utils/date";
 
 const batchSchema = z.object({
     league_id: z.string().uuid(),
@@ -68,7 +69,7 @@ export async function POST(request: Request): Promise<Response> {
             }
 
             extractedSteps = extractedSteps ?? verification.data.extracted_steps ?? undefined;
-            forDate = forDate ?? normalizeDate(verification.data.extracted_date);
+            forDate = forDate ?? normalizeExtractedDate(verification.data.extracted_date);
             verificationData = verification.data;
         }
 

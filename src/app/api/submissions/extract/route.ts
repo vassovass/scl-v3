@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
 import { json, badRequest, unauthorized, forbidden, serverError } from "@/lib/api";
 import { callVerificationFunction } from "@/lib/server/verify";
+import { normalizeExtractedDate } from "@/lib/utils/date";
 
 const extractSchema = z.object({
     league_id: z.string().uuid(),
@@ -60,7 +61,8 @@ export async function POST(request: Request): Promise<Response> {
         }
 
         const extractedSteps = verification.data.extracted_steps;
-        const extractedDate = normalizeDate(verification.data.extracted_date);
+        // Use smart date normalization (handles missing years)
+        const extractedDate = normalizeExtractedDate(verification.data.extracted_date);
 
         return json({
             extracted_steps: extractedSteps,
@@ -73,11 +75,4 @@ export async function POST(request: Request): Promise<Response> {
         console.error("Extract error:", error);
         return serverError(error instanceof Error ? error.message : "Unknown error");
     }
-}
-
-function normalizeDate(dateStr: string | null | undefined): string {
-    if (!dateStr) return new Date().toISOString().slice(0, 10);
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return new Date().toISOString().slice(0, 10);
-    return d.toISOString().slice(0, 10);
 }
