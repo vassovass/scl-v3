@@ -23,15 +23,18 @@ export type VerificationResult = {
     ok: boolean;
     data: {
         verified?: boolean;
+        code?: string; // e.g. "rate_limited", "step_mismatch", "extraction_failed"
+        message?: string;
+        should_retry?: boolean;
+        retry_after?: number;
+
+        // Verification details
         tolerance_used?: number;
         difference?: number | null;
         extracted_steps?: number | null;
         extracted_km?: number | null;
         extracted_calories?: number | null;
         notes?: string;
-        error?: string;
-        message?: string;
-        retry_after?: number;
     };
 };
 
@@ -82,6 +85,9 @@ export async function callVerificationFunction(payload: VerificationPayload): Pr
             ok: true,
             data: {
                 verified: evaluation.verified,
+                code: evaluation.verified ? "success" : "verification_failed",
+                message: evaluation.notes,
+
                 tolerance_used: evaluation.tolerance,
                 difference: evaluation.difference,
                 extracted_steps: geminiResult.extraction.steps ?? null,
@@ -99,7 +105,12 @@ export async function callVerificationFunction(payload: VerificationPayload): Pr
             return {
                 status: 429,
                 ok: false,
-                data: { error: "rate_limited", retry_after: 60, message: errorMessage },
+                data: {
+                    code: "rate_limited",
+                    message: "AI service verification limit reached",
+                    should_retry: true,
+                    retry_after: 60
+                },
             };
         }
 
@@ -108,14 +119,22 @@ export async function callVerificationFunction(payload: VerificationPayload): Pr
             return {
                 status: 504,
                 ok: false,
-                data: { error: "verification_timeout", message: "Request timed out" },
+                data: {
+                    code: "timeout",
+                    message: "Verification timed out",
+                    should_retry: true
+                },
             };
         }
 
         return {
             status: 500,
             ok: false,
-            data: { error: "verification_failed", message: errorMessage },
+            data: {
+                code: "internal_error",
+                message: errorMessage,
+                should_retry: false
+            },
         };
     } finally {
         clearTimeout(timeout);
@@ -178,7 +197,7 @@ function evaluateVerdict({
         notes.push(`Screenshot date ${extraction.date} differs from claimed date ${claimedDate}.`);
     }
     if (!verified && extractedSteps != null && difference !== null) {
-        notes.push(`Difference of ${difference} steps exceeds tolerance of ${tolerance}.`);
+        notes.push(`Extracted ${extractedSteps} steps, which differs from claimed ${claimedSteps} by ${difference} (tolerance: ${tolerance}).`);
     }
 
     return {

@@ -24,7 +24,9 @@ interface SubmissionResponse {
     };
     verification_error?: {
         error: string;
+        message: string;
         retry_after?: number;
+        should_retry?: boolean;
     };
 }
 
@@ -142,7 +144,9 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
     const handleCancelWait = () => {
         setShowWaitConfirm(false);
         setPendingVerification(null);
-        setStatus("Submission saved but verification cancelled. It may be verified later.");
+        // If we cancel wait, the submission is still technically saved but not verified.
+        // We can inform the user they can retry manually or it's pending.
+        setStatus("Submission saved as pending. Detailed verification skipped due to rate limits.");
     };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -185,13 +189,15 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
 
             setFile(null);
 
-            // Check if verification was rate limited
-            if (response.verification_error?.error === "rate_limited") {
-                const retryAfter = response.verification_error.retry_after ?? 10;
+            // Check if verification was rate limited or failed
+            if (response.verification_error) {
+                const { error, message, retry_after, should_retry } = response.verification_error;
 
-                // If wait > 3 minutes, ask for confirmation
-                if (retryAfter > MAX_WAIT_SECONDS) {
-                    setEstimatedWaitSeconds(retryAfter);
+                if (error === "rate_limited" || retry_after) {
+                    const waitTime = retry_after ?? 10;
+
+                    // UX: Always show confirm for rate limits now, so user can skip immediately
+                    setEstimatedWaitSeconds(waitTime);
                     setShowWaitConfirm(true);
                     setPendingVerification({
                         submissionId: response.submission.id,
@@ -199,20 +205,19 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                         steps,
                         forDate: date,
                         proofPath: signed.path,
-                        retryAt: Date.now() + retryAfter * 1000,
+                        retryAt: Date.now() + waitTime * 1000,
                         attempts: 0,
                     });
+
+                    if (error === "rate_limited") {
+                        setStatus(`Rate limited. Waiting ${waitTime}s...`);
+                    }
                 } else {
-                    setStatus(`Submission saved! Verification queued (waiting ${retryAfter}s due to rate limit)...`);
-                    setPendingVerification({
-                        submissionId: response.submission.id,
-                        leagueId,
-                        steps,
-                        forDate: date,
-                        proofPath: signed.path,
-                        retryAt: Date.now() + retryAfter * 1000,
-                        attempts: 0,
-                    });
+                    // Permanent error or non-rate-limit error (e.g. step mismatch, bad image)
+                    setPendingVerification(null);
+                    // Use the detailed message from the backend
+                    setError(`Verification Failed: ${message}`);
+                    setStatus("Submission saved as Pending (Manual Review Required)");
                 }
             } else if (response.verification?.verified !== undefined) {
                 setStatus(response.verification.verified
@@ -222,8 +227,7 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                     onSubmitted();
                 }
             } else {
-                // Verification failed or returned no result - set up retry
-                // This handles cases where Edge Function failed, timed out, or returned an error
+                // No result yet - set up retry loop
                 setStatus("Submission saved! Verification in progress...");
                 setPendingVerification({
                     submissionId: response.submission.id,
@@ -241,7 +245,7 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
             } else if (err instanceof Error) {
                 setError(err.message);
             } else {
-                setError("Unexpected error");
+                setError("Unexpected error during submission");
             }
         } finally {
             setSubmitting(false);

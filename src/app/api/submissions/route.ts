@@ -87,11 +87,18 @@ export async function POST(request: Request): Promise<Response> {
             league_id: input.league_id,
             submission_id: submission.id,
             requester_id: user.id,
-        }).catch((err) => ({
-            status: 500,
-            ok: false,
-            data: { error: "verification_failed", message: String(err) }
-        }));
+        }).catch((err) => {
+            return {
+                status: 500,
+                ok: false,
+                data: {
+                    code: "internal_error",
+                    message: String(err),
+                    should_retry: false,
+                    retry_after: undefined
+                }
+            };
+        });
 
         // Fetch updated submission (verification may have updated it)
         const { data: refreshed } = await adminClient
@@ -107,7 +114,13 @@ export async function POST(request: Request): Promise<Response> {
         if (verification.ok) {
             payload.verification = verification.data;
         } else {
-            payload.verification_error = verification.data;
+            payload.verification_error = {
+                // Map new structure to what client expects, or pass through
+                error: verification.data.code ?? "verification_failed",
+                message: verification.data.message ?? "Verification failed",
+                retry_after: verification.data.retry_after,
+                should_retry: verification.data.should_retry,
+            };
         }
 
         const status = verification.ok ? 201 : 202;
