@@ -86,7 +86,7 @@ export function DatePicker({
             )}
 
             <div className="flex gap-2">
-                {/* Native date input (styled) */}
+                {/* Native date input (styled for dark mode) */}
                 <input
                     type="date"
                     value={value}
@@ -96,6 +96,9 @@ export function DatePicker({
                     required={required}
                     disabled={disabled}
                     className="flex-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-slate-50 focus:border-sky-500 focus:outline-none disabled:opacity-50"
+                    style={{
+                        colorScheme: "dark",
+                    }}
                 />
 
                 {/* Quick select button */}
@@ -119,8 +122,8 @@ export function DatePicker({
                             type="button"
                             onClick={() => handleQuickSelect(date)}
                             className={`w-full px-3 py-2 text-left text-sm transition hover:bg-slate-700 ${value === date.toISOString().slice(0, 10)
-                                    ? "bg-sky-600/20 text-sky-400"
-                                    : "text-slate-300"
+                                ? "bg-sky-600/20 text-sky-400"
+                                : "text-slate-300"
                                 }`}
                         >
                             {label}
