@@ -8,6 +8,9 @@ interface League {
   id: string;
   name: string;
   role: string;
+  member_count: number;
+  user_rank: number;
+  user_steps_this_week: number;
 }
 
 export default function DashboardPage() {
@@ -20,7 +23,6 @@ export default function DashboardPage() {
 
     const fetchLeagues = async () => {
       try {
-        // Use API route to avoid RLS infinite recursion issues
         const response = await fetch("/api/leagues");
         if (!response.ok) {
           console.error("Error fetching leagues:", response.statusText);
@@ -29,13 +31,7 @@ export default function DashboardPage() {
         }
 
         const data = await response.json();
-        const mapped = (data.leagues || []).map((league: any) => ({
-          id: league.id,
-          name: league.name,
-          role: league.role,
-        }));
-
-        setLeagues(mapped);
+        setLeagues(data.leagues || []);
       } catch (error) {
         console.error("Error fetching leagues:", error);
       } finally {
@@ -48,7 +44,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-950">
-      {/* Main content */}
       <div className="mx-auto max-w-5xl px-6 py-12">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-slate-50">Your Leagues</h1>
@@ -89,6 +84,27 @@ export default function DashboardPage() {
                   {league.name}
                 </h3>
                 <p className="mt-1 text-sm text-slate-500 capitalize">{league.role}</p>
+
+                {/* Stats row */}
+                <div className="mt-4 flex items-center gap-4 text-xs">
+                  <div className="flex items-center gap-1 text-slate-400">
+                    <span>👥</span>
+                    <span>{league.member_count} member{league.member_count !== 1 ? "s" : ""}</span>
+                  </div>
+                  {league.user_rank > 0 && (
+                    <div className="flex items-center gap-1 text-emerald-400">
+                      <span>🏆</span>
+                      <span>#{league.user_rank} of {league.member_count}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Weekly steps */}
+                {league.user_steps_this_week > 0 && (
+                  <div className="mt-2 text-sm text-sky-400">
+                    {league.user_steps_this_week.toLocaleString()} steps this week
+                  </div>
+                )}
               </Link>
             ))}
           </div>
@@ -97,3 +113,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+

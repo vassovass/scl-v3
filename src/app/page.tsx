@@ -1,6 +1,35 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 export default function HomePage() {
+  const { session, loading } = useAuth();
+  const router = useRouter();
+
+  // Auto-redirect logged-in users to dashboard
+  useEffect(() => {
+    if (!loading && session) {
+      router.replace("/dashboard");
+    }
+  }, [session, loading, router]);
+
+  // Show loading or nothing while checking auth
+  if (loading) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center px-6">
+        <div className="text-slate-400">Loading...</div>
+      </main>
+    );
+  }
+
+  // If logged in, show nothing (redirect in progress)
+  if (session) {
+    return null;
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6">
       <div className="mx-auto max-w-2xl text-center">

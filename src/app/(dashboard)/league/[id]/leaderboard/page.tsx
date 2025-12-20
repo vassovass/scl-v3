@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { DatePicker } from "@/components/ui/DatePicker";
 
-type Period = "day" | "week" | "month";
+type Period = "day" | "week" | "month" | "year" | "all" | "custom";
+type VerifiedFilter = "all" | "verified" | "unverified";
 
 interface LeaderboardEntry {
   rank: number;
@@ -31,6 +33,11 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [period, setPeriod] = useState<Period>("day");
+  const [verifiedFilter, setVerifiedFilter] = useState<VerifiedFilter>("all");
+
+  // Custom date range
+  const [customStartDate, setCustomStartDate] = useState<string>("");
+  const [customEndDate, setCustomEndDate] = useState<string>("");
 
   // Calculate date range based on period
   const getDateRange = (p: Period): string[] => {
@@ -51,6 +58,16 @@ export default function LeaderboardPage() {
         date.setDate(today.getDate() - i);
         dates.push(date.toISOString().split("T")[0]);
       }
+    } else if (p === "year") {
+      for (let i = 0; i < 365; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        dates.push(date.toISOString().split("T")[0]);
+      }
+    } else if (p === "all") {
+      return ["all"];
+    } else if (p === "custom") {
+      return ["custom"];
     }
 
     return dates;
@@ -65,16 +82,19 @@ export default function LeaderboardPage() {
 
       try {
         const dates = getDateRange(period);
-        const datesParam = dates.join(",");
+        let url = `/api/leaderboard?league_id=${leagueId}&period=${period}&verified=${verifiedFilter}`;
 
-        const res = await fetch(
-          `/api/leaderboard?league_id=${leagueId}&period=${period}&dates=${datesParam}`,
-          {
-            headers: {
-              Authorization: `Bearer ${session.access_token}`,
-            },
-          }
-        );
+        if (period === "custom" && customStartDate && customEndDate) {
+          url += `&start_date=${customStartDate}&end_date=${customEndDate}`;
+        } else if (period !== "custom") {
+          url += `&dates=${dates.join(",")}`;
+        }
+
+        const res = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
 
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
@@ -95,14 +115,35 @@ export default function LeaderboardPage() {
       }
     };
 
+    // Don't fetch if custom period but dates not set
+    if (period === "custom" && (!customStartDate || !customEndDate)) {
+      setLoading(false);
+      return;
+    }
+
     fetchLeaderboard();
-  }, [session, leagueId, period]);
+  }, [session, leagueId, period, verifiedFilter, customStartDate, customEndDate]);
 
   const getPeriodLabel = (p: Period) => {
     switch (p) {
       case "day": return "Today";
-      case "week": return "This Week";
-      case "month": return "This Month";
+      case "week": return "Week";
+      case "month": return "Month";
+      case "year": return "Year";
+      case "all": return "All Time";
+      case "custom": return "Custom";
+    }
+  };
+
+  const handlePeriodChange = (p: Period) => {
+    setPeriod(p);
+    if (p === "custom" && !customStartDate) {
+      // Set default custom range to last 7 days
+      const today = new Date();
+      const weekAgo = new Date(today);
+      weekAgo.setDate(today.getDate() - 7);
+      setCustomEndDate(today.toISOString().slice(0, 10));
+      setCustomStartDate(weekAgo.toISOString().slice(0, 10));
     }
   };
 
@@ -124,14 +165,14 @@ export default function LeaderboardPage() {
       {/* Period Tabs */}
       <div className="border-b border-slate-800">
         <div className="mx-auto max-w-3xl px-6">
-          <div className="flex gap-1">
-            {(["day", "week", "month"] as Period[]).map((p) => (
+          <div className="flex gap-1 overflow-x-auto">
+            {(["day", "week", "month", "year", "all", "custom"] as Period[]).map((p) => (
               <button
                 key={p}
-                onClick={() => setPeriod(p)}
-                className={`px-4 py-3 text-sm font-medium transition border-b-2 -mb-px ${period === p
-                    ? "border-sky-500 text-sky-400"
-                    : "border-transparent text-slate-400 hover:text-slate-300"
+                onClick={() => handlePeriodChange(p)}
+                className={`px-4 py-3 text-sm font-medium transition border-b-2 -mb-px whitespace-nowrap ${period === p
+                  ? "border-sky-500 text-sky-400"
+                  : "border-transparent text-slate-400 hover:text-slate-300"
                   }`}
               >
                 {getPeriodLabel(p)}
@@ -141,8 +182,52 @@ export default function LeaderboardPage() {
         </div>
       </div>
 
+      {/* Custom Date Range */}
+      {period === "custom" && (
+        <div className="mx-auto max-w-3xl px-6 py-4 border-b border-slate-800">
+          <div className="flex flex-wrap items-end gap-4">
+            <div className="flex-1 min-w-[150px]">
+              <DatePicker
+                value={customStartDate}
+                onChange={setCustomStartDate}
+                label="From"
+                max={customEndDate || new Date().toISOString().slice(0, 10)}
+              />
+            </div>
+            <div className="flex-1 min-w-[150px]">
+              <DatePicker
+                value={customEndDate}
+                onChange={setCustomEndDate}
+                label="To"
+                min={customStartDate}
+                max={new Date().toISOString().slice(0, 10)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Filters */}
+      <div className="mx-auto max-w-3xl px-6 py-4">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-slate-500">Show:</span>
+          {(["all", "verified", "unverified"] as VerifiedFilter[]).map((f) => (
+            <button
+              key={f}
+              onClick={() => setVerifiedFilter(f)}
+              className={`px-3 py-1 text-xs rounded-full transition ${verifiedFilter === f
+                ? "bg-sky-600/20 text-sky-400 border border-sky-600"
+                : "bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-600"
+                }`}
+            >
+              {f === "all" ? "All" : f === "verified" ? "Verified Only" : "Unverified Only"}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Main */}
-      <div className="mx-auto max-w-3xl px-6 py-8">
+      <div className="mx-auto max-w-3xl px-6 py-4">
         {/* Stats Summary */}
         {meta && entries.length > 0 && (
           <div className="mb-6 grid grid-cols-2 gap-4">
@@ -173,9 +258,13 @@ export default function LeaderboardPage() {
               Try again
             </button>
           </div>
+        ) : period === "custom" && (!customStartDate || !customEndDate) ? (
+          <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-12 text-center">
+            <p className="text-slate-400">Select a date range above to view the leaderboard.</p>
+          </div>
         ) : entries.length === 0 ? (
           <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-12 text-center">
-            <p className="text-slate-400">No submissions {getPeriodLabel(period).toLowerCase()}.</p>
+            <p className="text-slate-400">No submissions for this period.</p>
           </div>
         ) : (
           <div className="overflow-hidden rounded-xl border border-slate-800">
@@ -208,12 +297,12 @@ export default function LeaderboardPage() {
                     <td className="px-4 py-3">
                       <span
                         className={`inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${entry.rank === 1
-                            ? "bg-yellow-500/20 text-yellow-400"
-                            : entry.rank === 2
-                              ? "bg-slate-400/20 text-slate-300"
-                              : entry.rank === 3
-                                ? "bg-amber-600/20 text-amber-500"
-                                : "bg-slate-800 text-slate-400"
+                          ? "bg-yellow-500/20 text-yellow-400"
+                          : entry.rank === 2
+                            ? "bg-slate-400/20 text-slate-300"
+                            : entry.rank === 3
+                              ? "bg-amber-600/20 text-amber-500"
+                              : "bg-slate-800 text-slate-400"
                           }`}
                       >
                         {entry.rank}
@@ -251,4 +340,3 @@ export default function LeaderboardPage() {
     </div>
   );
 }
-
