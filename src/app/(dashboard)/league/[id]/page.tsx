@@ -8,6 +8,7 @@ import { SubmissionForm } from "@/components/forms/SubmissionForm";
 import { BatchSubmissionForm } from "@/components/forms/BatchSubmissionForm";
 import { BulkUnverifiedForm } from "@/components/forms/BulkUnverifiedForm";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
+import { LeagueInviteControl } from "@/components/league/LeagueInviteControl";
 
 interface League {
   id: string;
@@ -106,13 +107,7 @@ export default function LeaguePage() {
     fetchSubmissions();
   };
 
-  const copyInviteCode = () => {
-    if (league?.invite_code) {
-      navigator.clipboard.writeText(league.invite_code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
+
 
   const getVerificationBadge = (verified: boolean | null) => {
     if (verified === true) {
@@ -185,12 +180,10 @@ export default function LeaguePage() {
             >
               📊 Analytics
             </Link>
-            <button
-              onClick={copyInviteCode}
-              className="rounded-lg border border-slate-700 px-6 py-3 text-sm font-medium text-slate-300 transition hover:border-slate-500"
-            >
-              {copied ? "Copied!" : `Invite Code: ${league.invite_code}`}
-            </button>
+            <LeagueInviteControl
+              inviteCode={league.invite_code}
+              leagueName={league.name}
+            />
           </div>
         </ModuleFeedback>
 
