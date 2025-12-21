@@ -185,9 +185,10 @@ npx tsc --noEmit # Type check
 
 **AI agents MUST update documentation on every commit/push:**
 
-1. **README.md** - Update features list if adding new features
-2. **ROADMAP.md** - Move completed items to "Completed", update "In Progress"
-3. **AGENTS.md** - Update "Key Features" section if structure changes
+1. **CHANGELOG.md** - Add entry for every change (date, category, description)
+2. **README.md** - Update features list if adding new features
+3. **ROADMAP.md** - Move completed items to "Completed", update "In Progress"
+4. **AGENTS.md** - Update "Key Features" section if structure changes
 
 This ensures documentation stays current for future sessions and developers.
 
@@ -198,6 +199,7 @@ This ensures documentation stays current for future sessions and developers.
 | File | Purpose |
 |------|---------|
 | [README.md](./README.md) | Setup, deployment, overview for developers |
+| [CHANGELOG.md](./CHANGELOG.md) | All changes by date (must update every commit) |
 | [ROADMAP.md](./ROADMAP.md) | Upcoming features and planned work |
 | [CLAUDE.md](./CLAUDE.md) | Claude-specific notes (references this file) |
 | [.cursor/rules/](./cursor/rules/) | Cursor IDE rules |
