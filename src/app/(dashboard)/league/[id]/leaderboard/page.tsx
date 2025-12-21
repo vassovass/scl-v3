@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
+import { ShareAchievementButton, AchievementData } from "@/components/ui/AchievementShareCard";
 
 type PeriodPreset =
   | "today" | "yesterday"
@@ -331,6 +332,22 @@ export default function LeaderboardPage() {
                       <td className="px-3 py-3">
                         <span className="text-slate-100">{entry.display_name || "Anonymous"}</span>
                         {entry.user_id === session?.user?.id && <span className="ml-1 text-xs text-sky-400">(You)</span>}
+                        {entry.user_id === session?.user?.id && (
+                          <ShareAchievementButton
+                            achievement={{
+                              type: entry.rank === 1 ? "leader" : "rank",
+                              value: entry.total_steps,
+                              label: "steps",
+                              rank: entry.rank,
+                              totalMembers: meta?.total_members,
+                              userName: entry.display_name || "I",
+                              leagueName: "Step Counter League",
+                            } as AchievementData}
+                            className="ml-2 text-xs"
+                          >
+                            🎉 Share
+                          </ShareAchievementButton>
+                        )}
                       </td>
                       <td className="px-3 py-3 text-right font-mono text-slate-100">
                         {entry.total_steps.toLocaleString()}

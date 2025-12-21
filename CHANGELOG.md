@@ -40,6 +40,9 @@ All notable changes to StepCountLeague v3.
 ### Added
 - **Submit Another Batch** button after completing batch submission
 - **Compact calendar heatmap** - smaller squares, submission ratio on hover
+- **Achievement Share Cards** - branded shareable images with rank, steps, league name
+- **Screenshot capture** - uses html2canvas to create shareable PNG images
+- **🎉 Share button** on leaderboard for user's own rank with WhatsApp/native share
 
 ---
 
