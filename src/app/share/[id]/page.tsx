@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { APP_CONFIG } from "@/lib/config";
 
 interface SharePageProps {
     params: { id: string };
@@ -11,7 +12,7 @@ export async function generateMetadata({ searchParams }: SharePageProps): Promis
     const steps = parseInt(searchParams.steps || "0");
     const period = searchParams.period || "this week";
     const name = searchParams.name || "Someone";
-    const league = searchParams.league || "Step Counter League";
+    const league = searchParams.league || APP_CONFIG.name;
     const improvement = searchParams.improvement ? parseInt(searchParams.improvement) : null;
     const type = searchParams.type || "rank";
 
@@ -35,7 +36,7 @@ export async function generateMetadata({ searchParams }: SharePageProps): Promis
         title = `🏆 ${name} ranked #${rank} in ${league}!`;
     }
 
-    const description = `${steps.toLocaleString()} steps ${period}${improvement ? ` (+${improvement}% improvement!)` : ""}. Join the challenge! #StepCountLeague`;
+    const description = `${steps.toLocaleString()} steps ${period}${improvement ? ` (+${improvement}% improvement!)` : ""}. Join the challenge! ${APP_CONFIG.hashtag}`;
 
     // Dynamic OG Image URL (Vercel OG)
     const ogImageUrl = new URL("/api/og", process.env.NEXT_PUBLIC_APP_URL || "https://scl-v3.vercel.app");
@@ -78,7 +79,7 @@ export default function SharePage({ searchParams }: SharePageProps) {
     const steps = parseInt(searchParams.steps || "0");
     const period = searchParams.period || "this week";
     const name = searchParams.name || "Someone";
-    const league = searchParams.league || "Step Counter League";
+    const league = searchParams.league || APP_CONFIG.name;
     const improvement = searchParams.improvement ? parseInt(searchParams.improvement) : null;
     const type = searchParams.type || "rank";
 
@@ -122,7 +123,7 @@ export default function SharePage({ searchParams }: SharePageProps) {
 
                     <div className="mt-8 pt-4 border-t border-slate-700">
                         <div className="text-sm font-semibold text-slate-300">
-                            Step<span className="text-sky-400">Count</span>League
+                            {APP_CONFIG.name}
                         </div>
                     </div>
                 </div>

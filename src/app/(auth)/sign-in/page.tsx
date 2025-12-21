@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { APP_CONFIG } from "@/lib/config";
 
 function SignInForm() {
   const router = useRouter();
@@ -94,7 +95,7 @@ function SignInForm() {
   return (
     <div className="w-full max-w-sm">
       <h1 className="text-center text-2xl font-bold text-slate-50">
-        Sign in to SCL
+        Sign in to {APP_CONFIG.name}
       </h1>
       <p className="mt-2 text-center text-sm text-slate-400">
         Welcome back! Enter your credentials.

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { APP_CONFIG } from "@/lib/config";
 
 interface LeagueInviteControlProps {
     inviteCode: string;
@@ -44,7 +45,7 @@ export function LeagueInviteControl({ inviteCode, leagueName, className = "" }: 
             try {
                 await navigator.share({
                     title: `Join ${leagueName}`,
-                    text: `Join me in ${leagueName} on StepCountLeague!`,
+                    text: `Join me in ${leagueName} on ${APP_CONFIG.name}!`,
                     url: getInviteUrl(),
                 });
                 setIsOpen(false);
@@ -57,13 +58,13 @@ export function LeagueInviteControl({ inviteCode, leagueName, className = "" }: 
     };
 
     const shareWhatsApp = () => {
-        const text = `Join me in ${leagueName} on StepCountLeague! ${getInviteUrl()}`;
+        const text = `Join me in ${leagueName} on ${APP_CONFIG.name}! ${getInviteUrl()}`;
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
         setIsOpen(false);
     };
 
     const shareTwitter = () => {
-        const text = `Join me in ${leagueName} on StepCountLeague!`;
+        const text = `Join me in ${leagueName} on ${APP_CONFIG.name}!`;
         window.open(
             `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(getInviteUrl())}`,
             "_blank"

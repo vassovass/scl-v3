@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { createAdminClient, createServerSupabaseClient } from "@/lib/supabase/server";
 import { JoinLeagueForm } from "@/components/forms/JoinLeagueForm";
+import { APP_CONFIG } from "@/lib/config";
 
 interface InvitePageProps {
     params: { code: string };
@@ -37,7 +38,7 @@ export async function generateMetadata({ params }: InvitePageProps): Promise<Met
         };
     }
 
-    const title = `Join ${league.name} on StepCountLeague`;
+    const title = `Join ${league.name} on ${APP_CONFIG.name}`;
     const description = `You've been invited to join ${league.name}! Track your steps, compete with friends, and stay active.`;
 
     // Dynamic OG Image URL
@@ -145,7 +146,7 @@ export default async function InvitePage({ params }: InvitePageProps) {
                                 {/* We reuse the Logic from Join Page but pre-fill code */}
                                 <JoinLeagueForm prefilledCode={params.code} />
                                 <p className="text-xs text-slate-500 mt-6">
-                                    StepCountLeague is the best place to track steps with friends.
+                                    {APP_CONFIG.name} is the best place to track steps with friends.
                                 </p>
                             </>
                         )}

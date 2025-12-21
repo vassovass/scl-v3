@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { APP_CONFIG } from "@/lib/config";
 
 export function GlobalFooter() {
     const currentYear = new Date().getFullYear();
@@ -13,10 +14,10 @@ export function GlobalFooter() {
                     <div className="col-span-2 md:col-span-1">
                         <Link href="/dashboard" className="flex items-center gap-2 text-slate-200">
                             <span className="text-xl">👟</span>
-                            <span className="font-bold">StepCountLeague</span>
+                            <span className="font-bold">{APP_CONFIG.name}</span>
                         </Link>
                         <p className="mt-2 text-xs text-slate-500">
-                            Compete with friends to walk more steps together.
+                            {APP_CONFIG.tagline}
                         </p>
                     </div>
 
@@ -85,7 +86,7 @@ export function GlobalFooter() {
                 {/* Bottom bar */}
                 <div className="mt-8 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-xs text-slate-600">
-                        © {currentYear} Step Counter League. All rights reserved.
+                        © {currentYear} {APP_CONFIG.name}. All rights reserved.
                     </p>
                     <div className="flex items-center gap-4 text-xs text-slate-600">
                         <span className="flex items-center gap-1">

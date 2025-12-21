@@ -4,8 +4,8 @@ import { AuthProvider } from "@/components/providers/AuthProvider";
 import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
-  title: "StepCountLeague",
-  description: "Compete with friends in step counting challenges",
+  title: "StepLeague",
+  description: "Step competition with friends",
 };
 
 export default function RootLayout({

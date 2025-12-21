@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { APP_CONFIG } from "@/lib/config";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -71,7 +72,7 @@ export default function SignUpPage() {
           Create your account
         </h1>
         <p className="mt-2 text-center text-sm text-slate-400">
-          Join StepCountLeague and start competing.
+          Join {APP_CONFIG.name} and start competing.
         </p>
 
         {/* Google Sign Up */}
