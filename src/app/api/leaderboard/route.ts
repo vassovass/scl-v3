@@ -43,6 +43,9 @@ interface ComparisonResult {
   common_days_steps_b: number | null;
   badges: string[];
   rank: number;
+  // Authoritative stats
+  current_streak: number;
+  total_steps_lifetime: number;
 }
 
 // GET /api/leaderboard
@@ -120,6 +123,14 @@ export async function GET(request: Request) {
       userSubmissionDates.get(sub.user_id)!.push(sub.for_date);
     }
 
+    // Fetch user records (streaks, lifetime steps)
+    const { data: userRecords } = await adminClient
+      .from("user_records")
+      .select("user_id, current_streak, total_steps_lifetime")
+      .in("user_id", allUserIds);
+
+    const recordsMap = new Map(userRecords?.map(r => [r.user_id, r]));
+
     // Build results
     const results: ComparisonResult[] = [];
 
@@ -146,20 +157,25 @@ export async function GET(request: Request) {
         }
       }
 
-      // Calculate streak
-      const streak = calculateStreak(userSubmissionDates.get(userId) || []);
+      // Calculate streak from period (fallback)
+      const periodStreak = calculateStreak(userSubmissionDates.get(userId) || []);
+      const record = recordsMap.get(userId);
+      const currentStreak = record?.current_streak ?? periodStreak; // Use DB streak if avail
+      const lifetimeSteps = record?.total_steps_lifetime ?? 0;
 
       results.push({
         user_id: userId,
         display_name: a.display_name,
         nickname: a.nickname,
-        period_a: { ...a, streak },
+        period_a: { ...a, streak: periodStreak }, // Keep period streak in stats object for context? Or update?
         period_b: b,
         improvement_pct: improvementPct,
         common_days_steps_a: commonDaysStepsA,
         common_days_steps_b: commonDaysStepsB,
         badges: [],
         rank: 0,
+        current_streak: currentStreak,
+        total_steps_lifetime: Number(lifetimeSteps),
       });
     }
 
@@ -321,12 +337,23 @@ function assignBadges(results: ComparisonResult[]) {
   // Consistent badge (submitted every day in period)
   // Would need to know total days in period - skip for now
 
-  // Streak badges
+  // Streak badges (using authoritative streak)
   for (const r of results) {
-    if (r.period_a.streak >= 7) {
+    if (r.current_streak >= 30) {
+      r.badges.push("streak_30");
+    } else if (r.current_streak >= 7) {
       r.badges.push("streak_7");
-    } else if (r.period_a.streak >= 3) {
+    } else if (r.current_streak >= 3) {
       r.badges.push("streak_3");
+    }
+
+    // Lifetime Milestone badges
+    if (r.total_steps_lifetime >= 1000000) { // 1 Million
+      r.badges.push("million_club");
+    } else if (r.total_steps_lifetime >= 500000) {
+      r.badges.push("500k_club");
+    } else if (r.total_steps_lifetime >= 100000) {
+      r.badges.push("100k_club");
     }
   }
 }

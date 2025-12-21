@@ -124,6 +124,7 @@ scl-v3/
 | `submissions` | league_id, user_id, for_date, steps, verified, `flagged` |
 | `feedback` | type, subject, description, screenshot_url |
 | `module_feedback` | module_id, feedback_type, comment, screenshot_url |
+| `user_records` | user_id, best_day_steps, best_day_date, current_streak, total_steps_lifetime |
 
 ---
 

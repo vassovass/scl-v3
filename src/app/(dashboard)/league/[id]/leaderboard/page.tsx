@@ -63,8 +63,12 @@ const PERIOD_OPTIONS: { value: PeriodPreset; label: string }[] = [
 const BADGE_INFO: Record<string, { icon: string; label: string; color: string }> = {
   leader: { icon: "👑", label: "Leader", color: "text-yellow-400" },
   most_improved: { icon: "🚀", label: "Most Improved", color: "text-emerald-400" },
+  streak_30: { icon: "🔥", label: "30+ Day Streak", color: "text-red-500" },
   streak_7: { icon: "🔥", label: "7+ Day Streak", color: "text-orange-400" },
   streak_3: { icon: "🔥", label: "3+ Day Streak", color: "text-orange-300" },
+  million_club: { icon: "💎", label: "1 Million Steps Club", color: "text-purple-400" },
+  "500k_club": { icon: "👟", label: "500k Steps Club", color: "text-indigo-400" },
+  "100k_club": { icon: "👟", label: "100k Steps Club", color: "text-sky-400" },
 };
 
 export default function LeaderboardPage() {

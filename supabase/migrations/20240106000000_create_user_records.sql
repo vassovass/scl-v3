@@ -96,12 +96,7 @@ BEGIN
         target_user_id,
         max_steps,
         max_steps_date,
-        CASE WHEN last_date = CURRENT_DATE OR last_date = CURRENT_DATE - 1 THEN curr_streak ELSE 0 END, -- Current streak is 0 if broken today/yesterday? 
-        -- Actually, if last_date is yesterday, streak is alive. If today, streak is alive.
-        -- If last_date < yesterday, streak is technically 0 for "current active streak" context?
-        -- But simplified: just store the calculated streak ending at last_date.
-        -- Let's store 'curr_streak' as calculated at the end of history.
-        curr_streak,
+        CASE WHEN last_date >= CURRENT_DATE - 1 THEN curr_streak ELSE 0 END,
         max_streak,
         total_steps,
         last_date,
