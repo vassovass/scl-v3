@@ -21,7 +21,7 @@ export function JoinLeagueForm({ prefilledCode = "" }: JoinLeagueFormProps) {
         if (!session) {
             // If not logged in, redirect to login with callback
             // This is simplified; invite page might handle auth differently
-            router.push(`/login?next=/invite/${inviteCode}`);
+            router.push(`/sign-in?redirect=/invite/${inviteCode}`);
             return;
         }
 
