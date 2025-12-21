@@ -13,7 +13,7 @@
 - **Language**: TypeScript (strict)
 - **Styling**: Tailwind CSS (mobile-first)
 - **Database**: Supabase (PostgreSQL + RLS)
-- **AI Verification**: Gemini 2.5 Flash (via Supabase Edge Functions)
+- **AI Verification**: Gemini 2.0 Flash (via Supabase Edge Functions)
 - **Hosting**: Vercel
 
 ---

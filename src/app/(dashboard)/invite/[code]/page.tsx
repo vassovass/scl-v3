@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { createAdminClient } from "@/lib/supabase/server";
+import { createAdminClient, createServerSupabaseClient } from "@/lib/supabase/server";
 import { JoinLeagueForm } from "@/components/forms/JoinLeagueForm";
 
 interface InvitePageProps {
@@ -72,6 +72,23 @@ export async function generateMetadata({ params }: InvitePageProps): Promise<Met
 
 export default async function InvitePage({ params }: InvitePageProps) {
     const league = await getLeague(params.code);
+    const supabase = await createServerSupabaseClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Check if user is already a member
+    let isMember = false;
+    if (user && league) {
+        const { data: membership } = await createAdminClient()
+            .from("memberships")
+            .select("id")
+            .eq("league_id", league.id)
+            .eq("user_id", user.id)
+            .single();
+
+        if (membership) {
+            isMember = true;
+        }
+    }
 
     if (!league) {
         return (
@@ -111,12 +128,27 @@ export default async function InvitePage({ params }: InvitePageProps) {
                     </div>
 
                     <div className="space-y-4">
-                        {/* We reuse the Logic from Join Page but pre-fill code */}
-                        <JoinLeagueForm prefilledCode={params.code} />
-
-                        <p className="text-xs text-slate-500 mt-6">
-                            StepCountLeague is the best place to track steps with friends.
-                        </p>
+                        {isMember ? (
+                            <div className="space-y-4">
+                                <div className="rounded-lg border border-sky-500/20 bg-sky-500/10 p-4 text-sky-200 text-sm">
+                                    You are already a member of this league!
+                                </div>
+                                <Link
+                                    href={`/league/${league.id}`}
+                                    className="block w-full rounded-lg bg-sky-600 px-4 py-3 text-sm font-semibold text-white hover:bg-sky-500 transition"
+                                >
+                                    Go to League Dashboard
+                                </Link>
+                            </div>
+                        ) : (
+                            <>
+                                {/* We reuse the Logic from Join Page but pre-fill code */}
+                                <JoinLeagueForm prefilledCode={params.code} />
+                                <p className="text-xs text-slate-500 mt-6">
+                                    StepCountLeague is the best place to track steps with friends.
+                                </p>
+                            </>
+                        )}
                     </div>
                 </div>
 

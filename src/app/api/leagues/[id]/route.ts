@@ -39,14 +39,23 @@ export async function GET(
             .eq("user_id", user.id)
             .single();
 
-        if (!membership) {
+        // Check for super admin status
+        const { data: userProfile } = await adminClient
+            .from("users")
+            .select("is_superadmin")
+            .eq("id", user.id)
+            .single();
+
+        const isSuperAdmin = userProfile?.is_superadmin ?? false;
+
+        if (!membership && !isSuperAdmin) {
             return forbidden("You are not a member of this league");
         }
 
         return json({
             league: {
                 ...league,
-                role: membership.role,
+                role: membership?.role ?? (isSuperAdmin ? "owner" : null), // Give Super Admin owner-level access in UI
             },
         });
     } catch (error) {
@@ -73,7 +82,7 @@ export async function DELETE(
 
         const adminClient = createAdminClient();
 
-        // Check if user is admin of this league
+        // Check permissions: Super Admin OR (Member AND (Admin OR Owner))
         const { data: membership } = await adminClient
             .from("memberships")
             .select("role")
@@ -81,8 +90,17 @@ export async function DELETE(
             .eq("user_id", user.id)
             .single();
 
-        if (!membership || membership.role !== "admin") {
-            return forbidden("Only league admins can delete leagues");
+        const { data: userProfile } = await adminClient
+            .from("users")
+            .select("is_superadmin")
+            .eq("id", user.id)
+            .single();
+
+        const isSuperAdmin = userProfile?.is_superadmin ?? false;
+        const isLeagueAdmin = membership?.role === "admin" || membership?.role === "owner";
+
+        if (!isSuperAdmin && !isLeagueAdmin) {
+            return forbidden("Only league admins or owners can delete leagues");
         }
 
         // Get league
@@ -157,7 +175,7 @@ export async function PATCH(
 
         const adminClient = createAdminClient();
 
-        // Check if user is admin
+        // Check permissions: Super Admin OR (Member AND (Admin OR Owner))
         const { data: membership } = await adminClient
             .from("memberships")
             .select("role")
@@ -165,8 +183,17 @@ export async function PATCH(
             .eq("user_id", user.id)
             .single();
 
-        if (!membership || membership.role !== "admin") {
-            return forbidden("Only league admins can restore leagues");
+        const { data: userProfile } = await adminClient
+            .from("users")
+            .select("is_superadmin")
+            .eq("id", user.id)
+            .single();
+
+        const isSuperAdmin = userProfile?.is_superadmin ?? false;
+        const isLeagueAdmin = membership?.role === "admin" || membership?.role === "owner";
+
+        if (!isSuperAdmin && !isLeagueAdmin) {
+            return forbidden("Only league admins or owners can restore leagues");
         }
 
         // Restore by clearing deleted_at

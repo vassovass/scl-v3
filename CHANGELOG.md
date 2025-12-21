@@ -63,7 +63,7 @@ All notable changes to StepCountLeague v3.
 
 ### Fixed
 - Rate limiting error display improvements
-- Gemini verification using correct model (2.5 Flash)
+- Gemini verification using correct model (2.0 Flash)
 
 ---
 

@@ -58,7 +58,17 @@ export async function POST(request: Request): Promise<Response> {
             return jsonError(404, "Submission not found");
         }
 
-        if (submission.user_id !== user.id) {
+        // Check for super admin status
+        const { data: userProfile } = await adminClient
+            .from("users")
+            .select("is_superadmin")
+            .eq("id", user.id)
+            .single();
+
+        const isSuperAdmin = userProfile?.is_superadmin ?? false;
+        const isLeagueAdmin = membership.role === "admin" || membership.role === "owner";
+
+        if (submission.user_id !== user.id && !isLeagueAdmin && !isSuperAdmin) {
             return forbidden("You can only verify your own submissions");
         }
 

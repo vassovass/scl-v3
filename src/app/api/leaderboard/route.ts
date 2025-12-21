@@ -83,7 +83,16 @@ export async function GET(request: Request) {
       .eq("user_id", user.id)
       .single();
 
-    if (!membership) {
+    // Check for super admin status
+    const { data: userProfile } = await adminClient
+      .from("users")
+      .select("is_superadmin")
+      .eq("id", user.id)
+      .single();
+
+    const isSuperAdmin = userProfile?.is_superadmin ?? false;
+
+    if (!membership && !isSuperAdmin) {
       return forbidden("You are not a member of this league");
     }
 
