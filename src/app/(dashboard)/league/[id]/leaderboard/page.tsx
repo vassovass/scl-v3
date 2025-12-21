@@ -71,6 +71,11 @@ const BADGE_INFO: Record<string, { icon: string; label: string; color: string }>
   "100k_club": { icon: "👟", label: "100k Steps Club", color: "text-sky-400" },
 };
 
+function formatDate(dateStr: string) {
+  if (!dateStr) return "";
+  return new Date(dateStr + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 export default function LeaderboardPage() {
   const params = useParams();
   const leagueId = params.id as string;
@@ -360,6 +365,8 @@ export default function LeaderboardPage() {
                               periodLabel: PERIOD_OPTIONS.find(p => p.value === period)?.label,
                               improvementPct: entry.improvement_pct ?? undefined,
                               comparisonPeriod: periodB ? PERIOD_OPTIONS.find(p => p.value === periodB)?.label?.toLowerCase() : undefined,
+                              dateRange: period === "custom" ? `${formatDate(customStartA)} - ${formatDate(customEndA)}` : undefined,
+                              comparisonDateRange: periodB === "custom" ? `${formatDate(customStartB)} - ${formatDate(customEndB)}` : undefined,
                             } as AchievementData}
                             className="ml-2 text-xs"
                           >

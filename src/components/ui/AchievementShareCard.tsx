@@ -16,6 +16,8 @@ export interface AchievementData {
     periodLabel?: string;
     improvementPct?: number;
     comparisonPeriod?: string;
+    dateRange?: string;
+    comparisonDateRange?: string;
 }
 
 interface AchievementShareCardProps {
@@ -43,7 +45,8 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
     };
 
     const getPeriodText = useCallback(() => {
-        if (achievement.periodLabel) return achievement.periodLabel.toLowerCase();
+        if (achievement.dateRange) return achievement.dateRange;
+        if (achievement.periodLabel && achievement.period !== "custom") return achievement.periodLabel.toLowerCase();
         switch (achievement.period) {
             case "today": return "today";
             case "yesterday": return "yesterday";
@@ -95,7 +98,7 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
         const name = achievement.userName || "I";
         const periodText = getPeriodText();
         const improvementText = achievement.improvementPct
-            ? ` That's +${achievement.improvementPct}% vs ${achievement.comparisonPeriod || "last period"}!`
+            ? ` That's +${achievement.improvementPct}% vs ${achievement.comparisonDateRange || achievement.comparisonPeriod || "last period"}!`
             : "";
 
         switch (achievement.type) {
@@ -182,7 +185,7 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
                     {achievement.improvementPct !== undefined && (
                         <div className="mt-4 text-center">
                             <span className={`inline-block px-3 py-1 rounded-full text-sm ${achievement.improvementPct >= 0 ? "bg-emerald-900/50 text-emerald-400" : "bg-rose-900/50 text-rose-400"}`}>
-                                {achievement.improvementPct >= 0 ? "📈 +" : "📉 "}{achievement.improvementPct}% vs {achievement.comparisonPeriod || "last period"}
+                                {achievement.improvementPct >= 0 ? "📈 +" : "📉 "}{achievement.improvementPct}% vs {achievement.comparisonDateRange || achievement.comparisonPeriod || "last period"}
                             </span>
                         </div>
                     )}
