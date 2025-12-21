@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { DatePicker } from "@/components/ui/DatePicker";
+import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
 
 type PeriodPreset =
   | "today" | "yesterday"
@@ -292,88 +293,90 @@ export default function LeaderboardPage() {
             <p className="text-slate-400">No submissions for this period.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-slate-800">
-            <table className="w-full text-sm">
-              <thead className="bg-slate-900">
-                <tr>
-                  <th className="px-3 py-3 text-left text-slate-400 font-medium">#</th>
-                  <th className="px-3 py-3 text-left text-slate-400 font-medium">Name</th>
-                  <th className="px-3 py-3 text-right text-slate-400 font-medium">Steps</th>
-                  <th className="px-3 py-3 text-center text-slate-400 font-medium">Days</th>
-                  {comparisonMode && (
-                    <>
-                      <th className="px-3 py-3 text-right text-slate-400 font-medium">Prev</th>
-                      <th className="px-3 py-3 text-right text-slate-400 font-medium">Δ%</th>
-                    </>
-                  )}
-                  <th className="px-3 py-3 text-right text-slate-400 font-medium">Avg/Day</th>
-                  <th className="px-3 py-3 text-center text-slate-400 font-medium">🔥</th>
-                  <th className="px-3 py-3 text-center text-slate-400 font-medium">Badges</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800">
-                {entries.map((entry) => (
-                  <tr
-                    key={entry.user_id}
-                    className={`hover:bg-slate-900/50 ${entry.user_id === session?.user?.id ? "bg-sky-950/20" : ""}`}
-                  >
-                    <td className="px-3 py-3">
-                      <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${entry.rank === 1 ? "bg-yellow-500/20 text-yellow-400" :
-                        entry.rank === 2 ? "bg-slate-400/20 text-slate-300" :
-                          entry.rank === 3 ? "bg-amber-600/20 text-amber-500" :
-                            "bg-slate-800 text-slate-400"
-                        }`}>
-                        {entry.rank}
-                      </span>
-                    </td>
-                    <td className="px-3 py-3">
-                      <span className="text-slate-100">{entry.display_name || "Anonymous"}</span>
-                      {entry.user_id === session?.user?.id && <span className="ml-1 text-xs text-sky-400">(You)</span>}
-                    </td>
-                    <td className="px-3 py-3 text-right font-mono text-slate-100">
-                      {entry.total_steps.toLocaleString()}
-                    </td>
-                    <td className="px-3 py-3 text-center text-sm">
-                      <span className="text-sky-400">{entry.days_submitted}</span>
-                      {entry.total_days_in_period && (
-                        <>
-                          <span className="text-slate-600">/</span>
-                          <span className="text-slate-400">{entry.total_days_in_period}</span>
-                        </>
-                      )}
-                    </td>
+          <ModuleFeedback moduleId="leaderboard-table" moduleName="Leaderboard Table">
+            <div className="overflow-x-auto rounded-xl border border-slate-800">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-900">
+                  <tr>
+                    <th className="px-3 py-3 text-left text-slate-400 font-medium">#</th>
+                    <th className="px-3 py-3 text-left text-slate-400 font-medium">Name</th>
+                    <th className="px-3 py-3 text-right text-slate-400 font-medium">Steps</th>
+                    <th className="px-3 py-3 text-center text-slate-400 font-medium">Days</th>
                     {comparisonMode && (
                       <>
-                        <td className="px-3 py-3 text-right font-mono text-slate-400">
-                          {entry.period_b_steps?.toLocaleString() ?? "—"}
-                        </td>
-                        <td className="px-3 py-3 text-right">
-                          {entry.improvement_pct !== null ? (
-                            <span className={entry.improvement_pct >= 0 ? "text-emerald-400" : "text-slate-500"}>
-                              {entry.improvement_pct >= 0 ? "+" : ""}{entry.improvement_pct}%
-                            </span>
-                          ) : "—"}
-                        </td>
+                        <th className="px-3 py-3 text-right text-slate-400 font-medium">Prev</th>
+                        <th className="px-3 py-3 text-right text-slate-400 font-medium">Δ%</th>
                       </>
                     )}
-                    <td className="px-3 py-3 text-right text-slate-400">
-                      {entry.average_per_day.toLocaleString()}
-                    </td>
-                    <td className="px-3 py-3 text-center">
-                      {entry.streak > 0 && <span className="text-orange-400">{entry.streak}</span>}
-                    </td>
-                    <td className="px-3 py-3 text-center">
-                      {entry.badges.map(badge => (
-                        <span key={badge} className={`mr-1 ${BADGE_INFO[badge]?.color || ""}`} title={BADGE_INFO[badge]?.label}>
-                          {BADGE_INFO[badge]?.icon || "🏅"}
-                        </span>
-                      ))}
-                    </td>
+                    <th className="px-3 py-3 text-right text-slate-400 font-medium">Avg/Day</th>
+                    <th className="px-3 py-3 text-center text-slate-400 font-medium">🔥</th>
+                    <th className="px-3 py-3 text-center text-slate-400 font-medium">Badges</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-slate-800">
+                  {entries.map((entry) => (
+                    <tr
+                      key={entry.user_id}
+                      className={`hover:bg-slate-900/50 ${entry.user_id === session?.user?.id ? "bg-sky-950/20" : ""}`}
+                    >
+                      <td className="px-3 py-3">
+                        <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${entry.rank === 1 ? "bg-yellow-500/20 text-yellow-400" :
+                          entry.rank === 2 ? "bg-slate-400/20 text-slate-300" :
+                            entry.rank === 3 ? "bg-amber-600/20 text-amber-500" :
+                              "bg-slate-800 text-slate-400"
+                          }`}>
+                          {entry.rank}
+                        </span>
+                      </td>
+                      <td className="px-3 py-3">
+                        <span className="text-slate-100">{entry.display_name || "Anonymous"}</span>
+                        {entry.user_id === session?.user?.id && <span className="ml-1 text-xs text-sky-400">(You)</span>}
+                      </td>
+                      <td className="px-3 py-3 text-right font-mono text-slate-100">
+                        {entry.total_steps.toLocaleString()}
+                      </td>
+                      <td className="px-3 py-3 text-center text-sm">
+                        <span className="text-sky-400">{entry.days_submitted}</span>
+                        {entry.total_days_in_period && (
+                          <>
+                            <span className="text-slate-600">/</span>
+                            <span className="text-slate-400">{entry.total_days_in_period}</span>
+                          </>
+                        )}
+                      </td>
+                      {comparisonMode && (
+                        <>
+                          <td className="px-3 py-3 text-right font-mono text-slate-400">
+                            {entry.period_b_steps?.toLocaleString() ?? "—"}
+                          </td>
+                          <td className="px-3 py-3 text-right">
+                            {entry.improvement_pct !== null ? (
+                              <span className={entry.improvement_pct >= 0 ? "text-emerald-400" : "text-slate-500"}>
+                                {entry.improvement_pct >= 0 ? "+" : ""}{entry.improvement_pct}%
+                              </span>
+                            ) : "—"}
+                          </td>
+                        </>
+                      )}
+                      <td className="px-3 py-3 text-right text-slate-400">
+                        {entry.average_per_day.toLocaleString()}
+                      </td>
+                      <td className="px-3 py-3 text-center">
+                        {entry.streak > 0 && <span className="text-orange-400">{entry.streak}</span>}
+                      </td>
+                      <td className="px-3 py-3 text-center">
+                        {entry.badges.map(badge => (
+                          <span key={badge} className={`mr-1 ${BADGE_INFO[badge]?.color || ""}`} title={BADGE_INFO[badge]?.label}>
+                            {BADGE_INFO[badge]?.icon || "🏅"}
+                          </span>
+                        ))}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </ModuleFeedback>
         )}
       </div>
     </div>
