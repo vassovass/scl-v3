@@ -20,20 +20,26 @@ interface LeaderboardEntry {
   rank: number;
   user_id: string;
   display_name: string | null;
+  nickname: string | null;
   total_steps: number;
   days_submitted: number;
+  total_days_in_period: number | null;
   average_per_day: number;
   verified_days: number;
   unverified_days: number;
   streak: number;
   period_b_steps: number | null;
+  period_b_days: number | null;
   improvement_pct: number | null;
+  common_days_steps_a: number | null;
+  common_days_steps_b: number | null;
   badges: string[];
 }
 
 interface LeaderboardMeta {
   total_members: number;
   team_total_steps: number;
+  total_days_in_period: number | null;
   period_a: { start: string; end: string } | null;
   period_b: { start: string; end: string } | null;
 }
@@ -170,8 +176,8 @@ export default function LeaderboardPage() {
             <button
               onClick={toggleComparison}
               className={`ml-auto px-3 py-1.5 text-sm rounded-md transition ${comparisonMode
-                  ? "bg-sky-600 text-white"
-                  : "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"
+                ? "bg-sky-600 text-white"
+                : "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"
                 }`}
             >
               {comparisonMode ? "✓ Compare" : "Compare Periods"}
@@ -223,8 +229,8 @@ export default function LeaderboardPage() {
               key={s}
               onClick={() => setSortBy(s)}
               className={`px-2 py-1 text-xs rounded-md transition ${sortBy === s
-                  ? "bg-sky-600/20 text-sky-400 border border-sky-600"
-                  : "bg-slate-800 text-slate-400 border border-slate-700"
+                ? "bg-sky-600/20 text-sky-400 border border-sky-600"
+                : "bg-slate-800 text-slate-400 border border-slate-700"
                 }`}
             >
               {s === "steps" ? "Steps" : s === "improvement" ? "Improvement %" : s === "average" ? "Daily Avg" : "Streak"}
@@ -240,8 +246,8 @@ export default function LeaderboardPage() {
               key={f}
               onClick={() => setVerifiedFilter(f)}
               className={`px-2 py-1 text-xs rounded-md transition ${verifiedFilter === f
-                  ? "bg-emerald-600/20 text-emerald-400 border border-emerald-600"
-                  : "bg-slate-800 text-slate-400 border border-slate-700"
+                ? "bg-emerald-600/20 text-emerald-400 border border-emerald-600"
+                : "bg-slate-800 text-slate-400 border border-slate-700"
                 }`}
             >
               {f === "all" ? "All" : f === "verified" ? "Verified" : "Unverified"}
@@ -293,6 +299,7 @@ export default function LeaderboardPage() {
                   <th className="px-3 py-3 text-left text-slate-400 font-medium">#</th>
                   <th className="px-3 py-3 text-left text-slate-400 font-medium">Name</th>
                   <th className="px-3 py-3 text-right text-slate-400 font-medium">Steps</th>
+                  <th className="px-3 py-3 text-center text-slate-400 font-medium">Days</th>
                   {comparisonMode && (
                     <>
                       <th className="px-3 py-3 text-right text-slate-400 font-medium">Prev</th>
@@ -312,9 +319,9 @@ export default function LeaderboardPage() {
                   >
                     <td className="px-3 py-3">
                       <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${entry.rank === 1 ? "bg-yellow-500/20 text-yellow-400" :
-                          entry.rank === 2 ? "bg-slate-400/20 text-slate-300" :
-                            entry.rank === 3 ? "bg-amber-600/20 text-amber-500" :
-                              "bg-slate-800 text-slate-400"
+                        entry.rank === 2 ? "bg-slate-400/20 text-slate-300" :
+                          entry.rank === 3 ? "bg-amber-600/20 text-amber-500" :
+                            "bg-slate-800 text-slate-400"
                         }`}>
                         {entry.rank}
                       </span>
@@ -325,6 +332,15 @@ export default function LeaderboardPage() {
                     </td>
                     <td className="px-3 py-3 text-right font-mono text-slate-100">
                       {entry.total_steps.toLocaleString()}
+                    </td>
+                    <td className="px-3 py-3 text-center text-sm">
+                      <span className="text-sky-400">{entry.days_submitted}</span>
+                      {entry.total_days_in_period && (
+                        <>
+                          <span className="text-slate-600">/</span>
+                          <span className="text-slate-400">{entry.total_days_in_period}</span>
+                        </>
+                      )}
                     </td>
                     {comparisonMode && (
                       <>

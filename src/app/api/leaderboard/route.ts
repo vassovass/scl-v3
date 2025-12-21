@@ -21,6 +21,7 @@ const querySchema = z.object({
 interface UserStats {
   user_id: string;
   display_name: string | null;
+  nickname: string | null;
   total_steps: number;
   days_submitted: number;
   verified_days: number;
@@ -28,14 +29,18 @@ interface UserStats {
   average_per_day: number;
   streak: number;
   submission_dates: string[];
+  steps_by_date: Map<string, number>;
 }
 
 interface ComparisonResult {
   user_id: string;
   display_name: string | null;
+  nickname: string | null;
   period_a: UserStats;
   period_b: UserStats | null;
   improvement_pct: number | null;
+  common_days_steps_a: number | null;
+  common_days_steps_b: number | null;
   badges: string[];
   rank: number;
 }
@@ -130,15 +135,29 @@ export async function GET(request: Request) {
         improvementPct = ((a.total_steps - b.total_steps) / b.total_steps) * 100;
       }
 
+      // Calculate common days steps (only for days both periods have submissions)
+      let commonDaysStepsA: number | null = null;
+      let commonDaysStepsB: number | null = null;
+      if (b) {
+        const commonDates = a.submission_dates.filter(d => b.submission_dates.includes(d));
+        if (commonDates.length > 0) {
+          commonDaysStepsA = commonDates.reduce((sum, d) => sum + (a.steps_by_date.get(d) || 0), 0);
+          commonDaysStepsB = commonDates.reduce((sum, d) => sum + (b.steps_by_date.get(d) || 0), 0);
+        }
+      }
+
       // Calculate streak
       const streak = calculateStreak(userSubmissionDates.get(userId) || []);
 
       results.push({
         user_id: userId,
         display_name: a.display_name,
+        nickname: a.nickname,
         period_a: { ...a, streak },
         period_b: b,
         improvement_pct: improvementPct,
+        common_days_steps_a: commonDaysStepsA,
+        common_days_steps_b: commonDaysStepsB,
         badges: [],
         rank: 0,
       });
@@ -168,24 +187,33 @@ export async function GET(request: Request) {
     // Calculate totals
     const totalSteps = results.reduce((sum, r) => sum + r.period_a.total_steps, 0);
 
+    // Calculate total days in period
+    const totalDaysInPeriod = rangeA ? calculateDaysBetween(rangeA.start, rangeA.end) : null;
+
     return json({
       leaderboard: results.slice(offset, offset + limit).map(r => ({
         rank: r.rank,
         user_id: r.user_id,
-        display_name: r.display_name,
+        display_name: r.nickname || r.display_name, // Prefer nickname
+        nickname: r.nickname,
         total_steps: r.period_a.total_steps,
         days_submitted: r.period_a.days_submitted,
+        total_days_in_period: totalDaysInPeriod,
         average_per_day: Math.round(r.period_a.average_per_day),
         verified_days: r.period_a.verified_days,
         unverified_days: r.period_a.unverified_days,
         streak: r.period_a.streak,
         period_b_steps: r.period_b?.total_steps ?? null,
+        period_b_days: r.period_b?.days_submitted ?? null,
         improvement_pct: r.improvement_pct !== null ? Math.round(r.improvement_pct * 10) / 10 : null,
+        common_days_steps_a: r.common_days_steps_a,
+        common_days_steps_b: r.common_days_steps_b,
         badges: r.badges,
       })),
       meta: {
         total_members: results.length,
         team_total_steps: totalSteps,
+        total_days_in_period: totalDaysInPeriod,
         period_a: rangeA,
         period_b: rangeB,
         limit,
@@ -211,7 +239,7 @@ async function fetchPeriodStats(
       steps,
       verified,
       for_date,
-      profiles:user_id (display_name)
+      profiles:user_id (display_name, nickname)
     `)
     .eq("league_id", leagueId);
 
@@ -236,12 +264,13 @@ async function fetchPeriodStats(
 
   for (const sub of submissions || []) {
     const uid = sub.user_id;
-    const profile = sub.profiles as unknown as { display_name: string | null } | null;
+    const profile = sub.profiles as unknown as { display_name: string | null; nickname: string | null } | null;
 
     if (!userMap.has(uid)) {
       userMap.set(uid, {
         user_id: uid,
         display_name: profile?.display_name ?? null,
+        nickname: profile?.nickname ?? null,
         total_steps: 0,
         days_submitted: 0,
         verified_days: 0,
@@ -249,6 +278,7 @@ async function fetchPeriodStats(
         average_per_day: 0,
         streak: 0,
         submission_dates: [],
+        steps_by_date: new Map(),
       });
     }
 
@@ -256,6 +286,7 @@ async function fetchPeriodStats(
     u.total_steps += sub.steps || 0;
     u.days_submitted += 1;
     u.submission_dates.push(sub.for_date);
+    u.steps_by_date.set(sub.for_date, (u.steps_by_date.get(sub.for_date) || 0) + (sub.steps || 0));
 
     if (sub.verified) {
       u.verified_days += 1;
@@ -298,4 +329,11 @@ function assignBadges(results: ComparisonResult[]) {
       r.badges.push("streak_3");
     }
   }
+}
+
+function calculateDaysBetween(startDate: string, endDate: string): number {
+  const start = new Date(startDate + "T00:00:00");
+  const end = new Date(endDate + "T00:00:00");
+  const diffTime = Math.abs(end.getTime() - start.getTime());
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to be inclusive
 }
