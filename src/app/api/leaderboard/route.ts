@@ -30,6 +30,7 @@ interface UserStats {
   streak: number;
   submission_dates: string[];
   steps_by_date: Map<string, number>;
+  is_proxy?: boolean; // True if this is a proxy member
 }
 
 interface ComparisonResult {
@@ -46,6 +47,7 @@ interface ComparisonResult {
   // Authoritative stats
   current_streak: number;
   total_steps_lifetime: number;
+  is_proxy?: boolean; // True if this is a proxy member
 }
 
 // GET /api/leaderboard
@@ -108,11 +110,17 @@ export async function GET(request: Request) {
         : presetToDateRange(period_b as PeriodPreset))
       : null;
 
-    // Fetch period A data
+    // Fetch period A data (includes real users)
     const statsA = await fetchPeriodStats(adminClient, league_id, rangeA, verified);
 
     // Fetch period B data if comparison mode
     const statsB = rangeB ? await fetchPeriodStats(adminClient, league_id, rangeB, verified) : null;
+
+    // Fetch proxy member stats for period A
+    const proxyStatsA = await fetchProxyMemberStats(adminClient, league_id, rangeA, verified);
+
+    // Fetch proxy member stats for period B if comparison mode
+    const proxyStatsB = rangeB ? await fetchProxyMemberStats(adminClient, league_id, rangeB, verified) : null;
 
     // Calculate streaks for all users
     const allUserIds = Array.from(new Set([...Array.from(statsA.keys()), ...Array.from(statsB?.keys() || [])]));
@@ -122,6 +130,7 @@ export async function GET(request: Request) {
       .from("submissions")
       .select("user_id, for_date")
       .eq("league_id", league_id)
+      .is("proxy_member_id", null) // Only real user submissions for streaks
       .order("for_date", { ascending: false });
 
     const userSubmissionDates = new Map<string, string[]>();
@@ -185,6 +194,34 @@ export async function GET(request: Request) {
         rank: 0,
         current_streak: currentStreak,
         total_steps_lifetime: Number(lifetimeSteps),
+        is_proxy: false,
+      });
+    }
+
+    // Add proxy members to results
+    for (const [proxyId, proxyStats] of Array.from(proxyStatsA.entries())) {
+      const proxyB = proxyStatsB?.get(proxyId) || null;
+
+      // Calculate improvement percentage for proxy
+      let improvementPct: number | null = null;
+      if (proxyB && proxyB.total_steps > 0) {
+        improvementPct = ((proxyStats.total_steps - proxyB.total_steps) / proxyB.total_steps) * 100;
+      }
+
+      results.push({
+        user_id: proxyStats.user_id, // Already prefixed with "proxy:"
+        display_name: proxyStats.display_name,
+        nickname: null,
+        period_a: { ...proxyStats, streak: 0 },
+        period_b: proxyB,
+        improvement_pct: improvementPct,
+        common_days_steps_a: null,
+        common_days_steps_b: null,
+        badges: [],
+        rank: 0,
+        current_streak: 0, // Proxies don't have streaks
+        total_steps_lifetime: 0, // Proxies don't have lifetime stats
+        is_proxy: true,
       });
     }
 
@@ -234,6 +271,7 @@ export async function GET(request: Request) {
         common_days_steps_a: r.common_days_steps_a,
         common_days_steps_b: r.common_days_steps_b,
         badges: r.badges,
+        is_proxy: r.is_proxy ?? false, // Indicate if this is a proxy member
       })),
       meta: {
         total_members: results.length,
@@ -326,6 +364,94 @@ async function fetchPeriodStats(
   }
 
   return userMap;
+}
+
+// Fetch stats for proxy members (submissions with proxy_member_id set)
+async function fetchProxyMemberStats(
+  client: ReturnType<typeof createAdminClient>,
+  leagueId: string,
+  range: { start: string; end: string } | null,
+  verified: "all" | "verified" | "unverified"
+): Promise<Map<string, UserStats>> {
+  // First get all proxy members for this league
+  const { data: proxyMembers } = await client
+    .from("proxy_members")
+    .select("id, display_name")
+    .eq("league_id", leagueId);
+
+  if (!proxyMembers || proxyMembers.length === 0) {
+    return new Map();
+  }
+
+  const proxyIds = proxyMembers.map((p: any) => p.id);
+  const proxyNameMap = new Map(proxyMembers.map((p: any) => [p.id, p.display_name]));
+
+  // Fetch submissions for proxy members
+  let query = client
+    .from("submissions")
+    .select("proxy_member_id, steps, verified, for_date")
+    .eq("league_id", leagueId)
+    .in("proxy_member_id", proxyIds);
+
+  if (range) {
+    query = query.gte("for_date", range.start).lte("for_date", range.end);
+  }
+
+  if (verified === "verified") {
+    query = query.eq("verified", true);
+  } else if (verified === "unverified") {
+    query = query.eq("verified", false);
+  }
+
+  const { data: submissions, error } = await query;
+
+  if (error) {
+    console.error("Fetch proxy stats error:", error);
+    throw error;
+  }
+
+  const proxyMap = new Map<string, UserStats>();
+
+  for (const sub of submissions || []) {
+    const proxyId = sub.proxy_member_id;
+    if (!proxyId) continue;
+
+    if (!proxyMap.has(proxyId)) {
+      proxyMap.set(proxyId, {
+        user_id: `proxy:${proxyId}`, // Prefix to distinguish from real users
+        display_name: proxyNameMap.get(proxyId) ?? "Unknown Proxy",
+        nickname: null,
+        total_steps: 0,
+        days_submitted: 0,
+        verified_days: 0,
+        unverified_days: 0,
+        average_per_day: 0,
+        streak: 0,
+        submission_dates: [],
+        steps_by_date: new Map(),
+        is_proxy: true,
+      });
+    }
+
+    const u = proxyMap.get(proxyId)!;
+    u.total_steps += sub.steps || 0;
+    u.days_submitted += 1;
+    u.submission_dates.push(sub.for_date);
+    u.steps_by_date.set(sub.for_date, (u.steps_by_date.get(sub.for_date) || 0) + (sub.steps || 0));
+
+    if (sub.verified) {
+      u.verified_days += 1;
+    } else {
+      u.unverified_days += 1;
+    }
+  }
+
+  // Calculate averages
+  for (const u of Array.from(proxyMap.values())) {
+    u.average_per_day = u.days_submitted > 0 ? u.total_steps / u.days_submitted : 0;
+  }
+
+  return proxyMap;
 }
 
 function assignBadges(results: ComparisonResult[]) {

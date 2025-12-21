@@ -7,6 +7,19 @@ All notable changes to StepCountLeague v3.
 
 ---
 
+## [2025-12-22]
+
+### Added
+- **Proxy Members** - League owners/admins can create placeholder profiles for people who haven't signed up yet
+  - Submit steps on behalf of proxy members (verified or unverified)
+  - Link proxy to a real user when they join, transferring all submissions
+  - Proxy members appear on leaderboard with their own rankings
+- **ProxyMemberManagement** component with create, link, and delete functionality
+- **Proxy member API routes** (`/api/leagues/[id]/proxy-members`)
+- **Members list** added to league API response for admin tools
+
+---
+
 ## [2025-12-21]
 
 ### Added

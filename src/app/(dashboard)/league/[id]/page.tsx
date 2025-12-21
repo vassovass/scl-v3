@@ -9,6 +9,7 @@ import { BatchSubmissionForm } from "@/components/forms/BatchSubmissionForm";
 import { BulkUnverifiedForm } from "@/components/forms/BulkUnverifiedForm";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
 import { LeagueInviteControl } from "@/components/league/LeagueInviteControl";
+import { ProxyMemberManagement } from "@/components/league/ProxyMemberManagement";
 
 interface League {
   id: string;
@@ -350,6 +351,15 @@ export default function LeaguePage() {
             </div>
           </section>
         </ModuleFeedback>
+
+        {/* Proxy Member Management - Only for admins/owners */}
+        {(league.role === "owner" || league.role === "admin") && (
+          <ModuleFeedback moduleId="proxy-members" moduleName="Proxy Members">
+            <section className="mt-12">
+              <ProxyMemberManagement leagueId={leagueId} userRole={league.role || "member"} />
+            </section>
+          </ModuleFeedback>
+        )}
       </main>
     </div>
   );

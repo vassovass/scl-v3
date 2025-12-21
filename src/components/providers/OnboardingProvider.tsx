@@ -143,6 +143,12 @@ const adminTour: OnboardingStep[] = [
         requiresAdmin: true,
     },
     {
+        target: '[data-tour="proxy-members"]',
+        content: "Create Proxy Members for people who haven't signed up yet. Submit steps on their behalf, then link to their real account when they join!",
+        placement: "top",
+        requiresAdmin: true,
+    },
+    {
         target: '[data-tour="league-settings"]',
         content: "Manage your league settings here (coming soon!).",
         placement: "bottom",
@@ -508,8 +514,8 @@ export function OnboardingProvider({ children, isAdmin = false, hasLeagues = fal
                                     <button
                                         onClick={() => setFeedbackType("positive")}
                                         className={`flex-1 py-2 rounded-lg text-sm transition ${feedbackType === "positive"
-                                                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500"
-                                                : "bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-600"
+                                            ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500"
+                                            : "bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-600"
                                             }`}
                                     >
                                         👍 Helpful
@@ -517,8 +523,8 @@ export function OnboardingProvider({ children, isAdmin = false, hasLeagues = fal
                                     <button
                                         onClick={() => setFeedbackType("negative")}
                                         className={`flex-1 py-2 rounded-lg text-sm transition ${feedbackType === "negative"
-                                                ? "bg-rose-500/20 text-rose-400 border border-rose-500"
-                                                : "bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-600"
+                                            ? "bg-rose-500/20 text-rose-400 border border-rose-500"
+                                            : "bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-600"
                                             }`}
                                     >
                                         👎 Needs work

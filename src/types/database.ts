@@ -120,6 +120,7 @@ export type Database = {
           verified: boolean | null;
           ai_extracted_steps: number | null;
           tolerance_used: number | null;
+          proxy_member_id: string | null;
           created_at: string;
         };
         Insert: {
@@ -134,6 +135,7 @@ export type Database = {
           verified?: boolean | null;
           ai_extracted_steps?: number | null;
           tolerance_used?: number | null;
+          proxy_member_id?: string | null;
           created_at?: string;
         };
         Update: {
@@ -148,6 +150,7 @@ export type Database = {
           verified?: boolean | null;
           ai_extracted_steps?: number | null;
           tolerance_used?: number | null;
+          proxy_member_id?: string | null;
           created_at?: string;
         };
         Relationships: [
@@ -163,6 +166,13 @@ export type Database = {
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "submissions_proxy_member_id_fkey";
+            columns: ["proxy_member_id"];
+            isOneToOne: false;
+            referencedRelation: "proxy_members";
             referencedColumns: ["id"];
           }
         ];
@@ -228,6 +238,45 @@ export type Database = {
           {
             foreignKeyName: "audit_log_actor_id_fkey";
             columns: ["actor_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      proxy_members: {
+        Row: {
+          id: string;
+          league_id: string;
+          display_name: string;
+          created_by: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          league_id: string;
+          display_name: string;
+          created_by: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          league_id?: string;
+          display_name?: string;
+          created_by?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "proxy_members_league_id_fkey";
+            columns: ["league_id"];
+            isOneToOne: false;
+            referencedRelation: "leagues";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "proxy_members_created_by_fkey";
+            columns: ["created_by"];
             isOneToOne: false;
             referencedRelation: "users";
             referencedColumns: ["id"];
@@ -304,3 +353,4 @@ export type Membership = Tables<"memberships">;
 export type Submission = Tables<"submissions">;
 export type SiteSetting = Tables<"site_settings">;
 export type AuditLog = Tables<"audit_log">;
+export type ProxyMember = Tables<"proxy_members">;

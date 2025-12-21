@@ -52,11 +52,24 @@ export async function GET(
             return forbidden("You are not a member of this league");
         }
 
+        // Fetch all members for admin tools (proxy linking dropdown)
+        const { data: members } = await adminClient
+            .from("memberships")
+            .select("user_id, role, users:user_id (display_name, nickname)")
+            .eq("league_id", id);
+
+        const membersList = (members || []).map((m: any) => ({
+            user_id: m.user_id,
+            role: m.role,
+            display_name: m.users?.nickname || m.users?.display_name || null,
+        }));
+
         return json({
             league: {
                 ...league,
                 role: membership?.role ?? (isSuperAdmin ? "owner" : null), // Give Super Admin owner-level access in UI
             },
+            members: membersList,
         });
     } catch (error) {
         return serverError(error instanceof Error ? error.message : "Unknown error");
