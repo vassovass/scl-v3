@@ -78,6 +78,7 @@ export function LeagueInviteControl({ inviteCode, leagueName, className = "" }: 
                 onClick={() => setIsOpen(!isOpen)}
                 onMouseEnter={() => setIsOpen(true)}
                 className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/50 px-6 py-3 text-sm font-medium text-slate-300 transition hover:border-slate-500 hover:bg-slate-800 hover:text-white"
+                data-tour="invite-button"
             >
                 <span>Invite Code:</span>
                 <span className="font-mono tracking-wider text-sky-400">{inviteCode}</span>

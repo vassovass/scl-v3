@@ -231,6 +231,16 @@ export function NavHeader() {
                                     >
                                         ⚙️ Profile Settings
                                     </Link>
+                                    <button
+                                        onClick={() => {
+                                            setOpenDropdown(null);
+                                            // Dispatch custom event to trigger tour
+                                            window.dispatchEvent(new CustomEvent('start-onboarding-tour'));
+                                        }}
+                                        className="w-full text-left px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800"
+                                    >
+                                        📖 Start Tour
+                                    </button>
                                     <Link
                                         href="/feedback"
                                         onClick={() => setOpenDropdown(null)}

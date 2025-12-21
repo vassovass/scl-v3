@@ -171,12 +171,14 @@ export default function LeaguePage() {
             <Link
               href={`/league/${leagueId}/leaderboard`}
               className="rounded-lg bg-sky-500 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
+              data-tour="nav-leaderboard"
             >
               View Leaderboard
             </Link>
             <Link
               href={`/league/${leagueId}/analytics`}
               className="rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500"
+              data-tour="nav-analytics"
             >
               📊 Analytics
             </Link>
@@ -189,7 +191,7 @@ export default function LeaguePage() {
 
         {/* Submit Steps Section */}
         <ModuleFeedback moduleId="submission-form" moduleName="Step Submission Form">
-          <section className="mt-12">
+          <section className="mt-12" data-tour="submission-form">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-slate-100">Submit Today&apos;s Steps</h2>
@@ -202,7 +204,7 @@ export default function LeaguePage() {
                 </p>
               </div>
 
-              <div className="flex rounded-lg border border-slate-700 bg-slate-800 p-1">
+              <div className="flex rounded-lg border border-slate-700 bg-slate-800 p-1" data-tour="batch-toggle">
                 <button
                   onClick={() => setSubmissionMode("single")}
                   className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${submissionMode === "single"

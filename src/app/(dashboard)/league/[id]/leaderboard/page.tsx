@@ -237,7 +237,7 @@ export default function LeaderboardPage() {
 
       {/* Filters Row */}
       <ModuleFeedback moduleId="leaderboard-filters" moduleName="Leaderboard Filters">
-        <div className="mx-auto max-w-3xl px-6 py-4 flex flex-wrap items-center gap-4">
+        <div className="mx-auto max-w-3xl px-6 py-4 flex flex-wrap items-center gap-4" data-tour="leaderboard-filters">
           {/* Sort By */}
           <div className="flex items-center gap-2">
             <span className="text-xs text-slate-500">Sort:</span>
@@ -256,7 +256,7 @@ export default function LeaderboardPage() {
           </div>
 
           {/* Verified Filter */}
-          <div className="flex items-center gap-2 ml-auto">
+          <div className="flex items-center gap-2 ml-auto" data-tour="verified-filter">
             <span className="text-xs text-slate-500">Show:</span>
             {(["all", "verified", "unverified"] as VerifiedFilter[]).map(f => (
               <button
@@ -313,7 +313,7 @@ export default function LeaderboardPage() {
           </div>
         ) : (
           <ModuleFeedback moduleId="leaderboard-table" moduleName="Leaderboard Table">
-            <div className="overflow-x-auto rounded-xl border border-slate-800">
+            <div className="overflow-x-auto rounded-xl border border-slate-800" data-tour="leaderboard-table">
               <table className="w-full text-sm">
                 <thead className="bg-slate-900">
                   <tr>
@@ -370,6 +370,7 @@ export default function LeaderboardPage() {
                               comparisonDateRange: periodB === "custom" ? `${formatDate(customStartB)} - ${formatDate(customEndB)}` : undefined,
                             } as AchievementData}
                             className="ml-2 text-xs"
+                            data-tour="share-button"
                           >
                             🎉 Share
                           </ShareAchievementButton>

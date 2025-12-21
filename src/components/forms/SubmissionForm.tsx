@@ -304,14 +304,16 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/60 p-4 shadow-lg">
-            <DatePicker
-                value={date}
-                onChange={setDate}
-                label="Date"
-                required
-            />
+            <div data-tour="date-picker">
+                <DatePicker
+                    value={date}
+                    onChange={setDate}
+                    label="Date"
+                    required
+                />
+            </div>
 
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center" data-tour="steps-input">
                 <label className="text-sm font-medium text-slate-300" htmlFor="submission-steps">
                     Steps
                 </label>
@@ -368,7 +370,7 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                 )}
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2" data-tour="screenshot-upload">
                 <label className="text-sm font-medium text-slate-300" htmlFor="submission-proof">
                     Screenshot (PNG, JPG, HEIC)
                 </label>
@@ -575,6 +577,7 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                 type="submit"
                 disabled={submitting || !!pendingVerification}
                 className="w-full rounded-md bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-60"
+                data-tour="submit-button"
             >
                 {submitting ? "Submitting..." : pendingVerification ? "Verifying..." : "Submit Steps"}
             </button>
