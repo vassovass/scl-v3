@@ -13,17 +13,19 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccess(null);
 
     const supabase = createClient();
 
     // Sign up
-    const { error: signUpError } = await supabase.auth.signUp({
+    const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -34,12 +36,28 @@ export default function SignUpPage() {
     });
 
     if (signUpError) {
+      console.error("[SignUp Error]", signUpError);
       setError(signUpError.message);
       setLoading(false);
       return;
     }
 
-    // Auto sign-in after signup (Supabase does this by default)
+    // Check if email confirmation is required
+    // When email confirm is enabled, user will be created but session will be null
+    if (data?.user && !data?.session) {
+      setSuccess("Check your email for a confirmation link to complete your registration.");
+      setLoading(false);
+      return;
+    }
+
+    // Check if user already exists (Supabase returns a fake user with no identities)
+    if (data?.user && data.user.identities?.length === 0) {
+      setError("An account with this email already exists. Please sign in instead.");
+      setLoading(false);
+      return;
+    }
+
+    // Auto sign-in after signup (Supabase does this by default when email confirm is disabled)
     router.push("/dashboard");
     router.refresh();
   };
@@ -116,6 +134,12 @@ export default function SignUpPage() {
           {error && (
             <div className="rounded-lg border border-red-500/50 bg-red-500/10 px-4 py-3 text-sm text-red-400">
               {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="rounded-lg border border-emerald-500/50 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+              {success}
             </div>
           )}
 
