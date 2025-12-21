@@ -239,7 +239,7 @@ async function fetchPeriodStats(
       steps,
       verified,
       for_date,
-      profiles:user_id (display_name, nickname)
+      users:user_id (display_name, nickname)
     `)
     .eq("league_id", leagueId);
 
@@ -264,7 +264,7 @@ async function fetchPeriodStats(
 
   for (const sub of submissions || []) {
     const uid = sub.user_id;
-    const profile = sub.profiles as unknown as { display_name: string | null; nickname: string | null } | null;
+    const profile = sub.users as unknown as { display_name: string | null; nickname: string | null } | null;
 
     if (!userMap.has(uid)) {
       userMap.set(uid, {
