@@ -1,25 +1,46 @@
 # StepCountLeague v3
 
-A step-tracking competition platform built with Next.js 14 and Supabase.
+> A step-tracking competition platform where friends form leagues and compete weekly.
 
-> **For AI Assistants**: See [CLAUDE.md](./CLAUDE.md) for full technical context, patterns, and gotchas.
+## TL;DR
+
+**For developers**: Clone → `npm install` → copy `.env.example` to `.env.local` → `npm run dev`
+
+**For AI assistants**: Read **[AGENTS.md](./AGENTS.md)** for coding patterns and context.
+
+**For upcoming features**: See **[ROADMAP.md](./ROADMAP.md)**.
+
+---
+
+## Version History
+
+| Version | Stack | Status | Notes |
+|---------|-------|--------|-------|
+| **v1** | React + Firebase | Deprecated | Original prototype |
+| **v2** | Next.js + Supabase + Cloudflare | Production | Current live version with Edge Functions |
+| **v3** | Next.js 14 + Supabase + Vercel | Active Development | This repo - rewrite for Vercel deployment |
+
+**v3 shares the same Supabase database as v2** - all data, Edge Functions, and storage buckets are shared. v3 is a frontend rewrite optimized for Vercel.
+
+---
 
 ## Quick Start
 
-### 1. Install Dependencies
+### 1. Clone & Install
 
 ```bash
+git clone https://github.com/vassovass/scl-v3.git
+cd scl-v3
 npm install
 ```
 
-### 2. Set Up Environment Variables
+### 2. Configure Environment
 
 ```bash
 cp .env.example .env.local
 ```
 
 Edit `.env.local`:
-
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
@@ -39,104 +60,91 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ## Deploy to Vercel
 
-### Step 1: Push to GitHub
-
-```bash
-git add .
-git commit -m "Your commit message"
-git push origin main
-```
-
-### Step 2: Import to Vercel
-
-1. Go to [vercel.com](https://vercel.com) → "Add New..." → "Project"
-2. Select your `scl-v3` repository
-3. Add environment variables:
-
-| Variable | Value |
-|----------|-------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Your service role key |
-| `GEMINI_API_KEY` | Your Gemini API key |
-
-4. Click "Deploy"
-
-### Step 3: Configure Supabase Auth (Critical!)
-
-Update Supabase to use your Vercel URL instead of localhost:
-
-1. Go to **Supabase Dashboard** → **Authentication** → **URL Configuration**
-2. Set **Site URL**: `https://your-app.vercel.app`
-3. Add to **Redirect URLs**: `https://your-app.vercel.app/**`
-
-Without this, confirmation emails will redirect to localhost.
+1. **Push to GitHub**: `git push origin main`
+2. **Import to Vercel**: [vercel.com](https://vercel.com) → Add New → Project
+3. **Add environment variables** (same as `.env.local`)
+4. **Configure Supabase Auth**:
+   - Dashboard → Authentication → URL Configuration
+   - Site URL: `https://your-app.vercel.app`
+   - Redirect URLs: `https://your-app.vercel.app/**`
 
 ---
 
 ## Project Structure
 
 ```
-src/
-├── app/                    # Pages and API routes
-│   ├── (auth)/             # Sign-in, sign-up pages
-│   ├── (dashboard)/        # Protected pages (dashboard, leagues)
-│   └── api/                # API routes
-├── components/             # React components
-│   └── providers/          # Auth context provider
-├── lib/                    # Utilities
-│   ├── api.ts              # API response helpers
-│   └── supabase/           # Supabase clients
-└── types/                  # TypeScript types
+scl-v3/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── (auth)/             # Sign-in, sign-up
+│   │   ├── (dashboard)/        # Protected routes
+│   │   └── api/                # API routes
+│   ├── components/
+│   │   ├── analytics/          # CalendarHeatmap, DailyBreakdownTable
+│   │   ├── forms/              # SubmissionForm, BatchSubmissionForm
+│   │   ├── layout/             # GlobalFooter
+│   │   ├── navigation/         # NavHeader (mobile hamburger)
+│   │   └── ui/                 # Reusable components
+│   └── lib/                    # Utilities, Supabase clients
+├── supabase/migrations/        # Database migrations
+├── AGENTS.md                   # AI assistant context (universal)
+├── CLAUDE.md                   # Claude-specific (references AGENTS.md)
+├── ROADMAP.md                  # Upcoming features
+└── README.md                   # This file
 ```
-
----
-
-## Available Scripts
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Build for production |
-| `npm run start` | Start production server |
-| `npm run lint` | Run ESLint |
 
 ---
 
 ## Tech Stack
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| Next.js | 14.2.18 | Framework (App Router) |
-| Supabase | Latest | Database, Auth, Storage |
-| Tailwind CSS | 3.4 | Styling |
-| Zod | 3.23 | Validation |
-| TypeScript | 5.x | Type safety |
+| Layer | Technology | Notes |
+|-------|------------|-------|
+| Framework | Next.js 14 (App Router) | NOT v15 (avoids breaking changes) |
+| Database | Supabase (PostgreSQL) | Shared with v2, includes RLS |
+| Auth | Supabase Auth | Email/password |
+| Styling | Tailwind CSS | Mobile-first, dark theme |
+| AI Verification | Gemini 2.5 Flash | Via Supabase Edge Function |
+| Deployment | Vercel | Auto-deploy from main |
 
 ---
 
-## Key Architecture Decisions
+## Current Features
 
-1. **Next.js 14.2.x** (not 15) - Avoids async params breaking changes
-2. **Untyped Supabase clients** - Simpler, avoids complex type inference issues
-3. **Flat structure** - No monorepo complexity
-4. **Vercel deployment** - Zero-config, auto-deploy from main branch
+- ✅ League creation/joining with invite codes
+- ✅ Single + batch step submission with AI verification
+- ✅ Leaderboard with filters (period, verified, custom dates)
+- ✅ Analytics dashboard (calendar heatmap, daily breakdown)
+- ✅ User nicknames and profile settings
+- ✅ Module feedback system
+- ✅ Social sharing (Web Share API)
+- ✅ Mobile-responsive navigation
+- ✅ Footer with legal links
 
-See [CLAUDE.md](./CLAUDE.md) for detailed explanations.
+See **[ROADMAP.md](./ROADMAP.md)** for upcoming features.
 
 ---
 
-## Using Existing SCL v2 Database
+## Commands
 
-This project connects to your existing Supabase database from SCL v2. The schema, RPC functions, Edge Functions, and storage buckets are already configured.
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npx tsc --noEmit` | Type check |
+| `npm run lint` | Run ESLint |
 
-**Optional**: Generate TypeScript types from your database:
+---
 
-```bash
-npx supabase gen types typescript --project-id YOUR_PROJECT_ID > src/types/database.ts
-```
+## Documentation
 
-Note: Current setup uses untyped Supabase clients. See CLAUDE.md for why.
+| File | Purpose |
+|------|---------|
+| **[README.md](./README.md)** | This file - setup, deployment, overview |
+| **[AGENTS.md](./AGENTS.md)** | AI assistant context (coding patterns, architecture) |
+| **[CLAUDE.md](./CLAUDE.md)** | Claude-specific notes (references AGENTS.md) |
+| **[ROADMAP.md](./ROADMAP.md)** | Upcoming features and enhancements |
+
+> **Tip**: Copy `README.md` + `AGENTS.md` into any LLM chat for instant project context.
 
 ---
 
@@ -144,14 +152,16 @@ Note: Current setup uses untyped Supabase clients. See CLAUDE.md for why.
 
 | Issue | Solution |
 |-------|----------|
-| Auth redirects to localhost | Update Site URL in Supabase → Auth → URL Configuration |
-| Build fails with type errors | See CLAUDE.md for common patterns |
-| `useSearchParams` error | Wrap component in `<Suspense>` boundary |
-| Supabase query returns `never` | Use untyped client with `any` casts |
+| Auth redirects to localhost | Update Site URL in Supabase Auth settings |
+| `useSearchParams` error | Wrap component in `<Suspense>` |
+| Type errors with Supabase | Use untyped client (see AGENTS.md) |
+| Build fails | Run `npx tsc --noEmit` locally first |
 
 ---
 
-## Documentation
+## Contributing
 
-- **[CLAUDE.md](./CLAUDE.md)** - Full technical context for AI assistants
-- **SCL v2 repo** - Contains Supabase migrations and Edge Functions
+1. Read **[AGENTS.md](./AGENTS.md)** for coding standards
+2. Use mobile-first Tailwind (base = mobile, add `md:`, `lg:`)
+3. Run `npx tsc --noEmit` before pushing
+4. Conventional commits: `feat:`, `fix:`, `docs:`
