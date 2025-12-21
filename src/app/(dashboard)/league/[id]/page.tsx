@@ -176,6 +176,12 @@ export default function LeaguePage() {
           >
             View Leaderboard
           </Link>
+          <Link
+            href={`/league/${leagueId}/analytics`}
+            className="rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500"
+          >
+            📊 Analytics
+          </Link>
           <button
             onClick={copyInviteCode}
             className="rounded-lg border border-slate-700 px-6 py-3 text-sm font-medium text-slate-300 transition hover:border-slate-500"
