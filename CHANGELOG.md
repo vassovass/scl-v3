@@ -20,15 +20,20 @@ All notable changes to StepCountLeague v3.
 - **AGENTS.md** universal AI context file
 - **ROADMAP.md** feature roadmap
 - **CHANGELOG.md** (this file)
+- **Resend confirmation email** button on sign-in page when email not confirmed
 
 ### Changed
 - **NavHeader** now mobile-responsive with hamburger menu on small screens
 - **ModuleFeedback widget** moved to floating icon in bottom-right corner
 - **README.md** updated with version history, TL;DR, and doc references
 - **CLAUDE.md** simplified to reference AGENTS.md
+- **Landing page** redesigned with responsive heading (breaks on mobile)
+- **Feature cards** now use compact inline-icon layout on mobile
 
 ### Fixed
 - Feedback widget no longer interferes with table content
+- Landing page heading overflow on mobile
+- Sign-in page now shows resend option for unconfirmed emails
 
 ---
 

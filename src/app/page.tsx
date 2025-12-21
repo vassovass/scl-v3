@@ -19,7 +19,7 @@ export default function HomePage() {
   // Show loading or nothing while checking auth
   if (loading) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center px-6">
+      <main className="flex min-h-screen flex-col items-center justify-center px-4">
         <div className="text-slate-400">Loading...</div>
       </main>
     );
@@ -31,57 +31,72 @@ export default function HomePage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-6">
+    <main className="min-h-screen bg-slate-950 px-4 py-12">
+      {/* Hero Section */}
       <div className="mx-auto max-w-2xl text-center">
-        <h1 className="text-5xl font-bold tracking-tight text-slate-50 sm:text-6xl">
-          Step<span className="text-sky-500">Count</span>League
+        <h1 className="text-3xl font-bold tracking-tight text-slate-50 sm:text-5xl">
+          <span className="block sm:inline">Step</span>
+          <span className="text-sky-500">Count</span>
+          <span className="block sm:inline">League</span>
         </h1>
-        <p className="mt-6 text-lg leading-8 text-slate-400">
-          Compete with friends and colleagues in step counting challenges.
+        <p className="mt-4 text-base leading-7 text-slate-400 sm:mt-6 sm:text-lg">
+          Compete with friends in step counting challenges.
           Submit your daily steps, get AI-verified, and climb the leaderboard.
         </p>
-        <div className="mt-10 flex items-center justify-center gap-x-4">
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center sm:gap-4">
           <Link
             href="/sign-up"
-            className="rounded-lg bg-sky-500 px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500"
+            className="w-full rounded-lg bg-sky-500 px-6 py-3 text-center text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-sky-400 sm:w-auto"
           >
             Get Started
           </Link>
           <Link
             href="/sign-in"
-            className="rounded-lg border border-slate-700 px-6 py-3 text-sm font-semibold text-slate-300 transition hover:border-slate-500 hover:text-slate-50"
+            className="w-full rounded-lg border border-slate-700 px-6 py-3 text-center text-sm font-semibold text-slate-300 transition hover:border-slate-500 hover:text-slate-50 sm:w-auto"
           >
             Sign In
           </Link>
         </div>
       </div>
 
-      {/* Features */}
-      <div className="mx-auto mt-24 max-w-4xl">
-        <div className="grid gap-8 sm:grid-cols-3">
-          <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
-            <div className="mb-4 text-3xl">📱</div>
-            <h3 className="text-lg font-semibold text-slate-100">Screenshot Proof</h3>
-            <p className="mt-2 text-sm text-slate-400">
-              Upload a screenshot from your fitness app. Our AI verifies your step count.
-            </p>
+      {/* Features - Compact cards with inline icons */}
+      <div className="mx-auto mt-16 max-w-3xl sm:mt-20">
+        <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4">
+          {/* Feature 1 */}
+          <div className="flex items-start gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-4 transition hover:border-slate-700 sm:flex-col sm:items-center sm:text-center sm:p-5">
+            <span className="text-2xl sm:text-3xl sm:mb-2">📱</span>
+            <div className="flex-1 sm:flex-none">
+              <h3 className="text-sm font-semibold text-slate-100 sm:text-base">Screenshot Proof</h3>
+              <p className="mt-1 text-xs text-slate-400 sm:text-sm">
+                Upload from your fitness app. AI verifies your steps.
+              </p>
+            </div>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
-            <div className="mb-4 text-3xl">🏆</div>
-            <h3 className="text-lg font-semibold text-slate-100">Leaderboards</h3>
-            <p className="mt-2 text-sm text-slate-400">
-              See how you rank against your league. Daily and weekly standings.
-            </p>
+
+          {/* Feature 2 */}
+          <div className="flex items-start gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-4 transition hover:border-slate-700 sm:flex-col sm:items-center sm:text-center sm:p-5">
+            <span className="text-2xl sm:text-3xl sm:mb-2">🏆</span>
+            <div className="flex-1 sm:flex-none">
+              <h3 className="text-sm font-semibold text-slate-100 sm:text-base">Leaderboards</h3>
+              <p className="mt-1 text-xs text-slate-400 sm:text-sm">
+                See how you rank. Daily and weekly standings.
+              </p>
+            </div>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
-            <div className="mb-4 text-3xl">👥</div>
-            <h3 className="text-lg font-semibold text-slate-100">Private Leagues</h3>
-            <p className="mt-2 text-sm text-slate-400">
-              Create a league and invite friends with a simple code.
-            </p>
+
+          {/* Feature 3 */}
+          <div className="flex items-start gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-4 transition hover:border-slate-700 sm:flex-col sm:items-center sm:text-center sm:p-5">
+            <span className="text-2xl sm:text-3xl sm:mb-2">👥</span>
+            <div className="flex-1 sm:flex-none">
+              <h3 className="text-sm font-semibold text-slate-100 sm:text-base">Private Leagues</h3>
+              <p className="mt-1 text-xs text-slate-400 sm:text-sm">
+                Create a league and invite friends with a code.
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </main>
   );
 }
+

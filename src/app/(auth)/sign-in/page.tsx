@@ -15,11 +15,16 @@ function SignInForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showResend, setShowResend] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setShowResend(false);
+    setResendSuccess(false);
 
     const supabase = createClient();
     const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -29,12 +34,39 @@ function SignInForm() {
 
     if (signInError) {
       setError(signInError.message);
+      // Check if email is not confirmed
+      if (signInError.message.toLowerCase().includes("email not confirmed") ||
+        signInError.message.toLowerCase().includes("email not verified")) {
+        setShowResend(true);
+      }
       setLoading(false);
       return;
     }
 
     router.push(redirect);
     router.refresh();
+  };
+
+  const handleResendConfirmation = async () => {
+    setResendLoading(true);
+    setError(null);
+
+    const supabase = createClient();
+    const { error: resendError } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/api/auth/callback?next=/dashboard`,
+      },
+    });
+
+    if (resendError) {
+      setError(resendError.message);
+    } else {
+      setResendSuccess(true);
+      setShowResend(false);
+    }
+    setResendLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
@@ -72,6 +104,13 @@ function SignInForm() {
       {signedOut && (
         <div className="mt-6 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
           ✓ You&apos;ve been signed out successfully
+        </div>
+      )}
+
+      {/* Resend success message */}
+      {resendSuccess && (
+        <div className="mt-6 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+          ✓ Confirmation email sent! Check your inbox.
         </div>
       )}
 
@@ -117,6 +156,18 @@ function SignInForm() {
           <div className="rounded-lg border border-red-500/50 bg-red-500/10 px-4 py-3 text-sm text-red-400">
             {error}
           </div>
+        )}
+
+        {/* Resend confirmation button */}
+        {showResend && (
+          <button
+            type="button"
+            onClick={handleResendConfirmation}
+            disabled={resendLoading || !email}
+            className="w-full rounded-lg border border-amber-500/50 bg-amber-500/10 px-4 py-3 text-sm text-amber-400 hover:bg-amber-500/20 disabled:opacity-50 transition"
+          >
+            {resendLoading ? "Sending..." : "📧 Resend confirmation email"}
+          </button>
         )}
 
         <div>
