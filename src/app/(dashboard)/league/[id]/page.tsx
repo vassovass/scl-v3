@@ -354,6 +354,7 @@ export default function LeaguePage() {
               )}
             </div>
           </section>
+        </ModuleFeedback>
       </main>
     </div>
   );

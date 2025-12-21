@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
 
 export default function JoinLeaguePage() {
   const router = useRouter();
@@ -55,43 +56,45 @@ export default function JoinLeaguePage() {
       </div>
 
       {/* Main */}
-      <div className="mx-auto max-w-md px-6 py-12">
-        <p className="text-center text-slate-400">
-          Enter the invite code shared by your league admin.
-        </p>
+      <ModuleFeedback moduleId="join-league-form" moduleName="Join League Form">
+        <div className="mx-auto max-w-md px-6 py-12">
+          <p className="text-center text-slate-400">
+            Enter the invite code shared by your league admin.
+          </p>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-          {error && (
-            <div className="rounded-lg border border-red-500/50 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-              {error}
+          <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+            {error && (
+              <div className="rounded-lg border border-red-500/50 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                {error}
+              </div>
+            )}
+
+            <div>
+              <label htmlFor="code" className="block text-sm font-medium text-slate-300">
+                Invite Code
+              </label>
+              <input
+                id="code"
+                type="text"
+                value={inviteCode}
+                onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                required
+                placeholder="ABC123"
+                className="mt-1 block w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-center text-2xl font-mono tracking-widest text-slate-50 uppercase placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+                maxLength={10}
+              />
             </div>
-          )}
 
-          <div>
-            <label htmlFor="code" className="block text-sm font-medium text-slate-300">
-              Invite Code
-            </label>
-            <input
-              id="code"
-              type="text"
-              value={inviteCode}
-              onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
-              required
-              placeholder="ABC123"
-              className="mt-1 block w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-center text-2xl font-mono tracking-widest text-slate-50 uppercase placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
-              maxLength={10}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading || inviteCode.length < 4}
-            className="w-full rounded-lg bg-sky-500 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:opacity-50"
-          >
-            {loading ? "Joining..." : "Join League"}
-          </button>
-        </form>
-      </div>
+            <button
+              type="submit"
+              disabled={loading || inviteCode.length < 4}
+              className="w-full rounded-lg bg-sky-500 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:opacity-50"
+            >
+              {loading ? "Joining..." : "Join League"}
+            </button>
+          </form>
+        </div>
+      </ModuleFeedback>
     </div>
   );
 }

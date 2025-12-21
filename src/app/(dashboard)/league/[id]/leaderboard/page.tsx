@@ -160,124 +160,130 @@ export default function LeaderboardPage() {
       </div>
 
       {/* Period Selection */}
-      <div className="border-b border-slate-800 bg-slate-900/20">
-        <div className="mx-auto max-w-3xl px-6 py-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <label className="text-sm text-slate-400">Period:</label>
-            <select
-              value={period}
-              onChange={(e) => setPeriod(e.target.value as PeriodPreset)}
-              className="rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100"
-              style={{ colorScheme: "dark" }}
-            >
-              {PERIOD_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+      <ModuleFeedback moduleId="leaderboard-period" moduleName="Period Selector" className="w-full">
+        <div className="border-b border-slate-800 bg-slate-900/20">
+          <div className="mx-auto max-w-3xl px-6 py-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <label className="text-sm text-slate-400">Period:</label>
+              <select
+                value={period}
+                onChange={(e) => setPeriod(e.target.value as PeriodPreset)}
+                className="rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100"
+                style={{ colorScheme: "dark" }}
+              >
+                {PERIOD_OPTIONS.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
 
-            <button
-              onClick={toggleComparison}
-              className={`ml-auto px-3 py-1.5 text-sm rounded-md transition ${comparisonMode
-                ? "bg-sky-600 text-white"
-                : "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"
-                }`}
-            >
-              {comparisonMode ? "✓ Compare" : "Compare Periods"}
-            </button>
-          </div>
-
-          {/* Custom Date Range A */}
-          {period === "custom" && (
-            <div className="mt-4 flex flex-wrap gap-4">
-              <DatePicker value={customStartA} onChange={setCustomStartA} label="From" max={customEndA || undefined} />
-              <DatePicker value={customEndA} onChange={setCustomEndA} label="To" min={customStartA} />
+              <button
+                onClick={toggleComparison}
+                className={`ml-auto px-3 py-1.5 text-sm rounded-md transition ${comparisonMode
+                  ? "bg-sky-600 text-white"
+                  : "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"
+                  }`}
+              >
+                {comparisonMode ? "✓ Compare" : "Compare Periods"}
+              </button>
             </div>
-          )}
 
-          {/* Comparison Period B */}
-          {comparisonMode && (
-            <div className="mt-4 pt-4 border-t border-slate-800">
-              <div className="flex flex-wrap items-center gap-3">
-                <label className="text-sm text-slate-400">Compare to:</label>
-                <select
-                  value={periodB || ""}
-                  onChange={(e) => setPeriodB(e.target.value as PeriodPreset)}
-                  className="rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100"
-                  style={{ colorScheme: "dark" }}
-                >
-                  {PERIOD_OPTIONS.map(opt => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
+            {/* Custom Date Range A */}
+            {period === "custom" && (
+              <div className="mt-4 flex flex-wrap gap-4">
+                <DatePicker value={customStartA} onChange={setCustomStartA} label="From" max={customEndA || undefined} />
+                <DatePicker value={customEndA} onChange={setCustomEndA} label="To" min={customStartA} />
               </div>
-              {periodB === "custom" && (
-                <div className="mt-4 flex flex-wrap gap-4">
-                  <DatePicker value={customStartB} onChange={setCustomStartB} label="From" max={customEndB || undefined} />
-                  <DatePicker value={customEndB} onChange={setCustomEndB} label="To" min={customStartB} />
+            )}
+
+            {/* Comparison Period B */}
+            {comparisonMode && (
+              <div className="mt-4 pt-4 border-t border-slate-800">
+                <div className="flex flex-wrap items-center gap-3">
+                  <label className="text-sm text-slate-400">Compare to:</label>
+                  <select
+                    value={periodB || ""}
+                    onChange={(e) => setPeriodB(e.target.value as PeriodPreset)}
+                    className="rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100"
+                    style={{ colorScheme: "dark" }}
+                  >
+                    {PERIOD_OPTIONS.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
                 </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Filters Row */}
-      <div className="mx-auto max-w-3xl px-6 py-4 flex flex-wrap items-center gap-4">
-        {/* Sort By */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-500">Sort:</span>
-          {(["steps", "improvement", "average", "streak"] as SortBy[]).map(s => (
-            <button
-              key={s}
-              onClick={() => setSortBy(s)}
-              className={`px-2 py-1 text-xs rounded-md transition ${sortBy === s
-                ? "bg-sky-600/20 text-sky-400 border border-sky-600"
-                : "bg-slate-800 text-slate-400 border border-slate-700"
-                }`}
-            >
-              {s === "steps" ? "Steps" : s === "improvement" ? "Improvement %" : s === "average" ? "Daily Avg" : "Streak"}
-            </button>
-          ))}
-        </div>
-
-        {/* Verified Filter */}
-        <div className="flex items-center gap-2 ml-auto">
-          <span className="text-xs text-slate-500">Show:</span>
-          {(["all", "verified", "unverified"] as VerifiedFilter[]).map(f => (
-            <button
-              key={f}
-              onClick={() => setVerifiedFilter(f)}
-              className={`px-2 py-1 text-xs rounded-md transition ${verifiedFilter === f
-                ? "bg-emerald-600/20 text-emerald-400 border border-emerald-600"
-                : "bg-slate-800 text-slate-400 border border-slate-700"
-                }`}
-            >
-              {f === "all" ? "All" : f === "verified" ? "Verified" : "Unverified"}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Stats Summary */}
-      {meta && entries.length > 0 && (
-        <div className="mx-auto max-w-3xl px-6 pb-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-3 text-center">
-              <p className="text-xl font-bold text-slate-100">{meta.team_total_steps.toLocaleString()}</p>
-              <p className="text-xs text-slate-500">Team Total</p>
-            </div>
-            <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-3 text-center">
-              <p className="text-xl font-bold text-slate-100">{meta.total_members}</p>
-              <p className="text-xs text-slate-500">Members</p>
-            </div>
-            {meta.period_a && (
-              <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-3 text-center col-span-2">
-                <p className="text-sm text-slate-300">{meta.period_a.start} → {meta.period_a.end}</p>
-                <p className="text-xs text-slate-500">Period</p>
+                {periodB === "custom" && (
+                  <div className="mt-4 flex flex-wrap gap-4">
+                    <DatePicker value={customStartB} onChange={setCustomStartB} label="From" max={customEndB || undefined} />
+                    <DatePicker value={customEndB} onChange={setCustomEndB} label="To" min={customStartB} />
+                  </div>
+                )}
               </div>
             )}
           </div>
         </div>
+      </ModuleFeedback>
+
+      {/* Filters Row */}
+      <ModuleFeedback moduleId="leaderboard-filters" moduleName="Leaderboard Filters">
+        <div className="mx-auto max-w-3xl px-6 py-4 flex flex-wrap items-center gap-4">
+          {/* Sort By */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-500">Sort:</span>
+            {(["steps", "improvement", "average", "streak"] as SortBy[]).map(s => (
+              <button
+                key={s}
+                onClick={() => setSortBy(s)}
+                className={`px-2 py-1 text-xs rounded-md transition ${sortBy === s
+                  ? "bg-sky-600/20 text-sky-400 border border-sky-600"
+                  : "bg-slate-800 text-slate-400 border border-slate-700"
+                  }`}
+              >
+                {s === "steps" ? "Steps" : s === "improvement" ? "Improvement %" : s === "average" ? "Daily Avg" : "Streak"}
+              </button>
+            ))}
+          </div>
+
+          {/* Verified Filter */}
+          <div className="flex items-center gap-2 ml-auto">
+            <span className="text-xs text-slate-500">Show:</span>
+            {(["all", "verified", "unverified"] as VerifiedFilter[]).map(f => (
+              <button
+                key={f}
+                onClick={() => setVerifiedFilter(f)}
+                className={`px-2 py-1 text-xs rounded-md transition ${verifiedFilter === f
+                  ? "bg-emerald-600/20 text-emerald-400 border border-emerald-600"
+                  : "bg-slate-800 text-slate-400 border border-slate-700"
+                  }`}
+              >
+                {f === "all" ? "All" : f === "verified" ? "Verified" : "Unverified"}
+              </button>
+            ))}
+          </div>
+        </div>
+      </ModuleFeedback>
+
+      {/* Stats Summary */}
+      {meta && entries.length > 0 && (
+        <ModuleFeedback moduleId="leaderboard-stats" moduleName="Stats Summary">
+          <div className="mx-auto max-w-3xl px-6 pb-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-3 text-center">
+                <p className="text-xl font-bold text-slate-100">{meta.team_total_steps.toLocaleString()}</p>
+                <p className="text-xs text-slate-500">Team Total</p>
+              </div>
+              <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-3 text-center">
+                <p className="text-xl font-bold text-slate-100">{meta.total_members}</p>
+                <p className="text-xs text-slate-500">Members</p>
+              </div>
+              {meta.period_a && (
+                <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-3 text-center col-span-2">
+                  <p className="text-sm text-slate-300">{meta.period_a.start} → {meta.period_a.end}</p>
+                  <p className="text-xs text-slate-500">Period</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </ModuleFeedback>
       )}
 
       {/* Main Table */}

@@ -46,29 +46,31 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-slate-950">
       <div className="mx-auto max-w-5xl px-6 py-12">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-slate-50">Your Leagues</h1>
-          <div className="flex gap-3">
-            <Link
-              href="/settings/profile"
-              className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-slate-500"
-            >
-              ⚙️ Settings
-            </Link>
-            <Link
-              href="/join"
-              className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-slate-500"
-            >
-              Join League
-            </Link>
-            <Link
-              href="/league/create"
-              className="rounded-lg bg-sky-500 px-4 py-2 text-sm font-medium text-slate-950 transition hover:bg-sky-400"
-            >
-              Create League
-            </Link>
+        <ModuleFeedback moduleId="dashboard-header" moduleName="Dashboard Actions">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-slate-50">Your Leagues</h1>
+            <div className="flex gap-3">
+              <Link
+                href="/settings/profile"
+                className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-slate-500"
+              >
+                ⚙️ Settings
+              </Link>
+              <Link
+                href="/join"
+                className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-slate-500"
+              >
+                Join League
+              </Link>
+              <Link
+                href="/league/create"
+                className="rounded-lg bg-sky-500 px-4 py-2 text-sm font-medium text-slate-950 transition hover:bg-sky-400"
+              >
+                Create League
+              </Link>
+            </div>
           </div>
-        </div>
+        </ModuleFeedback>
 
         {loading ? (
           <div className="mt-12 text-center text-slate-400">Loading...</div>
