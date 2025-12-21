@@ -9,6 +9,7 @@ const createSchema = z.object({
     steps: z.number().int().positive(),
     partial: z.boolean().optional().default(false),
     proof_path: z.string().min(3),
+    proxy_member_id: z.string().uuid().optional(),
 });
 
 const querySchema = z.object({
@@ -99,6 +100,7 @@ export async function POST(request: Request): Promise<Response> {
             proof_path: input.proof_path,
             flagged: (body as any).flagged ?? false,
             flag_reason: (body as any).flag_reason ?? null,
+            proxy_member_id: input.proxy_member_id ?? null,
         };
 
         let submission;

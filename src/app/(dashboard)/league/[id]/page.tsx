@@ -9,7 +9,7 @@ import { BatchSubmissionForm } from "@/components/forms/BatchSubmissionForm";
 import { BulkUnverifiedForm } from "@/components/forms/BulkUnverifiedForm";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
 import { LeagueInviteControl } from "@/components/league/LeagueInviteControl";
-import { ProxyMemberManagement } from "@/components/league/ProxyMemberManagement";
+import { ProxyMembersDropdown } from "@/components/league/ProxyMembersDropdown";
 
 interface League {
   id: string;
@@ -43,6 +43,9 @@ export default function LeaguePage() {
   const [copied, setCopied] = useState(false);
   const [expandedSubmissionId, setExpandedSubmissionId] = useState<string | null>(null);
   const [submissionMode, setSubmissionMode] = useState<"single" | "batch" | "bulk-manual">("batch");
+  const [selectedProxy, setSelectedProxy] = useState<{ id: string; display_name: string; submission_count: number } | null>(null);
+
+  const canManageProxy = league?.role === "owner" || league?.role === "admin";
 
   // Get dates for current week (last 7 days)
   const getWeekDates = () => {
@@ -187,6 +190,13 @@ export default function LeaguePage() {
               inviteCode={league.invite_code}
               leagueName={league.name}
             />
+            {canManageProxy && (
+              <ProxyMembersDropdown
+                leagueId={leagueId}
+                selectedProxy={selectedProxy}
+                onSelectProxy={setSelectedProxy}
+              />
+            )}
           </div>
         </ModuleFeedback>
 
@@ -238,7 +248,12 @@ export default function LeaguePage() {
 
             <div className="mt-6">
               {submissionMode === "single" ? (
-                <SubmissionForm leagueId={leagueId} onSubmitted={handleSubmissionComplete} />
+                <SubmissionForm
+                  leagueId={leagueId}
+                  proxyMemberId={selectedProxy?.id}
+                  proxyDisplayName={selectedProxy?.display_name}
+                  onSubmitted={handleSubmissionComplete}
+                />
               ) : submissionMode === "batch" ? (
                 <BatchSubmissionForm leagueId={leagueId} onSubmitted={handleSubmissionComplete} />
               ) : (
@@ -352,14 +367,6 @@ export default function LeaguePage() {
           </section>
         </ModuleFeedback>
 
-        {/* Proxy Member Management - Only for admins/owners */}
-        {(league.role === "owner" || league.role === "admin") && (
-          <ModuleFeedback moduleId="proxy-members" moduleName="Proxy Members">
-            <section className="mt-12">
-              <ProxyMemberManagement leagueId={leagueId} userRole={league.role || "member"} />
-            </section>
-          </ModuleFeedback>
-        )}
       </main>
     </div>
   );

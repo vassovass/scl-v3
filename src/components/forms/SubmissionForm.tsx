@@ -7,6 +7,8 @@ import { DatePicker } from "@/components/ui/DatePicker";
 
 interface SubmissionFormProps {
     leagueId: string;
+    proxyMemberId?: string;
+    proxyDisplayName?: string;
     onSubmitted?: () => void;
 }
 
@@ -61,7 +63,7 @@ interface PendingVerification {
 const MAX_RETRY_ATTEMPTS = 5; // Reduced from 10 - don't spam the API
 const BASE_RETRY_SECONDS = 5; // Base for exponential backoff
 
-export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
+export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSubmitted }: SubmissionFormProps) {
     const [date, setDate] = useState<string>(new Date().toISOString().slice(0, 10));
     const [steps, setSteps] = useState<string>("");
     const [partial, setPartial] = useState<boolean>(false);
@@ -226,6 +228,7 @@ export function SubmissionForm({ leagueId, onSubmitted }: SubmissionFormProps) {
                     flagged,
                     flag_reason: flagged ? flagReason : null,
                     overwrite,
+                    proxy_member_id: proxyMemberId || undefined,
                 }),
             });
 

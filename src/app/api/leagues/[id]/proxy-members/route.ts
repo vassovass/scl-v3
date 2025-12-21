@@ -99,7 +99,7 @@ export async function POST(
 
         const adminClient = createAdminClient();
 
-        // Check if user is owner or admin
+        // Check if user is owner, admin, or superadmin
         const { data: membership } = await adminClient
             .from("memberships")
             .select("role")
@@ -107,8 +107,17 @@ export async function POST(
             .eq("user_id", user.id)
             .single();
 
-        if (!membership || !["owner", "admin"].includes(membership.role)) {
-            return forbidden("Only league owners and admins can create proxy members");
+        const { data: userProfile } = await adminClient
+            .from("users")
+            .select("is_superadmin")
+            .eq("id", user.id)
+            .single();
+
+        const isSuperAdmin = userProfile?.is_superadmin ?? false;
+        const isLeagueAdmin = membership && ["owner", "admin"].includes(membership.role);
+
+        if (!isSuperAdmin && !isLeagueAdmin) {
+            return forbidden("Only league owners, admins, or superadmins can create proxy members");
         }
 
         // Create proxy member
@@ -156,7 +165,7 @@ export async function DELETE(
 
         const adminClient = createAdminClient();
 
-        // Check if user is owner or admin
+        // Check if user is owner, admin, or superadmin
         const { data: membership } = await adminClient
             .from("memberships")
             .select("role")
@@ -164,8 +173,17 @@ export async function DELETE(
             .eq("user_id", user.id)
             .single();
 
-        if (!membership || !["owner", "admin"].includes(membership.role)) {
-            return forbidden("Only league owners and admins can delete proxy members");
+        const { data: userProfile } = await adminClient
+            .from("users")
+            .select("is_superadmin")
+            .eq("id", user.id)
+            .single();
+
+        const isSuperAdmin = userProfile?.is_superadmin ?? false;
+        const isLeagueAdmin = membership && ["owner", "admin"].includes(membership.role);
+
+        if (!isSuperAdmin && !isLeagueAdmin) {
+            return forbidden("Only league owners, admins, or superadmins can delete proxy members");
         }
 
         // Verify proxy exists and belongs to this league
