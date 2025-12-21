@@ -65,6 +65,11 @@ export function GlobalFooter() {
                         <h4 className="text-sm font-medium text-slate-300 mb-3">Legal</h4>
                         <ul className="space-y-2">
                             <li>
+                                <Link href="/terms" className="text-sm text-slate-500 hover:text-slate-300 transition">
+                                    Terms of Service
+                                </Link>
+                            </li>
+                            <li>
                                 <Link href="/privacy" className="text-sm text-slate-500 hover:text-slate-300 transition">
                                     Privacy Policy
                                 </Link>

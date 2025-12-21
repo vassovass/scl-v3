@@ -1,6 +1,8 @@
 # ROADMAP.md - Feature Roadmap
 
-> Proposed future features for StepCountLeague v3. Items may be added, removed, or reprioritized.
+> Proposed future features for StepLeague v3. Items may be added, removed, or reprioritized.
+> 
+> **Current Stage:** Alpha (friends & family testing)
 
 ---
 
@@ -12,7 +14,15 @@
 
 ---
 
-## Planned (Short Term)
+## Planned (Short Term) - Alpha Phase
+
+### Notifications & Reminders (Priority)
+*Goal: Remind users to submit their steps daily*
+
+- [ ] **Email reminders** - Daily cron job to notify users who haven't submitted (Supabase + Resend, **$0/month**)
+- [ ] Weekly email digest with league summary and stats
+- [ ] User preference to opt-in/out of reminders
+- [ ] Web Push notifications (browser-based, **$0/month**)
 
 ### Analytics Enhancements
 - [ ] "Consistent" badge for users who submitted every day in period
@@ -27,12 +37,19 @@
 
 ### User Experience
 - [ ] Onboarding flow for new users
-- [ ] Notification system (email digests for weekly summary)
 - [ ] Achievement badges (streaks, milestones)
 
 ---
 
-## Planned (Medium Term)
+## Planned (Medium Term) - Growth Phase
+
+### Enhanced Notifications
+*When user base grows beyond free tier limits*
+
+- [ ] **WhatsApp text reminders** via Intercom (~$65/mo with startup discount)
+- [ ] In-app notification center
+- [ ] Customizable reminder times per user
+- [ ] League-wide announcements from admins
 
 ### Social Features
 - [ ] League chat / comments
@@ -51,13 +68,31 @@
 
 ---
 
-## Ideas (Long Term)
+## Ideas (Long Term) - Premium Features
 *Under consideration, not committed*
 
+### Premium Tier Features
+- [ ] **AI Voice Coach "StepCoach"** - WhatsApp voice calls with AI motivational coach (ElevenLabs, startup grant available)
+- [ ] Advanced analytics and insights
+- [ ] Custom league branding
+- [ ] Priority support
+
+### Platform Expansion
 - [ ] Mobile app (React Native or Flutter)
 - [ ] Team leagues (groups within leagues)
 - [ ] Seasonal competitions with prizes
-- [ ] Premium tier with advanced analytics
+- [ ] Telegram bot integration (free alternative to WhatsApp)
+
+---
+
+## Startup Programs to Apply For
+*Free/discounted tools for bootstrapped startups*
+
+| Platform | Benefit | Status |
+|----------|---------|--------|
+| Intercom Early Stage | 90% off Year 1 (~$65/mo) | [ ] Apply |
+| ElevenLabs Startup Grants | 12 months free (33M credits) | [ ] Apply |
+| Resend | 3,000 emails/mo free | [ ] Already available |
 
 ---
 
@@ -76,4 +111,4 @@
 
 ---
 
-*Last updated: 2025-12-21*
+*Last updated: 2025-12-22*
