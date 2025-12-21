@@ -1,6 +1,7 @@
 "use client";
 
 import { NavHeader } from "@/components/navigation/NavHeader";
+import { GlobalFooter } from "@/components/layout/GlobalFooter";
 
 export default function DashboardLayout({
     children,
@@ -8,9 +9,10 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     return (
-        <>
+        <div className="min-h-screen flex flex-col">
             <NavHeader />
-            <main>{children}</main>
-        </>
+            <main className="flex-1">{children}</main>
+            <GlobalFooter />
+        </div>
     );
 }

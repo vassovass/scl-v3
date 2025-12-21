@@ -12,6 +12,7 @@ export function NavHeader() {
     const [isSuperadmin, setIsSuperadmin] = useState(false);
     const [signingOut, setSigningOut] = useState(false);
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const navRef = useRef<HTMLDivElement>(null);
 
     // Extract league ID from path if on a league page
@@ -46,9 +47,16 @@ export function NavHeader() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    // Close mobile menu on route change
+    useEffect(() => {
+        setMobileMenuOpen(false);
+        setOpenDropdown(null);
+    }, [pathname]);
+
     const handleSignOut = async () => {
         setSigningOut(true);
         setOpenDropdown(null);
+        setMobileMenuOpen(false);
         await signOut();
     };
 
@@ -68,18 +76,38 @@ export function NavHeader() {
                 <Link href="/dashboard" className="flex items-center gap-2">
                     <span className="text-xl">👟</span>
                     <span className="text-lg font-bold text-slate-50 transition hover:text-sky-400">
-                        Step<span className="text-sky-500">Count</span>League
+                        Step<span className="text-sky-500">Count</span><span className="hidden sm:inline">League</span>
                     </span>
                 </Link>
 
+                {/* Mobile hamburger button */}
                 {session && (
-                    <div className="flex items-center gap-1">
+                    <button
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        className="md:hidden p-2 rounded-lg text-slate-400 hover:bg-slate-800"
+                        aria-label="Toggle menu"
+                    >
+                        {mobileMenuOpen ? (
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        ) : (
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        )}
+                    </button>
+                )}
+
+                {/* Desktop Navigation */}
+                {session && (
+                    <div className="hidden md:flex items-center gap-1">
                         {/* Dashboard */}
                         <Link
                             href="/dashboard"
                             className={`px-3 py-2 text-sm rounded-lg transition ${isActive("/dashboard")
-                                    ? "bg-sky-600/20 text-sky-400"
-                                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                                ? "bg-sky-600/20 text-sky-400"
+                                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
                                 }`}
                         >
                             Dashboard
@@ -91,8 +119,8 @@ export function NavHeader() {
                                 <button
                                     onClick={() => toggleDropdown("league")}
                                     className={`px-3 py-2 text-sm rounded-lg transition flex items-center gap-1 ${isActivePrefix(`/league/${currentLeagueId}`)
-                                            ? "bg-sky-600/20 text-sky-400"
-                                            : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                                        ? "bg-sky-600/20 text-sky-400"
+                                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
                                         }`}
                                 >
                                     League <span className="text-[10px]">▼</span>
@@ -104,8 +132,8 @@ export function NavHeader() {
                                             href={`/league/${currentLeagueId}`}
                                             onClick={() => setOpenDropdown(null)}
                                             className={`block px-4 py-2.5 text-sm transition ${isActive(`/league/${currentLeagueId}`)
-                                                    ? "bg-sky-600/20 text-sky-400"
-                                                    : "text-slate-300 hover:bg-slate-800"
+                                                ? "bg-sky-600/20 text-sky-400"
+                                                : "text-slate-300 hover:bg-slate-800"
                                                 }`}
                                         >
                                             📝 Submit Steps
@@ -114,8 +142,8 @@ export function NavHeader() {
                                             href={`/league/${currentLeagueId}/leaderboard`}
                                             onClick={() => setOpenDropdown(null)}
                                             className={`block px-4 py-2.5 text-sm transition ${isActive(`/league/${currentLeagueId}/leaderboard`)
-                                                    ? "bg-sky-600/20 text-sky-400"
-                                                    : "text-slate-300 hover:bg-slate-800"
+                                                ? "bg-sky-600/20 text-sky-400"
+                                                : "text-slate-300 hover:bg-slate-800"
                                                 }`}
                                         >
                                             🏆 Leaderboard
@@ -124,8 +152,8 @@ export function NavHeader() {
                                             href={`/league/${currentLeagueId}/analytics`}
                                             onClick={() => setOpenDropdown(null)}
                                             className={`block px-4 py-2.5 text-sm transition ${isActive(`/league/${currentLeagueId}/analytics`)
-                                                    ? "bg-sky-600/20 text-sky-400"
-                                                    : "text-slate-300 hover:bg-slate-800"
+                                                ? "bg-sky-600/20 text-sky-400"
+                                                : "text-slate-300 hover:bg-slate-800"
                                                 }`}
                                         >
                                             📊 Analytics
@@ -169,8 +197,8 @@ export function NavHeader() {
                             <Link
                                 href="/admin"
                                 className={`px-3 py-2 text-sm rounded-lg transition ${isActive("/admin")
-                                        ? "bg-amber-600/20 text-amber-400"
-                                        : "text-amber-500/70 hover:text-amber-400 hover:bg-amber-900/20"
+                                    ? "bg-amber-600/20 text-amber-400"
+                                    : "text-amber-500/70 hover:text-amber-400 hover:bg-amber-900/20"
                                     }`}
                             >
                                 Admin
@@ -252,6 +280,69 @@ export function NavHeader() {
                     </Link>
                 )}
             </nav>
+
+            {/* Mobile Menu Drawer */}
+            {session && mobileMenuOpen && (
+                <div className="md:hidden border-t border-slate-800 bg-slate-950 px-4 py-4 space-y-2">
+                    <Link
+                        href="/dashboard"
+                        className={`block px-4 py-3 rounded-lg text-sm ${isActive("/dashboard") ? "bg-sky-600/20 text-sky-400" : "text-slate-300 hover:bg-slate-800"
+                            }`}
+                    >
+                        📊 Dashboard
+                    </Link>
+
+                    {currentLeagueId && (
+                        <>
+                            <div className="pt-2 pb-1 px-4 text-xs text-slate-500 uppercase">Current League</div>
+                            <Link
+                                href={`/league/${currentLeagueId}`}
+                                className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800"
+                            >
+                                📝 Submit Steps
+                            </Link>
+                            <Link
+                                href={`/league/${currentLeagueId}/leaderboard`}
+                                className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800"
+                            >
+                                🏆 Leaderboard
+                            </Link>
+                            <Link
+                                href={`/league/${currentLeagueId}/analytics`}
+                                className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800"
+                            >
+                                📊 Analytics
+                            </Link>
+                        </>
+                    )}
+
+                    <div className="pt-2 pb-1 px-4 text-xs text-slate-500 uppercase">Actions</div>
+                    <Link href="/league/create" className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800">
+                        ➕ Create League
+                    </Link>
+                    <Link href="/join" className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800">
+                        🔗 Join League
+                    </Link>
+
+                    <div className="pt-2 pb-1 px-4 text-xs text-slate-500 uppercase">Account</div>
+                    <Link href="/settings/profile" className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800">
+                        ⚙️ Profile Settings
+                    </Link>
+                    <Link href="/feedback" className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800">
+                        💬 Send Feedback
+                    </Link>
+
+                    <div className="pt-4 border-t border-slate-800">
+                        <button
+                            onClick={handleSignOut}
+                            disabled={signingOut}
+                            className="w-full px-4 py-3 rounded-lg text-sm text-rose-400 hover:bg-slate-800 text-left disabled:opacity-50"
+                        >
+                            {signingOut ? "Signing out..." : "🚪 Sign Out"}
+                        </button>
+                    </div>
+                </div>
+            )}
         </header>
     );
 }
