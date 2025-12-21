@@ -77,9 +77,10 @@ export default function TermsOfServicePage() {
                         </p>
                         <ul className="mt-2 list-disc list-inside space-y-1">
                             <li>Monthly subscriptions: No refunds for partial months</li>
-                            <li>Annual subscriptions: Pro-rated refund within first 30 days only</li>
-                            <li>Lifetime plans: Refund within 14 days of purchase if Service not used</li>
+                            <li>Annual subscriptions: Refund within 7 days of purchase only, minus any usage</li>
+                            <li>Lifetime plans: Refund within 7 days of purchase only if Service not used</li>
                             <li>Service discontinuation: No refunds for any plan type</li>
+                            <li>Refunds are limited to one per account; repeat refund requests may be denied</li>
                         </ul>
                     </div>
 
