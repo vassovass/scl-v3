@@ -7,6 +7,7 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
 import { ShareAchievementButton, AchievementData } from "@/components/ui/AchievementShareCard";
+import { useUserStats } from "@/hooks/useUserStats";
 
 type PeriodPreset =
   | "today" | "yesterday"
@@ -88,6 +89,7 @@ export default function LeaderboardPage() {
   const [customEndA, setCustomEndA] = useState("");
   const [customStartB, setCustomStartB] = useState("");
   const [customEndB, setCustomEndB] = useState("");
+  const { stats: userStats } = useUserStats();
 
   const fetchLeaderboard = useCallback(async () => {
     if (!session) return;
@@ -341,7 +343,9 @@ export default function LeaderboardPage() {
                         {entry.user_id === session?.user?.id && (
                           <ShareAchievementButton
                             achievement={{
-                              type: entry.rank === 1 ? "leader" : "rank",
+                              type: (period === "today" && userStats && entry.total_steps >= userStats.best_day_steps && entry.total_steps > 0)
+                                ? "personal_best"
+                                : (entry.rank === 1 ? "leader" : "rank"),
                               value: entry.total_steps,
                               label: "steps",
                               rank: entry.rank,

@@ -12,11 +12,16 @@ export async function GET(request: NextRequest) {
     const period = searchParams.get("period") || "this week";
     const emoji = searchParams.get("emoji") || "🏆";
     const improvement = searchParams.get("improvement");
+    const customTitle = searchParams.get("title");
 
     // Rank display
-    let rankText = `#${rank}`;
+    let rankText = customTitle || `#${rank}`;
     let rankColor = "#38bdf8"; // sky-400
-    if (rank === 1) {
+
+    if (customTitle) {
+        rankColor = "#38bdf8"; // sky-400 (default)
+        if (customTitle.includes("Personal Best")) rankColor = "#c084fc"; // purple-400
+    } else if (rank === 1) {
         rankText = "1st Place!";
         rankColor = "#facc15"; // yellow-400
     } else if (rank === 2) {

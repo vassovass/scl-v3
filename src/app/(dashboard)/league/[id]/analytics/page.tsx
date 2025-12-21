@@ -7,7 +7,9 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { CalendarHeatmap } from "@/components/analytics/CalendarHeatmap";
 import { DailyBreakdownTable } from "@/components/analytics/DailyBreakdownTable";
 import { ShareButton, generateShareMessage } from "@/components/ui/ShareButton";
+
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
+import { PersonalStatsCard } from "@/components/analytics/PersonalStatsCard";
 
 type ViewMode = "both" | "calendar" | "table";
 
@@ -75,6 +77,14 @@ export default function LeagueAnalyticsPage() {
 
             {/* Main Content */}
             <main className="mx-auto max-w-6xl px-6 py-6">
+
+                {/* Personal Stats */}
+                <ModuleFeedback moduleId="personal-stats" moduleName="Personal Records">
+                    <section className="mb-8">
+                        <h2 className="text-sm font-medium text-slate-400 mb-3">🏆 Your Records</h2>
+                        <PersonalStatsCard />
+                    </section>
+                </ModuleFeedback>
                 {/* Calendar View */}
                 {(viewMode === "both" || viewMode === "calendar") && (
                     <ModuleFeedback moduleId="analytics-calendar" moduleName="Calendar Heatmap">

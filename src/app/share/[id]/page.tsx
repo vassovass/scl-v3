@@ -13,11 +13,16 @@ export async function generateMetadata({ searchParams }: SharePageProps): Promis
     const name = searchParams.name || "Someone";
     const league = searchParams.league || "Step Counter League";
     const improvement = searchParams.improvement ? parseInt(searchParams.improvement) : null;
+    const type = searchParams.type || "rank";
 
-    // Generate title based on rank
+    // Generate title based on type/rank
     let title = "";
     let emoji = "🏆";
-    if (rank === 1) {
+
+    if (type === "personal_best") {
+        title = `💪 ${name} hit a new Personal Best!`;
+        emoji = "💪";
+    } else if (rank === 1) {
         title = `👑 ${name} is #1 in ${league}!`;
         emoji = "👑";
     } else if (rank === 2) {
@@ -39,6 +44,8 @@ export async function generateMetadata({ searchParams }: SharePageProps): Promis
     ogImageUrl.searchParams.set("name", name);
     ogImageUrl.searchParams.set("period", period);
     ogImageUrl.searchParams.set("emoji", emoji);
+    ogImageUrl.searchParams.set("type", type);
+    if (type === "personal_best") ogImageUrl.searchParams.set("title", "New Personal Best!");
     if (improvement) ogImageUrl.searchParams.set("improvement", improvement.toString());
 
     return {
@@ -73,8 +80,10 @@ export default function SharePage({ searchParams }: SharePageProps) {
     const name = searchParams.name || "Someone";
     const league = searchParams.league || "Step Counter League";
     const improvement = searchParams.improvement ? parseInt(searchParams.improvement) : null;
+    const type = searchParams.type || "rank";
 
     const getRankDisplay = () => {
+        if (type === "personal_best") return { emoji: "💪", text: "New Personal Best!", color: "text-sky-400" };
         if (rank === 1) return { emoji: "👑", text: "1st Place!", color: "text-yellow-400" };
         if (rank === 2) return { emoji: "🥈", text: "2nd Place!", color: "text-slate-300" };
         if (rank === 3) return { emoji: "🥉", text: "3rd Place!", color: "text-amber-600" };

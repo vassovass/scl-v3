@@ -83,6 +83,7 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
             name: achievement.userName || "Player",
             period: getPeriodText(),
             league: achievement.leagueName || "Step Counter League",
+            type: achievement.type,
         });
         if (achievement.improvementPct !== undefined) {
             params.set("improvement", achievement.improvementPct.toString());
