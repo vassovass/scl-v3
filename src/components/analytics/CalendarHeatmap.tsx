@@ -140,19 +140,19 @@ export function CalendarHeatmap({ leagueId, onDayClick }: CalendarHeatmapProps) 
             </div>
 
             {/* Weekday headers */}
-            <div className="grid grid-cols-7 gap-1 mb-1">
+            <div className="grid grid-cols-7 gap-0.5 mb-0.5">
                 {WEEKDAYS.map((day) => (
-                    <div key={day} className="text-center text-xs text-slate-500 py-1">
-                        {day}
+                    <div key={day} className="text-center text-[10px] text-slate-500 py-0.5">
+                        {day.charAt(0)}
                     </div>
                 ))}
             </div>
 
-            {/* Calendar grid */}
-            <div className="grid grid-cols-7 gap-1">
+            {/* Calendar grid - compact squares */}
+            <div className="grid grid-cols-7 gap-0.5">
                 {/* Empty cells for offset */}
                 {Array.from({ length: offset }).map((_, i) => (
-                    <div key={`empty-${i}`} className="aspect-square" />
+                    <div key={`empty-${i}`} className="w-full h-6 sm:h-8" />
                 ))}
 
                 {/* Day cells */}
@@ -160,12 +160,10 @@ export function CalendarHeatmap({ leagueId, onDayClick }: CalendarHeatmapProps) 
                     <button
                         key={day.date}
                         onClick={() => onDayClick?.(day)}
-                        className={`aspect-square rounded p-1 text-xs transition hover:ring-2 hover:ring-sky-500 ${getCoverageColor(day.coverage_pct)}`}
+                        title={`${day.date}: ${day.submitted_count}/${day.total_members} submitted (${day.coverage_pct}%)`}
+                        className={`h-6 sm:h-8 w-full rounded-sm text-[10px] sm:text-xs transition hover:ring-1 hover:ring-sky-500 flex items-center justify-center ${getCoverageColor(day.coverage_pct)}`}
                     >
-                        <div className="text-slate-300 font-medium">{day.day_of_month}</div>
-                        <div className="text-[10px] text-slate-400">
-                            {day.submitted_count}/{day.total_members}
-                        </div>
+                        <span className="text-slate-300 font-medium">{day.day_of_month}</span>
                     </button>
                 ))}
             </div>

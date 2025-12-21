@@ -38,6 +38,7 @@ All notable changes to StepCountLeague v3.
 
 ### Added
 - **Submit Another Batch** button after completing batch submission
+- **Compact calendar heatmap** - smaller squares, submission ratio on hover
 
 ---
 
