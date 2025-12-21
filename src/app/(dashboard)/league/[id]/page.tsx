@@ -6,6 +6,8 @@ import { useParams } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { SubmissionForm } from "@/components/forms/SubmissionForm";
 import { BatchSubmissionForm } from "@/components/forms/BatchSubmissionForm";
+import { BulkUnverifiedForm } from "@/components/forms/BulkUnverifiedForm";
+import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
 
 interface League {
   id: string;
@@ -38,7 +40,7 @@ export default function LeaguePage() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [expandedSubmissionId, setExpandedSubmissionId] = useState<string | null>(null);
-  const [submissionMode, setSubmissionMode] = useState<"single" | "batch">("batch");
+  const [submissionMode, setSubmissionMode] = useState<"single" | "batch" | "bulk-manual">("batch");
 
   // Get dates for current week (last 7 days)
   const getWeekDates = () => {
@@ -169,171 +171,189 @@ export default function LeaguePage() {
       {/* Main */}
       <main className="mx-auto max-w-5xl px-6 py-12">
         {/* Actions */}
-        <div className="flex flex-wrap gap-4">
-          <Link
-            href={`/league/${leagueId}/leaderboard`}
-            className="rounded-lg bg-sky-500 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
-          >
-            View Leaderboard
-          </Link>
-          <Link
-            href={`/league/${leagueId}/analytics`}
-            className="rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500"
-          >
-            📊 Analytics
-          </Link>
-          <button
-            onClick={copyInviteCode}
-            className="rounded-lg border border-slate-700 px-6 py-3 text-sm font-medium text-slate-300 transition hover:border-slate-500"
-          >
-            {copied ? "Copied!" : `Invite Code: ${league.invite_code}`}
-          </button>
-        </div>
+        <ModuleFeedback moduleId="league-actions" moduleName="Quick Actions">
+          <div className="flex flex-wrap gap-4">
+            <Link
+              href={`/league/${leagueId}/leaderboard`}
+              className="rounded-lg bg-sky-500 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
+            >
+              View Leaderboard
+            </Link>
+            <Link
+              href={`/league/${leagueId}/analytics`}
+              className="rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500"
+            >
+              📊 Analytics
+            </Link>
+            <button
+              onClick={copyInviteCode}
+              className="rounded-lg border border-slate-700 px-6 py-3 text-sm font-medium text-slate-300 transition hover:border-slate-500"
+            >
+              {copied ? "Copied!" : `Invite Code: ${league.invite_code}`}
+            </button>
+          </div>
+        </ModuleFeedback>
 
         {/* Submit Steps Section */}
-        <section className="mt-12">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-semibold text-slate-100">Submit Today&apos;s Steps</h2>
-              <p className="mt-2 text-sm text-slate-400">
-                {submissionMode === "single"
-                  ? "Upload a screenshot to verify your step count."
-                  : "Upload multiple screenshots to auto-extract data."}
-              </p>
+        <ModuleFeedback moduleId="submission-form" moduleName="Step Submission Form">
+          <section className="mt-12">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-slate-100">Submit Today&apos;s Steps</h2>
+                <p className="mt-2 text-sm text-slate-400">
+                  {submissionMode === "single"
+                    ? "Upload a screenshot to verify your step count."
+                    : submissionMode === "batch"
+                      ? "Upload multiple screenshots to auto-extract data."
+                      : "Manually enter step counts for multiple days (unverified)."}
+                </p>
+              </div>
+
+              <div className="flex rounded-lg border border-slate-700 bg-slate-800 p-1">
+                <button
+                  onClick={() => setSubmissionMode("single")}
+                  className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${submissionMode === "single"
+                    ? "bg-sky-600 text-white shadow-sm"
+                    : "text-slate-400 hover:text-slate-200"
+                    }`}
+                >
+                  Single Entry
+                </button>
+                <button
+                  onClick={() => setSubmissionMode("batch")}
+                  className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${submissionMode === "batch"
+                    ? "bg-sky-600 text-white shadow-sm"
+                    : "text-slate-400 hover:text-slate-200"
+                    }`}
+                >
+                  Batch Upload
+                </button>
+                <button
+                  onClick={() => setSubmissionMode("bulk-manual")}
+                  className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${submissionMode === "bulk-manual"
+                    ? "bg-amber-600 text-white shadow-sm"
+                    : "text-slate-400 hover:text-slate-200"
+                    }`}
+                >
+                  Bulk Manual
+                </button>
+              </div>
             </div>
 
-            <div className="flex rounded-lg border border-slate-700 bg-slate-800 p-1">
-              <button
-                onClick={() => setSubmissionMode("single")}
-                className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${submissionMode === "single"
-                  ? "bg-sky-600 text-white shadow-sm"
-                  : "text-slate-400 hover:text-slate-200"
-                  }`}
-              >
-                Single Entry
-              </button>
-              <button
-                onClick={() => setSubmissionMode("batch")}
-                className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${submissionMode === "batch"
-                  ? "bg-sky-600 text-white shadow-sm"
-                  : "text-slate-400 hover:text-slate-200"
-                  }`}
-              >
-                Batch Upload
-              </button>
+            <div className="mt-6">
+              {submissionMode === "single" ? (
+                <SubmissionForm leagueId={leagueId} onSubmitted={handleSubmissionComplete} />
+              ) : submissionMode === "batch" ? (
+                <BatchSubmissionForm leagueId={leagueId} onSubmitted={handleSubmissionComplete} />
+              ) : (
+                <BulkUnverifiedForm leagueId={leagueId} onSubmitted={handleSubmissionComplete} />
+              )}
             </div>
-          </div>
-
-          <div className="mt-6">
-            {submissionMode === "single" ? (
-              <SubmissionForm leagueId={leagueId} onSubmitted={handleSubmissionComplete} />
-            ) : (
-              <BatchSubmissionForm leagueId={leagueId} onSubmitted={handleSubmissionComplete} />
-            )}
-          </div>
-        </section>
+          </section>
+        </ModuleFeedback>
 
         {/* Your Recent Submissions */}
-        <section className="mt-12">
-          <h2 className="text-xl font-semibold text-slate-100">Your Recent Submissions</h2>
-          <p className="mt-2 text-sm text-slate-400">
-            Your step submissions from the past 7 days.
-          </p>
+        <ModuleFeedback moduleId="recent-submissions" moduleName="Recent Submissions">
+          <section className="mt-12">
+            <h2 className="text-xl font-semibold text-slate-100">Your Recent Submissions</h2>
+            <p className="mt-2 text-sm text-slate-400">
+              Your step submissions from the past 7 days.
+            </p>
 
-          <div className="mt-6">
-            {submissions.length === 0 ? (
-              <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-6 text-center">
-                <p className="text-slate-400">No submissions this week yet.</p>
-              </div>
-            ) : (
-              <div className="overflow-hidden rounded-lg border border-slate-800">
-                <table className="w-full">
-                  <thead className="bg-slate-900">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-slate-400">Date</th>
-                      <th className="px-4 py-3 text-right text-sm font-medium text-slate-400">Steps</th>
-                      <th className="px-4 py-3 text-right text-sm font-medium text-slate-400">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-800">
-                    {submissions.map((sub) => {
-                      const isExpanded = expandedSubmissionId === sub.id;
-                      const canExpand = sub.verified === false && sub.verification_notes;
+            <div className="mt-6">
+              {submissions.length === 0 ? (
+                <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-6 text-center">
+                  <p className="text-slate-400">No submissions this week yet.</p>
+                </div>
+              ) : (
+                <div className="overflow-hidden rounded-lg border border-slate-800">
+                  <table className="w-full">
+                    <thead className="bg-slate-900">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-slate-400">Date</th>
+                        <th className="px-4 py-3 text-right text-sm font-medium text-slate-400">Steps</th>
+                        <th className="px-4 py-3 text-right text-sm font-medium text-slate-400">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800">
+                      {submissions.map((sub) => {
+                        const isExpanded = expandedSubmissionId === sub.id;
+                        const canExpand = sub.verified === false && sub.verification_notes;
 
-                      return (
-                        <React.Fragment key={sub.id}>
-                          <tr
-                            className={`hover:bg-slate-900/50 ${canExpand ? 'cursor-pointer' : ''}`}
-                            onClick={() => {
-                              if (canExpand) {
-                                setExpandedSubmissionId(isExpanded ? null : sub.id);
-                              }
-                            }}
-                          >
-                            <td className="px-4 py-3 text-slate-100">
-                              {formatDate(sub.for_date)}
-                              {sub.partial && (
-                                <span className="ml-2 text-xs text-slate-500">(partial)</span>
-                              )}
-                              {canExpand && (
-                                <span className="ml-2 text-xs text-slate-500">
-                                  {isExpanded ? '▼' : '▶'}
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-4 py-3 text-right font-mono text-slate-100">
-                              {sub.steps.toLocaleString()}
-                            </td>
-                            <td className="px-4 py-3 text-right">
-                              {getVerificationBadge(sub.verified)}
-                            </td>
-                          </tr>
-                          {/* Expanded verification details */}
-                          {isExpanded && sub.verification_notes && (
-                            <tr>
-                              <td colSpan={3} className="bg-slate-900/80 px-4 py-3">
-                                <div className="rounded-md border border-slate-700 bg-slate-800/50 p-3 space-y-2">
-                                  <p className="text-sm font-medium text-slate-300">Verification Details</p>
-                                  <p className="text-sm text-slate-400">{sub.verification_notes}</p>
-                                  {(sub.extracted_km || sub.extracted_calories) && (
-                                    <div className="flex gap-4 text-xs text-slate-500 pt-1">
-                                      {sub.extracted_km && <span>Distance: {sub.extracted_km} km</span>}
-                                      {sub.extracted_calories && <span>Calories: {sub.extracted_calories}</span>}
-                                    </div>
-                                  )}
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      const issueDetails = [
-                                        `Verification Issue Report`,
-                                        `========================`,
-                                        `Date: ${new Date().toISOString()}`,
-                                        `For: ${sub.for_date}`,
-                                        `Steps: ${sub.steps}`,
-                                        ``,
-                                        `Verification Notes:`,
-                                        sub.verification_notes ?? 'None',
-                                      ].join('\n');
-                                      navigator.clipboard.writeText(issueDetails);
-                                      alert('Issue details copied to clipboard!');
-                                    }}
-                                    className="mt-2 rounded-md border border-slate-600 bg-slate-700 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-slate-600"
-                                  >
-                                    📋 Report Issue
-                                  </button>
-                                </div>
+                        return (
+                          <React.Fragment key={sub.id}>
+                            <tr
+                              className={`hover:bg-slate-900/50 ${canExpand ? 'cursor-pointer' : ''}`}
+                              onClick={() => {
+                                if (canExpand) {
+                                  setExpandedSubmissionId(isExpanded ? null : sub.id);
+                                }
+                              }}
+                            >
+                              <td className="px-4 py-3 text-slate-100">
+                                {formatDate(sub.for_date)}
+                                {sub.partial && (
+                                  <span className="ml-2 text-xs text-slate-500">(partial)</span>
+                                )}
+                                {canExpand && (
+                                  <span className="ml-2 text-xs text-slate-500">
+                                    {isExpanded ? '▼' : '▶'}
+                                  </span>
+                                )}
+                              </td>
+                              <td className="px-4 py-3 text-right font-mono text-slate-100">
+                                {sub.steps.toLocaleString()}
+                              </td>
+                              <td className="px-4 py-3 text-right">
+                                {getVerificationBadge(sub.verified)}
                               </td>
                             </tr>
-                          )}
-                        </React.Fragment>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </section>
+                            {/* Expanded verification details */}
+                            {isExpanded && sub.verification_notes && (
+                              <tr>
+                                <td colSpan={3} className="bg-slate-900/80 px-4 py-3">
+                                  <div className="rounded-md border border-slate-700 bg-slate-800/50 p-3 space-y-2">
+                                    <p className="text-sm font-medium text-slate-300">Verification Details</p>
+                                    <p className="text-sm text-slate-400">{sub.verification_notes}</p>
+                                    {(sub.extracted_km || sub.extracted_calories) && (
+                                      <div className="flex gap-4 text-xs text-slate-500 pt-1">
+                                        {sub.extracted_km && <span>Distance: {sub.extracted_km} km</span>}
+                                        {sub.extracted_calories && <span>Calories: {sub.extracted_calories}</span>}
+                                      </div>
+                                    )}
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        const issueDetails = [
+                                          `Verification Issue Report`,
+                                          `========================`,
+                                          `Date: ${new Date().toISOString()}`,
+                                          `For: ${sub.for_date}`,
+                                          `Steps: ${sub.steps}`,
+                                          ``,
+                                          `Verification Notes:`,
+                                          sub.verification_notes ?? 'None',
+                                        ].join('\n');
+                                        navigator.clipboard.writeText(issueDetails);
+                                        alert('Issue details copied to clipboard!');
+                                      }}
+                                      className="mt-2 rounded-md border border-slate-600 bg-slate-700 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-slate-600"
+                                    >
+                                      📋 Report Issue
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </React.Fragment>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </section>
       </main>
     </div>
   );
