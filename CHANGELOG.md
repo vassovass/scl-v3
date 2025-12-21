@@ -35,6 +35,7 @@ All notable changes to StepCountLeague v3.
 - Landing page heading overflow on mobile
 - Sign-in page now shows resend option for unconfirmed emails
 - Batch submission no longer freezes when selecting 5+ images (gracefully takes first 5, warns about rest)
+- Analytics share button now visible on mobile (header stacks vertically)
 
 ### Added
 - **Submit Another Batch** button after completing batch submission

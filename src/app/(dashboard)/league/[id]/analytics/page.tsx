@@ -27,41 +27,44 @@ export default function LeagueAnalyticsPage() {
         <div className="min-h-screen bg-slate-950">
             {/* Header */}
             <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-sm sticky top-0 z-20">
-                <div className="mx-auto max-w-6xl px-6 py-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
+                <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6 sm:py-4">
+                    {/* Mobile: Stack vertically, Desktop: Single row */}
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        {/* Title row */}
+                        <div className="flex items-center gap-3">
                             <Link
                                 href={`/league/${leagueId}`}
                                 className="text-sm text-sky-400 hover:text-sky-300"
                             >
-                                ← Back to League
+                                ←
                             </Link>
-                            <h1 className="text-xl font-bold text-slate-100">Analytics</h1>
+                            <h1 className="text-lg font-bold text-slate-100 sm:text-xl">Analytics</h1>
                         </div>
 
-                        <div className="flex items-center gap-3">
+                        {/* Controls row - always visible */}
+                        <div className="flex items-center justify-between gap-2 sm:gap-3">
                             {/* View Mode Toggle */}
                             <div className="flex rounded-lg border border-slate-700 p-0.5">
                                 {(["both", "calendar", "table"] as const).map((mode) => (
                                     <button
                                         key={mode}
                                         onClick={() => setViewMode(mode)}
-                                        className={`px-3 py-1 text-xs rounded transition ${viewMode === mode
-                                                ? "bg-sky-600 text-white"
-                                                : "text-slate-400 hover:text-slate-200"
+                                        className={`px-2 py-1 text-xs rounded transition sm:px-3 ${viewMode === mode
+                                            ? "bg-sky-600 text-white"
+                                            : "text-slate-400 hover:text-slate-200"
                                             }`}
                                     >
-                                        {mode === "both" ? "📅+📋" : mode === "calendar" ? "📅" : "📋"}
+                                        {mode === "both" ? "📅📋" : mode === "calendar" ? "📅" : "📋"}
                                     </button>
                                 ))}
                             </div>
 
-                            {/* Share Button */}
+                            {/* Share Button - Prominent on mobile */}
                             <ShareButton
                                 message={generateShareMessage("total_steps", { steps: 100000, period: "month" })}
-                                className="text-xs"
+                                className="px-3 py-1.5 text-xs sm:px-4 sm:py-2"
                             >
-                                Share
+                                📤 Share
                             </ShareButton>
                         </div>
                     </div>
@@ -128,10 +131,10 @@ export default function LeagueAnalyticsPage() {
                                 <div className="inline-flex items-center gap-2 rounded-full bg-slate-800 px-4 py-2">
                                     <span className="text-sm text-slate-400">Coverage:</span>
                                     <span className={`text-sm font-semibold ${selectedDay.submitted_count === selectedDay.total_members
-                                            ? "text-emerald-400"
-                                            : selectedDay.submitted_count >= selectedDay.total_members * 0.5
-                                                ? "text-sky-400"
-                                                : "text-amber-400"
+                                        ? "text-emerald-400"
+                                        : selectedDay.submitted_count >= selectedDay.total_members * 0.5
+                                            ? "text-sky-400"
+                                            : "text-amber-400"
                                         }`}>
                                         {Math.round((selectedDay.submitted_count / selectedDay.total_members) * 100)}%
                                     </span>
