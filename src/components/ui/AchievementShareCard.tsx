@@ -13,6 +13,14 @@ export interface AchievementData {
     userName?: string;
     leagueName?: string;
     date?: string;
+    /** Time period for the achievement (e.g., "this_week", "this_month") */
+    period?: string;
+    /** Human-readable period label (e.g., "This Week", "Last 7 Days") */
+    periodLabel?: string;
+    /** Improvement percentage compared to previous period */
+    improvementPct?: number;
+    /** Previous period comparison name (e.g., "last week", "previous month") */
+    comparisonPeriod?: string;
 }
 
 interface AchievementShareCardProps {
@@ -40,6 +48,22 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
         }
     };
 
+    const getPeriodText = () => {
+        if (achievement.periodLabel) return achievement.periodLabel.toLowerCase();
+        switch (achievement.period) {
+            case "today": return "today";
+            case "yesterday": return "yesterday";
+            case "this_week": return "this week";
+            case "last_week": return "last week";
+            case "this_month": return "this month";
+            case "last_month": return "last month";
+            case "last_7_days": return "in the last 7 days";
+            case "last_30_days": return "in the last 30 days";
+            case "all_time": return "all time";
+            default: return "this period";
+        }
+    };
+
     const getTitle = () => {
         switch (achievement.type) {
             case "rank":
@@ -49,7 +73,7 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
                 return `Ranked #${achievement.rank}!`;
             case "personal_best": return "New Personal Best!";
             case "streak": return `${achievement.value}-Day Streak!`;
-            case "improvement": return `${achievement.value}% Improvement!`;
+            case "improvement": return `${achievement.value}% Better!`;
             case "leader": return "I'm Leading!";
             default: return achievement.label;
         }
@@ -57,22 +81,27 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
 
     const getMessage = () => {
         const name = achievement.userName || "I";
+        const periodText = getPeriodText();
+        const improvementText = achievement.improvementPct
+            ? ` That's ${achievement.improvementPct > 0 ? "+" : ""}${achievement.improvementPct}% vs ${achievement.comparisonPeriod || "last period"}!`
+            : "";
+
         switch (achievement.type) {
             case "rank":
                 if (achievement.rank === 1) {
-                    return `${name} came 1st in ${achievement.leagueName || "my league"} with ${achievement.value.toLocaleString()} steps! 👑`;
+                    return `${name} came 1st in ${achievement.leagueName || "Step Counter League"} ${periodText} with ${achievement.value.toLocaleString()} steps! 👑${improvementText}`;
                 }
-                return `${name} ranked #${achievement.rank} out of ${achievement.totalMembers} with ${achievement.value.toLocaleString()} steps! 🏆`;
+                return `${name} ranked #${achievement.rank} out of ${achievement.totalMembers} ${periodText} with ${achievement.value.toLocaleString()} steps! 🏆${improvementText}`;
             case "personal_best":
-                return `${name} hit a new personal best: ${achievement.value.toLocaleString()} steps in one day! 💪`;
+                return `${name} hit a new personal best: ${achievement.value.toLocaleString()} steps ${periodText}! 💪`;
             case "streak":
                 return `${name}'m on a ${achievement.value}-day step tracking streak! 🔥`;
             case "improvement":
-                return `${name} improved by ${achievement.value}% compared to last week! 📈`;
+                return `${name} improved by ${achievement.value}% ${periodText} compared to ${achievement.comparisonPeriod || "last period"}! 📈`;
             case "leader":
-                return `${name}'m leading ${achievement.leagueName || "my league"} with ${achievement.value.toLocaleString()} steps! 👑`;
+                return `${name}'m leading ${achievement.leagueName || "Step Counter League"} ${periodText} with ${achievement.value.toLocaleString()} steps! 👑${improvementText}`;
             default:
-                return `${achievement.label}: ${achievement.value.toLocaleString()} steps! #StepCountLeague`;
+                return `${achievement.label}: ${achievement.value.toLocaleString()} steps ${periodText}! #StepCountLeague`;
         }
     };
 
@@ -205,6 +234,20 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
                             )}
                         </div>
                     )}
+
+                    {/* Period and improvement */}
+                    <div className="mt-3 flex items-center justify-center gap-3 text-xs">
+                        {(achievement.period || achievement.periodLabel) && (
+                            <span className="px-2 py-1 rounded-full bg-slate-700 text-slate-300">
+                                📅 {achievement.periodLabel || getPeriodText()}
+                            </span>
+                        )}
+                        {achievement.improvementPct !== undefined && (
+                            <span className={`px-2 py-1 rounded-full ${achievement.improvementPct >= 0 ? "bg-emerald-900/50 text-emerald-400" : "bg-rose-900/50 text-rose-400"}`}>
+                                {achievement.improvementPct >= 0 ? "📈 +" : "📉 "}{achievement.improvementPct}% vs {achievement.comparisonPeriod || "last period"}
+                            </span>
+                        )}
+                    </div>
 
                     {/* Branding */}
                     <div className="mt-6 pt-4 border-t border-slate-700 text-center">

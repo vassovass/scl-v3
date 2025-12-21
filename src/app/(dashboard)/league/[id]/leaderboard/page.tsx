@@ -342,6 +342,10 @@ export default function LeaderboardPage() {
                               totalMembers: meta?.total_members,
                               userName: entry.display_name || "I",
                               leagueName: "Step Counter League",
+                              period: period,
+                              periodLabel: PERIOD_OPTIONS.find(p => p.value === period)?.label,
+                              improvementPct: entry.improvement_pct ?? undefined,
+                              comparisonPeriod: periodB ? PERIOD_OPTIONS.find(p => p.value === periodB)?.label?.toLowerCase() : undefined,
                             } as AchievementData}
                             className="ml-2 text-xs"
                           >
