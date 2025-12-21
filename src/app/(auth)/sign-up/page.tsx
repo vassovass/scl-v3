@@ -90,7 +90,7 @@ export default function SignUpPage() {
           Create your account
         </h1>
         <p className="mt-2 text-center text-sm text-slate-400">
-          Join {APP_CONFIG.name} and start competing.
+          Join Step<span className="text-sky-500">League</span> and start competing.
         </p>
 
         {/* Google Sign Up */}

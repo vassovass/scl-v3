@@ -76,7 +76,7 @@ export function NavHeader() {
                 <Link href="/dashboard" className="flex items-center gap-2">
                     <span className="text-xl">👟</span>
                     <span className="text-lg font-bold text-slate-50 transition hover:text-sky-400">
-                        Step<span className="text-sky-500">Count</span><span className="hidden sm:inline">League</span>
+                        Step<span className="text-sky-500">League</span>
                     </span>
                 </Link>
 

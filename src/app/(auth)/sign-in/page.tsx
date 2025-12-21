@@ -95,7 +95,7 @@ function SignInForm() {
   return (
     <div className="w-full max-w-sm">
       <h1 className="text-center text-2xl font-bold text-slate-50">
-        Sign in to {APP_CONFIG.name}
+        Sign in to Step<span className="text-sky-500">League</span>
       </h1>
       <p className="mt-2 text-center text-sm text-slate-400">
         Welcome back! Enter your credentials.

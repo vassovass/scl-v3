@@ -123,7 +123,7 @@ export default function SharePage({ searchParams }: SharePageProps) {
 
                     <div className="mt-8 pt-4 border-t border-slate-700">
                         <div className="text-sm font-semibold text-slate-300">
-                            {APP_CONFIG.name}
+                            Step<span className="text-sky-500">League</span>
                         </div>
                     </div>
                 </div>

@@ -146,7 +146,7 @@ export default async function InvitePage({ params }: InvitePageProps) {
                                 {/* We reuse the Logic from Join Page but pre-fill code */}
                                 <JoinLeagueForm prefilledCode={params.code} />
                                 <p className="text-xs text-slate-500 mt-6">
-                                    {APP_CONFIG.name} is the best place to track steps with friends.
+                                    Step<span className="text-sky-500">League</span> is the best place to track steps with friends.
                                 </p>
                             </>
                         )}
