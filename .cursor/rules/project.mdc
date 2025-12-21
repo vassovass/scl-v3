@@ -1,0 +1,11 @@
+# Cursor Project Rules
+
+> See [AGENTS.md](../../AGENTS.md) for complete project context.
+
+## Quick Rules
+
+- **Mobile-first**: Base styles = mobile, add `md:`, `lg:` for larger
+- **Untyped Supabase**: No `<Database>` generics
+- **Use adminClient**: For all DB operations in API routes
+- **Dark theme**: `bg-slate-950`, `text-slate-100`, `border-slate-800`
+- **Tailwind only**: No inline styles or CSS modules
