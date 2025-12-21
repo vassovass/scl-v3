@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { APP_CONFIG } from "@/lib/config";
 
 export default function HomePage() {
   const { session, loading } = useAuth();
@@ -35,12 +36,11 @@ export default function HomePage() {
       {/* Hero Section */}
       <div className="mx-auto max-w-2xl text-center">
         <h1 className="text-3xl font-bold tracking-tight text-slate-50 sm:text-5xl">
-          <span className="block sm:inline">Step</span>
-          <span className="text-sky-500">Count</span>
-          <span className="block sm:inline">League</span>
+          <span>Step</span>
+          <span className="text-sky-500">League</span>
         </h1>
         <p className="mt-4 text-base leading-7 text-slate-400 sm:mt-6 sm:text-lg">
-          Compete with friends in step counting challenges.
+          {APP_CONFIG.tagline}.
           Submit your daily steps, get AI-verified, and climb the leaderboard.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center sm:gap-4">

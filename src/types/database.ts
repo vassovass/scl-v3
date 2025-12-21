@@ -1,4 +1,4 @@
-// Database types for StepCountLeague
+// Database types for StepLeague
 // Based on the Supabase migrations schema
 
 export type Json =

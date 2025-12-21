@@ -8,6 +8,7 @@ import { DatePicker } from "@/components/ui/DatePicker";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
 import { ShareAchievementButton, AchievementData } from "@/components/ui/AchievementShareCard";
 import { useUserStats } from "@/hooks/useUserStats";
+import { APP_CONFIG } from "@/lib/config";
 
 type PeriodPreset =
   | "today" | "yesterday"
@@ -360,7 +361,7 @@ export default function LeaderboardPage() {
                               rank: entry.rank,
                               totalMembers: meta?.total_members,
                               userName: entry.display_name || "I",
-                              leagueName: "Step Counter League",
+                              leagueName: APP_CONFIG.name,
                               period: period,
                               periodLabel: PERIOD_OPTIONS.find(p => p.value === period)?.label,
                               improvementPct: entry.improvement_pct ?? undefined,

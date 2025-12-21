@@ -1,12 +1,13 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
+import { APP_CONFIG } from "@/lib/config";
 
 export const runtime = "edge";
 
 export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl;
 
-    const leagueName = searchParams.get("name") || "Step Counter League";
+    const leagueName = searchParams.get("name") || APP_CONFIG.name;
     const members = searchParams.get("members") || "?";
 
     // Truncate long league names
@@ -108,8 +109,7 @@ export async function GET(request: NextRequest) {
                     }}
                 >
                     <span style={{ color: "#cbd5e1" }}>Step</span>
-                    <span style={{ color: "#38bdf8" }}>Count</span>
-                    <span style={{ color: "#cbd5e1" }}>League</span>
+                    <span style={{ color: "#38bdf8" }}>League</span>
                 </div>
             </div>
         ),

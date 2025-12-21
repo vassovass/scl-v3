@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { APP_CONFIG } from "@/lib/config";
 
 export interface AchievementData {
     type: "rank" | "personal_best" | "streak" | "improvement" | "leader" | "custom";
@@ -85,7 +86,7 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
             steps: achievement.value.toString(),
             name: achievement.userName || "Player",
             period: getPeriodText(),
-            league: achievement.leagueName || "Step Counter League",
+            league: achievement.leagueName || APP_CONFIG.name,
             type: achievement.type,
         });
         if (achievement.improvementPct !== undefined) {
@@ -104,7 +105,7 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
         switch (achievement.type) {
             case "rank":
                 if (achievement.rank === 1) {
-                    return `${name} came 1st in ${achievement.leagueName || "Step Counter League"} ${periodText} with ${achievement.value.toLocaleString()} steps! 👑${improvementText}`;
+                    return `${name} came 1st in ${achievement.leagueName || APP_CONFIG.name} ${periodText} with ${achievement.value.toLocaleString()} steps! 👑${improvementText}`;
                 }
                 return `${name} ranked #${achievement.rank} out of ${achievement.totalMembers} ${periodText} with ${achievement.value.toLocaleString()} steps! 🏆${improvementText}`;
             case "personal_best":
@@ -114,7 +115,7 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
             case "improvement":
                 return `${name} improved by ${achievement.value}% ${periodText} compared to ${achievement.comparisonPeriod || "last period"}! 📈`;
             case "leader":
-                return `${name}'m leading ${achievement.leagueName || "Step Counter League"} ${periodText} with ${achievement.value.toLocaleString()} steps! 👑${improvementText}`;
+                return `${name}'m leading ${achievement.leagueName || APP_CONFIG.name} ${periodText} with ${achievement.value.toLocaleString()} steps! 👑${improvementText}`;
             default:
                 return `${achievement.label}: ${achievement.value.toLocaleString()} steps ${periodText}!`;
         }

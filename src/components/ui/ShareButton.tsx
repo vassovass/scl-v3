@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { APP_CONFIG } from "@/lib/config";
 
 interface ShareButtonProps {
     /** Pre-filled message to share */
@@ -41,7 +42,7 @@ export function ShareButton({
                 if (supportsNativeShare) {
                     try {
                         await navigator.share({
-                            title: "Step Counter League",
+                            title: APP_CONFIG.name,
                             text: message,
                             url: shareUrl,
                         });
@@ -128,24 +129,24 @@ export function ShareButton({
 export function generateShareMessage(type: string, data: Record<string, unknown>): string {
     switch (type) {
         case "total_steps":
-            return `🏃 I walked ${(data.steps as number).toLocaleString()} steps this ${data.period || "week"}! #StepCounterLeague`;
+            return `🏃 I walked ${(data.steps as number).toLocaleString()} steps this ${data.period || "week"}! ${APP_CONFIG.hashtag}`;
 
         case "streak":
-            return `🔥 I'm on a ${data.days}-day step tracking streak! #StepCounterLeague`;
+            return `🔥 I'm on a ${data.days}-day step tracking streak! ${APP_CONFIG.hashtag}`;
 
         case "rank":
-            return `🏆 I'm ranked #${data.rank} in my league with ${(data.steps as number).toLocaleString()} steps! #StepCounterLeague`;
+            return `🏆 I'm ranked #${data.rank} in my league with ${(data.steps as number).toLocaleString()} steps! ${APP_CONFIG.hashtag}`;
 
         case "personal_best":
-            return `💪 New personal best! ${(data.steps as number).toLocaleString()} steps in one day! #StepCounterLeague`;
+            return `💪 New personal best! ${(data.steps as number).toLocaleString()} steps in one day! ${APP_CONFIG.hashtag}`;
 
         case "league_leader":
-            return `👑 I'm leading my Step Counter League with ${(data.steps as number).toLocaleString()} steps! #StepCounterLeague`;
+            return `👑 I'm leading my ${APP_CONFIG.name} with ${(data.steps as number).toLocaleString()} steps! ${APP_CONFIG.hashtag}`;
 
         case "consistency":
-            return `📊 ${data.days} days of step tracking this month! Consistency is key! #StepCounterLeague`;
+            return `📊 ${data.days} days of step tracking this month! Consistency is key! ${APP_CONFIG.hashtag}`;
 
         default:
-            return `Check out my step counting progress! #StepCounterLeague`;
+            return `Check out my step counting progress! ${APP_CONFIG.hashtag}`;
     }
 }

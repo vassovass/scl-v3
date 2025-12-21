@@ -144,8 +144,7 @@ export async function GET(request: NextRequest) {
                     }}
                 >
                     <span style={{ color: "#cbd5e1" }}>Step</span>
-                    <span style={{ color: "#38bdf8" }}>Count</span>
-                    <span style={{ color: "#cbd5e1" }}>League</span>
+                    <span style={{ color: "#38bdf8" }}>League</span>
                 </div>
             </div>
         ),
