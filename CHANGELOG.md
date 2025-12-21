@@ -34,6 +34,10 @@ All notable changes to StepCountLeague v3.
 - Feedback widget no longer interferes with table content
 - Landing page heading overflow on mobile
 - Sign-in page now shows resend option for unconfirmed emails
+- Batch submission no longer freezes when selecting 5+ images (gracefully takes first 5, warns about rest)
+
+### Added
+- **Submit Another Batch** button after completing batch submission
 
 ---
 

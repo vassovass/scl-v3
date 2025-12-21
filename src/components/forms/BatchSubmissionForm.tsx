@@ -71,20 +71,33 @@ export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFo
     const [processing, setProcessing] = useState(false);
     const [overallStatus, setOverallStatus] = useState<string | null>(null);
     const [previewImage, setPreviewImage] = useState<string | null>(null); // For modal
+    const [limitWarning, setLimitWarning] = useState<string | null>(null);
 
     const generateId = () => Math.random().toString(36).substr(2, 9);
 
     const handleFilesSelected = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(event.target.files || []);
+        setLimitWarning(null);
 
-        if (images.length + files.length > MAX_FILES) {
-            alert(`Maximum ${MAX_FILES} images allowed at a time`);
+        // Calculate how many we can still add
+        const remainingSlots = MAX_FILES - images.length;
+
+        if (remainingSlots <= 0) {
+            setLimitWarning(`Already at maximum ${MAX_FILES} images. Remove some to add more.`);
+            event.target.value = "";
             return;
+        }
+
+        // Take only what fits, warn if truncated
+        let filesToProcess = files;
+        if (files.length > remainingSlots) {
+            filesToProcess = files.slice(0, remainingSlots);
+            setLimitWarning(`Only first ${remainingSlots} image${remainingSlots !== 1 ? 's' : ''} added (max ${MAX_FILES} total). ${files.length - remainingSlots} skipped.`);
         }
 
         const newImages: ImageFile[] = [];
 
-        for (const file of files) {
+        for (const file of filesToProcess) {
             if (!file.type.startsWith("image/")) {
                 continue;
             }
@@ -305,6 +318,16 @@ export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFo
 
     const pendingCount = images.filter((i) => i.status === "pending").length;
     const reviewCount = images.filter((i) => i.status === "review").length;
+    const completedCount = images.filter((i) => i.status === "success" || i.status === "error").length;
+    const allCompleted = images.length > 0 && completedCount === images.length;
+
+    const handleReset = useCallback(() => {
+        // Revoke all preview URLs
+        images.forEach((img) => URL.revokeObjectURL(img.preview));
+        setImages([]);
+        setOverallStatus(null);
+        setLimitWarning(null);
+    }, [images]);
 
     return (
         <div className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/60 p-4 shadow-lg">
@@ -330,6 +353,11 @@ export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFo
                 <p className="text-xs text-slate-500">
                     Images will be auto-compressed. AI extracts date and steps - you can review and edit before submitting.
                 </p>
+                {limitWarning && (
+                    <p className="text-xs text-amber-400 bg-amber-500/10 px-3 py-2 rounded-md">
+                        ⚠️ {limitWarning}
+                    </p>
+                )}
             </div>
 
             {/* Image Grid */}
@@ -369,9 +397,9 @@ export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFo
                             <div className="bg-slate-800 p-2 space-y-2">
                                 <div className="flex items-center justify-between">
                                     <span className={`text-xs font-medium ${img.status === "success" ? "text-emerald-400" :
-                                            img.status === "error" ? "text-rose-400" :
-                                                img.status === "review" ? "text-sky-400" :
-                                                    "text-slate-400"
+                                        img.status === "error" ? "text-rose-400" :
+                                            img.status === "review" ? "text-sky-400" :
+                                                "text-slate-400"
                                         }`}>
                                         {getStatusText(img.status)}
                                     </span>
@@ -439,7 +467,7 @@ export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFo
             )}
 
             {/* Action Buttons */}
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
                 {pendingCount > 0 && (
                     <button
                         onClick={handleExtractAll}
@@ -457,6 +485,15 @@ export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFo
                         className="flex-1 rounded-md bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         {processing ? "Submitting..." : `Submit (${reviewCount} image${reviewCount !== 1 ? "s" : ""})`}
+                    </button>
+                )}
+
+                {allCompleted && (
+                    <button
+                        onClick={handleReset}
+                        className="flex-1 rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500"
+                    >
+                        ➕ Submit Another Batch
                     </button>
                 )}
             </div>
