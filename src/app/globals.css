@@ -428,13 +428,13 @@ body {
 
 /* Make existing sky-500 usage consistent with brand */
 .text-sky-500 {
-  color: rgb(var(--brand-primary)) !important;
+  color: rgb(var(--brand-primary));
 }
 
 .bg-sky-500 {
-  background-color: rgb(var(--brand-primary)) !important;
+  background-color: rgb(var(--brand-primary));
 }
 
 .border-sky-500 {
-  border-color: rgb(var(--brand-primary)) !important;
+  border-color: rgb(var(--brand-primary));
 }
