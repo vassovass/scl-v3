@@ -5,7 +5,17 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { createClient } from "@/lib/supabase/client";
-import { SUPERADMIN_PAGES } from "@/lib/adminPages";
+import {
+    LEAGUE_MENU_ITEMS,
+    ACTIONS_MENU_ITEMS,
+    SUPERADMIN_PAGES,
+    USER_MENU_SECTIONS,
+    NavItem
+} from "@/lib/navigation";
+import { NavDropdown } from "./NavDropdown";
+import { MobileMenu } from "./MobileMenu";
+import { NavItem as NavItemType } from "@/lib/navigation";
+import { APP_CONFIG } from "@/lib/config";
 
 export function NavHeader() {
     const { user, session, signOut } = useAuth();
@@ -71,8 +81,64 @@ export function NavHeader() {
 
     const displayName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "User";
 
+    // --- Dynamic Menu Preparation ---
+
+    // Inject dynamic League ID into hrefs
+    const preparedLeagueItems = LEAGUE_MENU_ITEMS.map(item => ({
+        ...item,
+        href: currentLeagueId ? item.href.replace("[id]", currentLeagueId) : item.href
+    }));
+
+    // Flatten User Menu Sections for the dropdown (since NavDropdown expects a flat list)
+    // We'll treat the sections as just a flat list for now, or we could enhance NavDropdown later.
+    // For now, flattening preserves the order.
+    const preparedUserItems = USER_MENU_SECTIONS.flatMap(section => section.items);
+
+    // Handle special item clicks (Tours, etc)
+    const handleItemClick = (item: NavItemType) => {
+        if (item.href.startsWith("#tour-")) {
+            const tourId = item.href.replace("#tour-", "");
+
+            // Logic to handle specific tours that need navigation first
+            setOpenDropdown(null);
+
+            // Map tour IDs to required paths
+            const tourPaths: Record<string, string> = {
+                "new-user": "/dashboard",
+                "member": `/league/${currentLeagueId || ""}`,
+                "leaderboard": `/league/${currentLeagueId || ""}/leaderboard`,
+                "admin": `/league/${currentLeagueId || ""}`
+            };
+
+            const targetPath = tourPaths[tourId];
+
+            const startTour = () => {
+                window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: tourId } }));
+            };
+
+            // If we need to navigate and we aren't there (or roughly there)
+            if (targetPath) {
+                // Check if we are already roughly on the page (simple check)
+                // For league pages, ensure we have a league ID
+                if ((tourId === 'member' || tourId === 'leaderboard' || tourId === 'admin') && !currentLeagueId) {
+                    alert("Please navigate to a league first to see this tour.");
+                    return;
+                }
+
+                if (pathname !== targetPath && !pathname.includes(targetPath)) {
+                    router.push(targetPath);
+                    setTimeout(startTour, 500);
+                } else {
+                    startTour();
+                }
+            } else {
+                startTour();
+            }
+        }
+    };
+
     return (
-        <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/95 backdrop-blur-sm">
+        <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/95 backdrop-blur-md transition-all duration-300">
             <nav ref={navRef} className="mx-auto flex max-w-6xl items-center justify-between px-4 h-14">
                 {/* Logo */}
                 <Link href="/dashboard" className="group flex items-center gap-2">
@@ -87,7 +153,7 @@ export function NavHeader() {
                 {session && (
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        className="md:hidden p-2 rounded-lg text-slate-400 hover:bg-slate-800"
+                        className="md:hidden p-2 rounded-lg text-slate-400 hover:bg-slate-800 transition-colors"
                         aria-label="Toggle menu"
                     >
                         {mobileMenuOpen ? (
@@ -108,290 +174,82 @@ export function NavHeader() {
                         {/* Dashboard */}
                         <Link
                             href="/dashboard"
-                            className={`px-3 py-2 text-sm rounded-lg transition ${isActive("/dashboard")
-                                ? "bg-sky-600/20 text-sky-400"
-                                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                            data-tour="nav-dashboard"
+                            className={`px-3 py-2 text-sm rounded-lg transition-colors duration-200 ${isActive("/dashboard")
+                                    ? "bg-sky-600/20 text-sky-400 font-medium"
+                                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
                                 }`}
                         >
                             Dashboard
                         </Link>
 
-                        {/* League Dropdown - only show when in a league */}
+                        {/* League Dropdown */}
                         {currentLeagueId && (
-                            <div className="relative">
-                                <button
-                                    onClick={() => toggleDropdown("league")}
-                                    className={`px-3 py-2 text-sm rounded-lg transition flex items-center gap-1 ${isActivePrefix(`/league/${currentLeagueId}`)
-                                        ? "bg-sky-600/20 text-sky-400"
-                                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
-                                        }`}
-                                >
-                                    League <span className="text-[10px]">▼</span>
-                                </button>
-
-                                {openDropdown === "league" && (
-                                    <div className="absolute left-0 mt-1 w-48 rounded-lg border border-slate-700 bg-slate-900 shadow-xl py-1 z-50">
-                                        <Link
-                                            href={`/league/${currentLeagueId}`}
-                                            onClick={() => setOpenDropdown(null)}
-                                            className={`block px-4 py-2.5 text-sm transition ${isActive(`/league/${currentLeagueId}`)
-                                                ? "bg-sky-600/20 text-sky-400"
-                                                : "text-slate-300 hover:bg-slate-800"
-                                                }`}
-                                        >
-                                            📝 Submit Steps
-                                        </Link>
-                                        <Link
-                                            href={`/league/${currentLeagueId}/leaderboard`}
-                                            onClick={() => setOpenDropdown(null)}
-                                            className={`block px-4 py-2.5 text-sm transition ${isActive(`/league/${currentLeagueId}/leaderboard`)
-                                                ? "bg-sky-600/20 text-sky-400"
-                                                : "text-slate-300 hover:bg-slate-800"
-                                                }`}
-                                        >
-                                            🏆 Leaderboard
-                                        </Link>
-                                        <Link
-                                            href={`/league/${currentLeagueId}/analytics`}
-                                            onClick={() => setOpenDropdown(null)}
-                                            className={`block px-4 py-2.5 text-sm transition ${isActive(`/league/${currentLeagueId}/analytics`)
-                                                ? "bg-sky-600/20 text-sky-400"
-                                                : "text-slate-300 hover:bg-slate-800"
-                                                }`}
-                                        >
-                                            📊 Analytics
-                                        </Link>
-                                    </div>
-                                )}
+                            <div data-tour="nav-league-menu">
+                                <NavDropdown
+                                    label="League"
+                                    name="league"
+                                    isOpen={openDropdown === "league"}
+                                    onToggle={toggleDropdown}
+                                    onClose={() => setOpenDropdown(null)}
+                                    items={preparedLeagueItems}
+                                    isActive={isActive}
+                                    onItemClick={handleItemClick}
+                                />
                             </div>
                         )}
 
-                        {/* Create/Join */}
-                        <div className="relative">
-                            <button
-                                onClick={() => toggleDropdown("actions")}
-                                className={`px-3 py-2 text-sm rounded-lg transition flex items-center gap-1 text-slate-400 hover:text-slate-200 hover:bg-slate-800`}
-                            >
-                                Actions <span className="text-[10px]">▼</span>
-                            </button>
-
-                            {openDropdown === "actions" && (
-                                <div className="absolute left-0 mt-1 w-44 rounded-lg border border-slate-700 bg-slate-900 shadow-xl py-1 z-50">
-                                    <Link
-                                        href="/league/create"
-                                        onClick={() => setOpenDropdown(null)}
-                                        className="block px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800"
-                                    >
-                                        ➕ Create League
-                                    </Link>
-                                    <Link
-                                        href="/join"
-                                        onClick={() => setOpenDropdown(null)}
-                                        className="block px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800"
-                                    >
-                                        🔗 Join League
-                                    </Link>
-                                </div>
-                            )}
+                        {/* Actions Dropdown */}
+                        <div data-tour="nav-actions-menu">
+                            <NavDropdown
+                                label="Actions"
+                                name="actions"
+                                isOpen={openDropdown === "actions"}
+                                onToggle={toggleDropdown}
+                                onClose={() => setOpenDropdown(null)}
+                                items={ACTIONS_MENU_ITEMS}
+                                isActive={isActive}
+                                onItemClick={handleItemClick}
+                            />
                         </div>
 
-                        {/* SuperAdmin Menu (SuperAdmin only) */}
+                        {/* SuperAdmin Menu */}
                         {isSuperadmin && (
-                            <div className="relative">
-                                <button
-                                    onClick={() => toggleDropdown("superadmin")}
-                                    className={`px-3 py-2 text-sm rounded-lg transition flex items-center gap-1 ${isActivePrefix("/admin")
-                                        ? "bg-amber-600/20 text-amber-400"
-                                        : "text-amber-500/70 hover:text-amber-400 hover:bg-amber-900/20"
-                                        }`}
-                                >
-                                    ⚡ Admin <span className="text-[10px]">▼</span>
-                                </button>
-
-                                {openDropdown === "superadmin" && (
-                                    <div className="absolute right-0 mt-1 w-52 rounded-lg border border-amber-800/50 bg-slate-900 shadow-xl py-1 z-50">
-                                        <div className="px-4 py-2 border-b border-slate-800">
-                                            <div className="text-xs text-amber-500 font-medium">SuperAdmin</div>
-                                        </div>
-                                        {SUPERADMIN_PAGES.map((page) => (
-                                            <Link
-                                                key={page.href}
-                                                href={page.href}
-                                                onClick={() => setOpenDropdown(null)}
-                                                className={`block px-4 py-2.5 text-sm transition ${isActive(page.href)
-                                                    ? "bg-amber-600/20 text-amber-400"
-                                                    : "text-slate-300 hover:bg-slate-800"
-                                                    }`}
-                                            >
-                                                {page.label}
-                                            </Link>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+                            <NavDropdown
+                                label="Admin"
+                                labelContent={<span className="text-amber-500 hover:text-amber-400 flex items-center gap-1">⚡ Admin <span className="text-[10px]">▼</span></span>}
+                                name="superadmin"
+                                isOpen={openDropdown === "superadmin"}
+                                onToggle={toggleDropdown}
+                                onClose={() => setOpenDropdown(null)}
+                                items={SUPERADMIN_PAGES}
+                                isActive={isActive}
+                                className="ml-2"
+                                align="right"
+                            />
                         )}
 
                         {/* User Menu */}
-                        <div className="relative ml-2">
-                            <button
-                                onClick={() => toggleDropdown("user")}
-                                className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-800 transition"
-                            >
-                                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-emerald-500 flex items-center justify-center text-white text-sm font-medium">
-                                    {displayName[0].toUpperCase()}
-                                </span>
-                                <span className="text-[10px] text-slate-500">▼</span>
-                            </button>
-
-                            {openDropdown === "user" && (
-                                <div className="absolute right-0 mt-1 w-52 rounded-lg border border-slate-700 bg-slate-900 shadow-xl py-1 z-50">
-                                    <div className="px-4 py-3 border-b border-slate-800">
-                                        <div className="text-sm font-medium text-slate-200">{displayName}</div>
-                                        <div className="text-xs text-slate-500 truncate">{user?.email}</div>
+                        <div className="ml-2" data-tour="nav-user-menu">
+                            <NavDropdown
+                                label="User"
+                                labelContent={
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-emerald-500 flex items-center justify-center text-white text-sm font-medium shadow-md ring-2 ring-slate-950 group-hover:ring-slate-800 transition-all">
+                                            {displayName[0]?.toUpperCase()}
+                                        </span>
+                                        <span className="text-[10px] text-slate-500">▼</span>
                                     </div>
-
-                                    <Link
-                                        href="/settings/profile"
-                                        onClick={() => setOpenDropdown(null)}
-                                        className="block px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800"
-                                    >
-                                        ⚙️ Profile Settings
-                                    </Link>
-
-                                    {/* Help & Tours Section */}
-                                    <div className="border-t border-slate-800 mt-1 pt-1">
-                                        <div className="px-4 py-1.5 text-[10px] text-slate-500 uppercase tracking-wider">
-                                            Guides & Help
-                                        </div>
-                                        <button
-                                            onClick={() => {
-                                                setOpenDropdown(null);
-                                                // Navigate to dashboard first, then start tour
-                                                if (pathname !== "/dashboard") {
-                                                    router.push("/dashboard");
-                                                    setTimeout(() => {
-                                                        window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'new-user' } }));
-                                                    }, 500);
-                                                } else {
-                                                    window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'new-user' } }));
-                                                }
-                                            }}
-                                            className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 flex items-center gap-2"
-                                        >
-                                            <span>🏠</span>
-                                            <span className="flex-1">Dashboard Basics</span>
-                                            <span className="text-[10px] text-slate-500">~30s</span>
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                setOpenDropdown(null);
-                                                // Member tour works on league page - navigate if needed
-                                                if (!currentLeagueId) {
-                                                    // No league context - show message or go to dashboard
-                                                    alert("Please navigate to a league first to see this tour.");
-                                                    return;
-                                                }
-                                                const leaguePath = `/league/${currentLeagueId}`;
-                                                if (!pathname.startsWith(leaguePath) || pathname.includes('/leaderboard') || pathname.includes('/analytics')) {
-                                                    router.push(leaguePath);
-                                                    setTimeout(() => {
-                                                        window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'member' } }));
-                                                    }, 500);
-                                                } else {
-                                                    window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'member' } }));
-                                                }
-                                            }}
-                                            className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 flex items-center gap-2"
-                                        >
-                                            <span>📝</span>
-                                            <span className="flex-1">How to Submit Steps</span>
-                                            <span className="text-[10px] text-slate-500">~1m</span>
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                setOpenDropdown(null);
-                                                // Leaderboard tour - navigate to leaderboard
-                                                if (!currentLeagueId) {
-                                                    alert("Please navigate to a league first to see this tour.");
-                                                    return;
-                                                }
-                                                const leaderboardPath = `/league/${currentLeagueId}/leaderboard`;
-                                                if (pathname !== leaderboardPath) {
-                                                    router.push(leaderboardPath);
-                                                    setTimeout(() => {
-                                                        window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'leaderboard' } }));
-                                                    }, 500);
-                                                } else {
-                                                    window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'leaderboard' } }));
-                                                }
-                                            }}
-                                            className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 flex items-center gap-2"
-                                        >
-                                            <span>🏆</span>
-                                            <span className="flex-1">Leaderboard & Filters</span>
-                                            <span className="text-[10px] text-slate-500">~30s</span>
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                setOpenDropdown(null);
-                                                // Admin tour - navigate to league page
-                                                if (!currentLeagueId) {
-                                                    alert("Please navigate to a league first to see this tour.");
-                                                    return;
-                                                }
-                                                const leaguePath = `/league/${currentLeagueId}`;
-                                                if (!pathname.startsWith(leaguePath) || pathname.includes('/leaderboard') || pathname.includes('/analytics')) {
-                                                    router.push(leaguePath);
-                                                    setTimeout(() => {
-                                                        window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'admin' } }));
-                                                    }, 500);
-                                                } else {
-                                                    window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'admin' } }));
-                                                }
-                                            }}
-                                            className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 flex items-center gap-2"
-                                        >
-                                            <span>👑</span>
-                                            <span className="flex-1">League Owner Guide</span>
-                                            <span className="text-[10px] text-slate-500">~30s</span>
-                                        </button>
-                                    </div>
-                                    <Link
-                                        href="/feedback"
-                                        onClick={() => setOpenDropdown(null)}
-                                        className="block px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800"
-                                    >
-                                        💬 Send Feedback
-                                    </Link>
-
-                                    <div className="border-t border-slate-800 mt-1 pt-1">
-                                        <Link
-                                            href="/beta"
-                                            onClick={() => setOpenDropdown(null)}
-                                            className="block px-4 py-2 text-xs text-slate-500 hover:bg-slate-800"
-                                        >
-                                            📋 Beta Info
-                                        </Link>
-                                        <Link
-                                            href="/privacy"
-                                            onClick={() => setOpenDropdown(null)}
-                                            className="block px-4 py-2 text-xs text-slate-500 hover:bg-slate-800"
-                                        >
-                                            🔒 Privacy Policy
-                                        </Link>
-                                    </div>
-
-                                    <div className="border-t border-slate-800 mt-1 pt-1">
-                                        <button
-                                            onClick={handleSignOut}
-                                            disabled={signingOut}
-                                            className="w-full text-left px-4 py-2.5 text-sm text-rose-400 hover:bg-slate-800 disabled:opacity-50"
-                                        >
-                                            {signingOut ? "Signing out..." : "🚪 Sign Out"}
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
+                                }
+                                name="user"
+                                isOpen={openDropdown === "user"}
+                                onToggle={toggleDropdown}
+                                onClose={() => setOpenDropdown(null)}
+                                items={preparedUserItems}
+                                isActive={isActive}
+                                align="right"
+                                onItemClick={handleItemClick}
+                            />
                         </div>
                     </div>
                 )}
@@ -399,7 +257,7 @@ export function NavHeader() {
                 {!session && (
                     <Link
                         href="/sign-in"
-                        className="rounded-lg bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
+                        className="rounded-lg bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 shadow-lg shadow-sky-500/20"
                     >
                         Sign in
                     </Link>
@@ -408,81 +266,17 @@ export function NavHeader() {
 
             {/* Mobile Menu Drawer */}
             {session && mobileMenuOpen && (
-                <div className="md:hidden border-t border-slate-800 bg-slate-950 px-4 py-4 space-y-2">
-                    <Link
-                        href="/dashboard"
-                        className={`block px-4 py-3 rounded-lg text-sm ${isActive("/dashboard") ? "bg-sky-600/20 text-sky-400" : "text-slate-300 hover:bg-slate-800"
-                            }`}
-                    >
-                        📊 Dashboard
-                    </Link>
-
-                    {currentLeagueId && (
-                        <>
-                            <div className="pt-2 pb-1 px-4 text-xs text-slate-500 uppercase">Current League</div>
-                            <Link
-                                href={`/league/${currentLeagueId}`}
-                                className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800"
-                            >
-                                📝 Submit Steps
-                            </Link>
-                            <Link
-                                href={`/league/${currentLeagueId}/leaderboard`}
-                                className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800"
-                            >
-                                🏆 Leaderboard
-                            </Link>
-                            <Link
-                                href={`/league/${currentLeagueId}/analytics`}
-                                className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800"
-                            >
-                                📊 Analytics
-                            </Link>
-                        </>
-                    )}
-
-                    <div className="pt-2 pb-1 px-4 text-xs text-slate-500 uppercase">Actions</div>
-                    <Link href="/league/create" className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800">
-                        ➕ Create League
-                    </Link>
-                    <Link href="/join" className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800">
-                        🔗 Join League
-                    </Link>
-
-                    <div className="pt-2 pb-1 px-4 text-xs text-slate-500 uppercase">Account</div>
-                    <Link href="/settings/profile" className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800">
-                        ⚙️ Profile Settings
-                    </Link>
-                    <Link href="/feedback" className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800">
-                        💬 Send Feedback
-                    </Link>
-
-                    {/* SuperAdmin Section (Mobile) */}
-                    {isSuperadmin && (
-                        <>
-                            <div className="pt-2 pb-1 px-4 text-xs text-amber-500 uppercase">⚡ SuperAdmin</div>
-                            {SUPERADMIN_PAGES.map((page) => (
-                                <Link
-                                    key={page.href}
-                                    href={page.href}
-                                    className="block px-4 py-3 rounded-lg text-sm text-amber-400 hover:bg-amber-900/20"
-                                >
-                                    {page.label}
-                                </Link>
-                            ))}
-                        </>
-                    )}
-
-                    <div className="pt-4 border-t border-slate-800">
-                        <button
-                            onClick={handleSignOut}
-                            disabled={signingOut}
-                            className="w-full px-4 py-3 rounded-lg text-sm text-rose-400 hover:bg-slate-800 text-left disabled:opacity-50"
-                        >
-                            {signingOut ? "Signing out..." : "🚪 Sign Out"}
-                        </button>
-                    </div>
-                </div>
+                <MobileMenu
+                    isOpen={mobileMenuOpen}
+                    onClose={() => setMobileMenuOpen(false)}
+                    user={user}
+                    isSuperadmin={isSuperadmin}
+                    currentLeagueId={currentLeagueId}
+                    isActive={isActive}
+                    onSignOut={handleSignOut}
+                    isSigningOut={signingOut}
+                    onItemClick={handleItemClick}
+                />
             )}
         </header>
     );

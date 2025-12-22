@@ -5,7 +5,7 @@ import Joyride, { CallBackProps, STATUS, ACTIONS, EVENTS, Step } from "react-joy
 import { usePathname } from "next/navigation";
 
 // Tour names
-export type TourName = "new-user" | "member" | "admin" | "leaderboard";
+export type TourName = "new-user" | "member" | "admin" | "leaderboard" | "navigation";
 
 // Step with optional role requirement
 interface OnboardingStep extends Step {
@@ -159,6 +159,44 @@ const adminTour: OnboardingStep[] = [
     },
 ];
 
+/**
+ * NAVIGATION TOUR - Menu system and how to get around
+ * Covers header nav, dropdowns, and admin-specific menu items
+ */
+const navigationTour: OnboardingStep[] = [
+    {
+        target: "body",
+        content: "🧭 Let me show you how to navigate around StepLeague!",
+        placement: "center",
+        disableBeacon: true,
+    },
+    {
+        target: '[data-tour="nav-dashboard"]',
+        content: "🏠 DASHBOARD: Your home base. Click here anytime to see all your leagues.",
+        placement: "bottom",
+    },
+    {
+        target: '[data-tour="nav-league-menu"]',
+        content: "🏆 LEAGUE MENU: Quick access to your current league's pages - submission form, leaderboard, and analytics.",
+        placement: "bottom",
+    },
+    {
+        target: '[data-tour="nav-actions-menu"]',
+        content: "⚡ ACTIONS: Create a new league, join with a code, or submit steps quickly.",
+        placement: "bottom",
+    },
+    {
+        target: '[data-tour="nav-user-menu"]',
+        content: "👤 YOUR PROFILE: Settings, help guides, and sign out. All your tours are in 'Guides & Help'!",
+        placement: "bottom",
+    },
+    {
+        target: "body",
+        content: "💡 TIP: League owners see extra options like invite codes and member management. Admins get even more!",
+        placement: "center",
+    },
+];
+
 // ============================================
 // CONTEXT
 // ============================================
@@ -266,6 +304,9 @@ export function OnboardingProvider({ children, isAdmin = false, hasLeagues = fal
                 break;
             case "admin":
                 tourSteps = adminTour;
+                break;
+            case "navigation":
+                tourSteps = navigationTour;
                 break;
         }
 

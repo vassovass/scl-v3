@@ -586,6 +586,16 @@ export default function DesignSystemPage() {
                                     <p className="text-xs text-slate-500 mt-1">Main navigation with dropdowns and mobile menu</p>
                                     <p className="text-xs text-slate-600 mt-1">navigation/NavHeader.tsx</p>
                                 </div>
+                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                    <code className="text-sky-400">NavDropdown</code>
+                                    <p className="text-xs text-slate-500 mt-1">Reusable animated dropdown menu</p>
+                                    <p className="text-xs text-slate-600 mt-1">navigation/NavDropdown.tsx</p>
+                                </div>
+                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                    <code className="text-sky-400">MobileMenu</code>
+                                    <p className="text-xs text-slate-500 mt-1">Responsive drawer for small screens</p>
+                                    <p className="text-xs text-slate-600 mt-1">navigation/MobileMenu.tsx</p>
+                                </div>
                             </div>
                         </div>
 

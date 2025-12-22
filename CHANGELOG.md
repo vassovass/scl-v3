@@ -10,6 +10,9 @@ All notable changes to StepLeague v3.
 ## [2025-12-23]
 
 ### Added
+- **Modular Navigation System** - Refactored `NavHeader` into reusable `NavDropdown` and `MobileMenu` components
+- **Navigation Config** (`src/lib/navigation.ts`) - Centralized menu items configuration
+- **Menu Size Warnings** - Console warning when menus exceed 7 items (UX best practice)
 - **Guided Onboarding System** with React Joyride
   - 4 role-based tours: Dashboard Basics, How to Submit Steps, Leaderboard & Filters, League Owner Guide
   - Auto-start for new users on first visit
