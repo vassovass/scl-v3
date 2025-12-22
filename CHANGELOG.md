@@ -22,6 +22,9 @@ All notable changes to StepLeague v3.
 - **Design System page** - Now comprehensive with all components, patterns, and theme notes
 - Logo hover behavior updated in NavHeader and GlobalFooter
 
+### Fixed
+- **Module feedback button** now stays visible long enough to click - added 1.5s delay before hiding and button hover tracking
+
 ---
 
 ## [2025-12-22]

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 
 interface ModuleFeedbackProps {
     moduleId: string;
@@ -11,9 +11,13 @@ interface ModuleFeedbackProps {
 
 type FeedbackType = "positive" | "negative" | null;
 
+// Delay before hiding the feedback button (ms) - gives users time to reach the button
+const HIDE_DELAY_MS = 1500;
+
 /**
  * Wrap any module/section with this component to add inline feedback UI.
  * Renders a minimal feedback icon that appears on hover.
+ * Uses a delay before hiding so users can move their mouse to the fixed button.
  */
 export function ModuleFeedback({
     moduleId,
@@ -22,13 +26,62 @@ export function ModuleFeedback({
     className = "",
 }: ModuleFeedbackProps) {
     const containerRef = useRef<HTMLDivElement>(null);
+    const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [isHovered, setIsHovered] = useState(false);
+    const [isButtonHovered, setIsButtonHovered] = useState(false);
     const [feedbackType, setFeedbackType] = useState<FeedbackType>(null);
     const [isExpanded, setIsExpanded] = useState(false);
     const [comment, setComment] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [screenshotData, setScreenshotData] = useState<string | null>(null);
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (hideTimeoutRef.current) {
+                clearTimeout(hideTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    const handleMouseEnter = useCallback(() => {
+        // Clear any pending hide timeout
+        if (hideTimeoutRef.current) {
+            clearTimeout(hideTimeoutRef.current);
+            hideTimeoutRef.current = null;
+        }
+        setIsHovered(true);
+    }, []);
+
+    const handleMouseLeave = useCallback(() => {
+        // Don't hide if expanded or if button is hovered
+        if (isExpanded || isButtonHovered) return;
+
+        // Set a delay before hiding to allow user to reach the button
+        hideTimeoutRef.current = setTimeout(() => {
+            setIsHovered(false);
+        }, HIDE_DELAY_MS);
+    }, [isExpanded, isButtonHovered]);
+
+    const handleButtonMouseEnter = useCallback(() => {
+        // Clear hide timeout when entering button area
+        if (hideTimeoutRef.current) {
+            clearTimeout(hideTimeoutRef.current);
+            hideTimeoutRef.current = null;
+        }
+        setIsButtonHovered(true);
+    }, []);
+
+    const handleButtonMouseLeave = useCallback(() => {
+        setIsButtonHovered(false);
+        // Start hide timeout when leaving button (unless still in module)
+        if (!isExpanded) {
+            hideTimeoutRef.current = setTimeout(() => {
+                setIsHovered(false);
+            }, HIDE_DELAY_MS);
+        }
+    }, [isExpanded]);
 
     const captureScreenshot = useCallback(async () => {
         if (!containerRef.current) return;
@@ -91,20 +144,26 @@ export function ModuleFeedback({
         setFeedbackType(null);
         setComment("");
         setScreenshotData(null);
+        setIsHovered(false);
+        setIsButtonHovered(false);
     };
 
     return (
         <div
             ref={containerRef}
             className={className}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => !isExpanded && setIsHovered(false)}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
         >
             {children}
 
             {/* Minimal feedback trigger - appears on hover as floating icon */}
-            {(isHovered || isExpanded) && (
-                <div className="fixed bottom-4 right-4 z-50">
+            {(isHovered || isExpanded || isButtonHovered) && (
+                <div
+                    className="fixed bottom-4 right-4 z-50"
+                    onMouseEnter={handleButtonMouseEnter}
+                    onMouseLeave={handleButtonMouseLeave}
+                >
                     {!isExpanded ? (
                         <button
                             onClick={handleOpenFeedback}
@@ -138,8 +197,8 @@ export function ModuleFeedback({
                                         <button
                                             onClick={() => setFeedbackType("positive")}
                                             className={`flex-1 py-2 rounded-lg text-sm transition ${feedbackType === "positive"
-                                                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500"
-                                                    : "bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-600"
+                                                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500"
+                                                : "bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-600"
                                                 }`}
                                         >
                                             👍 Good
@@ -147,8 +206,8 @@ export function ModuleFeedback({
                                         <button
                                             onClick={() => setFeedbackType("negative")}
                                             className={`flex-1 py-2 rounded-lg text-sm transition ${feedbackType === "negative"
-                                                    ? "bg-rose-500/20 text-rose-400 border border-rose-500"
-                                                    : "bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-600"
+                                                ? "bg-rose-500/20 text-rose-400 border border-rose-500"
+                                                : "bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-600"
                                                 }`}
                                         >
                                             👎 Needs work
