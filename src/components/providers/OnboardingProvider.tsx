@@ -13,6 +13,15 @@ interface OnboardingStep extends Step {
 }
 
 // ============================================
+// HELPER: Check if element exists in DOM
+// ============================================
+function isElementVisible(selector: string): boolean {
+    if (selector === "body") return true;
+    if (typeof document === "undefined") return false;
+    return document.querySelector(selector) !== null;
+}
+
+// ============================================
 // TOUR DEFINITIONS
 // ============================================
 
@@ -272,7 +281,18 @@ export function OnboardingProvider({ children, isAdmin = false, hasLeagues = fal
             tourSteps = tourSteps.filter(step => !step.requiresAdmin);
         }
 
-        setSteps(tourSteps);
+        // Filter to only steps with visible targets (fixes step count issue)
+        const visibleSteps = tourSteps.filter(step => {
+            const target = typeof step.target === "string" ? step.target : "body";
+            return isElementVisible(target);
+        });
+
+        if (visibleSteps.length === 0) {
+            console.log("No visible tour elements found");
+            return;
+        }
+
+        setSteps(visibleSteps);
         setStepIndex(0);
         setRun(true);
     }, [pathname, isAdmin]);
@@ -289,11 +309,9 @@ export function OnboardingProvider({ children, isAdmin = false, hasLeagues = fal
                 startTour("member");
             }
         } else if (pathname.includes("/leaderboard")) {
-            // Show leaderboard-specific tour
+            // Show leaderboard-specific tour (use member tour which handles leaderboard)
             if (!hasCompletedTour("member")) {
-                setSteps(leaderboardTour);
-                setStepIndex(0);
-                setRun(true);
+                startTour("member");
             }
         }
     }, [pathname, hasLeagues, hasCompletedTour, startTour]);
@@ -313,14 +331,11 @@ export function OnboardingProvider({ children, isAdmin = false, hasLeagues = fal
     // Listen for custom event from NavHeader
     useEffect(() => {
         const handleStartTour = () => {
-            // Reset and start contextual tour
+            // Start contextual tour based on current page
             if (pathname === "/dashboard") {
                 startTour("new-user");
-            } else if (pathname.match(/\/league\/[^/]+\/leaderboard/)) {
-                setSteps(leaderboardTour);
-                setStepIndex(0);
-                setRun(true);
             } else if (pathname.match(/\/league\/[^/]+/)) {
+                // Both league page and leaderboard use member tour (which adapts)
                 startTour("member");
             } else {
                 startTour("new-user");
