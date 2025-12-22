@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import Joyride, { CallBackProps, STATUS, ACTIONS, EVENTS, Step } from "react-joyride";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 // Tour names
 export type TourName = "new-user" | "member" | "admin" | "leaderboard" | "navigation";
@@ -350,17 +350,34 @@ export function OnboardingProvider({ children, isAdmin = false, hasLeagues = fal
         }
     }, [pathname, hasLeagues, hasCompletedTour, startTour]);
 
-    // Auto-start tour for new users
+    const searchParams = useSearchParams();
+
+    // Auto-start tour based on context or query param
     useEffect(() => {
         if (!isHydrated) return;
 
-        // Delay to ensure DOM is ready
+        // Check for explicit start_tour param first
+        const tourParam = searchParams?.get("start_tour");
+        if (tourParam) {
+            // Clear the param from URL to prevent loop, then start tour
+            const url = new URL(window.location.href);
+            url.searchParams.delete("start_tour");
+            window.history.replaceState({}, "", url.toString());
+
+            // Short delay to ensure page content is ready
+            setTimeout(() => {
+                startTour(tourParam as TourName);
+            }, 500);
+            return;
+        }
+
+        // Otherwise run standard contextual check
         const timer = setTimeout(() => {
             startContextualTour();
         }, 1000);
 
         return () => clearTimeout(timer);
-    }, [isHydrated, pathname, startContextualTour]);
+    }, [isHydrated, pathname, searchParams, startContextualTour, startTour]);
 
     // Listen for custom event from NavHeader - supports explicit tour selection
     useEffect(() => {

@@ -126,8 +126,9 @@ export function NavHeader() {
                 }
 
                 if (pathname !== targetPath && !pathname.includes(targetPath)) {
-                    router.push(targetPath);
-                    setTimeout(startTour, 500);
+                    // Navigate with start_tour param to ensure tour starts after load
+                    const separator = targetPath.includes("?") ? "&" : "?";
+                    router.push(`${targetPath}${separator}start_tour=${tourId}`);
                 } else {
                     startTour();
                 }
@@ -176,8 +177,8 @@ export function NavHeader() {
                             href="/dashboard"
                             data-tour="nav-dashboard"
                             className={`px-3 py-2 text-sm rounded-lg transition-colors duration-200 ${isActive("/dashboard")
-                                    ? "bg-sky-600/20 text-sky-400 font-medium"
-                                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                                ? "bg-sky-600/20 text-sky-400 font-medium"
+                                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
                                 }`}
                         >
                             Dashboard
