@@ -3,6 +3,13 @@
 > **Universal context file for AI coding assistants**
 > Supported: Cursor, Claude Code, GitHub Copilot, OpenAI Codex, Google Jules, JetBrains AI, Windsurf, Aider
 
+> ⚠️ **BEFORE COMPLETING ANY TASK - READ THIS:**
+> 1. Check the **"Documentation Update Rule"** section below
+> 2. Update `CHANGELOG.md` with your changes
+> 3. Update design system page (`/admin/design-system`) if adding UI/components
+> 4. Update config files (e.g., `adminPages.ts` for new admin pages)
+> 5. This is **REQUIRED** - do not skip!
+
 ---
 
 ## Project Overview
