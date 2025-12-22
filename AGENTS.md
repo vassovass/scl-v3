@@ -158,14 +158,15 @@ scl-v3/
 | `Parameter implicitly has 'any' type` | Add `CookieOptions[]` type to setAll |
 | `useSearchParams should be wrapped in Suspense` | Wrap in `<Suspense>` |
 | `Property 'id' does not exist on type 'never'` | Remove `<Database>` generic |
-| Auth redirects to localhost | Update Site URL in Supabase Dashboard |
+| Auth redirects incorrectly | Update Site URL in Supabase Dashboard to `https://scl-v3.vercel.app` |
 
 ---
 
 ## Commands
 
+**Live URL**: [https://scl-v3.vercel.app/](https://scl-v3.vercel.app/) (auto-deploys from main)
+
 ```bash
-npm run dev      # Dev server (localhost:3000)
 npm run build    # Production build
 npx tsc --noEmit # Type check
 ```

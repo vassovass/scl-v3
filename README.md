@@ -48,13 +48,11 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 GEMINI_API_KEY=your-gemini-key
 ```
 
-### 3. Run Development Server
+### 3. Live Application
 
-```bash
-npm run dev
-```
+**Production URL**: [https://scl-v3.vercel.app/](https://scl-v3.vercel.app/)
 
-Open [http://localhost:3000](http://localhost:3000)
+The app is deployed on Vercel with auto-deploy from main branch. Local development is not required - all changes pushed to main are automatically deployed.
 
 ---
 
@@ -153,7 +151,7 @@ See **[ROADMAP.md](./ROADMAP.md)** for upcoming features.
 
 | Issue | Solution |
 |-------|----------|
-| Auth redirects to localhost | Update Site URL in Supabase Auth settings |
+| Auth redirects incorrectly | Update Site URL in Supabase Auth settings to `https://scl-v3.vercel.app` |
 | `useSearchParams` error | Wrap component in `<Suspense>` |
 | Type errors with Supabase | Use untyped client (see AGENTS.md) |
 | Build fails | Run `npx tsc --noEmit` locally first |
