@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { createClient } from "@/lib/supabase/client";
@@ -10,6 +10,7 @@ import { SUPERADMIN_PAGES } from "@/lib/adminPages";
 export function NavHeader() {
     const { user, session, signOut } = useAuth();
     const pathname = usePathname();
+    const router = useRouter();
     const [isSuperadmin, setIsSuperadmin] = useState(false);
     const [signingOut, setSigningOut] = useState(false);
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -265,7 +266,15 @@ export function NavHeader() {
                                         <button
                                             onClick={() => {
                                                 setOpenDropdown(null);
-                                                window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'new-user' } }));
+                                                // Navigate to dashboard first, then start tour
+                                                if (pathname !== "/dashboard") {
+                                                    router.push("/dashboard");
+                                                    setTimeout(() => {
+                                                        window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'new-user' } }));
+                                                    }, 500);
+                                                } else {
+                                                    window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'new-user' } }));
+                                                }
                                             }}
                                             className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 flex items-center gap-2"
                                         >
@@ -276,7 +285,21 @@ export function NavHeader() {
                                         <button
                                             onClick={() => {
                                                 setOpenDropdown(null);
-                                                window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'member' } }));
+                                                // Member tour works on league page - navigate if needed
+                                                if (!currentLeagueId) {
+                                                    // No league context - show message or go to dashboard
+                                                    alert("Please navigate to a league first to see this tour.");
+                                                    return;
+                                                }
+                                                const leaguePath = `/league/${currentLeagueId}`;
+                                                if (!pathname.startsWith(leaguePath) || pathname.includes('/leaderboard') || pathname.includes('/analytics')) {
+                                                    router.push(leaguePath);
+                                                    setTimeout(() => {
+                                                        window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'member' } }));
+                                                    }, 500);
+                                                } else {
+                                                    window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'member' } }));
+                                                }
                                             }}
                                             className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 flex items-center gap-2"
                                         >
@@ -287,7 +310,20 @@ export function NavHeader() {
                                         <button
                                             onClick={() => {
                                                 setOpenDropdown(null);
-                                                window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'leaderboard' } }));
+                                                // Leaderboard tour - navigate to leaderboard
+                                                if (!currentLeagueId) {
+                                                    alert("Please navigate to a league first to see this tour.");
+                                                    return;
+                                                }
+                                                const leaderboardPath = `/league/${currentLeagueId}/leaderboard`;
+                                                if (pathname !== leaderboardPath) {
+                                                    router.push(leaderboardPath);
+                                                    setTimeout(() => {
+                                                        window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'leaderboard' } }));
+                                                    }, 500);
+                                                } else {
+                                                    window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'leaderboard' } }));
+                                                }
                                             }}
                                             className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 flex items-center gap-2"
                                         >
@@ -298,7 +334,20 @@ export function NavHeader() {
                                         <button
                                             onClick={() => {
                                                 setOpenDropdown(null);
-                                                window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'admin' } }));
+                                                // Admin tour - navigate to league page
+                                                if (!currentLeagueId) {
+                                                    alert("Please navigate to a league first to see this tour.");
+                                                    return;
+                                                }
+                                                const leaguePath = `/league/${currentLeagueId}`;
+                                                if (!pathname.startsWith(leaguePath) || pathname.includes('/leaderboard') || pathname.includes('/analytics')) {
+                                                    router.push(leaguePath);
+                                                    setTimeout(() => {
+                                                        window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'admin' } }));
+                                                    }, 500);
+                                                } else {
+                                                    window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'admin' } }));
+                                                }
                                             }}
                                             className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 flex items-center gap-2"
                                         >

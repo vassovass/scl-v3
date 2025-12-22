@@ -22,145 +22,139 @@ function isElementVisible(selector: string): boolean {
 }
 
 // ============================================
-// TOUR DEFINITIONS
+// TOUR DEFINITIONS - Redesigned for UX
 // ============================================
 
+/**
+ * WELCOME TOUR - Dashboard orientation for new users
+ * Brief intro, points to key actions
+ */
 const newUserTour: OnboardingStep[] = [
     {
         target: "body",
-        content: "Welcome to StepLeague! 👟 Let me show you around so you can start competing with friends.",
+        content: "👟 Welcome to StepLeague! Let's get you started in under a minute.",
         placement: "center",
         disableBeacon: true,
     },
     {
         target: '[data-tour="dashboard-header"]',
-        content: "This is your dashboard where you can see all your leagues and stats at a glance.",
+        content: "This is your home base. All your leagues and stats appear here.",
         placement: "bottom",
     },
     {
         target: '[data-tour="create-league"]',
-        content: "Create a new league to compete with friends. You'll get an invite code to share!",
+        content: "🏆 Start your own competition! You'll get an invite code to share with friends.",
         placement: "bottom",
     },
     {
         target: '[data-tour="join-league"]',
-        content: "Or join an existing league using an invite code or link from a friend.",
+        content: "🔗 Have an invite code? Join an existing league here.",
         placement: "bottom",
     },
     {
         target: "body",
-        content: "That's it for now! Create or join a league to get started. 🏆",
+        content: "That's the basics! Once you're in a league, check out 'How to Submit Steps' in the Help menu. 💪",
         placement: "center",
     },
 ];
 
+/**
+ * SUBMISSION TOUR - Deep-dive into the 3 submission modes
+ * Focused only on submission, explains each mode clearly
+ */
 const memberTour: OnboardingStep[] = [
     {
         target: "body",
-        content: "Welcome to your league! Here's how to submit your daily steps and compete. 👟",
+        content: "📝 Let's learn how to submit your daily steps! There are 3 different modes to choose from.",
         placement: "center",
         disableBeacon: true,
     },
     {
+        target: '[data-tour="batch-toggle"]',
+        content: "⭐ CHOOSE YOUR MODE: Pick between Single Entry, Batch Upload, or Bulk Manual. Each works differently!",
+        placement: "bottom",
+    },
+    {
         target: '[data-tour="submission-form"]',
-        content: "This is the submission form. Upload a screenshot of your step count here.",
+        content: "📸 BATCH UPLOAD (Recommended): Upload up to 5 screenshots at once. AI automatically extracts dates and step counts. You can review and correct before submitting!",
         placement: "right",
     },
     {
         target: '[data-tour="date-picker"]',
-        content: "Select the date for your step submission. You can submit for past days too!",
-        placement: "bottom",
-    },
-    {
-        target: '[data-tour="steps-input"]',
-        content: "Enter your step count. The AI will verify this matches your screenshot.",
-        placement: "bottom",
-    },
-    {
-        target: '[data-tour="screenshot-upload"]',
-        content: "Upload a screenshot from your fitness app (Apple Health, Google Fit, Samsung Health, etc.).",
-        placement: "top",
-    },
-    {
-        target: '[data-tour="partial-checkbox"]',
-        content: "Check this if you didn't have your phone all day - it helps explain lower counts.",
+        content: "📝 SINGLE ENTRY: Pick a date, enter your steps manually, and upload one screenshot. AI verifies the count matches.",
         placement: "bottom",
     },
     {
         target: '[data-tour="submit-button"]',
-        content: "Hit submit and our AI will verify your steps automatically!",
+        content: "⚡ BULK MANUAL: For catching up without screenshots. Enter multiple days at once - these are marked as 'unverified'.",
         placement: "top",
     },
     {
-        target: '[data-tour="batch-toggle"]',
-        content: "Switch to Batch Mode to upload multiple screenshots at once - great for catching up!",
-        placement: "bottom",
-    },
-    {
-        target: '[data-tour="nav-leaderboard"]',
-        content: "Check the Leaderboard to see how you rank against others.",
-        placement: "bottom",
-    },
-    {
-        target: '[data-tour="nav-analytics"]',
-        content: "View your Analytics for detailed stats and heatmaps of your activity.",
-        placement: "bottom",
+        target: "body",
+        content: "🤖 HOW VERIFICATION WORKS: AI checks your screenshot matches your steps. If there's a mismatch, it's flagged for your league admin to review. Verified submissions get a ✓ badge!",
+        placement: "center",
     },
 ];
 
+/**
+ * LEADERBOARD TOUR - Explains filters and competition features
+ */
 const leaderboardTour: OnboardingStep[] = [
     {
-        target: '[data-tour="leaderboard-filters"]',
-        content: "Filter by time period: this week, last week, month, or custom dates.",
-        placement: "bottom",
+        target: "body",
+        content: "🏆 See how you rank against your league! Let me show you the powerful filters.",
+        placement: "center",
         disableBeacon: true,
     },
     {
-        target: '[data-tour="verified-filter"]',
-        content: "Toggle to show only verified submissions for fair competition.",
+        target: '[data-tour="leaderboard-filters"]',
+        content: "📅 TIME PERIOD: Filter by today, this week, last 30 days, or pick custom dates for any range.",
         placement: "bottom",
     },
     {
-        target: '[data-tour="common-days-filter"]',
-        content: "Compare only days where everyone submitted - great for fairness!",
+        target: '[data-tour="verified-filter"]',
+        content: "✓ VERIFIED FILTER: Show only AI-verified submissions for fair competition. Unverified entries won't count!",
         placement: "bottom",
     },
     {
         target: '[data-tour="leaderboard-table"]',
-        content: "See everyone's total steps and ranking for the selected period.",
+        content: "📊 RANKINGS: See total steps, daily average, streaks, and badges. Click your row to see more details.",
         placement: "top",
     },
     {
         target: '[data-tour="share-button"]',
-        content: "Share your achievements or invite friends to join your league!",
-        placement: "bottom",
+        content: "🎉 SHARE: Brag about your rank! Creates a shareable image for social media.",
+        placement: "left",
     },
 ];
 
+/**
+ * ADMIN TOUR - League owner specific features
+ */
 const adminTour: OnboardingStep[] = [
     {
         target: "body",
-        content: "As the league owner, you have extra powers! 👑 Let me show you.",
+        content: "👑 As league owner, you have extra powers! Let me show you.",
         placement: "center",
         disableBeacon: true,
         requiresAdmin: true,
     },
     {
         target: '[data-tour="invite-button"]',
-        content: "Share this invite link or code with friends to add them to your league.",
+        content: "🔗 INVITE FRIENDS: Share this code or copy the link. Anyone with it can join your league!",
         placement: "bottom",
         requiresAdmin: true,
     },
     {
         target: '[data-tour="proxy-members"]',
-        content: "Create Proxy Members for people who haven't signed up yet. Submit steps on their behalf, then link to their real account when they join!",
+        content: "👤 PROXY MEMBERS: Add placeholders for people not signed up yet. Submit steps on their behalf, then link their real account when they join!",
         placement: "top",
         requiresAdmin: true,
     },
     {
-        target: '[data-tour="league-settings"]',
-        content: "Manage your league settings here (coming soon!).",
-        placement: "bottom",
+        target: "body",
+        content: "🔍 ADMIN DUTIES: You'll see flagged submissions when AI detects mismatches. Review them to keep competition fair!",
+        placement: "center",
         requiresAdmin: true,
     },
 ];
