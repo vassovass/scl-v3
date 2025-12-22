@@ -5,7 +5,7 @@ import Joyride, { CallBackProps, STATUS, ACTIONS, EVENTS, Step } from "react-joy
 import { usePathname } from "next/navigation";
 
 // Tour names
-export type TourName = "new-user" | "member" | "admin";
+export type TourName = "new-user" | "member" | "admin" | "leaderboard";
 
 // Step with optional role requirement
 interface OnboardingStep extends Step {
@@ -266,10 +266,9 @@ export function OnboardingProvider({ children, isAdmin = false, hasLeagues = fal
                 break;
             case "member":
                 tourSteps = [...memberTour];
-                // Add leaderboard steps if on leaderboard page
-                if (pathname.includes("/leaderboard")) {
-                    tourSteps = leaderboardTour;
-                }
+                break;
+            case "leaderboard":
+                tourSteps = leaderboardTour;
                 break;
             case "admin":
                 tourSteps = adminTour;
@@ -328,14 +327,22 @@ export function OnboardingProvider({ children, isAdmin = false, hasLeagues = fal
         return () => clearTimeout(timer);
     }, [isHydrated, pathname, startContextualTour]);
 
-    // Listen for custom event from NavHeader
+    // Listen for custom event from NavHeader - supports explicit tour selection
     useEffect(() => {
-        const handleStartTour = () => {
-            // Start contextual tour based on current page
+        const handleStartTour = (event: Event) => {
+            const customEvent = event as CustomEvent<{ tour?: TourName }>;
+            const requestedTour = customEvent.detail?.tour;
+
+            // If explicit tour requested, use it
+            if (requestedTour) {
+                startTour(requestedTour);
+                return;
+            }
+
+            // Otherwise, start contextual tour based on current page
             if (pathname === "/dashboard") {
                 startTour("new-user");
             } else if (pathname.match(/\/league\/[^/]+/)) {
-                // Both league page and leaderboard use member tour (which adapts)
                 startTour("member");
             } else {
                 startTour("new-user");

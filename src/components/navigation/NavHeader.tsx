@@ -256,16 +256,57 @@ export function NavHeader() {
                                     >
                                         ⚙️ Profile Settings
                                     </Link>
-                                    <button
-                                        onClick={() => {
-                                            setOpenDropdown(null);
-                                            // Dispatch custom event to trigger tour
-                                            window.dispatchEvent(new CustomEvent('start-onboarding-tour'));
-                                        }}
-                                        className="w-full text-left px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800"
-                                    >
-                                        📖 Start Tour
-                                    </button>
+
+                                    {/* Help & Tours Section */}
+                                    <div className="border-t border-slate-800 mt-1 pt-1">
+                                        <div className="px-4 py-1.5 text-[10px] text-slate-500 uppercase tracking-wider">
+                                            Guides & Help
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                setOpenDropdown(null);
+                                                window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'new-user' } }));
+                                            }}
+                                            className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 flex items-center gap-2"
+                                        >
+                                            <span>🏠</span>
+                                            <span className="flex-1">Dashboard Basics</span>
+                                            <span className="text-[10px] text-slate-500">~30s</span>
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setOpenDropdown(null);
+                                                window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'member' } }));
+                                            }}
+                                            className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 flex items-center gap-2"
+                                        >
+                                            <span>📝</span>
+                                            <span className="flex-1">How to Submit Steps</span>
+                                            <span className="text-[10px] text-slate-500">~1m</span>
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setOpenDropdown(null);
+                                                window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'leaderboard' } }));
+                                            }}
+                                            className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 flex items-center gap-2"
+                                        >
+                                            <span>🏆</span>
+                                            <span className="flex-1">Leaderboard & Filters</span>
+                                            <span className="text-[10px] text-slate-500">~30s</span>
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setOpenDropdown(null);
+                                                window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: 'admin' } }));
+                                            }}
+                                            className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 flex items-center gap-2"
+                                        >
+                                            <span>👑</span>
+                                            <span className="flex-1">League Owner Guide</span>
+                                            <span className="text-[10px] text-slate-500">~30s</span>
+                                        </button>
+                                    </div>
                                     <Link
                                         href="/feedback"
                                         onClick={() => setOpenDropdown(null)}

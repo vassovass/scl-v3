@@ -10,6 +10,13 @@ All notable changes to StepLeague v3.
 ## [2025-12-23]
 
 ### Added
+- **Guided Onboarding System** with React Joyride
+  - 4 role-based tours: Dashboard Basics, How to Submit Steps, Leaderboard & Filters, League Owner Guide
+  - Auto-start for new users on first visit
+  - Help & Guides menu in user dropdown with all tours and duration estimates
+  - Tours filter to only visible elements (fixes step count issue)
+  - Feedback modal on tour completion (uses same pattern as ModuleFeedback)
+  - LocalStorage persistence to remember completed tours
 - **SuperAdmin dropdown menu** in NavHeader with dynamic page list
 - **adminPages.ts config** - Add pages here, menu auto-updates (no code changes needed)
 - **Design System Component Library** - All 19 components now documented with categories
@@ -24,6 +31,7 @@ All notable changes to StepLeague v3.
 
 ### Fixed
 - **Module feedback button** now stays visible long enough to click - added 1.5s delay before hiding and button hover tracking
+- **OnboardingProvider** - Step counting now filters to only visible DOM elements
 
 ---
 
