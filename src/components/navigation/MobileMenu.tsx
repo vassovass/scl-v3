@@ -56,8 +56,8 @@ export function MobileMenu({
                 href="/dashboard"
                 onClick={onClose}
                 className={`block px-4 py-3 rounded-xl text-sm font-medium transition-colors ${isActive("/dashboard")
-                        ? "bg-sky-500/10 text-sky-400 border border-sky-500/20"
-                        : "text-slate-300 hover:bg-slate-800"
+                    ? "bg-sky-500/10 text-sky-400 border border-sky-500/20"
+                    : "text-slate-300 hover:bg-slate-800"
                     }`}
             >
                 📊 Dashboard
@@ -84,14 +84,35 @@ export function MobileMenu({
             <div className="space-y-1">
                 <div className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Actions</div>
                 {ACTIONS_MENU_ITEMS.map((item) => (
-                    <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => handleItemClick(item)}
-                        className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
-                    >
-                        {item.icon} <span className="ml-2">{item.label}</span>
-                    </Link>
+                    <>
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => !item.children && handleItemClick(item)}
+                            className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors flex justify-between items-center group"
+                        >
+                            <span className="flex items-center">
+                                {item.icon} <span className="ml-2">{item.label}</span>
+                            </span>
+                            {item.children && <span className="text-[10px] text-slate-600 group-hover:text-slate-400">▼</span>}
+                        </Link>
+                        {/* Render children inline for mobile (simple tree) */}
+                        {item.children && (
+                            <div className="pl-8 space-y-1 border-l border-slate-800 ml-6">
+                                {item.children.map(child => (
+                                    <Link
+                                        key={child.label}
+                                        href={child.href}
+                                        onClick={() => handleItemClick(child)}
+                                        className="block px-4 py-2 rounded-lg text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-colors"
+                                    >
+                                        <span className="mr-2">{child.icon}</span>
+                                        {child.label}
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                    </>
                 ))}
             </div>
 
