@@ -10,6 +10,20 @@ All notable changes to StepLeague v3.
 ## [2025-12-22]
 
 ### Added
+- **Design System** - Modular CSS custom properties (design tokens) in `globals.css`
+  - Brand colors, backgrounds, text, status colors all configurable from `:root`
+  - Utility classes: `.btn-primary`, `.btn-ghost`, `.glass-card`, `.card-glow`
+  - Text effects: `.text-gradient`, `.glow-text`
+  - Background effects: `.bg-gradient-mesh`, `.bg-gradient-primary`
+  - Animations: `.animate-float`, `.animate-pulse-glow`, `.animate-fade-in`
+- **Home Page Preview** at `/home-preview` - Strava-inspired dark design
+  - Animated gradient mesh background
+  - Glassmorphism feature cards
+  - How It Works section with step indicators
+  - Stats strip with social proof
+- **Design System Page** at `/admin/design-system` (superadmin-only)
+  - Live examples of all design tokens and utility classes
+  - Color palette, typography, buttons, cards, animations reference
 - **Proxy Members** - League owners/admins can create placeholder profiles for people who haven't signed up yet
   - Submit steps on behalf of proxy members (verified or unverified)
   - Link proxy to a real user when they join, transferring all submissions
@@ -17,6 +31,9 @@ All notable changes to StepLeague v3.
 - **ProxyMemberManagement** component with create, link, and delete functionality
 - **Proxy member API routes** (`/api/leagues/[id]/proxy-members`)
 - **Members list** added to league API response for admin tools
+
+### Changed
+- **AGENTS.md** updated with design token documentation and new rule requiring design system page updates
 
 ---
 

@@ -144,10 +144,24 @@ scl-v3/
 
 ## Theme & Styling
 
-- **Dark theme**: `bg-slate-950`, `text-slate-100`, `border-slate-800`
-- **Primary**: `sky-500/600`
-- **Success**: `emerald-500`
-- **Error**: `rose-500`
+**Design Tokens**: All defined in `src/app/globals.css` using CSS custom properties.
+
+| Category | Examples | CSS Variable |
+|----------|----------|-------------|
+| **Primary** | `sky-500/600` | `--brand-primary` |
+| **Backgrounds** | `bg-gradient-mesh`, `.glass-card` | `--bg-base`, `--bg-card` |
+| **Text** | `slate-50/400/500` | `--text-primary`, `--text-secondary` |
+| **Status** | `green-500`, `amber-400`, `red-500` | `--success`, `--warning`, `--error` |
+
+**Utility Classes** (from `globals.css`):
+- `.btn-primary`, `.btn-ghost` - Buttons
+- `.glass-card`, `.card-glow` - Card styles
+- `.text-gradient`, `.glow-text` - Text effects
+- `.bg-gradient-mesh`, `.bg-gradient-primary` - Backgrounds
+- `.animate-float`, `.animate-pulse-glow` - Animations
+- `.section-container`, `.stat-badge`, `.feature-icon` - Layout helpers
+
+> **Superadmins**: See `/admin/design-system` for live examples of all design tokens.
 
 ---
 
@@ -191,6 +205,7 @@ npx tsc --noEmit # Type check
 2. **README.md** - Update features list if adding new features
 3. **ROADMAP.md** - Move completed items to "Completed", update "In Progress"
 4. **AGENTS.md** - Update "Key Features" section if structure changes
+5. **Design System Page** - When adding new design tokens or utility classes to `globals.css`, update `/admin/design-system` page with examples
 
 This ensures documentation stays current for future sessions and developers.
 
@@ -208,5 +223,5 @@ This ensures documentation stays current for future sessions and developers.
 
 ---
 
-*Last updated: 2025-12-21. This file is the canonical source for AI agents.*
+*Last updated: 2025-12-22. This file is the canonical source for AI agents.*
 
