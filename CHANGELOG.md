@@ -7,6 +7,23 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2025-12-23]
+
+### Added
+- **SuperAdmin dropdown menu** in NavHeader with dynamic page list
+- **adminPages.ts config** - Add pages here, menu auto-updates (no code changes needed)
+- **Design System Component Library** - All 19 components now documented with categories
+- **Common UI Patterns** section in design system (inputs, selects, alerts)
+- **Page Templates** section documenting layout patterns
+- **Logo color-swap hover effect** - "Step" and "League" swap colors on hover
+
+### Changed
+- **AGENTS.md** - Added superadmin pages instructions, modularization rule, design system checklist
+- **Design System page** - Now comprehensive with all components, patterns, and theme notes
+- Logo hover behavior updated in NavHeader and GlobalFooter
+
+---
+
 ## [2025-12-22]
 
 ### Added

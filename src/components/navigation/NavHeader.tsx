@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { createClient } from "@/lib/supabase/client";
+import { SUPERADMIN_PAGES } from "@/lib/adminPages";
 
 export function NavHeader() {
     const { user, session, signOut } = useAuth();
@@ -73,10 +74,11 @@ export function NavHeader() {
         <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/95 backdrop-blur-sm">
             <nav ref={navRef} className="mx-auto flex max-w-6xl items-center justify-between px-4 h-14">
                 {/* Logo */}
-                <Link href="/dashboard" className="flex items-center gap-2">
+                <Link href="/dashboard" className="group flex items-center gap-2">
                     <span className="text-xl">👟</span>
-                    <span className="text-lg font-bold text-slate-50 transition hover:text-sky-400">
-                        Step<span className="text-sky-500">League</span>
+                    <span className="text-lg font-bold">
+                        <span className="text-slate-50 transition-colors group-hover:text-sky-400">Step</span>
+                        <span className="text-sky-500 transition-colors group-hover:text-slate-50">League</span>
                     </span>
                 </Link>
 
@@ -192,17 +194,40 @@ export function NavHeader() {
                             )}
                         </div>
 
-                        {/* Admin (SuperAdmin only) */}
+                        {/* SuperAdmin Menu (SuperAdmin only) */}
                         {isSuperadmin && (
-                            <Link
-                                href="/admin"
-                                className={`px-3 py-2 text-sm rounded-lg transition ${isActive("/admin")
-                                    ? "bg-amber-600/20 text-amber-400"
-                                    : "text-amber-500/70 hover:text-amber-400 hover:bg-amber-900/20"
-                                    }`}
-                            >
-                                Admin
-                            </Link>
+                            <div className="relative">
+                                <button
+                                    onClick={() => toggleDropdown("superadmin")}
+                                    className={`px-3 py-2 text-sm rounded-lg transition flex items-center gap-1 ${isActivePrefix("/admin")
+                                        ? "bg-amber-600/20 text-amber-400"
+                                        : "text-amber-500/70 hover:text-amber-400 hover:bg-amber-900/20"
+                                        }`}
+                                >
+                                    ⚡ Admin <span className="text-[10px]">▼</span>
+                                </button>
+
+                                {openDropdown === "superadmin" && (
+                                    <div className="absolute right-0 mt-1 w-52 rounded-lg border border-amber-800/50 bg-slate-900 shadow-xl py-1 z-50">
+                                        <div className="px-4 py-2 border-b border-slate-800">
+                                            <div className="text-xs text-amber-500 font-medium">SuperAdmin</div>
+                                        </div>
+                                        {SUPERADMIN_PAGES.map((page) => (
+                                            <Link
+                                                key={page.href}
+                                                href={page.href}
+                                                onClick={() => setOpenDropdown(null)}
+                                                className={`block px-4 py-2.5 text-sm transition ${isActive(page.href)
+                                                    ? "bg-amber-600/20 text-amber-400"
+                                                    : "text-slate-300 hover:bg-slate-800"
+                                                    }`}
+                                            >
+                                                {page.label}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         )}
 
                         {/* User Menu */}
@@ -341,6 +366,22 @@ export function NavHeader() {
                     <Link href="/feedback" className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800">
                         💬 Send Feedback
                     </Link>
+
+                    {/* SuperAdmin Section (Mobile) */}
+                    {isSuperadmin && (
+                        <>
+                            <div className="pt-2 pb-1 px-4 text-xs text-amber-500 uppercase">⚡ SuperAdmin</div>
+                            {SUPERADMIN_PAGES.map((page) => (
+                                <Link
+                                    key={page.href}
+                                    href={page.href}
+                                    className="block px-4 py-3 rounded-lg text-sm text-amber-400 hover:bg-amber-900/20"
+                                >
+                                    {page.label}
+                                </Link>
+                            ))}
+                        </>
+                    )}
 
                     <div className="pt-4 border-t border-slate-800">
                         <button

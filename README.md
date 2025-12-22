@@ -83,7 +83,7 @@ scl-v3/
 │   │   ├── layout/             # GlobalFooter
 │   │   ├── navigation/         # NavHeader (mobile hamburger)
 │   │   └── ui/                 # Reusable components
-│   └── lib/                    # Utilities, Supabase clients
+│   └── lib/                    # Utilities, Supabase clients, adminPages.ts (admin nav config)
 ├── supabase/migrations/        # Database migrations
 ├── AGENTS.md                   # AI assistant context (universal)
 ├── CLAUDE.md                   # Claude-specific (references AGENTS.md)

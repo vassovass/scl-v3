@@ -105,6 +105,7 @@ scl-v3/
 │   │   └── ui/                   # DatePicker, ShareButton, ModuleFeedback
 │   └── lib/
 │       ├── api.ts                # json(), badRequest(), unauthorized(), etc.
+│       ├── adminPages.ts         # SuperAdmin pages config (auto-populates nav menu)
 │       ├── supabase/             # Server/client Supabase clients
 │       └── utils/                # Date utilities
 ├── supabase/migrations/          # SQL migrations (numbered)
@@ -142,9 +143,21 @@ scl-v3/
 
 ---
 
-## Theme & Styling
+## Theme, Styling & Branding
 
-**Design Tokens**: All defined in `src/app/globals.css` using CSS custom properties.
+### Brand Logo Treatment
+The StepLeague logo uses two-tone text with a color-swap hover effect:
+- **Default**: "Step" (white/slate-50) + "League" (sky-500)
+- **Hover**: Colors swap → "Step" (sky-400) + "League" (white)
+- **Icon**: 👟 sneaker emoji
+
+**Logo locations to keep in sync:**
+- `src/components/navigation/NavHeader.tsx` - Main header logo
+- `src/components/layout/GlobalFooter.tsx` - Footer logo
+- `src/app/admin/design-system/page.tsx` - Design system documentation
+
+### Design Tokens
+All defined in `src/app/globals.css` using CSS custom properties.
 
 | Category | Examples | CSS Variable |
 |----------|----------|-------------|
@@ -153,7 +166,7 @@ scl-v3/
 | **Text** | `slate-50/400/500` | `--text-primary`, `--text-secondary` |
 | **Status** | `green-500`, `amber-400`, `red-500` | `--success`, `--warning`, `--error` |
 
-**Utility Classes** (from `globals.css`):
+### Utility Classes (from `globals.css`)
 - `.btn-primary`, `.btn-ghost` - Buttons
 - `.glass-card`, `.card-glow` - Card styles
 - `.text-gradient`, `.glow-text` - Text effects
@@ -161,13 +174,13 @@ scl-v3/
 - `.animate-float`, `.animate-pulse-glow` - Animations
 - `.section-container`, `.stat-badge`, `.feature-icon` - Layout helpers
 
-**Theme System** (future-proofed for light/dark mode):
+### Theme System (future-proofed for light/dark mode)
 - Default: Dark theme (`:root` variables)
 - Light theme: Add `data-theme="light"` to `<html>` element
 - All theme-aware colors use CSS variables, no hardcoded values
 - When adding new colors, add both dark `:root` and `[data-theme="light"]` variants
 
-> **Superadmins**: See `/admin/design-system` for live examples of all design tokens.
+> **Superadmins**: See `/admin/design-system` for live examples of all design tokens and branding.
 
 ---
 
@@ -211,7 +224,49 @@ npx tsc --noEmit # Type check
 2. **README.md** - Update features list if adding new features
 3. **ROADMAP.md** - Move completed items to "Completed", update "In Progress"
 4. **AGENTS.md** - Update "Key Features" section if structure changes
-5. **Design System Page** - When adding new design tokens or utility classes to `globals.css`, update `/admin/design-system` page with examples
+5. **Design System Page** (`/admin/design-system`) - **CRITICAL**: Update this page when:
+   - Adding new design tokens or utility classes to `globals.css`
+   - Changing logo styling, branding, or hover effects
+   - Introducing new UI patterns, components, or section types
+   - Creating new reusable modules or elements
+   - Modifying color schemes or typography
+
+### UI/Styling Change Checklist
+When making ANY UI, branding, or component changes:
+
+**Branding Changes:**
+- [ ] `src/components/navigation/NavHeader.tsx` - Header logo
+- [ ] `src/components/layout/GlobalFooter.tsx` - Footer logo  
+- [ ] `src/app/admin/design-system/page.tsx` - Design system docs
+- [ ] This file (`AGENTS.md`) - If changing brand guidelines
+
+**New Components/Modules/Sections:**
+- [ ] Add to design system page (`/admin/design-system`) with live examples
+- [ ] Document usage patterns in this file if reusable
+- [ ] Add CSS classes to `globals.css` if creating new patterns
+
+**New CSS Tokens/Classes:**
+- [ ] Add to `src/app/globals.css` with both light AND dark mode variants
+- [ ] Document in design system page with examples
+
+**New SuperAdmin Pages:**
+- [ ] Create page in `src/app/admin/[page-name]/page.tsx`
+- [ ] Add entry to `src/lib/adminPages.ts` - menu auto-updates!
+- [ ] No need to manually edit NavHeader
+
+### ⚠️ Light/Dark Mode Requirement (MANDATORY)
+**ALL new UI work MUST consider both light and dark mode:**
+- Use CSS variables from `globals.css` instead of hardcoded colors
+- When adding new color tokens, add BOTH `:root` (dark) AND `[data-theme="light"]` variants
+- Test visual appearance in both themes before considering work complete
+- Never use hardcoded colors like `bg-slate-900` - use theme-aware variables
+
+### 🔄 Modularization Rule
+**Extract repeated patterns into reusable components:**
+- If the same UI pattern is used **3+ times**, extract it into a component in `src/components/ui/`
+- Examples: Input, Select, Alert, Card, Badge
+- Reference the "Common UI Patterns" section in `/admin/design-system` for standard patterns
+- When creating new shared components, add them to the Component Library in the design system page
 
 This ensures documentation stays current for future sessions and developers.
 
@@ -226,8 +281,10 @@ This ensures documentation stays current for future sessions and developers.
 | [ROADMAP.md](./ROADMAP.md) | Upcoming features and planned work |
 | [CLAUDE.md](./CLAUDE.md) | Claude-specific notes (references this file) |
 | [.cursor/rules/](./cursor/rules/) | Cursor IDE rules |
+| [globals.css](./src/app/globals.css) | Design tokens, CSS variables, utility classes |
+| [/admin/design-system](./src/app/admin/design-system/page.tsx) | **Live component examples** (superadmin only) - UPDATE when adding/changing components |
 
 ---
 
-*Last updated: 2025-12-22. This file is the canonical source for AI agents.*
+*Last updated: 2025-12-23. This file is the canonical source for AI agents.*
 

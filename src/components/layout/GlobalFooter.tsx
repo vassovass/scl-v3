@@ -12,9 +12,12 @@ export function GlobalFooter() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                     {/* Brand */}
                     <div className="col-span-2 md:col-span-1">
-                        <Link href="/dashboard" className="flex items-center gap-2 text-slate-200">
+                        <Link href="/dashboard" className="group flex items-center gap-2">
                             <span className="text-xl">👟</span>
-                            <span className="font-bold">Step<span className="text-sky-500">League</span></span>
+                            <span className="font-bold">
+                                <span className="text-slate-200 transition-colors group-hover:text-sky-400">Step</span>
+                                <span className="text-sky-500 transition-colors group-hover:text-slate-200">League</span>
+                            </span>
                         </Link>
                         <p className="mt-2 text-xs text-slate-500">
                             {APP_CONFIG.tagline}
