@@ -1,4 +1,4 @@
-# StepCountLeague v3
+# StepLeague v3
 
 > A step-tracking competition platform where friends form leagues and compete weekly.
 

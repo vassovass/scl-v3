@@ -7,7 +7,7 @@
 
 ## Project Overview
 
-**Step Counter League (SCL)** - A competitive step counting web app where users form leagues and compete weekly.
+**StepLeague** - A competitive step counting web app where users form leagues and compete weekly.
 
 - **Framework**: Next.js 14 (App Router, NOT v15)
 - **Language**: TypeScript (strict)

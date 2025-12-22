@@ -1,5 +1,5 @@
 /**
- * SuperAdmin utility for SCL v3.
+ * SuperAdmin utility for StepLeague.
  * Determines if a user is a SuperAdmin based on their email address.
  */
 

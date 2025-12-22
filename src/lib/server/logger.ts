@@ -1,5 +1,5 @@
 /**
- * Server-side logging utility for SCL v3.
+ * Server-side logging utility for StepLeague.
  * Logs are written to console (visible in Vercel logs) with structured format.
  * SuperAdmins can access logs via a debug endpoint or UI.
  */

@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to StepCountLeague v3.
+All notable changes to StepLeague v3.
 
 > **Format**: [Keep a Changelog](https://keepachangelog.com/) with date-based versioning.
 > **AI agents**: Update this file on every commit.

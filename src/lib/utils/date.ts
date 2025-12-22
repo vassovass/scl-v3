@@ -1,5 +1,5 @@
 /**
- * Smart date normalization utilities for SCL v3.
+ * Smart date normalization utilities for StepLeague.
  * Handles dates without years by inferring the most logical year.
  */
 
