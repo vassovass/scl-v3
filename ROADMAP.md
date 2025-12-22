@@ -38,6 +38,7 @@
 ### User Experience
 - [ ] Onboarding flow for new users
 - [ ] Achievement badges (streaks, milestones)
+- [ ] **Light/Dark mode toggle** - Theme switcher using CSS custom properties (infrastructure ready in `globals.css`)
 
 ---
 

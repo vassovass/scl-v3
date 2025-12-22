@@ -100,7 +100,8 @@ scl-v3/
 | Framework | Next.js 14 (App Router) | NOT v15 (avoids breaking changes) |
 | Database | Supabase (PostgreSQL) | With RLS policies |
 | Auth | Supabase Auth | Email/password |
-| Styling | Tailwind CSS | Mobile-first, dark theme |
+| Styling | Tailwind CSS + CSS Variables | Mobile-first, dark theme (light mode ready via `data-theme`) |
+| Design System | `globals.css` | CSS custom properties for theming, see `/admin/design-system` |
 | AI Verification | Gemini 2.5 Flash | Via Supabase Edge Function |
 | Deployment | Vercel | Auto-deploy from main |
 

@@ -161,6 +161,12 @@ scl-v3/
 - `.animate-float`, `.animate-pulse-glow` - Animations
 - `.section-container`, `.stat-badge`, `.feature-icon` - Layout helpers
 
+**Theme System** (future-proofed for light/dark mode):
+- Default: Dark theme (`:root` variables)
+- Light theme: Add `data-theme="light"` to `<html>` element
+- All theme-aware colors use CSS variables, no hardcoded values
+- When adding new colors, add both dark `:root` and `[data-theme="light"]` variants
+
 > **Superadmins**: See `/admin/design-system` for live examples of all design tokens.
 
 ---
