@@ -6,6 +6,7 @@ export interface NavItem {
     icon?: string;
     description?: string;
     external?: boolean;
+    children?: NavItem[];
 }
 
 export interface NavSection {
