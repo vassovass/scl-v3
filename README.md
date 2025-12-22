@@ -117,6 +117,7 @@ scl-v3/
 - ✅ Module feedback system
 - ✅ Social sharing (Web Share API)
 - ✅ Mobile-responsive navigation
+- ✅ Guided onboarding tours
 - ✅ Footer with legal links
 
 See **[ROADMAP.md](./ROADMAP.md)** for upcoming features.

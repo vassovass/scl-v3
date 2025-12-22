@@ -36,7 +36,6 @@
 - [ ] Historical leaderboard snapshots
 
 ### User Experience
-- [ ] Onboarding flow for new users
 - [ ] Achievement badges (streaks, milestones)
 - [ ] **Light/Dark mode toggle** - Theme switcher using CSS custom properties (infrastructure ready in `globals.css`)
 
@@ -109,6 +108,7 @@
 - [x] Batch step submission with AI extraction
 - [x] Leaderboard filters (period, verified, custom dates)
 - [x] User nicknames
+- [x] Onboarding flow for new users
 
 ---
 

@@ -146,6 +146,7 @@ scl-v3/
 - ✅ Module feedback system (floating 💬 icon)
 - ✅ Social sharing (Web Share API + WhatsApp/Twitter)
 - ✅ Mobile-responsive navigation (hamburger menu)
+- ✅ Guided onboarding system (Joyride)
 - ✅ Footer with legal links
 
 ---
