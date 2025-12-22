@@ -98,4 +98,4 @@ All notable changes to StepLeague v3.
 
 ## [Earlier]
 
-Initial v3 setup migrated from v2 (Cloudflare → Vercel).
+Initial v3 setup. Complete rewrite from deprecated v2 (Cloudflare) to production v3 (Vercel).

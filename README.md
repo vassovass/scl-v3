@@ -17,10 +17,10 @@
 | Version | Stack | Status | Notes |
 |---------|-------|--------|-------|
 | **v1** | React + Firebase | Deprecated | Original prototype |
-| **v2** | Next.js + Supabase + Cloudflare | Production | Current live version with Edge Functions |
-| **v3** | Next.js 14 + Supabase + Vercel | Active Development | This repo - rewrite for Vercel deployment |
+| **v2** | Next.js + Supabase + Cloudflare | Deprecated | Used as scaffold for v3, no longer active |
+| **v3** | Next.js 14 + Supabase + Vercel | **Production** | This repo - current live version |
 
-**v3 shares the same Supabase database as v2** - all data, Edge Functions, and storage buckets are shared. v3 is a frontend rewrite optimized for Vercel.
+**v3 is the only production version** - hosted on Vercel with Supabase backend (database, Edge Functions, storage).
 
 ---
 
@@ -100,7 +100,7 @@ scl-v3/
 | Layer | Technology | Notes |
 |-------|------------|-------|
 | Framework | Next.js 14 (App Router) | NOT v15 (avoids breaking changes) |
-| Database | Supabase (PostgreSQL) | Shared with v2, includes RLS |
+| Database | Supabase (PostgreSQL) | With RLS policies |
 | Auth | Supabase Auth | Email/password |
 | Styling | Tailwind CSS | Mobile-first, dark theme |
 | AI Verification | Gemini 2.5 Flash | Via Supabase Edge Function |
