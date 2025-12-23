@@ -33,8 +33,33 @@ All notable changes to StepLeague v3.
 - Logo hover behavior updated in NavHeader and GlobalFooter
 
 ### Fixed
-- **Module feedback button** now stays visible long enough to click - added 1.5s delay before hiding and button hover tracking
 - **OnboardingProvider** - Step counting now filters to only visible DOM elements
+
+### Removed
+- **ModuleFeedback** - Replaced with global FeedbackWidget
+
+---
+
+## [2025-12-23]
+
+### Added
+- **Global Feedback System** - Floating widget (💬) available on all pages for authenticated users
+  - Supports "Bug", "Feature", "General", "Positive", "Negative" types
+  - **Screenshot capture** using `html2canvas`
+  - Auto-captures page URL and user agent
+- **Admin Feedback Dashboard** (`/admin/feedback`)
+  - List view of all feedback with status tracking
+  - Screenshot preview and details
+- **Feedback API** (`/api/feedback`) - Handles JSON payloads and base64 screenshots
+- **Database Schema** - New `feedback` table with RLS policies
+
+### Maintenance
+- **Repository Synchronization** - Performed hard reset to `origin/main` (Commit `43c65e6`) to align local environment with GitHub source of truth, discarding erroneous local modifications.
+
+### Changed
+- **NavDropdown** and **MobileMenu** - Refactored navigation (from previous commit)
+- **AGENTS.md** - Added documentation compliance check
+- **ModuleFeedback** - Deprecated and removed in favor of global widget
 
 ---
 

@@ -103,7 +103,7 @@
 - [x] Social sharing (Web Share API + WhatsApp/Twitter)
 - [x] Mobile-responsive navigation with hamburger menu
 - [x] Footer with legal links
-- [x] Module feedback system
+- [x] Global feedback system (Widget + Admin Dashboard)
 - [x] Profile settings page
 - [x] Batch step submission with AI extraction
 - [x] Leaderboard filters (period, verified, custom dates)

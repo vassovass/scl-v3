@@ -266,7 +266,7 @@ export type Database = {
           created_by?: string;
           created_at?: string;
         };
-        Relationships: [
+        Relations: [
           {
             foreignKeyName: "proxy_members_league_id_fkey";
             columns: ["league_id"];
@@ -277,6 +277,53 @@ export type Database = {
           {
             foreignKeyName: "proxy_members_created_by_fkey";
             columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      feedback: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          type: "bug" | "feature" | "general" | "positive" | "negative";
+          subject: string | null;
+          description: string | null;
+          page_url: string | null;
+          screenshot_url: string | null;
+          user_agent: string | null;
+          status: "new" | "in_progress" | "resolved" | "ignored";
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          type: "bug" | "feature" | "general" | "positive" | "negative";
+          subject?: string | null;
+          description?: string | null;
+          page_url?: string | null;
+          screenshot_url?: string | null;
+          user_agent?: string | null;
+          status?: "new" | "in_progress" | "resolved" | "ignored";
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          type?: "bug" | "feature" | "general" | "positive" | "negative";
+          subject?: string | null;
+          description?: string | null;
+          page_url?: string | null;
+          screenshot_url?: string | null;
+          user_agent?: string | null;
+          status?: "new" | "in_progress" | "resolved" | "ignored";
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "feedback_user_id_fkey";
+            columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "users";
             referencedColumns: ["id"];

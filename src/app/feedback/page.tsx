@@ -41,19 +41,27 @@ export default function FeedbackPage() {
         setErrorMsg("");
 
         try {
-            // Create FormData for file upload
-            const formData = new FormData();
-            formData.append("type", form.type);
-            formData.append("subject", form.subject);
-            formData.append("description", form.description);
-            formData.append("email", form.email);
+            // Convert file to base64 if exists
+            let screenshotData: string | null = null;
             if (form.screenshot) {
-                formData.append("screenshot", form.screenshot);
+                const reader = new FileReader();
+                screenshotData = await new Promise((resolve) => {
+                    reader.onload = (e) => resolve(e.target?.result as string);
+                    reader.readAsDataURL(form.screenshot!);
+                });
             }
 
             const res = await fetch("/api/feedback", {
                 method: "POST",
-                body: formData,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    type: form.type,
+                    subject: form.subject,
+                    description: form.description,
+                    email: form.email,
+                    screenshot: screenshotData,
+                    page_url: window.location.href,
+                }),
             });
 
             if (!res.ok) {
@@ -104,12 +112,12 @@ export default function FeedbackPage() {
                                         type="button"
                                         onClick={() => setForm({ ...form, type: t })}
                                         className={`px-4 py-2 rounded-lg text-sm transition ${form.type === t
-                                                ? t === "bug"
-                                                    ? "bg-rose-600/20 text-rose-400 border border-rose-600"
-                                                    : t === "feature"
-                                                        ? "bg-sky-600/20 text-sky-400 border border-sky-600"
-                                                        : "bg-slate-600/20 text-slate-300 border border-slate-600"
-                                                : "bg-slate-800 text-slate-400 border border-slate-700"
+                                            ? t === "bug"
+                                                ? "bg-rose-600/20 text-rose-400 border border-rose-600"
+                                                : t === "feature"
+                                                    ? "bg-sky-600/20 text-sky-400 border border-sky-600"
+                                                    : "bg-slate-600/20 text-slate-300 border border-slate-600"
+                                            : "bg-slate-800 text-slate-400 border border-slate-700"
                                             }`}
                                     >
                                         {t === "bug" ? "🐛 Bug" : t === "feature" ? "💡 Feature" : "💬 General"}

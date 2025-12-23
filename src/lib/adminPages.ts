@@ -25,6 +25,11 @@ export const SUPERADMIN_PAGES: AdminPage[] = [
         label: "🎨 Design System",
         description: "Brand guidelines, component library, and UI patterns",
     },
+    {
+        href: "/admin/feedback",
+        label: "💬 Feedback",
+        description: "View user feedback and bug reports",
+    },
     // Add more superadmin pages here:
     // {
     //     href: "/admin/users",

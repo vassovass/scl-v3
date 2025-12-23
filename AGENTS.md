@@ -143,7 +143,7 @@ scl-v3/
 - ✅ Leaderboard (period filters, verified filter, custom dates)
 - ✅ Analytics dashboard (calendar heatmap, daily breakdown with 3/5/7-day grouping)
 - ✅ User nicknames and profile settings
-- ✅ Module feedback system (floating 💬 icon)
+- ✅ Global feedback system (floating 💬 widget with screenshot)
 - ✅ Social sharing (Web Share API + WhatsApp/Twitter)
 - ✅ Mobile-responsive navigation (hamburger menu)
 - ✅ Guided onboarding system (Joyride)
