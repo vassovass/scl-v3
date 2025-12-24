@@ -10,6 +10,19 @@ All notable changes to StepLeague v3.
 ## [2025-12-24]
 
 ### Added
+
+- **Agent Work Tracking** - Roadmap auto-updates based on what AI agents are working on
+  - New `/api/agent/current-work` endpoint (POST/GET/PATCH/DELETE)
+  - "Building Now" badge with blue glow for active agent work in roadmap "Now" column
+  - Auto-stale: agent work cleared after 24 hours
+  - Database: `is_agent_working`, `agent_work_started_at` columns on feedback table
+  - Workflow: `.agent/workflows/update-roadmap.md` with agent instructions
+- **Feature Completion Detection** - Robust lifecycle tracking for roadmap items
+  - States: `backlog` → `in_progress` → `pending_review` → `verified` → `done`
+  - Status badges: "Awaiting Review" (amber), "Needs Work" (red), "Verified" (green)
+  - Only superadmin can mark items as done (verification required)
+  - Database: `completion_status` column on feedback table
+  - PATCH `/api/agent/current-work` to mark work as pending_review
 - **Modular Menu System** - WordPress-style menu configuration with unlimited nesting
   - `menuConfig.ts` - Centralized menu definitions with role-based visibility
   - `MenuRenderer.tsx` - Universal component supporting dropdown, accordion, vertical, horizontal variants
@@ -35,6 +48,7 @@ All notable changes to StepLeague v3.
 - **Date Awareness Rule** in AGENTS.md - Reminder for AI agents to use current date
 
 ### Changed
+
 - **NavHeader.tsx** - Refactored to use MenuRenderer for all dropdowns (League, Actions, Help, Admin, User)
 - **MobileMenu.tsx** - Refactored to use centralized menuConfig with accordion submenus
 - **GlobalFooter.tsx** - Now uses menuConfig.ts for all footer links
@@ -43,6 +57,7 @@ All notable changes to StepLeague v3.
 - **ROADMAP.md** - Added Kanban and Roadmap to Completed section
 
 ### Removed
+
 - **NavDropdown.tsx** - Replaced by MenuRenderer component
 
 ---
@@ -50,6 +65,7 @@ All notable changes to StepLeague v3.
 ## [2025-12-23]
 
 ### Added
+
 - **Modular Navigation System** - Refactored `NavHeader` into reusable `NavDropdown` and `MobileMenu` components
 - **Navigation Config** (`src/lib/navigation.ts`) - Centralized menu items configuration
 - **Menu Size Warnings** - Console warning when menus exceed 7 items (UX best practice)
@@ -68,14 +84,17 @@ All notable changes to StepLeague v3.
 - **Logo color-swap hover effect** - "Step" and "League" swap colors on hover
 
 ### Changed
+
 - **AGENTS.md** - Added superadmin pages instructions, modularization rule, design system checklist
 - **Design System page** - Now comprehensive with all components, patterns, and theme notes
 - Logo hover behavior updated in NavHeader and GlobalFooter
 
 ### Fixed
+
 - **OnboardingProvider** - Step counting now filters to only visible DOM elements
 
 ### Removed
+
 - **ModuleFeedback** - Replaced with global FeedbackWidget
 
 ---
@@ -83,6 +102,7 @@ All notable changes to StepLeague v3.
 ## [2025-12-23]
 
 ### Added
+
 - **Global Feedback System** - Floating widget (💬) available on all pages for authenticated users
   - Supports "Bug", "Feature", "General", "Positive", "Negative" types
   - **Screenshot capture** using `html2canvas`
@@ -94,9 +114,11 @@ All notable changes to StepLeague v3.
 - **Database Schema** - New `feedback` table with RLS policies
 
 ### Maintenance
+
 - **Repository Synchronization** - Performed hard reset to `origin/main` (Commit `43c65e6`) to align local environment with GitHub source of truth, discarding erroneous local modifications.
 
 ### Changed
+
 - **NavDropdown** and **MobileMenu** - Refactored navigation (from previous commit)
 - **AGENTS.md** - Added documentation compliance check
 - **ModuleFeedback** - Deprecated and removed in favor of global widget
@@ -106,6 +128,7 @@ All notable changes to StepLeague v3.
 ## [2025-12-22]
 
 ### Added
+
 - **Design System** - Modular CSS custom properties (design tokens) in `globals.css`
   - Brand colors, backgrounds, text, status colors all configurable from `:root`
   - Utility classes: `.btn-primary`, `.btn-ghost`, `.glass-card`, `.card-glow`
@@ -129,6 +152,7 @@ All notable changes to StepLeague v3.
 - **Members list** added to league API response for admin tools
 
 ### Changed
+
 - **AGENTS.md** updated with design token documentation and new rule requiring design system page updates
 
 ---
@@ -136,6 +160,7 @@ All notable changes to StepLeague v3.
 ## [2025-12-21]
 
 ### Added
+
 - **Analytics Dashboard** with calendar heatmap and daily breakdown table
 - **ShareButton** component (Web Share API + WhatsApp/Twitter fallback)
 - **Daily breakdown API** with flexible grouping (3-day, 5-day, weekly)
@@ -149,6 +174,7 @@ All notable changes to StepLeague v3.
 - **Resend confirmation email** button on sign-in page when email not confirmed
 
 ### Changed
+
 - **NavHeader** now mobile-responsive with hamburger menu on small screens
 - **ModuleFeedback widget** moved to floating icon in bottom-right corner
 - **README.md** updated with version history, TL;DR, and doc references
@@ -157,6 +183,7 @@ All notable changes to StepLeague v3.
 - **Feature cards** now use compact inline-icon layout on mobile
 
 ### Fixed
+
 - Feedback widget no longer interferes with table content
 - Landing page heading overflow on mobile
 - Sign-in page now shows resend option for unconfirmed emails
@@ -164,6 +191,7 @@ All notable changes to StepLeague v3.
 - Analytics share button now visible on mobile (header stacks vertically)
 
 ### Added
+
 - **Submit Another Batch** button after completing batch submission
 - **Compact calendar heatmap** - smaller squares, submission ratio on hover
 - **Dynamic OG share links** - shareable URLs with preview images showing rank, steps, period
@@ -176,6 +204,7 @@ All notable changes to StepLeague v3.
 ## [2025-12-20]
 
 ### Added
+
 - **Batch submission** with AI extraction (multi-image upload)
 - **DatePicker** component with quick-select buttons
 - **Profile settings page** for nickname and display name
@@ -184,10 +213,12 @@ All notable changes to StepLeague v3.
 - **Legal pages** (privacy, security, beta)
 
 ### Changed
+
 - Default submission mode set to batch
 - Leaderboard API enhanced with year/all-time periods
 
 ### Fixed
+
 - Rate limiting error display improvements
 - Gemini verification using correct model (2.0 Flash)
 
@@ -196,6 +227,7 @@ All notable changes to StepLeague v3.
 ## [2025-12-19]
 
 ### Added
+
 - **League soft delete** (deleted_at, deleted_by columns)
 - **Submission controls** (flagged, flag_reason, backfill_limit)
 - **SuperAdmin utilities** and debug logs endpoint
@@ -203,6 +235,7 @@ All notable changes to StepLeague v3.
 - **Dashboard stats** (member count, user rank, weekly steps)
 
 ### Fixed
+
 - Leaderboard RLS permission issues
 - Submission API upsert logic
 - League creation foreign key constraint

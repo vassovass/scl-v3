@@ -15,7 +15,17 @@ interface RoadmapItem {
     vote_count: number;
     comment_count: number;
     user_vote: number | null;
+    is_agent_working: boolean;
+    completion_status: string;
 }
+
+// Status badge styling
+const STATUS_BADGES: Record<string, { label: string; className: string; pulse?: boolean }> = {
+    in_progress: { label: "● Building Now", className: "text-sky-400 bg-sky-500/20", pulse: true },
+    pending_review: { label: "⏳ Awaiting Review", className: "text-amber-400 bg-amber-500/20" },
+    verified: { label: "✓ Verified", className: "text-emerald-400 bg-emerald-500/20" },
+    needs_work: { label: "⚠ Needs Work", className: "text-rose-400 bg-rose-500/20" },
+};
 
 const COLUMNS = [
     { id: "now", label: "🔥 Now", description: "In active development" },
@@ -63,10 +73,17 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                     return 0;
                 });
         } else if (columnId === "now") {
-            // Items in progress OR marked as "now"
-            result = items.filter(
-                (i) => i.board_status !== "done" && (i.target_release === "now" || i.board_status === "in_progress")
-            );
+            // Items in progress OR marked as "now" - agent work items first
+            result = items
+                .filter(
+                    (i) => i.board_status !== "done" && (i.target_release === "now" || i.board_status === "in_progress" || i.is_agent_working)
+                )
+                .sort((a, b) => {
+                    // Agent work items always first
+                    if (a.is_agent_working && !b.is_agent_working) return -1;
+                    if (!a.is_agent_working && b.is_agent_working) return 1;
+                    return 0;
+                });
         } else {
             result = items
                 .filter((i) => i.board_status !== "done" && i.target_release === columnId)
@@ -150,10 +167,26 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                                     {columnItems.map((item) => (
                                         <div
                                             key={item.id}
-                                            className="bg-slate-800/60 rounded-md border border-slate-700/50 hover:border-slate-600 transition-colors cursor-pointer"
+                                            className={`rounded-md border transition-colors cursor-pointer ${item.is_agent_working
+                                                ? "bg-sky-900/40 border-sky-500/50 hover:border-sky-400 ring-1 ring-sky-500/30"
+                                                : "bg-slate-800/60 border-slate-700/50 hover:border-slate-600"
+                                                }`}
                                             onClick={() => setExpandedCard(expandedCard === item.id ? null : item.id)}
                                         >
                                             <div className="p-2.5">
+                                                {/* Status badge */}
+                                                {item.is_agent_working && (
+                                                    <span className="inline-flex items-center gap-1 text-[9px] uppercase font-medium text-sky-400 bg-sky-500/20 px-1.5 py-0.5 rounded mb-1">
+                                                        <span className="animate-pulse">●</span> Building Now
+                                                    </span>
+                                                )}
+                                                {!item.is_agent_working && STATUS_BADGES[item.completion_status] && item.completion_status !== "backlog" && item.completion_status !== "done" && (
+                                                    <span className={`inline-flex items-center gap-1 text-[9px] uppercase font-medium px-1.5 py-0.5 rounded mb-1 ${STATUS_BADGES[item.completion_status].className}`}>
+                                                        {STATUS_BADGES[item.completion_status].pulse && <span className="animate-pulse">●</span>}
+                                                        {STATUS_BADGES[item.completion_status].label.replace("● ", "")}
+                                                    </span>
+                                                )}
+
                                                 {/* Type badge */}
                                                 <span className={`text-[9px] uppercase font-medium ${TYPE_BADGES[item.type] || "text-slate-400"}`}>
                                                     {item.type}

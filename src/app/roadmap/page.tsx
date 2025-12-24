@@ -20,6 +20,8 @@ interface RoadmapItem {
     vote_count: number;
     comment_count: number;
     user_vote: number | null;
+    is_agent_working: boolean;
+    completion_status: string;
 }
 
 export default async function RoadmapPage() {
@@ -38,7 +40,9 @@ export default async function RoadmapPage() {
       board_status,
       target_release,
       completed_at,
-      created_at
+      created_at,
+      is_agent_working,
+      completion_status
     `)
         .eq("is_public", true)
         .order("priority_order", { ascending: true })
@@ -96,6 +100,8 @@ export default async function RoadmapPage() {
             vote_count: itemVotes.length,
             comment_count: commentCount,
             user_vote: userVotes[item.id] || null,
+            is_agent_working: item.is_agent_working || false,
+            completion_status: item.completion_status || "backlog",
         };
     });
 

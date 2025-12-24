@@ -19,28 +19,43 @@
 >
 > **When to update:** After completing ANY feature, improvement, or bug fix that users would care about.
 >
-> **How to update (automatic via API):**
+> **Step 1: Mark as "Currently Working On" (at task start):**
 >
 > ```typescript
+> await fetch("/api/agent/current-work", {
+>   method: "POST",
+>   headers: { "Content-Type": "application/json" },
+>   body: JSON.stringify({
+>     subject: "Feature Name",
+>     description: "What you are building",
+>     type: "feature"  // or "improvement", "bug"
+>   })
+> });
+> ```
+>
+> This shows the item with a blue glow in the "Now" column on `/roadmap`.
+>
+> **Step 2: Mark as "Done" (when complete):**
+>
+> ```typescript
+> // First clear the "working on" flag
+> await fetch("/api/agent/current-work", { method: "DELETE" });
+>
+> // Then mark as done via kanban API
 > await fetch("/api/admin/kanban", {
 >   method: "PUT",
 >   headers: { "Content-Type": "application/json" },
 >   body: JSON.stringify({
->     id: "<existing-id-or-omit-for-new>",
->     type: "feature",  // or "improvement", "bug"
->     subject: "Feature Name",
->     description: "What was built and why it matters",
+>     id: "<existing-id>",
 >     board_status: "done",
->     is_public: true,
->     completed_at: "2025-12-24",  // Current date YYYY-MM-DD
->     target_release: "now"
+>     completed_at: "2025-12-24"  // Current date YYYY-MM-DD
 >   })
 > });
 > ```
 >
 > **Roadmap Columns:**
 >
-> - **Now** = Actively being built this sprint
+> - **Now** = Actively being built this sprint (agent work shows at top with glow)
 > - **Next** = Coming in 1-2 releases  
 > - **Later** = Planned for 3+ months out
 > - **Future** = Ideas/backlog
