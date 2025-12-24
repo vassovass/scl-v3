@@ -13,8 +13,16 @@ interface FeedbackItem {
     priority_order: number;
     created_at: string;
     completed_at: string | null;
+    target_release: string;
     users?: { display_name: string; email: string } | null;
 }
+
+const RELEASE_OPTIONS: { id: string; label: string; color: string }[] = [
+    { id: "now", label: "🔥 Now", color: "bg-rose-500/20 text-rose-400" },
+    { id: "next", label: "⏭️ Next", color: "bg-amber-500/20 text-amber-400" },
+    { id: "later", label: "📅 Later", color: "bg-sky-500/20 text-sky-400" },
+    { id: "future", label: "🔮 Future", color: "bg-slate-500/20 text-slate-400" },
+];
 
 interface KanbanColumn {
     id: string;
@@ -126,6 +134,33 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
         setIsUpdating(false);
     };
 
+    const cycleRelease = async (itemId: string, currentRelease: string) => {
+        const currentIndex = RELEASE_OPTIONS.findIndex((r) => r.id === currentRelease);
+        const nextIndex = (currentIndex + 1) % RELEASE_OPTIONS.length;
+        const nextRelease = RELEASE_OPTIONS[nextIndex].id;
+
+        setIsUpdating(true);
+        try {
+            await fetch("/api/admin/kanban", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: itemId, target_release: nextRelease }),
+            });
+            // Update local state
+            setColumns((prev) =>
+                prev.map((col) => ({
+                    ...col,
+                    items: col.items.map((item) =>
+                        item.id === itemId ? { ...item, target_release: nextRelease } : item
+                    ),
+                }))
+            );
+        } catch (error) {
+            console.error("Failed to update release:", error);
+        }
+        setIsUpdating(false);
+    };
+
     return (
         <div className="relative">
             {isUpdating && (
@@ -164,22 +199,32 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                                                         {...provided.draggableProps}
                                                         {...provided.dragHandleProps}
                                                         className={`p-3 mb-2 bg-slate-800/80 rounded-lg border transition-all ${snapshot.isDragging
-                                                                ? "border-sky-500 shadow-lg shadow-sky-500/20"
-                                                                : "border-slate-700 hover:border-slate-600"
+                                                            ? "border-sky-500 shadow-lg shadow-sky-500/20"
+                                                            : "border-slate-700 hover:border-slate-600"
                                                             }`}
                                                     >
                                                         <div className="flex items-start justify-between gap-2 mb-2">
-                                                            <span
-                                                                className={`text-[10px] px-1.5 py-0.5 rounded border uppercase font-medium ${TYPE_COLORS[item.type] || TYPE_COLORS.general
-                                                                    }`}
-                                                            >
-                                                                {item.type}
-                                                            </span>
+                                                            <div className="flex items-center gap-1">
+                                                                <span
+                                                                    className={`text-[10px] px-1.5 py-0.5 rounded border uppercase font-medium ${TYPE_COLORS[item.type] || TYPE_COLORS.general
+                                                                        }`}
+                                                                >
+                                                                    {item.type}
+                                                                </span>
+                                                                <button
+                                                                    onClick={() => cycleRelease(item.id, item.target_release || "later")}
+                                                                    className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${RELEASE_OPTIONS.find((r) => r.id === item.target_release)?.color || RELEASE_OPTIONS[2].color
+                                                                        }`}
+                                                                    title="Click to change release target"
+                                                                >
+                                                                    {RELEASE_OPTIONS.find((r) => r.id === item.target_release)?.label || "📅 Later"}
+                                                                </button>
+                                                            </div>
                                                             <button
                                                                 onClick={() => togglePublic(item.id, item.is_public)}
                                                                 className={`text-xs px-1.5 py-0.5 rounded transition-colors ${item.is_public
-                                                                        ? "bg-emerald-500/20 text-emerald-400"
-                                                                        : "bg-slate-700 text-slate-400 hover:text-slate-300"
+                                                                    ? "bg-emerald-500/20 text-emerald-400"
+                                                                    : "bg-slate-700 text-slate-400 hover:text-slate-300"
                                                                     }`}
                                                                 title={item.is_public ? "Public on roadmap" : "Private"}
                                                             >

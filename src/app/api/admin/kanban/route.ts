@@ -14,7 +14,7 @@ export async function PUT(request: NextRequest) {
         if (!isAdmin) return unauthorized("Superadmin access required");
 
         const body = await request.json();
-        const { id, board_status, priority_order, is_public, completed_at } = body;
+        const { id, board_status, priority_order, is_public, completed_at, target_release } = body;
 
         if (!id) return badRequest("Missing id");
 
@@ -27,6 +27,7 @@ export async function PUT(request: NextRequest) {
         if (priority_order !== undefined) updates.priority_order = priority_order;
         if (is_public !== undefined) updates.is_public = is_public;
         if (completed_at !== undefined) updates.completed_at = completed_at;
+        if (target_release !== undefined) updates.target_release = target_release;
 
         // Update using admin client (bypasses RLS)
         const adminClient = createAdminClient();
