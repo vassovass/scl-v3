@@ -64,6 +64,7 @@ export const USER_MENU_SECTIONS: NavSection[] = [
 ];
 
 export const FOOTER_LINKS: NavItem[] = [
+    { label: "Roadmap", href: "/roadmap", icon: "🗺️" },
     { label: "Beta Info", href: "/beta", icon: "📋" },
     { label: "Privacy Policy", href: "/privacy", icon: "🔒" },
 ];

@@ -21,6 +21,11 @@ export interface AdminPage {
 
 export const SUPERADMIN_PAGES: AdminPage[] = [
     {
+        href: "/admin/kanban",
+        label: "📋 Kanban Board",
+        description: "Task management with drag-and-drop columns",
+    },
+    {
         href: "/admin/design-system",
         label: "🎨 Design System",
         description: "Brand guidelines, component library, and UI patterns",
