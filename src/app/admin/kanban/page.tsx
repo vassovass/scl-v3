@@ -30,7 +30,7 @@ export default async function AdminKanbanPage() {
     const adminClient = createAdminClient();
     const { data: feedbackItems, error } = await adminClient
         .from("feedback")
-        .select("*, users(display_name, email)")
+        .select("*")
         .order("priority_order", { ascending: true })
         .order("created_at", { ascending: false });
 
