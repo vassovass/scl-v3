@@ -32,8 +32,41 @@ export async function POST(request: NextRequest) {
 
         let targetId = feedback_id;
 
-        // If no feedback_id, create a new item
+        // If no feedback_id but have subject, check for existing entry first
         if (!feedback_id && subject) {
+            // Check for existing entry with exact subject match
+            const { data: existing } = await adminClient
+                .from("feedback")
+                .select("id, subject, description")
+                .eq("subject", subject)
+                .limit(1)
+                .maybeSingle();
+
+            if (existing) {
+                // Update existing entry instead of creating duplicate
+                const { data, error } = await adminClient
+                    .from("feedback")
+                    .update({
+                        description: description || existing.description,
+                        board_status: "in_progress",
+                        target_release: "now",
+                        is_agent_working: true,
+                        agent_work_started_at: new Date().toISOString(),
+                        completion_status: "in_progress",
+                    })
+                    .eq("id", existing.id)
+                    .select()
+                    .single();
+
+                if (error) {
+                    console.error("Update existing agent work error:", error);
+                    return badRequest(error.message);
+                }
+
+                return json({ success: true, data, updated: true, message: "Updated existing entry" });
+            }
+
+            // No existing entry found, create new one
             const { data: newItem, error: createError } = await adminClient
                 .from("feedback")
                 .insert({
@@ -58,7 +91,7 @@ export async function POST(request: NextRequest) {
             return json({ success: true, data: newItem, created: true });
         }
 
-        // Mark existing item as active
+        // Mark existing item as active (when feedback_id is provided)
         if (targetId) {
             const { data, error } = await adminClient
                 .from("feedback")
