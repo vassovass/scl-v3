@@ -89,7 +89,12 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
             <div className="border-b border-slate-800 bg-slate-900/50">
                 <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
                     <div>
-                        <h1 className="text-xl font-bold text-slate-100">🗺️ Product Roadmap</h1>
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-xl font-bold text-slate-100">🗺️ Product Roadmap</h1>
+                            <span className="text-xs font-medium text-slate-500 bg-slate-800/50 px-2 py-1 rounded-full border border-slate-700/50">
+                                {items.length} features
+                            </span>
+                        </div>
                         <p className="text-sm text-slate-400">
                             See what we're building. {!isLoggedIn && <a href="/sign-in?redirect=/roadmap" className="text-sky-400 hover:underline">Sign in</a>} to vote on features.
                         </p>

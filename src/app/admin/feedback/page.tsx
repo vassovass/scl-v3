@@ -19,7 +19,7 @@ export default async function AdminFeedbackPage() {
 
     const { data: feedbacks, error } = await supabase
         .from("feedback")
-        .select("*, users(display_name, email)")
+        .select("*, users(display_name, nickname)")
         .order("created_at", { ascending: false });
 
     if (error) {
@@ -40,14 +40,14 @@ export default async function AdminFeedbackPage() {
                             <div className="flex items-center gap-3">
                                 <span
                                     className={`rounded-md px-2 py-1 text-xs font-medium uppercase tracking-wider ${item.type === "bug"
-                                            ? "bg-rose-500/10 text-rose-400"
-                                            : item.type === "feature"
-                                                ? "bg-amber-500/10 text-amber-400"
-                                                : item.type === "positive"
-                                                    ? "bg-emerald-500/10 text-emerald-400"
-                                                    : item.type === "negative"
-                                                        ? "bg-red-500/10 text-red-400"
-                                                        : "bg-sky-500/10 text-sky-400"
+                                        ? "bg-rose-500/10 text-rose-400"
+                                        : item.type === "feature"
+                                            ? "bg-amber-500/10 text-amber-400"
+                                            : item.type === "positive"
+                                                ? "bg-emerald-500/10 text-emerald-400"
+                                                : item.type === "negative"
+                                                    ? "bg-red-500/10 text-red-400"
+                                                    : "bg-sky-500/10 text-sky-400"
                                         }`}
                                 >
                                     {item.type}
@@ -57,7 +57,7 @@ export default async function AdminFeedbackPage() {
                                 </span>
                                 {item.user_id && (
                                     <span className="text-xs text-slate-400">
-                                        by {item.users?.display_name || item.users?.email || "User"}
+                                        by {item.users?.nickname || item.users?.display_name || "User"}
                                     </span>
                                 )}
                             </div>
