@@ -55,6 +55,68 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
     const [columns, setColumns] = useState<KanbanColumn[]>([]);
     const [isUpdating, setIsUpdating] = useState(false);
 
+    // Export all items to CSV
+    const exportToCSV = () => {
+        // Gather all items from all columns
+        const allItems = columns.flatMap((col) => col.items);
+
+        // Define CSV headers
+        const headers = [
+            "ID",
+            "Type",
+            "Subject",
+            "Description",
+            "Status",
+            "Is Public",
+            "Priority Order",
+            "Created At",
+            "Completed At",
+            "Target Release",
+            "Submitter",
+        ];
+
+        // Helper to escape CSV fields
+        const escapeCSV = (field: string | null | undefined): string => {
+            if (field === null || field === undefined) return "";
+            const str = String(field);
+            // Escape quotes and wrap in quotes if contains comma, quote, or newline
+            if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+                return `"${str.replace(/"/g, '""')}"`;
+            }
+            return str;
+        };
+
+        // Build CSV rows
+        const rows = allItems.map((item) => [
+            escapeCSV(item.id),
+            escapeCSV(item.type),
+            escapeCSV(item.subject),
+            escapeCSV(item.description),
+            escapeCSV(item.board_status),
+            item.is_public ? "Yes" : "No",
+            String(item.priority_order),
+            escapeCSV(item.created_at),
+            escapeCSV(item.completed_at),
+            escapeCSV(item.target_release),
+            escapeCSV(item.users?.nickname),
+        ]);
+
+        // Combine headers and rows
+        const csvContent = [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
+
+        // Create and download the file
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `StepLeague-Roadmap-Export-${new Date().toISOString().split("T")[0]}.csv`);
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
     useEffect(() => {
         // Load column order from local storage
         const savedOrder = localStorage.getItem("admin-kanban-order");
@@ -202,11 +264,24 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
 
     return (
         <div className="relative h-full flex flex-col">
-            {isUpdating && (
-                <div className="absolute top-2 right-2 text-xs text-sky-400 animate-pulse z-50">
-                    Saving...
-                </div>
-            )}
+            {/* Header with Export Button */}
+            <div className="flex items-center justify-end mb-3 gap-2">
+                {isUpdating && (
+                    <span className="text-xs text-sky-400 animate-pulse">
+                        Saving...
+                    </span>
+                )}
+                <button
+                    onClick={exportToCSV}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-lg border border-slate-700 hover:border-slate-600 transition-colors"
+                    title="Export all items to CSV"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Export CSV
+                </button>
+            </div>
 
             <DragDropContext onDragEnd={handleDragEnd}>
                 <Droppable droppableId="board" direction="horizontal" type="COLUMN">
