@@ -4,11 +4,12 @@
 > Supported: Cursor, Claude Code, GitHub Copilot, OpenAI Codex, Google Jules, JetBrains AI, Windsurf, Aider
 
 > ⚠️ **BEFORE COMPLETING ANY TASK - READ THIS:**
-> 1. Check the **"Documentation Update Rule"** section below
-> 2. Update `CHANGELOG.md` with your changes
-> 3. Update design system page (`/admin/design-system`) if adding UI/components
-> 4. Update config files (e.g., `adminPages.ts` for new admin pages)
-> 5. This is **REQUIRED** - do not skip!
+> 1. **CHECK THE CURRENT DATE** - The date is provided in your context. Use it for all timestamps!
+> 2. Check the **"Documentation Update Rule"** section below
+> 3. Update `CHANGELOG.md` with your changes
+> 4. Update design system page (`/admin/design-system`) if adding UI/components
+> 5. Update config files (e.g., `adminPages.ts` for new admin pages)
+> 6. This is **REQUIRED** - do not skip!
 
 ---
 
@@ -214,6 +215,29 @@ npx tsc --noEmit # Type check
 
 ---
 
+## Date Awareness (CRITICAL)
+
+> [!CAUTION]
+> **AI agents often default to training data dates (2023-2024). Always use the ACTUAL current date!**
+
+### Rules for Dates
+1. **Check the context** - The current date/time is provided in every request
+2. **Use 2025 dates** - We are in late 2025, not 2024!
+3. **Migration file naming** - Use format `YYYYMMDDHHMMSS_name.sql` with CORRECT year
+4. **Timestamps in docs** - Use ISO format: `2025-MM-DD`
+
+### Date Sources (Priority Order)
+1. `current local time` in request metadata (most accurate)
+2. Git commit timestamps
+3. File modification dates
+
+### Common Mistakes to Avoid
+- ❌ Using `2024` for new files (we're in 2025!)
+- ❌ Hardcoding dates without checking context
+- ❌ Assuming the year from training data
+
+---
+
 ## DO NOT
 
 - ❌ Use `<Database>` generics on Supabase clients
@@ -294,5 +318,5 @@ This ensures documentation stays current for future sessions and developers.
 
 ---
 
-*Last updated: 2025-12-23. This file is the canonical source for AI agents.*
+*Last updated: 2025-12-24. This file is the canonical source for AI agents.*
 
