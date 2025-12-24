@@ -223,8 +223,13 @@ export function MenuRenderer({
             {/* Dropdown Panel */}
             {isOpen && items.length > 0 && (
                 <div
-                    className={`absolute top-full mt-2 min-w-[200px] py-2 bg-slate-900 border border-slate-700 rounded-xl shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-150 ${align === "right" ? "right-0" : "left-0"
-                        }`}
+                    className={`absolute top-full mt-2 min-w-[200px] max-h-[70vh] overflow-y-auto py-2 
+                        bg-[var(--menu-bg,theme(colors.slate.900))] 
+                        border border-[var(--menu-border,theme(colors.slate.700))] 
+                        rounded-xl shadow-xl z-50 
+                        animate-in fade-in slide-in-from-top-2 duration-150
+                        scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent
+                        ${align === "right" ? "right-0" : "left-0"}`}
                 >
                     {items.map(item => (
                         <DropdownItem
@@ -426,16 +431,40 @@ function DropdownItemContent({
     depth,
     active,
 }: DropdownItemProps & { active: boolean; isSubmenuOpen: boolean; setIsSubmenuOpen: (v: boolean) => void }) {
+    const submenuRef = useRef<HTMLDivElement>(null);
+    const triggerRef = useRef<HTMLDivElement>(null);
+    const [submenuPosition, setSubmenuPosition] = useState<'right' | 'left'>('right');
+
+    // Edge detection: check if submenu would overflow viewport
+    useEffect(() => {
+        if (isSubmenuOpen && triggerRef.current) {
+            const triggerRect = triggerRef.current.getBoundingClientRect();
+            const submenuWidth = 200; // min-w-[200px]
+            const viewportWidth = window.innerWidth;
+
+            // If submenu would overflow right edge, flip to left
+            if (triggerRect.right + submenuWidth > viewportWidth - 16) {
+                setSubmenuPosition('left');
+            } else {
+                setSubmenuPosition('right');
+            }
+        }
+    }, [isSubmenuOpen]);
+
     // Has children - render as nested submenu
     if (item.children && item.children.length > 0) {
         return (
             <div
+                ref={triggerRef}
                 className="relative group"
                 onMouseEnter={() => setIsSubmenuOpen(true)}
                 onMouseLeave={() => setIsSubmenuOpen(false)}
             >
                 <button
-                    className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${isSubmenuOpen ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                    className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors
+                        ${isSubmenuOpen
+                            ? "bg-[var(--menu-item-hover-bg,theme(colors.slate.800))] text-[var(--menu-item-hover-text,white)]"
+                            : "text-[var(--menu-item-text,theme(colors.slate.300))] hover:bg-[var(--menu-item-hover-bg,theme(colors.slate.800))] hover:text-[var(--menu-item-hover-text,white)]"
                         }`}
                     data-module-id={`menu-${item.id}`}
                     data-module-name={item.label}
@@ -444,12 +473,24 @@ function DropdownItemContent({
                         {item.icon && <span>{item.icon}</span>}
                         <span>{item.label}</span>
                     </span>
-                    <span className="text-xs opacity-60">▶</span>
+                    <span className={`text-xs opacity-60 transition-transform ${submenuPosition === 'left' ? 'rotate-180' : ''}`}>▶</span>
                 </button>
 
-                {/* Submenu */}
+                {/* Submenu - auto-positions left or right based on viewport */}
                 {isSubmenuOpen && (
-                    <div className="absolute left-full top-0 ml-1 min-w-[180px] py-2 bg-slate-900 border border-slate-700 rounded-xl shadow-xl z-50 animate-in fade-in slide-in-from-left-2 duration-150">
+                    <div
+                        ref={submenuRef}
+                        className={`absolute top-0 min-w-[200px] max-h-[60vh] overflow-y-auto py-2 
+                            bg-[var(--menu-bg,theme(colors.slate.900))] 
+                            border border-[var(--menu-border,theme(colors.slate.700))] 
+                            rounded-xl shadow-xl z-50 
+                            animate-in fade-in duration-150
+                            scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent
+                            ${submenuPosition === 'right'
+                                ? 'left-full ml-1 slide-in-from-left-2'
+                                : 'right-full mr-1 slide-in-from-right-2'
+                            }`}
+                    >
                         {item.children.map(child => (
                             <DropdownItem
                                 key={child.id}

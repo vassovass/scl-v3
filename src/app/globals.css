@@ -78,6 +78,24 @@
   --z-sticky: 100;
   --z-modal: 1000;
   --z-toast: 1100;
+
+  /* Menu System - Dark Theme */
+  --menu-bg: 15 23 42;
+  /* slate-900 */
+  --menu-border: 51 65 85;
+  /* slate-700 */
+  --menu-item-text: 203 213 225;
+  /* slate-300 */
+  --menu-item-hover-bg: 30 41 59;
+  /* slate-800 */
+  --menu-item-hover-text: 255 255 255;
+  /* white */
+  --menu-item-active-bg: 14 165 233;
+  /* sky-500 at 20% */
+  --menu-item-active-text: 56 189 248;
+  /* sky-400 */
+  --menu-scrollbar: 71 85 105;
+  /* slate-600 */
 }
 
 /* === LIGHT THEME (Future) === */
@@ -110,6 +128,24 @@
   /* Adjusted glow for light mode (less intense) */
   --glow-primary: 14 165 233;
   --glow-accent: 168 85 247;
+
+  /* Menu System - Light Theme */
+  --menu-bg: 255 255 255;
+  /* white */
+  --menu-border: 226 232 240;
+  /* slate-200 */
+  --menu-item-text: 71 85 105;
+  /* slate-600 */
+  --menu-item-hover-bg: 241 245 249;
+  /* slate-100 */
+  --menu-item-hover-text: 15 23 42;
+  /* slate-900 */
+  --menu-item-active-bg: 224 242 254;
+  /* sky-100 */
+  --menu-item-active-text: 2 132 199;
+  /* sky-600 */
+  --menu-scrollbar: 203 213 225;
+  /* slate-300 */
 }
 
 /* ============================================
@@ -420,6 +456,28 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgb(var(--border-subtle));
+}
+
+/* Thin scrollbar utilities for menus */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgb(var(--menu-scrollbar, var(--border-default)));
+  border-radius: 3px;
+}
+
+.scrollbar-track-transparent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thumb-slate-700::-webkit-scrollbar-thumb {
+  background: rgb(51 65 85);
 }
 
 /* ============================================
