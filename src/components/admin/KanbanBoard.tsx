@@ -56,8 +56,28 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
     const [isUpdating, setIsUpdating] = useState(false);
 
     useEffect(() => {
+        // Load column order from local storage
+        const savedOrder = localStorage.getItem("admin-kanban-order");
+        let orderedColumns = [...COLUMNS];
+
+        if (savedOrder) {
+            try {
+                const orderIds = JSON.parse(savedOrder);
+                // Sort columns based on saved order, appending any new columns at the end
+                orderedColumns.sort((a, b) => {
+                    const indexA = orderIds.indexOf(a.id);
+                    const indexB = orderIds.indexOf(b.id);
+                    if (indexA === -1) return 1;
+                    if (indexB === -1) return -1;
+                    return indexA - indexB;
+                });
+            } catch (e) {
+                console.error("Failed to parse column order", e);
+            }
+        }
+
         // Organize items into columns
-        const organized = COLUMNS.map((col) => ({
+        const organized = orderedColumns.map((col) => ({
             ...col,
             items: initialItems
                 .filter((item) => item.board_status === col.id)
@@ -67,12 +87,25 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
     }, [initialItems]);
 
     const handleDragEnd = async (result: DropResult) => {
-        const { source, destination, draggableId } = result;
+        const { source, destination, draggableId, type } = result;
 
         if (!destination) return;
         if (source.droppableId === destination.droppableId && source.index === destination.index) return;
 
-        // Optimistic update
+        // Handle Column Reordering
+        if (type === "COLUMN") {
+            const newColumns = [...columns];
+            const [movedColumn] = newColumns.splice(source.index, 1);
+            newColumns.splice(destination.index, 0, movedColumn);
+            setColumns(newColumns);
+
+            // Save new order to local storage
+            const orderIds = newColumns.map(c => c.id);
+            localStorage.setItem("admin-kanban-order", JSON.stringify(orderIds));
+            return;
+        }
+
+        // Handle Item Reordering (existing logic)
         const newColumns = [...columns];
         const sourceCol = newColumns.find((c) => c.id === source.droppableId);
         const destCol = newColumns.find((c) => c.id === destination.droppableId);
@@ -88,6 +121,12 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
             item.priority_order = index;
         });
 
+        // If moved to "done", set completed_at
+        const completedAt = destination.droppableId === "done" ? new Date().toISOString() : null;
+        if (completedAt) {
+            movedItem.completed_at = completedAt;
+        }
+
         setColumns(newColumns);
 
         // Persist to database
@@ -100,7 +139,7 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                     id: draggableId,
                     board_status: destination.droppableId,
                     priority_order: destination.index,
-                    completed_at: destination.droppableId === "done" ? new Date().toISOString() : null,
+                    completed_at: completedAt,
                 }),
             });
         } catch (error) {
@@ -162,103 +201,120 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
     };
 
     return (
-        <div className="relative">
+        <div className="relative h-full flex flex-col">
             {isUpdating && (
-                <div className="absolute top-2 right-2 text-xs text-sky-400 animate-pulse">
+                <div className="absolute top-2 right-2 text-xs text-sky-400 animate-pulse z-50">
                     Saving...
                 </div>
             )}
 
             <DragDropContext onDragEnd={handleDragEnd}>
-                <div className="flex gap-4 overflow-x-auto pb-4">
-                    {columns.map((column) => (
+                <Droppable droppableId="board" direction="horizontal" type="COLUMN">
+                    {(provided) => (
                         <div
-                            key={column.id}
-                            className="flex-shrink-0 w-72 bg-slate-900/50 rounded-xl border border-slate-800"
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
+                            className="flex gap-4 overflow-x-auto pb-4 h-[calc(100vh-140px)] items-start"
                         >
-                            <div className="p-3 border-b border-slate-800 flex items-center justify-between">
-                                <h3 className="font-semibold text-slate-200">{column.title}</h3>
-                                <span className="text-xs text-slate-500 bg-slate-800 px-2 py-0.5 rounded-full">
-                                    {column.items.length}
-                                </span>
-                            </div>
+                            {columns.map((column, index) => (
+                                <Draggable key={column.id} draggableId={column.id} index={index}>
+                                    {(provided) => (
+                                        <div
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            className="flex-shrink-0 w-72 bg-slate-900/50 rounded-xl border border-slate-800 flex flex-col max-h-full"
+                                        >
+                                            <div
+                                                {...provided.dragHandleProps}
+                                                className="p-3 border-b border-slate-800 flex items-center justify-between cursor-grab active:cursor-grabbing hover:bg-slate-800/50 rounded-t-xl transition-colors"
+                                            >
+                                                <h3 className="font-semibold text-slate-200">{column.title}</h3>
+                                                <span className="text-xs text-slate-500 bg-slate-800 px-2 py-0.5 rounded-full">
+                                                    {column.items.length}
+                                                </span>
+                                            </div>
 
-                            <Droppable droppableId={column.id}>
-                                {(provided, snapshot) => (
-                                    <div
-                                        ref={provided.innerRef}
-                                        {...provided.droppableProps}
-                                        className={`p-2 min-h-[200px] transition-colors ${snapshot.isDraggingOver ? "bg-slate-800/30" : ""
-                                            }`}
-                                    >
-                                        {column.items.map((item, index) => (
-                                            <Draggable key={item.id} draggableId={item.id} index={index}>
+                                            <Droppable droppableId={column.id} type="ITEM">
                                                 {(provided, snapshot) => (
                                                     <div
                                                         ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
-                                                        className={`p-3 mb-2 bg-slate-800/80 rounded-lg border transition-all ${snapshot.isDragging
-                                                            ? "border-sky-500 shadow-lg shadow-sky-500/20"
-                                                            : "border-slate-700 hover:border-slate-600"
+                                                        {...provided.droppableProps}
+                                                        className={`p-2 flex-1 overflow-y-auto min-h-[100px] transition-colors ${snapshot.isDraggingOver ? "bg-slate-800/30" : ""
                                                             }`}
                                                     >
-                                                        <div className="flex items-start justify-between gap-2 mb-2">
-                                                            <div className="flex items-center gap-1">
-                                                                <span
-                                                                    className={`text-[10px] px-1.5 py-0.5 rounded border uppercase font-medium ${TYPE_COLORS[item.type] || TYPE_COLORS.general
-                                                                        }`}
-                                                                >
-                                                                    {item.type}
-                                                                </span>
-                                                                <button
-                                                                    onClick={() => cycleRelease(item.id, item.target_release || "later")}
-                                                                    className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${RELEASE_OPTIONS.find((r) => r.id === item.target_release)?.color || RELEASE_OPTIONS[2].color
-                                                                        }`}
-                                                                    title="Click to change release target"
-                                                                >
-                                                                    {RELEASE_OPTIONS.find((r) => r.id === item.target_release)?.label || "📅 Later"}
-                                                                </button>
-                                                            </div>
-                                                            <button
-                                                                onClick={() => togglePublic(item.id, item.is_public)}
-                                                                className={`text-xs px-1.5 py-0.5 rounded transition-colors ${item.is_public
-                                                                    ? "bg-emerald-500/20 text-emerald-400"
-                                                                    : "bg-slate-700 text-slate-400 hover:text-slate-300"
-                                                                    }`}
-                                                                title={item.is_public ? "Public on roadmap" : "Private"}
-                                                            >
-                                                                {item.is_public ? "🌐" : "🔒"}
-                                                            </button>
-                                                        </div>
+                                                        {column.items.map((item, index) => (
+                                                            <Draggable key={item.id} draggableId={item.id} index={index}>
+                                                                {(provided, snapshot) => (
+                                                                    <div
+                                                                        ref={provided.innerRef}
+                                                                        {...provided.draggableProps}
+                                                                        {...provided.dragHandleProps}
+                                                                        className={`p-3 mb-2 bg-slate-800/80 rounded-lg border transition-all ${snapshot.isDragging
+                                                                            ? "border-sky-500 shadow-lg shadow-sky-500/20"
+                                                                            : "border-slate-700 hover:border-slate-600"
+                                                                            }`}
+                                                                    >
+                                                                        <div className="flex items-start justify-between gap-2 mb-2">
+                                                                            <div className="flex items-center gap-1">
+                                                                                <span
+                                                                                    className={`text-[10px] px-1.5 py-0.5 rounded border uppercase font-medium ${TYPE_COLORS[item.type] || TYPE_COLORS.general
+                                                                                        }`}
+                                                                                >
+                                                                                    {item.type}
+                                                                                </span>
+                                                                                <button
+                                                                                    onClick={() => cycleRelease(item.id, item.target_release || "later")}
+                                                                                    className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${RELEASE_OPTIONS.find((r) => r.id === item.target_release)?.color || RELEASE_OPTIONS[2].color
+                                                                                        }`}
+                                                                                    title="Click to change release target"
+                                                                                >
+                                                                                    {RELEASE_OPTIONS.find((r) => r.id === item.target_release)?.label || "📅 Later"}
+                                                                                </button>
+                                                                            </div>
+                                                                            <button
+                                                                                onClick={() => togglePublic(item.id, item.is_public)}
+                                                                                className={`text-xs px-1.5 py-0.5 rounded transition-colors ${item.is_public
+                                                                                    ? "bg-emerald-500/20 text-emerald-400"
+                                                                                    : "bg-slate-700 text-slate-400 hover:text-slate-300"
+                                                                                    }`}
+                                                                                title={item.is_public ? "Public on roadmap" : "Private"}
+                                                                            >
+                                                                                {item.is_public ? "🌐" : "🔒"}
+                                                                            </button>
+                                                                        </div>
 
-                                                        <h4 className="text-sm font-medium text-slate-200 line-clamp-2 mb-1">
-                                                            {item.subject}
-                                                        </h4>
+                                                                        <h4 className="text-sm font-medium text-slate-200 line-clamp-2 mb-1">
+                                                                            {item.subject}
+                                                                        </h4>
 
-                                                        <p className="text-xs text-slate-400 line-clamp-2">
-                                                            {item.description}
-                                                        </p>
+                                                                        <p className="text-xs text-slate-400 line-clamp-2">
+                                                                            {item.description}
+                                                                        </p>
 
-                                                        <div className="mt-2 text-[10px] text-slate-500 flex items-center justify-between">
-                                                            <span>{new Date(item.created_at).toLocaleDateString()}</span>
-                                                            {item.users?.nickname && (
-                                                                <span className="text-slate-400">
-                                                                    👤 {item.users.nickname}
-                                                                </span>
-                                                            )}
-                                                        </div>
+                                                                        <div className="mt-2 text-[10px] text-slate-500 flex items-center justify-between">
+                                                                            <span>{new Date(item.created_at).toLocaleDateString()}</span>
+                                                                            {item.users?.nickname && (
+                                                                                <span className="text-slate-400">
+                                                                                    👤 {item.users.nickname}
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </Draggable>
+                                                        ))}
+                                                        {provided.placeholder}
                                                     </div>
                                                 )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
+                                            </Droppable>
+                                        </div>
+                                    )}
+                                </Draggable>
+                            ))}
+                            {provided.placeholder}
                         </div>
-                    ))}
-                </div>
+                    )}
+                </Droppable>
             </DragDropContext>
         </div>
     );
