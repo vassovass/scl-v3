@@ -74,6 +74,13 @@ export default async function RoadmapPage() {
         }
     }
 
+    // Check if superadmin
+    let isSuperAdmin = false;
+    if (user) {
+        const { data: isAdmin } = await supabase.rpc("is_superadmin");
+        isSuperAdmin = !!isAdmin;
+    }
+
     // Build aggregated items
     const roadmapItems: RoadmapItem[] = (items || []).map((item: any) => {
         const itemVotes = (voteAggregates || []).filter((v: any) => v.feedback_id === item.id);
@@ -92,5 +99,5 @@ export default async function RoadmapPage() {
         };
     });
 
-    return <RoadmapView items={roadmapItems} isLoggedIn={!!user} />;
+    return <RoadmapView items={roadmapItems} isLoggedIn={!!user} isSuperAdmin={isSuperAdmin} />;
 }

@@ -33,9 +33,10 @@ const TYPE_BADGES: Record<string, string> = {
 interface RoadmapViewProps {
     items: RoadmapItem[];
     isLoggedIn: boolean;
+    isSuperAdmin?: boolean;
 }
 
-export default function RoadmapView({ items, isLoggedIn }: RoadmapViewProps) {
+export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }: RoadmapViewProps) {
     const [expandedCard, setExpandedCard] = useState<string | null>(null);
 
     // Group items by release target
@@ -86,11 +87,21 @@ export default function RoadmapView({ items, isLoggedIn }: RoadmapViewProps) {
         <div className="min-h-screen bg-slate-950">
             {/* Header */}
             <div className="border-b border-slate-800 bg-slate-900/50">
-                <div className="max-w-7xl mx-auto px-4 py-4">
-                    <h1 className="text-xl font-bold text-slate-100">🗺️ Product Roadmap</h1>
-                    <p className="text-sm text-slate-400">
-                        See what we're building. {!isLoggedIn && <a href="/sign-in?redirect=/roadmap" className="text-sky-400 hover:underline">Sign in</a>} to vote on features.
-                    </p>
+                <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+                    <div>
+                        <h1 className="text-xl font-bold text-slate-100">🗺️ Product Roadmap</h1>
+                        <p className="text-sm text-slate-400">
+                            See what we're building. {!isLoggedIn && <a href="/sign-in?redirect=/roadmap" className="text-sky-400 hover:underline">Sign in</a>} to vote on features.
+                        </p>
+                    </div>
+                    {isSuperAdmin && (
+                        <a
+                            href="/admin/kanban"
+                            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-sky-600 hover:bg-sky-500 text-white rounded-lg transition-colors"
+                        >
+                            ✏️ Edit Roadmap
+                        </a>
+                    )}
                 </div>
             </div>
 

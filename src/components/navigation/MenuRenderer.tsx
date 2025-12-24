@@ -224,9 +224,9 @@ export function MenuRenderer({
             {isOpen && items.length > 0 && (
                 <div
                     className={`absolute top-full mt-2 min-w-[200px] max-h-[70vh] overflow-y-auto py-2 
-                        bg-[var(--menu-bg,theme(colors.slate.900))] 
-                        border border-[var(--menu-border,theme(colors.slate.700))] 
-                        rounded-xl shadow-xl z-50 
+                        bg-slate-900 
+                        border border-slate-700 
+                        rounded-xl shadow-xl shadow-black/50 z-50 
                         animate-in fade-in slide-in-from-top-2 duration-150
                         scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent
                         ${align === "right" ? "right-0" : "left-0"}`}
