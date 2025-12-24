@@ -14,7 +14,7 @@ interface FeedbackItem {
     created_at: string;
     completed_at: string | null;
     target_release: string;
-    users?: { display_name: string; email: string } | null;
+    users?: { nickname: string } | null;
 }
 
 const RELEASE_OPTIONS: { id: string; label: string; color: string }[] = [
@@ -240,8 +240,13 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                                                             {item.description}
                                                         </p>
 
-                                                        <div className="mt-2 text-[10px] text-slate-500">
-                                                            {new Date(item.created_at).toLocaleDateString()}
+                                                        <div className="mt-2 text-[10px] text-slate-500 flex items-center justify-between">
+                                                            <span>{new Date(item.created_at).toLocaleDateString()}</span>
+                                                            {item.users?.nickname && (
+                                                                <span className="text-slate-400">
+                                                                    👤 {item.users.nickname}
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 )}

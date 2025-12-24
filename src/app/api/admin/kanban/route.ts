@@ -65,7 +65,7 @@ export async function GET() {
         const adminClient = createAdminClient();
         const { data, error } = await adminClient
             .from("feedback")
-            .select("*, users(display_name, email)")
+            .select("*, users(nickname)")
             .order("priority_order", { ascending: true })
             .order("created_at", { ascending: false });
 
