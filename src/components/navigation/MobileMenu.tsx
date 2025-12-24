@@ -1,13 +1,10 @@
+"use client";
+
 import Link from "next/link";
-import {
-    LEAGUE_MENU_ITEMS,
-    ACTIONS_MENU_ITEMS,
-    SUPERADMIN_PAGES,
-    USER_MENU_SECTIONS,
-    FOOTER_LINKS,
-    NavItem
-} from "@/lib/navigation";
+import { useState } from "react";
 import { User } from "@supabase/supabase-js";
+import { MenuRenderer } from "./MenuRenderer";
+import { MenuItem, UserRole, MENUS, prepareMenuItems } from "@/lib/menuConfig";
 
 interface MobileMenuProps {
     isOpen: boolean;
@@ -18,7 +15,7 @@ interface MobileMenuProps {
     isActive: (path: string) => boolean;
     onSignOut: () => void;
     isSigningOut: boolean;
-    onItemClick?: (item: NavItem) => void;
+    onMenuAction?: (actionName: string, item: MenuItem) => void;
 }
 
 export function MobileMenu({
@@ -30,24 +27,38 @@ export function MobileMenu({
     isActive,
     onSignOut,
     isSigningOut,
-    onItemClick
+    onMenuAction,
 }: MobileMenuProps) {
+    const [expandedSection, setExpandedSection] = useState<string | null>(null);
+
     if (!isOpen) return null;
 
     const displayName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "User";
+    const userRole: UserRole = isSuperadmin ? 'superadmin' : 'member';
 
-    // Helper to replace dynamic params like [id]
-    const resolveHref = (href: string) => {
-        if (currentLeagueId) {
-            return href.replace("[id]", currentLeagueId);
+    // Handle menu action - close menu after action
+    const handleAction = (actionName: string, item: MenuItem) => {
+        if (actionName === 'signOut') {
+            onSignOut();
+            return;
         }
-        return href;
+        onMenuAction?.(actionName, item);
+        onClose();
     };
 
-    const handleItemClick = (item: NavItem) => {
-        onClose();
-        if (onItemClick) onItemClick(item);
-    };
+    // Get prepared menu items
+    const leagueItems = currentLeagueId
+        ? prepareMenuItems(MENUS.main.items.find(i => i.id === 'league')?.children || [], userRole, currentLeagueId)
+        : [];
+    const actionsItems = prepareMenuItems(MENUS.main.items.find(i => i.id === 'actions')?.children || [], userRole, currentLeagueId);
+    const helpItems = prepareMenuItems(MENUS.help.items, userRole, currentLeagueId);
+    const adminItems = isSuperadmin ? prepareMenuItems(MENUS.admin.items, userRole, currentLeagueId) : [];
+    const userItems = prepareMenuItems(MENUS.user.items.filter(i => i.id !== 'sign-out'), userRole, currentLeagueId);
+    const footerItems = [
+        ...MENUS.footerLegal.items.slice(0, 2), // Terms, Privacy
+        { id: 'roadmap', label: 'Roadmap', href: '/roadmap' },
+        { id: 'beta', label: 'Beta Info', href: '/beta' },
+    ];
 
     return (
         <div className="md:hidden border-t border-slate-800 bg-slate-950 px-4 py-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
@@ -64,53 +75,57 @@ export function MobileMenu({
             </Link>
 
             {/* League Section */}
-            {currentLeagueId && (
-                <div className="space-y-1">
-                    <div className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Current League</div>
-                    {LEAGUE_MENU_ITEMS.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={resolveHref(item.href)}
-                            onClick={() => handleItemClick(item)}
-                            className={`block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors`}
-                        >
-                            {item.icon} <span className="ml-2">{item.label}</span>
-                        </Link>
-                    ))}
-                </div>
+            {currentLeagueId && leagueItems.length > 0 && (
+                <MobileSection
+                    title="Current League"
+                    items={leagueItems}
+                    isExpanded={expandedSection === 'league'}
+                    onToggle={() => setExpandedSection(expandedSection === 'league' ? null : 'league')}
+                    onClose={onClose}
+                    onAction={handleAction}
+                    isActive={isActive}
+                />
             )}
 
             {/* Actions Section */}
-            <div className="space-y-1">
-                <div className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Actions</div>
-                {ACTIONS_MENU_ITEMS.map((item) => (
-                    <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => handleItemClick(item)}
-                        className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
-                    >
-                        {item.icon} <span className="ml-2">{item.label}</span>
-                    </Link>
-                ))}
-            </div>
+            {actionsItems.length > 0 && (
+                <MobileSection
+                    title="Actions"
+                    items={actionsItems}
+                    isExpanded={expandedSection === 'actions'}
+                    onToggle={() => setExpandedSection(expandedSection === 'actions' ? null : 'actions')}
+                    onClose={onClose}
+                    onAction={handleAction}
+                    isActive={isActive}
+                />
+            )}
+
+            {/* Help Section */}
+            {helpItems.length > 0 && (
+                <MobileSection
+                    title="Help & Guides"
+                    items={helpItems}
+                    isExpanded={expandedSection === 'help'}
+                    onToggle={() => setExpandedSection(expandedSection === 'help' ? null : 'help')}
+                    onClose={onClose}
+                    onAction={handleAction}
+                    isActive={isActive}
+                />
+            )}
 
             {/* SuperAdmin Section */}
-            {isSuperadmin && (
-                <div className="space-y-1">
-                    <div className="px-4 text-[10px] font-bold text-amber-500 uppercase tracking-widest">⚡ SuperAdmin</div>
-                    {SUPERADMIN_PAGES.map((page) => (
-                        <Link
-                            key={page.href}
-                            href={page.href}
-                            onClick={onClose}
-                            className="block px-4 py-3 rounded-lg text-sm text-amber-500/80 hover:bg-amber-900/10 hover:text-amber-400 transition-colors"
-                        >
-                            <span className="mr-2">{page.label.split(" ")[0]}</span>
-                            <span>{page.label.split(" ").slice(1).join(" ")}</span>
-                        </Link>
-                    ))}
-                </div>
+            {adminItems.length > 0 && (
+                <MobileSection
+                    title="⚡ SuperAdmin"
+                    titleClassName="text-amber-500"
+                    items={adminItems}
+                    isExpanded={expandedSection === 'admin'}
+                    onToggle={() => setExpandedSection(expandedSection === 'admin' ? null : 'admin')}
+                    onClose={onClose}
+                    onAction={handleAction}
+                    isActive={isActive}
+                    itemClassName="text-amber-500/80 hover:bg-amber-900/10 hover:text-amber-400"
+                />
             )}
 
             {/* User Account Section */}
@@ -125,41 +140,41 @@ export function MobileMenu({
                     </div>
                 </div>
 
-                {/* Flattened User Menu Sections */}
-                {USER_MENU_SECTIONS.map((section, idx) => (
-                    <div key={idx} className="space-y-1">
-                        {section.items.map((item) => (
-                            <Link
-                                key={item.label}
-                                href={item.href}
-                                onClick={() => handleItemClick(item)}
-                                className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
-                            >
-                                {item.icon} <span className="ml-2">{item.label}</span>
-                            </Link>
-                        ))}
-                    </div>
+                {/* User Menu Items */}
+                {userItems.map((item) => (
+                    <MobileLink
+                        key={item.id}
+                        item={item}
+                        onClose={onClose}
+                        onAction={handleAction}
+                        isActive={isActive}
+                    />
                 ))}
 
                 {/* Footer Links */}
                 <div className="grid grid-cols-2 gap-2 px-2 mt-2">
-                    {FOOTER_LINKS.map(link => (
+                    {footerItems.map(link => (
                         <Link
-                            key={link.href}
-                            href={link.href}
+                            key={link.id}
+                            href={link.href || '#'}
                             onClick={onClose}
                             className="text-center py-2 text-xs text-slate-500 hover:bg-slate-800 rounded-md transition-colors"
+                            data-module-id={`menu-${link.id}`}
+                            data-module-name={link.label}
                         >
                             {link.label}
                         </Link>
                     ))}
                 </div>
 
+                {/* Sign Out */}
                 <div className="pt-2">
                     <button
                         onClick={onSignOut}
                         disabled={isSigningOut}
                         className="w-full px-4 py-3 rounded-lg text-sm font-medium text-rose-400 hover:bg-rose-950/20 text-left disabled:opacity-50 transition-colors flex items-center gap-2"
+                        data-module-id="menu-sign-out"
+                        data-module-name="Sign Out"
                     >
                         <span>🚪</span>
                         <span>{isSigningOut ? "Signing out..." : "Sign Out"}</span>
@@ -167,5 +182,193 @@ export function MobileMenu({
                 </div>
             </div>
         </div>
+    );
+}
+
+// ----------------------------
+// Sub-components
+// ----------------------------
+
+interface MobileSectionProps {
+    title: string;
+    titleClassName?: string;
+    items: MenuItem[];
+    isExpanded: boolean;
+    onToggle: () => void;
+    onClose: () => void;
+    onAction: (actionName: string, item: MenuItem) => void;
+    isActive: (path: string) => boolean;
+    itemClassName?: string;
+}
+
+function MobileSection({
+    title,
+    titleClassName = "text-slate-500",
+    items,
+    isExpanded,
+    onToggle,
+    onClose,
+    onAction,
+    isActive,
+    itemClassName,
+}: MobileSectionProps) {
+    return (
+        <div className="space-y-1">
+            <button
+                onClick={onToggle}
+                className={`w-full px-4 flex items-center justify-between text-[10px] font-bold uppercase tracking-widest ${titleClassName}`}
+            >
+                <span>{title}</span>
+                <span className={`text-xs transition-transform ${isExpanded ? 'rotate-180' : ''}`}>▼</span>
+            </button>
+            {isExpanded && (
+                <div className="space-y-1 animate-in slide-in-from-top-2 duration-150">
+                    {items.map((item) => (
+                        <MobileMenuItem
+                            key={item.id}
+                            item={item}
+                            onClose={onClose}
+                            onAction={onAction}
+                            isActive={isActive}
+                            className={itemClassName}
+                        />
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+interface MobileMenuItemProps {
+    item: MenuItem;
+    onClose: () => void;
+    onAction: (actionName: string, item: MenuItem) => void;
+    isActive: (path: string) => boolean;
+    className?: string;
+    depth?: number;
+}
+
+function MobileMenuItem({
+    item,
+    onClose,
+    onAction,
+    isActive,
+    className,
+    depth = 0,
+}: MobileMenuItemProps) {
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    const baseClass = `block px-4 py-3 rounded-lg text-sm transition-colors ${className || "text-slate-300 hover:bg-slate-800 hover:text-white"}`;
+    const paddingLeft = depth > 0 ? `pl-${4 + depth * 4}` : '';
+
+    // Has children - render as sub-accordion
+    if (item.children && item.children.length > 0) {
+        return (
+            <div className={paddingLeft}>
+                <button
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className={`w-full flex items-center justify-between ${baseClass}`}
+                    data-module-id={`menu-${item.id}`}
+                    data-module-name={item.label}
+                >
+                    <span className="flex items-center gap-2">
+                        {item.icon && <span>{item.icon}</span>}
+                        <span>{item.label}</span>
+                    </span>
+                    <span className={`text-xs transition-transform ${isExpanded ? 'rotate-180' : ''}`}>▼</span>
+                </button>
+                {isExpanded && (
+                    <div className="ml-4 mt-1 space-y-1 border-l border-slate-800 pl-2">
+                        {item.children.map(child => (
+                            <MobileMenuItem
+                                key={child.id}
+                                item={child}
+                                onClose={onClose}
+                                onAction={onAction}
+                                isActive={isActive}
+                                className={className}
+                                depth={depth + 1}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    // Leaf item with action
+    if (item.onClick) {
+        return (
+            <button
+                onClick={() => {
+                    onAction(item.onClick!, item);
+                }}
+                className={`w-full text-left ${baseClass} ${paddingLeft}`}
+                data-module-id={`menu-${item.id}`}
+                data-module-name={item.label}
+            >
+                {item.icon && <span className="mr-2">{item.icon}</span>}
+                <span>{item.label}</span>
+                {item.description && (
+                    <span className="ml-2 text-xs text-slate-500">{item.description}</span>
+                )}
+            </button>
+        );
+    }
+
+    // Leaf item with href
+    return (
+        <Link
+            href={item.href || '#'}
+            onClick={onClose}
+            className={`${baseClass} ${paddingLeft}`}
+            data-module-id={`menu-${item.id}`}
+            data-module-name={item.label}
+        >
+            {item.icon && <span className="mr-2">{item.icon}</span>}
+            <span>{item.label}</span>
+            {item.description && (
+                <span className="ml-2 text-xs text-slate-500">{item.description}</span>
+            )}
+        </Link>
+    );
+}
+
+function MobileLink({
+    item,
+    onClose,
+    onAction,
+    isActive,
+}: {
+    item: MenuItem;
+    onClose: () => void;
+    onAction: (actionName: string, item: MenuItem) => void;
+    isActive: (path: string) => boolean;
+}) {
+    if (item.onClick) {
+        return (
+            <button
+                onClick={() => onAction(item.onClick!, item)}
+                className="block w-full text-left px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                data-module-id={`menu-${item.id}`}
+                data-module-name={item.label}
+            >
+                {item.icon && <span className="mr-2">{item.icon}</span>}
+                <span>{item.label}</span>
+            </button>
+        );
+    }
+
+    return (
+        <Link
+            href={item.href || '#'}
+            onClick={onClose}
+            className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+            data-module-id={`menu-${item.id}`}
+            data-module-name={item.label}
+        >
+            {item.icon && <span className="mr-2">{item.icon}</span>}
+            <span>{item.label}</span>
+        </Link>
     );
 }

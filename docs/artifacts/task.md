@@ -18,7 +18,7 @@
 - [x] Create `roadmap_votes` table (1-10 priority votes)
 - [x] Create `roadmap_comments` table
 - [x] Create RLS policies
-- [ ] Create seed script to migrate ROADMAP.md content
+- [x] Create seed script to migrate ROADMAP.md content
 
 ## Phase 3: Internal Kanban (Admin)
 - [x] Create `KanbanBoard.tsx` component with drag-drop

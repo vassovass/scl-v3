@@ -108,12 +108,13 @@ scl-v3/
 │   │   ├── analytics/            # CalendarHeatmap, DailyBreakdownTable
 │   │   ├── forms/                # SubmissionForm, BatchSubmissionForm
 │   │   ├── layout/               # GlobalFooter
-│   │   ├── navigation/           # NavHeader (with mobile hamburger)
+│   │   ├── navigation/           # NavHeader, MenuRenderer, MobileMenu
 │   │   ├── providers/            # AuthProvider
 │   │   └── ui/                   # DatePicker, ShareButton, ModuleFeedback
 │   └── lib/
 │       ├── api.ts                # json(), badRequest(), unauthorized(), etc.
-│       ├── adminPages.ts         # SuperAdmin pages config (auto-populates nav menu)
+│       ├── menuConfig.ts         # ⭐ Centralized menu configuration (WordPress-style)
+│       ├── adminPages.ts         # SuperAdmin pages config
 │       ├── supabase/             # Server/client Supabase clients
 │       └── utils/                # Date utilities
 ├── supabase/migrations/          # SQL migrations (numbered)
@@ -146,9 +147,12 @@ scl-v3/
 - ✅ User nicknames and profile settings
 - ✅ Global feedback system (floating 💬 widget with screenshot)
 - ✅ Social sharing (Web Share API + WhatsApp/Twitter)
-- ✅ Mobile-responsive navigation (hamburger menu)
+- ✅ **Modular menu system** (role-based, unlimited nesting, feedback integration)
+- ✅ Mobile-responsive navigation (hamburger menu, accordion submenus)
 - ✅ Guided onboarding system (Joyride)
 - ✅ Footer with legal links
+- ✅ Internal Kanban board (`/admin/kanban`)
+- ✅ Public roadmap with voting (`/roadmap`)
 
 ---
 

@@ -5,16 +5,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { createClient } from "@/lib/supabase/client";
-import {
-    LEAGUE_MENU_ITEMS,
-    ACTIONS_MENU_ITEMS,
-    SUPERADMIN_PAGES,
-    USER_MENU_SECTIONS,
-    NavItem
-} from "@/lib/navigation";
-import { NavDropdown } from "./NavDropdown";
+import { MenuRenderer } from "./MenuRenderer";
 import { MobileMenu } from "./MobileMenu";
-import { NavItem as NavItemType } from "@/lib/navigation";
+import { MenuItem, UserRole, MENUS } from "@/lib/menuConfig";
 import { APP_CONFIG } from "@/lib/config";
 
 export function NavHeader() {
@@ -30,6 +23,9 @@ export function NavHeader() {
     // Extract league ID from path if on a league page
     const leagueMatch = pathname.match(/\/league\/([^/]+)/);
     const currentLeagueId = leagueMatch?.[1];
+
+    // Determine user role for menu filtering
+    const userRole: UserRole = !session ? 'guest' : isSuperadmin ? 'superadmin' : 'member';
 
     useEffect(() => {
         if (!user) {
@@ -76,34 +72,22 @@ export function NavHeader() {
         setOpenDropdown(openDropdown === name ? null : name);
     };
 
-    const isActive = (path: string) => pathname === path;
-    const isActivePrefix = (prefix: string) => pathname.startsWith(prefix);
-
     const displayName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "User";
 
-    // --- Dynamic Menu Preparation ---
+    // Handle menu actions (tours, sign out, etc.)
+    const handleMenuAction = (actionName: string, item: MenuItem) => {
+        if (actionName === 'signOut') {
+            handleSignOut();
+            return;
+        }
 
-    // Inject dynamic League ID into hrefs
-    const preparedLeagueItems = LEAGUE_MENU_ITEMS.map(item => ({
-        ...item,
-        href: currentLeagueId ? item.href.replace("[id]", currentLeagueId) : item.href
-    }));
-
-    // Flatten User Menu Sections for the dropdown (since NavDropdown expects a flat list)
-    // We'll treat the sections as just a flat list for now, or we could enhance NavDropdown later.
-    // For now, flattening preserves the order.
-    const preparedUserItems = USER_MENU_SECTIONS.flatMap(section => section.items);
-
-    // Handle special item clicks (Tours, etc)
-    const handleItemClick = (item: NavItemType) => {
-        if (item.href.startsWith("#tour-")) {
-            const tourId = item.href.replace("#tour-", "");
-
-            // Logic to handle specific tours that need navigation first
+        if (actionName === 'startTour' && item.href?.startsWith('#tour-')) {
+            const tourId = item.href.replace('#tour-', '');
             setOpenDropdown(null);
 
             // Map tour IDs to required paths
             const tourPaths: Record<string, string> = {
+                "navigation": pathname, // Can run from anywhere
                 "new-user": "/dashboard",
                 "member": `/league/${currentLeagueId || ""}`,
                 "leaderboard": `/league/${currentLeagueId || ""}/leaderboard`,
@@ -116,9 +100,7 @@ export function NavHeader() {
                 window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: tourId } }));
             };
 
-            // If we need to navigate and we aren't there (or roughly there)
             if (targetPath) {
-                // Check if we are already roughly on the page (simple check)
                 // For league pages, ensure we have a league ID
                 if ((tourId === 'member' || tourId === 'leaderboard' || tourId === 'admin') && !currentLeagueId) {
                     alert("Please navigate to a league first to see this tour.");
@@ -126,7 +108,6 @@ export function NavHeader() {
                 }
 
                 if (pathname !== targetPath && !pathname.includes(targetPath)) {
-                    // Navigate with start_tour param to ensure tour starts after load
                     const separator = targetPath.includes("?") ? "&" : "?";
                     router.push(`${targetPath}${separator}start_tour=${tourId}`);
                 } else {
@@ -172,11 +153,11 @@ export function NavHeader() {
                 {/* Desktop Navigation */}
                 {session && (
                     <div className="hidden md:flex items-center gap-1">
-                        {/* Dashboard */}
+                        {/* Dashboard Link */}
                         <Link
                             href="/dashboard"
                             data-tour="nav-dashboard"
-                            className={`px-3 py-2 text-sm rounded-lg transition-colors duration-200 ${isActive("/dashboard")
+                            className={`px-3 py-2 text-sm rounded-lg transition-colors duration-200 ${pathname === "/dashboard"
                                 ? "bg-sky-600/20 text-sky-400 font-medium"
                                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
                                 }`}
@@ -184,57 +165,83 @@ export function NavHeader() {
                             Dashboard
                         </Link>
 
-                        {/* League Dropdown */}
+                        {/* League Menu */}
                         {currentLeagueId && (
                             <div data-tour="nav-league-menu">
-                                <NavDropdown
+                                <MenuRenderer
+                                    menuId="main"
+                                    items={MENUS.main.items.find(i => i.id === 'league')?.children}
+                                    variant="dropdown"
+                                    userRole={userRole}
+                                    leagueId={currentLeagueId}
                                     label="League"
-                                    name="league"
-                                    isOpen={openDropdown === "league"}
-                                    onToggle={toggleDropdown}
+                                    isOpen={openDropdown === 'league'}
+                                    onToggle={() => toggleDropdown('league')}
                                     onClose={() => setOpenDropdown(null)}
-                                    items={preparedLeagueItems}
-                                    isActive={isActive}
-                                    onItemClick={handleItemClick}
+                                    onAction={handleMenuAction}
+                                    currentPath={pathname}
                                 />
                             </div>
                         )}
 
-                        {/* Actions Dropdown */}
+                        {/* Actions Menu */}
                         <div data-tour="nav-actions-menu">
-                            <NavDropdown
+                            <MenuRenderer
+                                items={MENUS.main.items.find(i => i.id === 'actions')?.children}
+                                variant="dropdown"
+                                userRole={userRole}
+                                leagueId={currentLeagueId}
                                 label="Actions"
-                                name="actions"
-                                isOpen={openDropdown === "actions"}
-                                onToggle={toggleDropdown}
+                                isOpen={openDropdown === 'actions'}
+                                onToggle={() => toggleDropdown('actions')}
                                 onClose={() => setOpenDropdown(null)}
-                                items={ACTIONS_MENU_ITEMS}
-                                isActive={isActive}
-                                onItemClick={handleItemClick}
+                                onAction={handleMenuAction}
+                                currentPath={pathname}
                             />
                         </div>
 
+                        {/* Help Menu (with onboarding tours) */}
+                        <MenuRenderer
+                            menuId="help"
+                            variant="dropdown"
+                            userRole={userRole}
+                            leagueId={currentLeagueId}
+                            label="Help"
+                            isOpen={openDropdown === 'help'}
+                            onToggle={() => toggleDropdown('help')}
+                            onClose={() => setOpenDropdown(null)}
+                            onAction={handleMenuAction}
+                            currentPath={pathname}
+                        />
+
                         {/* SuperAdmin Menu */}
                         {isSuperadmin && (
-                            <NavDropdown
-                                label="Admin"
-                                labelContent={<span className="text-amber-500 hover:text-amber-400 flex items-center gap-1">⚡ Admin <span className="text-[10px]">▼</span></span>}
-                                name="superadmin"
-                                isOpen={openDropdown === "superadmin"}
-                                onToggle={toggleDropdown}
+                            <MenuRenderer
+                                menuId="admin"
+                                variant="dropdown"
+                                userRole={userRole}
+                                trigger={
+                                    <span className="text-amber-500 hover:text-amber-400 flex items-center gap-1">
+                                        ⚡ Admin <span className="text-[10px]">▼</span>
+                                    </span>
+                                }
+                                isOpen={openDropdown === 'admin'}
+                                onToggle={() => toggleDropdown('admin')}
                                 onClose={() => setOpenDropdown(null)}
-                                items={SUPERADMIN_PAGES}
-                                isActive={isActive}
-                                className="ml-2"
+                                onAction={handleMenuAction}
+                                currentPath={pathname}
                                 align="right"
+                                className="ml-2"
                             />
                         )}
 
                         {/* User Menu */}
                         <div className="ml-2" data-tour="nav-user-menu">
-                            <NavDropdown
-                                label="User"
-                                labelContent={
+                            <MenuRenderer
+                                menuId="user"
+                                variant="dropdown"
+                                userRole={userRole}
+                                trigger={
                                     <div className="flex items-center gap-2">
                                         <span className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-emerald-500 flex items-center justify-center text-white text-sm font-medium shadow-md ring-2 ring-slate-950 group-hover:ring-slate-800 transition-all">
                                             {displayName[0]?.toUpperCase()}
@@ -242,14 +249,12 @@ export function NavHeader() {
                                         <span className="text-[10px] text-slate-500">▼</span>
                                     </div>
                                 }
-                                name="user"
-                                isOpen={openDropdown === "user"}
-                                onToggle={toggleDropdown}
+                                isOpen={openDropdown === 'user'}
+                                onToggle={() => toggleDropdown('user')}
                                 onClose={() => setOpenDropdown(null)}
-                                items={preparedUserItems}
-                                isActive={isActive}
+                                onAction={handleMenuAction}
+                                currentPath={pathname}
                                 align="right"
-                                onItemClick={handleItemClick}
                             />
                         </div>
                     </div>
@@ -273,10 +278,10 @@ export function NavHeader() {
                     user={user}
                     isSuperadmin={isSuperadmin}
                     currentLeagueId={currentLeagueId}
-                    isActive={isActive}
+                    isActive={(path) => pathname === path}
                     onSignOut={handleSignOut}
                     isSigningOut={signingOut}
-                    onItemClick={handleItemClick}
+                    onMenuAction={handleMenuAction}
                 />
             )}
         </header>

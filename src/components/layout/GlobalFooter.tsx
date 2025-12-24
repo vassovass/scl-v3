@@ -2,9 +2,15 @@
 
 import Link from "next/link";
 import { APP_CONFIG } from "@/lib/config";
+import { MENUS } from "@/lib/menuConfig";
 
 export function GlobalFooter() {
     const currentYear = new Date().getFullYear();
+
+    // Get menu items from centralized config
+    const navigationItems = MENUS.footerNavigation.items;
+    const accountItems = MENUS.footerAccount.items;
+    const legalItems = MENUS.footerLegal.items;
 
     return (
         <footer className="border-t border-slate-800 bg-slate-950 mt-auto">
@@ -24,69 +30,66 @@ export function GlobalFooter() {
                         </p>
                     </div>
 
-                    {/* Main Pages */}
+                    {/* Navigation Column */}
                     <div>
-                        <h4 className="text-sm font-medium text-slate-300 mb-3">Navigation</h4>
+                        <h4 className="text-sm font-medium text-slate-300 mb-3">
+                            {MENUS.footerNavigation.label}
+                        </h4>
                         <ul className="space-y-2">
-                            <li>
-                                <Link href="/dashboard" className="text-sm text-slate-500 hover:text-slate-300 transition">
-                                    Dashboard
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/league/create" className="text-sm text-slate-500 hover:text-slate-300 transition">
-                                    Create League
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/join" className="text-sm text-slate-500 hover:text-slate-300 transition">
-                                    Join League
-                                </Link>
-                            </li>
+                            {navigationItems.map(item => (
+                                <li key={item.id}>
+                                    <Link
+                                        href={item.href || '#'}
+                                        className="text-sm text-slate-500 hover:text-slate-300 transition"
+                                        data-module-id={`footer-${item.id}`}
+                                        data-module-name={item.label}
+                                    >
+                                        {item.label}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 
-                    {/* Account */}
+                    {/* Account Column */}
                     <div>
-                        <h4 className="text-sm font-medium text-slate-300 mb-3">Account</h4>
+                        <h4 className="text-sm font-medium text-slate-300 mb-3">
+                            {MENUS.footerAccount.label}
+                        </h4>
                         <ul className="space-y-2">
-                            <li>
-                                <Link href="/settings/profile" className="text-sm text-slate-500 hover:text-slate-300 transition">
-                                    Profile Settings
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/feedback" className="text-sm text-slate-500 hover:text-slate-300 transition">
-                                    Send Feedback
-                                </Link>
-                            </li>
+                            {accountItems.map(item => (
+                                <li key={item.id}>
+                                    <Link
+                                        href={item.href || '#'}
+                                        className="text-sm text-slate-500 hover:text-slate-300 transition"
+                                        data-module-id={`footer-${item.id}`}
+                                        data-module-name={item.label}
+                                    >
+                                        {item.label}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 
-                    {/* Legal */}
+                    {/* Legal Column */}
                     <div>
-                        <h4 className="text-sm font-medium text-slate-300 mb-3">Legal</h4>
+                        <h4 className="text-sm font-medium text-slate-300 mb-3">
+                            {MENUS.footerLegal.label}
+                        </h4>
                         <ul className="space-y-2">
-                            <li>
-                                <Link href="/terms" className="text-sm text-slate-500 hover:text-slate-300 transition">
-                                    Terms of Service
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/privacy" className="text-sm text-slate-500 hover:text-slate-300 transition">
-                                    Privacy Policy
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/security" className="text-sm text-slate-500 hover:text-slate-300 transition">
-                                    Security
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/beta" className="text-sm text-slate-500 hover:text-slate-300 transition">
-                                    Beta Info
-                                </Link>
-                            </li>
+                            {legalItems.map(item => (
+                                <li key={item.id}>
+                                    <Link
+                                        href={item.href || '#'}
+                                        className="text-sm text-slate-500 hover:text-slate-300 transition"
+                                        data-module-id={`footer-${item.id}`}
+                                        data-module-name={item.label}
+                                    >
+                                        {item.label}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
                 </div>

@@ -99,6 +99,9 @@
 ## Completed
 *Recently shipped features*
 
+- [x] **Modular Menu System** (centralized config, role-based visibility, unlimited nesting)
+- [x] **Internal Kanban Board** (`/admin/kanban`) - drag-and-drop task management
+- [x] **Public Roadmap with Voting** (`/roadmap`) - users can vote on priorities
 - [x] Analytics Dashboard (calendar heatmap, daily breakdown)
 - [x] Social sharing (Web Share API + WhatsApp/Twitter)
 - [x] Mobile-responsive navigation with hamburger menu
@@ -112,4 +115,4 @@
 
 ---
 
-*Last updated: 2025-12-22*
+*Last updated: 2025-12-24*

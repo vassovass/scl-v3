@@ -7,6 +7,46 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2025-12-24]
+
+### Added
+- **Modular Menu System** - WordPress-style menu configuration with unlimited nesting
+  - `menuConfig.ts` - Centralized menu definitions with role-based visibility
+  - `MenuRenderer.tsx` - Universal component supporting dropdown, accordion, vertical, horizontal variants
+  - Role filtering: guest → member → admin → owner → superadmin
+  - Feedback integration via `data-module-id` attributes on all menu items
+- **Internal Kanban Board** (`/admin/kanban`) - Drag-and-drop task management for superadmins
+  - Five columns: Backlog → Todo → In Progress → Review → Done
+  - Quick toggle for public/private visibility
+  - Uses `@hello-pangea/dnd` for smooth drag-and-drop
+- **Public Roadmap Page** (`/roadmap`) - Users can view and vote on planned features
+  - Three sections: In Progress, Planned, Completed (changelog)
+  - Priority voting (1-10 scale) with average displayed
+  - Sign-in required to vote, viewing is public
+- **Roadmap Voting API** (`/api/roadmap/vote`) - Submit/update priority votes
+- **Database Schema Extensions**:
+  - `feedback` table extended with `board_status`, `is_public`, `priority_order`, `completed_at`
+  - New `roadmap_votes` table (1-10 priority, unique per user per item)
+  - New `roadmap_comments` table (for future comments feature)
+  - RLS policies for votes and comments
+- **Seed Script** (`supabase/seed_roadmap.sql`) - Migrates ROADMAP.md content to database
+- **ModuleFeedback Component** - Restored as passthrough wrapper (fixes build error)
+- **Artifact Storage Rule** in AGENTS.md - Artifacts now live in `docs/artifacts/`
+- **Date Awareness Rule** in AGENTS.md - Reminder for AI agents to use current date
+
+### Changed
+- **NavHeader.tsx** - Refactored to use MenuRenderer for all dropdowns (League, Actions, Help, Admin, User)
+- **MobileMenu.tsx** - Refactored to use centralized menuConfig with accordion submenus
+- **GlobalFooter.tsx** - Now uses menuConfig.ts for all footer links
+- **navigation.ts** - Deprecated, now re-exports from menuConfig.ts for backward compatibility
+- **AGENTS.md** - Added menu system documentation, updated Key Features
+- **ROADMAP.md** - Added Kanban and Roadmap to Completed section
+
+### Removed
+- **NavDropdown.tsx** - Replaced by MenuRenderer component
+
+---
+
 ## [2025-12-23]
 
 ### Added
