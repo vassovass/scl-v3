@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { APP_CONFIG } from "@/lib/config";
+import { useShare } from "@/hooks/useShare";
 
 interface LeagueInviteControlProps {
     inviteCode: string;
@@ -11,7 +12,6 @@ interface LeagueInviteControlProps {
 
 export function LeagueInviteControl({ inviteCode, leagueName, className = "" }: LeagueInviteControlProps) {
     const [isOpen, setIsOpen] = useState(false);
-    const [copied, setCopied] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     // Close dropdown when clicking outside
@@ -25,51 +25,22 @@ export function LeagueInviteControl({ inviteCode, leagueName, className = "" }: 
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    const { share, copied, supportsNativeShare } = useShare({
+        onShare: () => setIsOpen(false)
+    });
+
     const getInviteUrl = () => {
         return `${window.location.origin}/invite/${inviteCode}`;
     };
 
-    const copyLink = async () => {
-        try {
-            await navigator.clipboard.writeText(getInviteUrl());
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-            setIsOpen(false);
-        } catch (err) {
-            console.error("Failed to copy:", err);
-        }
-    };
+    const inviteText = `Join me in ${leagueName} on ${APP_CONFIG.name}!`;
 
-    const shareNative = async () => {
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: `Join ${leagueName}`,
-                    text: `Join me in ${leagueName} on ${APP_CONFIG.name}!`,
-                    url: getInviteUrl(),
-                });
-                setIsOpen(false);
-            } catch (err) {
-                console.log("Share cancelled:", err);
-            }
-        } else {
-            copyLink();
-        }
-    };
-
-    const shareWhatsApp = () => {
-        const text = `Join me in ${leagueName} on ${APP_CONFIG.name}! ${getInviteUrl()}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
-        setIsOpen(false);
-    };
-
-    const shareTwitter = () => {
-        const text = `Join me in ${leagueName} on ${APP_CONFIG.name}!`;
-        window.open(
-            `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(getInviteUrl())}`,
-            "_blank"
-        );
-        setIsOpen(false);
+    const handleShare = (platform: "native" | "whatsapp" | "twitter" | "copy") => {
+        share({
+            title: `Join ${leagueName}`,
+            text: inviteText,
+            url: getInviteUrl(),
+        }, platform);
     };
 
     return (
@@ -95,7 +66,7 @@ export function LeagueInviteControl({ inviteCode, leagueName, className = "" }: 
                     </div>
 
                     <button
-                        onClick={copyLink}
+                        onClick={() => handleShare("copy")}
                         className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-700 hover:text-white transition"
                     >
                         <span className="text-lg">{copied ? "✓" : "📋"}</span>
@@ -108,7 +79,7 @@ export function LeagueInviteControl({ inviteCode, leagueName, className = "" }: 
                     <div className="my-1 border-t border-slate-700/50" />
 
                     <button
-                        onClick={shareWhatsApp}
+                        onClick={() => handleShare("whatsapp")}
                         className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-slate-200 hover:bg-emerald-900/30 hover:text-emerald-400 transition"
                     >
                         <span className="text-lg">💬</span>
@@ -116,16 +87,16 @@ export function LeagueInviteControl({ inviteCode, leagueName, className = "" }: 
                     </button>
 
                     <button
-                        onClick={shareTwitter}
+                        onClick={() => handleShare("twitter")}
                         className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-slate-200 hover:bg-sky-900/30 hover:text-sky-400 transition"
                     >
                         <span className="text-lg">🐦</span>
                         Twitter
                     </button>
 
-                    {typeof navigator !== "undefined" && "share" in navigator && (
+                    {supportsNativeShare && (
                         <button
-                            onClick={shareNative}
+                            onClick={() => handleShare("native")}
                             className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-700 hover:text-white transition"
                         >
                             <span className="text-lg">📤</span>

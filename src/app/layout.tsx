@@ -7,6 +7,7 @@ import { Analytics } from "@vercel/analytics/next";
 export const metadata: Metadata = {
   title: "StepLeague",
   description: "Step competition with friends",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://stepleague.app"),
 };
 
 export default function RootLayout({

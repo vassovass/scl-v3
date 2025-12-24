@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { APP_CONFIG } from "@/lib/config";
+import { useShare } from "@/hooks/useShare";
 
 export interface AchievementData {
     type: "rank" | "personal_best" | "streak" | "improvement" | "leader" | "custom";
@@ -31,8 +32,7 @@ interface AchievementShareCardProps {
  * Generates a link with dynamic OG preview for social media.
  */
 export function AchievementShareCard({ achievement, onClose }: AchievementShareCardProps) {
-    const [sharing, setSharing] = useState(false);
-    const [copied, setCopied] = useState(false);
+    const { share, isSharing, copied, supportsNativeShare } = useShare();
 
     const getEmoji = () => {
         switch (achievement.type) {
@@ -124,46 +124,25 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
     const shareUrl = getShareUrl();
     const shareMessage = getMessage();
 
-    const handleShare = useCallback(async () => {
-        setSharing(true);
-        const fullMessage = `${shareMessage}\n\n${shareUrl}`;
-
-        try {
-            if (navigator.share) {
-                await navigator.share({
-                    title: getTitle(),
-                    text: shareMessage,
-                    url: shareUrl,
-                });
-            } else {
-                await navigator.clipboard.writeText(fullMessage);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-            }
-        } catch {
-            console.log("Share cancelled or failed");
-        } finally {
-            setSharing(false);
-        }
-    }, [shareMessage, shareUrl]);
+    const handleShare = useCallback(() => {
+        share({
+            title: getTitle(),
+            text: shareMessage,
+            url: shareUrl,
+        }, "native");
+    }, [shareMessage, shareUrl, share, getTitle]);
 
     const shareToWhatsApp = useCallback(() => {
-        const fullMessage = `${shareMessage}\n\n${shareUrl}`;
-        const waUrl = `https://wa.me/?text=${encodeURIComponent(fullMessage)}`;
-        window.open(waUrl, "_blank");
-    }, [shareMessage, shareUrl]);
+        share({ text: shareMessage, url: shareUrl }, "whatsapp");
+    }, [shareMessage, shareUrl, share]);
 
     const shareToTwitter = useCallback(() => {
-        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareMessage)}&url=${encodeURIComponent(shareUrl)}`;
-        window.open(twitterUrl, "_blank");
-    }, [shareMessage, shareUrl]);
+        share({ text: shareMessage, url: shareUrl }, "twitter");
+    }, [shareMessage, shareUrl, share]);
 
-    const copyLink = useCallback(async () => {
-        const fullMessage = `${shareMessage}\n\n${shareUrl}`;
-        await navigator.clipboard.writeText(fullMessage);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-    }, [shareMessage, shareUrl]);
+    const copyLink = useCallback(() => {
+        share({ text: shareMessage, url: shareUrl }, "copy");
+    }, [shareMessage, shareUrl, share]);
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
@@ -198,13 +177,15 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
 
                 {/* Share buttons */}
                 <div className="mt-4 space-y-2">
-                    <button
-                        onClick={handleShare}
-                        disabled={sharing}
-                        className="w-full flex items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-3 text-sm font-semibold text-white hover:bg-sky-500 disabled:opacity-50 transition"
-                    >
-                        📤 {sharing ? "Sharing..." : "Share"}
-                    </button>
+                    {supportsNativeShare && (
+                        <button
+                            onClick={handleShare}
+                            disabled={isSharing}
+                            className="w-full flex items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-3 text-sm font-semibold text-white hover:bg-sky-500 disabled:opacity-50 transition"
+                        >
+                            📤 {isSharing ? "Sharing..." : "Share"}
+                        </button>
+                    )}
 
                     <div className="grid grid-cols-3 gap-2">
                         <button
