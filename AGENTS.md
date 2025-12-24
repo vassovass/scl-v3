@@ -5,7 +5,7 @@
 
 > ⚠️ **BEFORE COMPLETING ANY TASK - READ THIS:**
 >
-> 1. **CHECK THE CURRENT DATE+TIME** - Use format `YYYY-MM-DD HH:MM` for all timestamps!
+> 1. **CHECK THE CURRENT DATE** - Use format `YYYY-MM-DD` for all timestamps!
 > 2. **UPDATE THE ROADMAP** - Add completed features to `/admin/kanban` as "Done" ⬇️
 > 3. Check the **"Documentation Update Rule"** section below
 > 4. Update `CHANGELOG.md` with your changes
@@ -13,15 +13,39 @@
 > 6. Update config files (e.g., `adminPages.ts` for new admin pages)
 > 7. This is **REQUIRED** - do not skip!
 
-> 🗺️ **ROADMAP UPDATE RULE (MANDATORY)**
-> When you complete a feature or improvement:
+> 🗺️ **ROADMAP UPDATE RULE (MANDATORY - DO NOT SKIP!)**
 >
-> 1. Call the `/api/admin/kanban` endpoint to add/update the item
-> 2. Set `board_status: "done"` and `completed_at` with CURRENT timestamp
-> 3. Set `is_public: true` so users can see it on `/roadmap`
-> 4. Include a clear `subject` and `description` of what was built
+> **Every feature you complete MUST be added to the roadmap.** This is industry best practice.
 >
-> **This keeps the public roadmap current and shows users what's been shipped!**
+> **When to update:** After completing ANY feature, improvement, or bug fix that users would care about.
+>
+> **How to update (automatic via API):**
+>
+> ```typescript
+> await fetch("/api/admin/kanban", {
+>   method: "PUT",
+>   headers: { "Content-Type": "application/json" },
+>   body: JSON.stringify({
+>     id: "<existing-id-or-omit-for-new>",
+>     type: "feature",  // or "improvement", "bug"
+>     subject: "Feature Name",
+>     description: "What was built and why it matters",
+>     board_status: "done",
+>     is_public: true,
+>     completed_at: "2025-12-24",  // Current date YYYY-MM-DD
+>     target_release: "now"
+>   })
+> });
+> ```
+>
+> **Roadmap Columns:**
+>
+> - **Now** = Actively being built this sprint
+> - **Next** = Coming in 1-2 releases  
+> - **Later** = Planned for 3+ months out
+> - **Future** = Ideas/backlog
+>
+> **Why this matters:** Users see completed features at `/roadmap`. This builds trust and shows progress!
 
 ---
 
