@@ -481,9 +481,9 @@ function DropdownItemContent({
                     <div
                         ref={submenuRef}
                         className={`absolute top-0 min-w-[200px] max-h-[60vh] overflow-y-auto py-2 
-                            bg-[var(--menu-bg,theme(colors.slate.900))] 
-                            border border-[var(--menu-border,theme(colors.slate.700))] 
-                            rounded-xl shadow-xl z-50 
+                            bg-slate-900 
+                            border border-slate-700 
+                            rounded-xl shadow-xl shadow-black/50 z-50 
                             animate-in fade-in duration-150
                             scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent
                             ${submenuPosition === 'right'
