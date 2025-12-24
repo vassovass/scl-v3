@@ -4,12 +4,24 @@
 > Supported: Cursor, Claude Code, GitHub Copilot, OpenAI Codex, Google Jules, JetBrains AI, Windsurf, Aider
 
 > ⚠️ **BEFORE COMPLETING ANY TASK - READ THIS:**
-> 1. **CHECK THE CURRENT DATE** - The date is provided in your context. Use it for all timestamps!
-> 2. Check the **"Documentation Update Rule"** section below
-> 3. Update `CHANGELOG.md` with your changes
-> 4. Update design system page (`/admin/design-system`) if adding UI/components
-> 5. Update config files (e.g., `adminPages.ts` for new admin pages)
-> 6. This is **REQUIRED** - do not skip!
+>
+> 1. **CHECK THE CURRENT DATE+TIME** - Use format `YYYY-MM-DD HH:MM` for all timestamps!
+> 2. **UPDATE THE ROADMAP** - Add completed features to `/admin/kanban` as "Done" ⬇️
+> 3. Check the **"Documentation Update Rule"** section below
+> 4. Update `CHANGELOG.md` with your changes
+> 5. Update design system page (`/admin/design-system`) if adding UI/components
+> 6. Update config files (e.g., `adminPages.ts` for new admin pages)
+> 7. This is **REQUIRED** - do not skip!
+
+> 🗺️ **ROADMAP UPDATE RULE (MANDATORY)**
+> When you complete a feature or improvement:
+>
+> 1. Call the `/api/admin/kanban` endpoint to add/update the item
+> 2. Set `board_status: "done"` and `completed_at` with CURRENT timestamp
+> 3. Set `is_public: true` so users can see it on `/roadmap`
+> 4. Include a clear `subject` and `description` of what was built
+>
+> **This keeps the public roadmap current and shows users what's been shipped!**
 
 ---
 
@@ -29,7 +41,9 @@
 ## Critical Rules
 
 ### 1. Mobile-First Design (MANDATORY)
+
 All UI must be designed mobile-first using Tailwind's responsive prefixes:
+
 ```tsx
 // ✅ CORRECT: Mobile-first (base = mobile)
 <div className="flex flex-col p-4 md:flex-row md:p-6">
@@ -40,7 +54,9 @@ All UI must be designed mobile-first using Tailwind's responsive prefixes:
 ```
 
 ### 2. Untyped Supabase Client
+
 Don't use `<Database>` generics - use untyped clients to avoid build failures:
+
 ```typescript
 // ✅ CORRECT - untyped
 const { data } = await supabase.from("leagues").select("*");
@@ -51,7 +67,9 @@ const supabase = createServerClient<Database>(...);
 ```
 
 ### 3. API Route Pattern
+
 Always use `adminClient` for database operations (bypasses RLS):
+
 ```typescript
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
 import { json, badRequest, unauthorized } from "@/lib/api";
@@ -68,7 +86,9 @@ export async function GET(request: Request) {
 ```
 
 ### 4. Suspense for useSearchParams
+
 Next.js 14 requires Suspense boundary:
+
 ```tsx
 function MyForm() {
   const searchParams = useSearchParams();
@@ -159,17 +179,21 @@ scl-v3/
 ## Theme, Styling & Branding
 
 ### Brand Logo Treatment
+
 The StepLeague logo uses two-tone text with a color-swap hover effect:
+
 - **Default**: "Step" (white/slate-50) + "League" (sky-500)
 - **Hover**: Colors swap → "Step" (sky-400) + "League" (white)
 - **Icon**: 👟 sneaker emoji
 
 **Logo locations to keep in sync:**
+
 - `src/components/navigation/NavHeader.tsx` - Main header logo
 - `src/components/layout/GlobalFooter.tsx` - Footer logo
 - `src/app/admin/design-system/page.tsx` - Design system documentation
 
 ### Design Tokens
+
 All defined in `src/app/globals.css` using CSS custom properties.
 
 | Category | Examples | CSS Variable |
@@ -180,6 +204,7 @@ All defined in `src/app/globals.css` using CSS custom properties.
 | **Status** | `green-500`, `amber-400`, `red-500` | `--success`, `--warning`, `--error` |
 
 ### Utility Classes (from `globals.css`)
+
 - `.btn-primary`, `.btn-ghost` - Buttons
 - `.glass-card`, `.card-glow` - Card styles
 - `.text-gradient`, `.glow-text` - Text effects
@@ -188,6 +213,7 @@ All defined in `src/app/globals.css` using CSS custom properties.
 - `.section-container`, `.stat-badge`, `.feature-icon` - Layout helpers
 
 ### Theme System (future-proofed for light/dark mode)
+
 - Default: Dark theme (`:root` variables)
 - Light theme: Add `data-theme="light"` to `<html>` element
 - All theme-aware colors use CSS variables, no hardcoded values
@@ -225,17 +251,20 @@ npx tsc --noEmit # Type check
 > **AI agents often default to training data dates (2023-2024). Always use the ACTUAL current date!**
 
 ### Rules for Dates
+
 1. **Check the context** - The current date/time is provided in every request
 2. **Use 2025 dates** - We are in late 2025, not 2024!
 3. **Migration file naming** - Use format `YYYYMMDDHHMMSS_name.sql` with CORRECT year
 4. **Timestamps in docs** - Use ISO format: `2025-MM-DD`
 
 ### Date Sources (Priority Order)
+
 1. `current local time` in request metadata (most accurate)
 2. Git commit timestamps
 3. File modification dates
 
 ### Common Mistakes to Avoid
+
 - ❌ Using `2024` for new files (we're in 2025!)
 - ❌ Hardcoding dates without checking context
 - ❌ Assuming the year from training data
@@ -268,43 +297,53 @@ npx tsc --noEmit # Type check
    - Modifying color schemes or typography
 
 ### UI/Styling Change Checklist
+
 When making ANY UI, branding, or component changes:
 
 **Branding Changes:**
+
 - [ ] `src/components/navigation/NavHeader.tsx` - Header logo
 - [ ] `src/components/layout/GlobalFooter.tsx` - Footer logo  
 - [ ] `src/app/admin/design-system/page.tsx` - Design system docs
 - [ ] This file (`AGENTS.md`) - If changing brand guidelines
 
 **New Components/Modules/Sections:**
+
 - [ ] Add to design system page (`/admin/design-system`) with live examples
 - [ ] Document usage patterns in this file if reusable
 - [ ] Add CSS classes to `globals.css` if creating new patterns
 
 **New CSS Tokens/Classes:**
+
 - [ ] Add to `src/app/globals.css` with both light AND dark mode variants
 - [ ] Document in design system page with examples
 
 **New SuperAdmin Pages:**
+
 - [ ] Create page in `src/app/admin/[page-name]/page.tsx`
 - [ ] Add entry to `src/lib/adminPages.ts` - menu auto-updates!
 - [ ] No need to manually edit NavHeader
 
 ### ⚠️ Light/Dark Mode Requirement (MANDATORY)
+
 **ALL new UI work MUST consider both light and dark mode:**
+
 - Use CSS variables from `globals.css` instead of hardcoded colors
 - When adding new color tokens, add BOTH `:root` (dark) AND `[data-theme="light"]` variants
 - Test visual appearance in both themes before considering work complete
 - Never use hardcoded colors like `bg-slate-900` - use theme-aware variables
 
 ### 🔄 Modularization Rule
+
 **Extract repeated patterns into reusable components:**
+
 - If the same UI pattern is used **3+ times**, extract it into a component in `src/components/ui/`
 - Examples: Input, Select, Alert, Card, Badge
 - Reference the "Common UI Patterns" section in `/admin/design-system` for standard patterns
 - When creating new shared components, add them to the Component Library in the design system page
 
 ### 📋 Artifact Changelog Rule
+
 **All artifact documents (.md files in artifacts directory) MUST have a changelog at the end:**
 
 ```markdown
@@ -319,6 +358,7 @@ When making ANY UI, branding, or component changes:
 ```
 
 **Format requirements:**
+
 - Place at the very end of the document after a horizontal rule
 - Use table format: Date | Section | Change
 - Most recent changes at top
@@ -329,6 +369,7 @@ When making ANY UI, branding, or component changes:
 This ensures artifact history is traceable across AI sessions.
 
 ### 📁 Artifact Storage Rule (IMPORTANT)
+
 **All AI-generated planning documents MUST be stored in the repository:**
 
 ```
@@ -340,12 +381,14 @@ docs/artifacts/
 ```
 
 **Rules:**
+
 1. **Store in repo** - Artifacts go in `docs/artifacts/`, NOT the hidden `.gemini` folder
 2. **Version controlled** - All planning docs should be committed to git
 3. **Naming convention** - Use descriptive names: `decisions_[topic].md`, `plan_[feature].md`
 4. **Copy to repo** - If you create artifacts elsewhere, copy them to `docs/artifacts/`
 
 This ensures all planning documents are:
+
 - Part of the repo history
 - Easy to find for developers
 - Reviewed in PRs
@@ -371,4 +414,3 @@ This ensures documentation stays current for future sessions and developers.
 ---
 
 *Last updated: 2025-12-24. This file is the canonical source for AI agents.*
-
