@@ -38,32 +38,46 @@ interface RoadmapViewProps {
 
 export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }: RoadmapViewProps) {
     const [expandedCard, setExpandedCard] = useState<string | null>(null);
+    const [showAllLater, setShowAllLater] = useState(false);
+    const [showAllDone, setShowAllDone] = useState(false);
+
+    // Item limits per column for clean UX
+    const COLUMN_LIMITS = {
+        now: 10,
+        next: 8,
+        later: showAllLater ? 100 : 6,
+        done: showAllDone ? 100 : 10,
+    };
 
     // Group items by release target
-    const getColumnItems = (columnId: string) => {
+    const getColumnItems = (columnId: string, withLimit = true) => {
+        let result: RoadmapItem[] = [];
+
         if (columnId === "done") {
-            return items
+            result = items
                 .filter((i) => i.board_status === "done")
                 .sort((a, b) => {
                     if (a.completed_at && b.completed_at) {
                         return new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime();
                     }
                     return 0;
-                })
-                .slice(0, 10); // Show last 10 completed
-        }
-
-        if (columnId === "now") {
+                });
+        } else if (columnId === "now") {
             // Items in progress OR marked as "now"
-            return items.filter(
+            result = items.filter(
                 (i) => i.board_status !== "done" && (i.target_release === "now" || i.board_status === "in_progress")
             );
+        } else {
+            result = items
+                .filter((i) => i.board_status !== "done" && i.target_release === columnId)
+                .sort((a, b) => b.avg_priority - a.avg_priority);
         }
 
-        return items
-            .filter((i) => i.board_status !== "done" && i.target_release === columnId)
-            .sort((a, b) => b.avg_priority - a.avg_priority);
+        const limit = COLUMN_LIMITS[columnId as keyof typeof COLUMN_LIMITS] || 10;
+        return withLimit ? result.slice(0, limit) : result;
     };
+
+    const getTotalCount = (columnId: string) => getColumnItems(columnId, false).length;
 
     const handleVote = async (itemId: string, priority: number) => {
         if (!isLoggedIn) {
@@ -203,6 +217,32 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                                         <div className="text-center py-6 text-xs text-slate-600">
                                             No items
                                         </div>
+                                    )}
+
+                                    {/* Show more button for Later column */}
+                                    {column.id === "later" && getTotalCount("later") > 6 && (
+                                        <button
+                                            onClick={() => setShowAllLater(!showAllLater)}
+                                            className="w-full text-center py-2 text-xs text-sky-400 hover:text-sky-300 transition-colors"
+                                        >
+                                            {showAllLater
+                                                ? "Show less ↑"
+                                                : `Show ${getTotalCount("later") - 6} more →`
+                                            }
+                                        </button>
+                                    )}
+
+                                    {/* Show more button for Done column */}
+                                    {column.id === "done" && getTotalCount("done") > 10 && (
+                                        <button
+                                            onClick={() => setShowAllDone(!showAllDone)}
+                                            className="w-full text-center py-2 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+                                        >
+                                            {showAllDone
+                                                ? "Show less ↑"
+                                                : `Show all ${getTotalCount("done")} completed →`
+                                            }
+                                        </button>
                                     )}
                                 </div>
                             </div>

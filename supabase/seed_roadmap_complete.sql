@@ -3,7 +3,7 @@
 -- Date: 2025-12-24
 -- 
 -- NOTE: This replaces seed_roadmap.sql with complete historical data
--- Delete existing public feedback items first if needed
+-- SAFE TO RE-RUN: Uses ON CONFLICT to skip existing entries
 
 -- ============================================================================
 -- 2025-12-24 Features
@@ -14,7 +14,8 @@ INSERT INTO feedback (type, subject, description, board_status, is_public, prior
 ('feature', 'Internal Kanban Board', 'Drag-and-drop task management at /admin/kanban for superadmins. Five columns: Backlog → Todo → In Progress → Review → Done.', 'done', true, 2, '2025-12-24', 'now'),
 ('feature', 'Public Roadmap Page', 'Users can view and vote on planned features at /roadmap. Trello-style Kanban layout with Now/Next/Later/Done columns.', 'done', true, 3, '2025-12-24', 'now'),
 ('feature', 'Roadmap Voting API', 'Priority voting system (1-10 scale) for roadmap items via /api/roadmap/vote.', 'done', true, 4, '2025-12-24', 'now'),
-('feature', 'Database Schema: Roadmap Tables', 'Extended feedback table with board_status, is_public, target_release. New roadmap_votes and roadmap_comments tables with RLS.', 'done', true, 5, '2025-12-24', 'now');
+('feature', 'Database Schema: Roadmap Tables', 'Extended feedback table with board_status, is_public, target_release. New roadmap_votes and roadmap_comments tables with RLS.', 'done', true, 5, '2025-12-24', 'now')
+ON CONFLICT (subject) WHERE is_public = true DO NOTHING;
 
 -- ============================================================================
 -- 2025-12-23 Features
