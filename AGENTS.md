@@ -300,6 +300,53 @@ When making ANY UI, branding, or component changes:
 - Reference the "Common UI Patterns" section in `/admin/design-system` for standard patterns
 - When creating new shared components, add them to the Component Library in the design system page
 
+### 📋 Artifact Changelog Rule
+**All artifact documents (.md files in artifacts directory) MUST have a changelog at the end:**
+
+```markdown
+---
+
+## Changelog
+
+| Date | Section | Change |
+|------|---------|--------|
+| 2025-12-24 | Launch Strategy | Added bootstrap/crowdfunding context |
+| 2025-12-24 | Initial | Document created with research findings |
+```
+
+**Format requirements:**
+- Place at the very end of the document after a horizontal rule
+- Use table format: Date | Section | Change
+- Most recent changes at top
+- "Section" should name the heading/area modified
+- "Change" should be a brief summary (one line)
+- Use correct current date (check context!)
+
+This ensures artifact history is traceable across AI sessions.
+
+### 📁 Artifact Storage Rule (IMPORTANT)
+**All AI-generated planning documents MUST be stored in the repository:**
+
+```
+docs/artifacts/
+├── task.md                      # Current task checklist
+├── implementation_plan.md       # Technical implementation plan
+├── decisions_*.md               # Decision documents with rationale
+└── [other planning docs]
+```
+
+**Rules:**
+1. **Store in repo** - Artifacts go in `docs/artifacts/`, NOT the hidden `.gemini` folder
+2. **Version controlled** - All planning docs should be committed to git
+3. **Naming convention** - Use descriptive names: `decisions_[topic].md`, `plan_[feature].md`
+4. **Copy to repo** - If you create artifacts elsewhere, copy them to `docs/artifacts/`
+
+This ensures all planning documents are:
+- Part of the repo history
+- Easy to find for developers
+- Reviewed in PRs
+- Accessible across AI sessions
+
 This ensures documentation stays current for future sessions and developers.
 
 ---
@@ -315,6 +362,7 @@ This ensures documentation stays current for future sessions and developers.
 | [.cursor/rules/](./cursor/rules/) | Cursor IDE rules |
 | [globals.css](./src/app/globals.css) | Design tokens, CSS variables, utility classes |
 | [/admin/design-system](./src/app/admin/design-system/page.tsx) | **Live component examples** (superadmin only) - UPDATE when adding/changing components |
+| **AI Artifacts Folder** | `docs/artifacts/` - All AI-generated planning docs, decisions, task lists (version controlled) |
 
 ---
 
