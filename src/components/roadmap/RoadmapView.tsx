@@ -66,7 +66,7 @@ export default function RoadmapView({ items, isLoggedIn }: RoadmapViewProps) {
 
     const handleVote = async (itemId: string, priority: number) => {
         if (!isLoggedIn) {
-            window.location.href = "/auth/login?redirect=/roadmap";
+            window.location.href = "/sign-in?redirect=/roadmap";
             return;
         }
 
@@ -89,7 +89,7 @@ export default function RoadmapView({ items, isLoggedIn }: RoadmapViewProps) {
                 <div className="max-w-7xl mx-auto px-4 py-4">
                     <h1 className="text-xl font-bold text-slate-100">🗺️ Product Roadmap</h1>
                     <p className="text-sm text-slate-400">
-                        See what we're building. {!isLoggedIn && <a href="/auth/login?redirect=/roadmap" className="text-sky-400 hover:underline">Sign in</a>} to vote on features.
+                        See what we're building. {!isLoggedIn && <a href="/sign-in?redirect=/roadmap" className="text-sky-400 hover:underline">Sign in</a>} to vote on features.
                     </p>
                 </div>
             </div>
@@ -151,8 +151,8 @@ export default function RoadmapView({ items, isLoggedIn }: RoadmapViewProps) {
                                                                             handleVote(item.id, p);
                                                                         }}
                                                                         className={`w-6 h-6 text-[10px] rounded transition-colors ${item.user_vote === p
-                                                                                ? "bg-sky-500 text-white"
-                                                                                : "bg-slate-700 text-slate-400 hover:bg-slate-600"
+                                                                            ? "bg-sky-500 text-white"
+                                                                            : "bg-slate-700 text-slate-400 hover:bg-slate-600"
                                                                             }`}
                                                                     >
                                                                         {p}
@@ -197,7 +197,7 @@ export default function RoadmapView({ items, isLoggedIn }: RoadmapViewProps) {
 
             {/* Legend */}
             <div className="border-t border-slate-800 p-4 text-center text-xs text-slate-500">
-                Click a card to expand • {isLoggedIn ? "Click priority buttons to vote" : <a href="/auth/login?redirect=/roadmap" className="text-sky-400 hover:underline">Sign in to vote</a>}
+                Click a card to expand • {isLoggedIn ? "Click priority buttons to vote" : <a href="/sign-in?redirect=/roadmap" className="text-sky-400 hover:underline">Sign in to vote</a>}
             </div>
         </div>
     );
