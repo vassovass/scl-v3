@@ -7,6 +7,18 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2025-12-26]
+
+### Added
+
+- **PRD 1: Feedback Timestamp Tracking** - Database schema updates for admin feedback system
+  - `status_changed_at` column auto-updated when `board_status` changes
+  - Trigger function `update_feedback_timestamps()` for automatic timestamp management
+  - Composite indexes: `(board_status, type)`, `(status_changed_at DESC)`, `(updated_at DESC)`
+  - Backward compatible: existing records initialized with current timestamps
+
+---
+
 ## [2025-12-24]
 
 ### Added
