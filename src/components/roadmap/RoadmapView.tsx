@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
+import UniversalFilters, { FILTER_PRESETS } from "@/components/shared/UniversalFilters";
+import { FeedbackFilterState, DEFAULT_FILTER_STATE } from "@/lib/filters/feedbackFilters";
 
 interface RoadmapItem {
     id: string;
@@ -50,6 +52,18 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
     const [expandedCard, setExpandedCard] = useState<string | null>(null);
     const [showAllLater, setShowAllLater] = useState(false);
     const [showAllDone, setShowAllDone] = useState(false);
+    const [filters, setFilters] = useState<FeedbackFilterState>(DEFAULT_FILTER_STATE);
+
+    // Handle filter changes
+    const handleFiltersChange = useCallback((newFilters: FeedbackFilterState) => {
+        setFilters(newFilters);
+    }, []);
+
+    // Filter items by type (if selected)
+    const filteredItems = useMemo(() => {
+        if (!filters.type) return items;
+        return items.filter(item => item.type === filters.type);
+    }, [items, filters.type]);
 
     // Item limits per column for clean UX
     const COLUMN_LIMITS = {
@@ -64,7 +78,7 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
         let result: RoadmapItem[] = [];
 
         if (columnId === "done") {
-            result = items
+            result = filteredItems
                 .filter((i) => i.board_status === "done")
                 .sort((a, b) => {
                     if (a.completed_at && b.completed_at) {
@@ -74,7 +88,7 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                 });
         } else if (columnId === "now") {
             // Items in progress OR marked as "now" - agent work items first
-            result = items
+            result = filteredItems
                 .filter(
                     (i) => i.board_status !== "done" && (i.target_release === "now" || i.board_status === "in_progress" || i.is_agent_working)
                 )
@@ -85,7 +99,7 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                     return 0;
                 });
         } else {
-            result = items
+            result = filteredItems
                 .filter((i) => i.board_status !== "done" && i.target_release === columnId)
                 .sort((a, b) => b.avg_priority - a.avg_priority);
         }
@@ -179,7 +193,7 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                         <div className="flex items-center gap-3">
                             <h1 className="text-xl font-bold text-slate-100">🗺️ Product Roadmap</h1>
                             <span className="text-xs font-medium text-slate-500 bg-slate-800/50 px-2 py-1 rounded-full border border-slate-700/50">
-                                {items.length} features
+                                {filteredItems.length} features
                             </span>
                         </div>
                         <p className="text-sm text-slate-400">
@@ -206,6 +220,17 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                             </a>
                         )}
                     </div>
+                </div>
+            </div>
+
+            {/* Filter bar */}
+            <div className="border-b border-slate-800 bg-slate-900/30">
+                <div className="max-w-7xl mx-auto px-4 py-2">
+                    <UniversalFilters
+                        config={FILTER_PRESETS.publicRoadmap}
+                        onFiltersChange={handleFiltersChange}
+                        compact
+                    />
                 </div>
             </div>
 
