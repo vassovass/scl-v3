@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
+import { useFetch } from "@/hooks/useFetch";
 
 interface League {
   id: string;
@@ -16,32 +16,8 @@ interface League {
 
 export default function DashboardPage() {
   const { user, session } = useAuth();
-  const [leagues, setLeagues] = useState<League[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!session || !user) return;
-
-    const fetchLeagues = async () => {
-      try {
-        const response = await fetch("/api/leagues");
-        if (!response.ok) {
-          console.error("Error fetching leagues:", response.statusText);
-          setLoading(false);
-          return;
-        }
-
-        const data = await response.json();
-        setLeagues(data.leagues || []);
-      } catch (error) {
-        console.error("Error fetching leagues:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchLeagues();
-  }, [session, user]);
+  const { data, loading } = useFetch<{ leagues: League[] }>("/api/leagues");
+  const leagues = data?.leagues || [];
 
   return (
     <div className="min-h-screen bg-slate-950">

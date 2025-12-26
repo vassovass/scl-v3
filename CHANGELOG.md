@@ -33,6 +33,10 @@ All notable changes to StepLeague v3.
   - Auto Zod schema validation with helpful error messages
   - Consistent error handling across all routes
   - Migrated `feedback/route.ts` and `admin/kanban/route.ts` as examples
+- **PRD 5: Universal Data Fetching** - Standardized `useFetch` hook
+  - Eliminates boilerplate for fetching, loading, and error states
+  - Supports automatic refetching, caching options, and type safety
+  - Migrated Dashboard and FeedbackList components
 
 ---
 

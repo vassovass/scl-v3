@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import UniversalFilters, { FILTER_PRESETS } from "@/components/shared/UniversalFilters";
-import { FeedbackFilterState, DEFAULT_FILTER_STATE, filterBySource, TYPE_COLORS, STATUS_COLORS } from "@/lib/filters/feedbackFilters";
+import { FeedbackFilterState, DEFAULT_FILTER_STATE, TYPE_COLORS, STATUS_COLORS } from "@/lib/filters/feedbackFilters";
+import { useFetch } from "@/hooks/useFetch";
 
 interface FeedbackItem {
     id: string;
@@ -24,73 +25,65 @@ interface FeedbackItem {
     } | null;
 }
 
+interface ApiResponse {
+    data: FeedbackItem[];
+    pagination: {
+        total: number;
+        totalPages: number;
+        page: number;
+        limit: number;
+    };
+    error?: string;
+}
+
 export default function FeedbackList() {
-    const [items, setItems] = useState<FeedbackItem[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [pagination, setPagination] = useState({
         page: 1,
         limit: 50,
-        total: 0,
-        totalPages: 0,
     });
     const [filters, setFilters] = useState<FeedbackFilterState>(DEFAULT_FILTER_STATE);
 
-    const fetchFeedback = useCallback(async () => {
-        setLoading(true);
-        setError(null);
+    const queryParams = useMemo(() => {
+        const params = new URLSearchParams();
+        params.set("page", pagination.page.toString());
+        params.set("limit", pagination.limit.toString());
 
-        try {
-            const params = new URLSearchParams();
-            params.set("page", pagination.page.toString());
-            params.set("limit", pagination.limit.toString());
+        if (filters.type) params.set("type", filters.type);
+        if (filters.status) params.set("status", filters.status);
+        if (filters.search) params.set("search", filters.search);
+        if (filters.dateFrom) params.set("dateFrom", filters.dateFrom);
+        if (filters.dateTo) params.set("dateTo", filters.dateTo);
 
-            if (filters.type) params.set("type", filters.type);
-            if (filters.status) params.set("status", filters.status);
-            if (filters.search) params.set("search", filters.search);
-            if (filters.dateFrom) params.set("dateFrom", filters.dateFrom);
-            if (filters.dateTo) params.set("dateTo", filters.dateTo);
-
-            const res = await fetch(`/api/admin/kanban?${params.toString()}`);
-            const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.error || "Failed to fetch feedback");
-            }
-
-            let filtered = data.data || [];
-
-            // Client-side filter for isPublic (not in API yet)
-            if (filters.isPublic) {
-                const isPublicBool = filters.isPublic === "true";
-                filtered = filtered.filter((item: FeedbackItem) => item.is_public === isPublicBool);
-            }
-
-            // Client-side filter for source (user_submitted has user_id, admin_created doesn't)
-            if (filters.source) {
-                if (filters.source === "user_submitted") {
-                    filtered = filtered.filter((item: FeedbackItem) => item.user_id !== null);
-                } else if (filters.source === "admin_created") {
-                    filtered = filtered.filter((item: FeedbackItem) => item.user_id === null);
-                }
-            }
-
-            setItems(filtered);
-            setPagination(prev => ({
-                ...prev,
-                total: data.pagination?.total || filtered.length,
-                totalPages: data.pagination?.totalPages || 1,
-            }));
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
+        return params.toString();
     }, [pagination.page, pagination.limit, filters]);
 
-    useEffect(() => {
-        fetchFeedback();
-    }, [fetchFeedback]);
+    const { data: apiData, loading, error: fetchError } = useFetch<ApiResponse>(`/api/admin/kanban?${queryParams}`);
+    const error = fetchError ? fetchError.message : null;
+
+    const items = useMemo(() => {
+        let filtered = apiData?.data || [];
+
+        // Client-side filter for isPublic (not in API yet)
+        if (filters.isPublic) {
+            const isPublicBool = filters.isPublic === "true";
+            filtered = filtered.filter((item: FeedbackItem) => item.is_public === isPublicBool);
+        }
+
+        // Client-side filter for source (user_submitted has user_id, admin_created doesn't)
+        if (filters.source) {
+            if (filters.source === "user_submitted") {
+                filtered = filtered.filter((item: FeedbackItem) => item.user_id !== null);
+            } else if (filters.source === "admin_created") {
+                filtered = filtered.filter((item: FeedbackItem) => item.user_id === null);
+            }
+        }
+        return filtered;
+    }, [apiData, filters.isPublic, filters.source]);
+
+    const totalCount = apiData?.pagination?.total || items.length;
+    const totalPages = apiData?.pagination?.totalPages || 1;
+
+
 
     const handleFiltersChange = useCallback((newFilters: FeedbackFilterState) => {
         setFilters(newFilters);
@@ -111,7 +104,7 @@ export default function FeedbackList() {
             <UniversalFilters
                 config={FILTER_PRESETS.adminFeedback}
                 onFiltersChange={handleFiltersChange}
-                totalCount={pagination.total}
+                totalCount={totalCount}
                 filteredCount={items.length}
             />
 
@@ -218,7 +211,7 @@ export default function FeedbackList() {
             )}
 
             {/* Pagination */}
-            {pagination.totalPages > 1 && (
+            {totalPages > 1 && (
                 <div className="flex items-center justify-center gap-2">
                     <button
                         onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
@@ -228,11 +221,11 @@ export default function FeedbackList() {
                         Previous
                     </button>
                     <span className="text-sm text-slate-400">
-                        Page {pagination.page} of {pagination.totalPages}
+                        Page {pagination.page} of {totalPages}
                     </span>
                     <button
                         onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
-                        disabled={pagination.page >= pagination.totalPages}
+                        disabled={pagination.page >= totalPages}
                         className="rounded-lg bg-slate-800 px-3 py-2 text-sm text-slate-300 disabled:opacity-50 hover:bg-slate-700 disabled:hover:bg-slate-800"
                     >
                         Next
