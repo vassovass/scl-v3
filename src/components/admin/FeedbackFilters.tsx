@@ -9,6 +9,7 @@ interface FilterState {
     dateFrom: string;
     dateTo: string;
     isPublic: string;
+    source: string; // user_submitted, admin_created, or empty for all
 }
 
 interface FeedbackFiltersProps {
@@ -50,6 +51,12 @@ const DATE_PRESETS = [
     { value: "custom", label: "Custom Range" },
 ];
 
+const SOURCE_OPTIONS = [
+    { value: "", label: "All Sources" },
+    { value: "user_submitted", label: "👤 User Submitted" },
+    { value: "admin_created", label: "🛠️ Admin Created" },
+];
+
 export default function FeedbackFilters({ onFiltersChange, totalCount, filteredCount }: FeedbackFiltersProps) {
     const [filters, setFilters] = useState<FilterState>({
         type: "",
@@ -58,6 +65,7 @@ export default function FeedbackFilters({ onFiltersChange, totalCount, filteredC
         dateFrom: "",
         dateTo: "",
         isPublic: "",
+        source: "",
     });
     const [datePreset, setDatePreset] = useState("");
     const [searchInput, setSearchInput] = useState("");
@@ -108,6 +116,7 @@ export default function FeedbackFilters({ onFiltersChange, totalCount, filteredC
             dateFrom: "",
             dateTo: "",
             isPublic: "",
+            source: "",
         });
         setSearchInput("");
         setDatePreset("");
@@ -119,6 +128,7 @@ export default function FeedbackFilters({ onFiltersChange, totalCount, filteredC
         filters.search,
         filters.dateFrom || filters.dateTo,
         filters.isPublic,
+        filters.source,
     ].filter(Boolean).length;
 
     return (
@@ -173,6 +183,17 @@ export default function FeedbackFilters({ onFiltersChange, totalCount, filteredC
                     className="rounded-lg border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-slate-200 focus:border-sky-500 focus:outline-none"
                 >
                     {VISIBILITY_OPTIONS.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                </select>
+
+                {/* Source filter (user vs admin) */}
+                <select
+                    value={filters.source}
+                    onChange={(e) => setFilters(prev => ({ ...prev, source: e.target.value }))}
+                    className="rounded-lg border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-slate-200 focus:border-sky-500 focus:outline-none"
+                >
+                    {SOURCE_OPTIONS.map(opt => (
                         <option key={opt.value} value={opt.value}>{opt.label}</option>
                     ))}
                 </select>
@@ -248,6 +269,11 @@ export default function FeedbackFilters({ onFiltersChange, totalCount, filteredC
                     {filters.isPublic && (
                         <span className="rounded-full bg-rose-500/20 px-2 py-0.5 text-xs text-rose-400">
                             {filters.isPublic === "true" ? "Public Only" : "Internal Only"}
+                        </span>
+                    )}
+                    {filters.source && (
+                        <span className="rounded-full bg-cyan-500/20 px-2 py-0.5 text-xs text-cyan-400">
+                            {SOURCE_OPTIONS.find(o => o.value === filters.source)?.label}
                         </span>
                     )}
                 </div>

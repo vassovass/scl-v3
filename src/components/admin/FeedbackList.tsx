@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import FeedbackFilters from "./FeedbackFilters";
+import UniversalFilters, { FILTER_PRESETS } from "@/components/shared/UniversalFilters";
+import { FeedbackFilterState, DEFAULT_FILTER_STATE, filterBySource, TYPE_COLORS, STATUS_COLORS } from "@/lib/filters/feedbackFilters";
 
 interface FeedbackItem {
     id: string;
@@ -23,32 +24,6 @@ interface FeedbackItem {
     } | null;
 }
 
-interface FilterState {
-    type: string;
-    status: string;
-    search: string;
-    dateFrom: string;
-    dateTo: string;
-    isPublic: string;
-}
-
-const TYPE_COLORS: Record<string, string> = {
-    bug: "bg-rose-500/10 text-rose-400",
-    feature: "bg-amber-500/10 text-amber-400",
-    improvement: "bg-sky-500/10 text-sky-400",
-    general: "bg-slate-500/10 text-slate-400",
-    positive: "bg-emerald-500/10 text-emerald-400",
-    negative: "bg-red-500/10 text-red-400",
-};
-
-const STATUS_COLORS: Record<string, string> = {
-    backlog: "text-slate-500",
-    todo: "text-slate-400",
-    in_progress: "text-sky-400",
-    review: "text-amber-400",
-    done: "text-emerald-400",
-};
-
 export default function FeedbackList() {
     const [items, setItems] = useState<FeedbackItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -59,14 +34,7 @@ export default function FeedbackList() {
         total: 0,
         totalPages: 0,
     });
-    const [filters, setFilters] = useState<FilterState>({
-        type: "",
-        status: "",
-        search: "",
-        dateFrom: "",
-        dateTo: "",
-        isPublic: "",
-    });
+    const [filters, setFilters] = useState<FeedbackFilterState>(DEFAULT_FILTER_STATE);
 
     const fetchFeedback = useCallback(async () => {
         setLoading(true);
@@ -98,6 +66,15 @@ export default function FeedbackList() {
                 filtered = filtered.filter((item: FeedbackItem) => item.is_public === isPublicBool);
             }
 
+            // Client-side filter for source (user_submitted has user_id, admin_created doesn't)
+            if (filters.source) {
+                if (filters.source === "user_submitted") {
+                    filtered = filtered.filter((item: FeedbackItem) => item.user_id !== null);
+                } else if (filters.source === "admin_created") {
+                    filtered = filtered.filter((item: FeedbackItem) => item.user_id === null);
+                }
+            }
+
             setItems(filtered);
             setPagination(prev => ({
                 ...prev,
@@ -115,7 +92,7 @@ export default function FeedbackList() {
         fetchFeedback();
     }, [fetchFeedback]);
 
-    const handleFiltersChange = useCallback((newFilters: FilterState) => {
+    const handleFiltersChange = useCallback((newFilters: FeedbackFilterState) => {
         setFilters(newFilters);
         setPagination(prev => ({ ...prev, page: 1 })); // Reset to page 1 on filter change
     }, []);
@@ -131,7 +108,8 @@ export default function FeedbackList() {
     return (
         <div className="space-y-6">
             {/* Filters */}
-            <FeedbackFilters
+            <UniversalFilters
+                config={FILTER_PRESETS.adminFeedback}
                 onFiltersChange={handleFiltersChange}
                 totalCount={pagination.total}
                 filteredCount={items.length}

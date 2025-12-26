@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
+import { filterBySource, FeedbackFilterState, DEFAULT_FILTER_STATE } from "@/lib/filters/feedbackFilters";
+import UniversalFilters, { FILTER_PRESETS } from "@/components/shared/UniversalFilters";
 
 interface FeedbackItem {
     id: string;
@@ -14,6 +16,7 @@ interface FeedbackItem {
     created_at: string;
     completed_at: string | null;
     target_release: string;
+    user_id: string | null;
     users?: { nickname: string } | null;
 }
 
@@ -54,6 +57,26 @@ interface KanbanBoardProps {
 export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
     const [columns, setColumns] = useState<KanbanColumn[]>([]);
     const [isUpdating, setIsUpdating] = useState(false);
+    const [filters, setFilters] = useState<FeedbackFilterState>(DEFAULT_FILTER_STATE);
+
+    // Handle filter changes from UniversalFilters
+    const handleFiltersChange = useCallback((newFilters: FeedbackFilterState) => {
+        setFilters(newFilters);
+    }, []);
+
+    // Filter items based on current filters
+    const filteredItems = useMemo(() => {
+        let items = initialItems;
+        items = filterBySource(items, filters.source);
+        if (filters.type) {
+            items = items.filter(item => item.type === filters.type);
+        }
+        if (filters.isPublic) {
+            const isPublicBool = filters.isPublic === "true";
+            items = items.filter(item => item.is_public === isPublicBool);
+        }
+        return items;
+    }, [initialItems, filters]);
 
     // Export all items to CSV
     const exportToCSV = () => {
@@ -138,15 +161,15 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
             }
         }
 
-        // Organize items into columns
+        // Organize items into columns using filtered items
         const organized = orderedColumns.map((col) => ({
             ...col,
-            items: initialItems
+            items: filteredItems
                 .filter((item) => item.board_status === col.id)
                 .sort((a, b) => a.priority_order - b.priority_order),
         }));
         setColumns(organized);
-    }, [initialItems]);
+    }, [filteredItems]);
 
     const handleDragEnd = async (result: DropResult) => {
         const { source, destination, draggableId, type } = result;
@@ -264,23 +287,30 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
 
     return (
         <div className="relative h-full flex flex-col">
-            {/* Header with Export Button */}
-            <div className="flex items-center justify-end mb-3 gap-2">
-                {isUpdating && (
-                    <span className="text-xs text-sky-400 animate-pulse">
-                        Saving...
-                    </span>
-                )}
-                <button
-                    onClick={exportToCSV}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-lg border border-slate-700 hover:border-slate-600 transition-colors"
-                    title="Export all items to CSV"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    Export CSV
-                </button>
+            {/* Header with Filters and Export Button */}
+            <div className="flex flex-wrap items-center justify-between mb-3 gap-2">
+                <UniversalFilters
+                    config={FILTER_PRESETS.adminKanban}
+                    onFiltersChange={handleFiltersChange}
+                    compact
+                />
+                <div className="flex items-center gap-2">
+                    {isUpdating && (
+                        <span className="text-xs text-sky-400 animate-pulse">
+                            Saving...
+                        </span>
+                    )}
+                    <button
+                        onClick={exportToCSV}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-lg border border-slate-700 hover:border-slate-600 transition-colors"
+                        title="Export all items to CSV"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Export CSV
+                    </button>
+                </div>
             </div>
 
             <DragDropContext onDragEnd={handleDragEnd}>
