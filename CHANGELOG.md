@@ -16,6 +16,11 @@ All notable changes to StepLeague v3.
   - Trigger function `update_feedback_timestamps()` for automatic timestamp management
   - Composite indexes: `(board_status, type)`, `(status_changed_at DESC)`, `(updated_at DESC)`
   - Backward compatible: existing records initialized with current timestamps
+- **PRD 2: Admin Feedback APIs** - Enhanced APIs for feedback management
+  - GET `/api/admin/kanban` now supports pagination, filtering, and search
+  - Query params: `page`, `limit`, `type`, `status`, `search`, `dateFrom`, `dateTo`, `sortBy`, `sortOrder`
+  - POST `/api/admin/feedback/bulk` for bulk updates (up to 100 items at once)
+  - Returns pagination metadata with total count and pages
 
 ---
 
