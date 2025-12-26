@@ -21,6 +21,12 @@ All notable changes to StepLeague v3.
   - Query params: `page`, `limit`, `type`, `status`, `search`, `dateFrom`, `dateTo`, `sortBy`, `sortOrder`
   - POST `/api/admin/feedback/bulk` for bulk updates (up to 100 items at once)
   - Returns pagination metadata with total count and pages
+- **PRD 3: Filter & Search UI** - Filter controls for admin feedback page
+  - `FeedbackFilters.tsx` component with type/status/visibility dropdowns
+  - Debounced search (300ms) across title and description
+  - Date presets (Today, This Week, This Month, Custom range)
+  - Active filter badges with clear all button
+  - `FeedbackList.tsx` client component with API fetching and pagination
 
 ---
 
