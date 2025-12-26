@@ -27,6 +27,12 @@ All notable changes to StepLeague v3.
   - Date presets (Today, This Week, This Month, Custom range)
   - Active filter badges with clear all button
   - `FeedbackList.tsx` client component with API fetching and pagination
+- **PRD 4: Unified API Handler** - Reusable wrapper eliminating boilerplate from API routes
+  - `withApiHandler()` function in `src/lib/api/handler.ts`
+  - 6 auth levels: `none`, `required`, `superadmin`, `league_member`, `league_admin`, `league_owner`
+  - Auto Zod schema validation with helpful error messages
+  - Consistent error handling across all routes
+  - Migrated `feedback/route.ts` and `admin/kanban/route.ts` as examples
 
 ---
 

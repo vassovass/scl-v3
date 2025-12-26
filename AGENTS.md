@@ -79,6 +79,14 @@
 
 ## Critical Rules
 
+### 0. Check Existing Patterns (MANDATORY)
+
+Before implementing any feature or refactoring:
+
+1. **Search implementation**: Check how similar features are implemented (e.g., auth, data fetching, error handling).
+2. **Check data models**: Look at `schema.sql` or existing types to understand relationships (e.g., `role` vs `is_superadmin`).
+3. **Don't assume**: Verify assumptions about auth levels, database columns, and existing utilities.
+
 ### 1. Mobile-First Design (MANDATORY)
 
 All UI must be designed mobile-first using Tailwind's responsive prefixes:
@@ -107,7 +115,37 @@ const supabase = createServerClient<Database>(...);
 
 ### 3. API Route Pattern
 
-Always use `adminClient` for database operations (bypasses RLS):
+**NEW: Use `withApiHandler` for new routes** (eliminates boilerplate):
+
+> **Usage Rule:** Use this new pattern for ALL new routes. Migrate legacy routes only when you are already modifying them for other reasons.
+
+```typescript
+import { withApiHandler } from "@/lib/api/handler";
+import { z } from "zod";
+
+const mySchema = z.object({ name: z.string() });
+
+export const POST = withApiHandler({
+  auth: 'required',  // or 'none', 'superadmin', 'league_member', 'league_admin', 'league_owner'
+  schema: mySchema,
+}, async ({ user, body, adminClient }) => {
+  const { data } = await adminClient.from("table").insert({ ...body, user_id: user.id });
+  return { success: true, data };
+});
+```
+
+**Auth levels:**
+
+| Level | Description |
+|-------|-------------|
+| `none` | No auth required |
+| `required` | Must be logged in |
+| `superadmin` | Site-wide superadmin |
+| `league_member` | Must be member of the league |
+| `league_admin` | Must be admin or owner |
+| `league_owner` | Must be owner |
+
+**Legacy pattern** (still works, for existing routes):
 
 ```typescript
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
