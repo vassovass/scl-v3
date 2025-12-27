@@ -13,10 +13,13 @@ import { APP_CONFIG } from "@/lib/config";
 interface NavHeaderProps {
     /** Override auto-detected menu location */
     location?: MenuLocation;
+    /** Visual variant - 'transparent' for hero overlays (homepage) */
+    variant?: 'default' | 'transparent';
 }
 
-export function NavHeader({ location: locationOverride }: NavHeaderProps = {}) {
+export function NavHeader({ location: locationOverride, variant = 'default' }: NavHeaderProps = {}) {
     const { user, session, signOut } = useAuth();
+    const isTransparent = variant === 'transparent';
     const pathname = usePathname();
     const router = useRouter();
     const [isSuperadmin, setIsSuperadmin] = useState(false);
@@ -132,8 +135,13 @@ export function NavHeader({ location: locationOverride }: NavHeaderProps = {}) {
         }
     };
 
+    // Dynamic header classes based on variant
+    const headerClasses = isTransparent
+        ? "absolute top-0 left-0 right-0 z-40 bg-transparent transition-all duration-300"
+        : "sticky top-0 z-40 border-b border-slate-800 bg-slate-950/95 backdrop-blur-md transition-all duration-300";
+
     return (
-        <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/95 backdrop-blur-md transition-all duration-300">
+        <header className={headerClasses}>
             <nav ref={navRef} className="mx-auto flex max-w-6xl items-center justify-between px-4 h-14">
                 {/* Logo */}
                 <Link href="/dashboard" className="group flex items-center gap-2">

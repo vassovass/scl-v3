@@ -28,6 +28,11 @@ All notable changes to StepLeague v3.
   - `MENU_LOCATIONS` config maps locations to menu sets
   - `detectMenuLocation()` auto-detects appropriate menu based on pathname
   - `NavHeader` accepts optional `location` prop for override
+- **PRD 8: Homepage Swap** - Promoted new Strava-inspired homepage
+  - Replaced simple homepage with immersive hero design from `/home-preview`
+  - Added `variant` prop to NavHeader ('default' | 'transparent') for hero overlays
+  - Created `(home)` route group with transparent nav for sleek homepage design
+  - Deleted `/home-preview` route and folder
 
 ### Changed
 
