@@ -30,16 +30,25 @@ export function FeedbackWidget() {
         }
     }, [isOpen, status]);
 
+    const [isCapturing, setIsCapturing] = useState(false);
+
     const handleCapture = async () => {
+        setIsCapturing(true);
         try {
             const html2canvas = (await import("html2canvas")).default;
             const canvas = await html2canvas(document.body, {
                 backgroundColor: "#020617", // slate-950
                 ignoreElements: (element) => element.id === "feedback-widget",
+                useCORS: true, // Crucial for external images (Supabase, etc)
+                logging: false, // Reduce console noise
+                scale: 1, // Default scale to prevent massive images
             });
             setScreenshot(canvas.toDataURL("image/png"));
         } catch (err) {
             console.error("Screenshot failed:", err);
+            // Optional: Show a toast or error state here
+        } finally {
+            setIsCapturing(false);
         }
     };
 
@@ -166,6 +175,7 @@ export function FeedbackWidget() {
                                 <button
                                     type="button"
                                     onClick={handleCapture}
+                                    disabled={isCapturing}
                                     className={`flex flex-1 items-center justify-center gap-2 rounded-lg border border-dashed px-3 py-2 text-xs transition ${screenshot
                                         ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
                                         : "border-slate-700 text-slate-400 hover:border-slate-600 hover:text-slate-300"
@@ -183,6 +193,11 @@ export function FeedbackWidget() {
                                             >
                                                 ✕
                                             </span>
+                                        </>
+                                    ) : isCapturing ? (
+                                        <>
+                                            <span className="animate-spin">⏳</span>
+                                            <span>Capturing...</span>
                                         </>
                                     ) : (
                                         <>📷 Attach Screenshot</>
