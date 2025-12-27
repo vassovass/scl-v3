@@ -19,6 +19,7 @@ interface FeedbackItem {
     target_release: string;
     user_id: string | null;
     users?: { nickname: string } | null;
+    screenshot_url: string | null;
 }
 
 interface KanbanColumn {
@@ -382,7 +383,21 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                                                                         </p>
 
                                                                         <div className="mt-2 text-[10px] text-slate-500 flex items-center justify-between">
-                                                                            <span>{new Date(item.created_at).toLocaleDateString()}</span>
+                                                                            <div className="flex items-center gap-2">
+                                                                                <span>{new Date(item.created_at).toLocaleDateString()}</span>
+                                                                                {item.screenshot_url && (
+                                                                                    <a
+                                                                                        href={item.screenshot_url}
+                                                                                        target="_blank"
+                                                                                        rel="noopener noreferrer"
+                                                                                        className="text-emerald-400 hover:text-emerald-300 transition-colors"
+                                                                                        title="View Screenshot"
+                                                                                        onClick={(e) => e.stopPropagation()}
+                                                                                    >
+                                                                                        📷
+                                                                                    </a>
+                                                                                )}
+                                                                            </div>
                                                                             {item.users?.nickname && (
                                                                                 <span className="text-slate-400">
                                                                                     👤 {item.users.nickname}
