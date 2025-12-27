@@ -178,7 +178,7 @@ export function prepareMenuItems(
 // ----------------------------
 
 /**
- * Main navigation menu (Dashboard, League, Actions)
+ * Main navigation menu (Dashboard, League, Actions, Roadmap)
  */
 export const MAIN_MENU: MenuDefinition = {
     id: 'main',
@@ -208,6 +208,14 @@ export const MAIN_MENU: MenuDefinition = {
                 { id: 'create-league', label: 'Create League', href: '/league/create', icon: '➕' },
                 { id: 'join-league', label: 'Join League', href: '/join', icon: '🔗' },
             ]
+        },
+        {
+            id: 'roadmap',
+            label: 'Roadmap',
+            href: '/roadmap',
+            icon: '🗺️',
+            // Visible to ALL users including guests
+            visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'],
         },
     ]
 };

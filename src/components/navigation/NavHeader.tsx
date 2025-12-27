@@ -178,6 +178,17 @@ export function NavHeader({ location: locationOverride }: NavHeaderProps = {}) {
                             Dashboard
                         </Link>
 
+                        {/* Roadmap Link - visible to all users */}
+                        <Link
+                            href="/roadmap"
+                            className={`px-3 py-2 text-sm rounded-lg transition-colors duration-200 ${pathname === "/roadmap"
+                                ? "bg-sky-600/20 text-sky-400 font-medium"
+                                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                                }`}
+                        >
+                            🗺️ Roadmap
+                        </Link>
+
                         {/* League Menu */}
                         {currentLeagueId && (
                             <div data-tour="nav-league-menu">
