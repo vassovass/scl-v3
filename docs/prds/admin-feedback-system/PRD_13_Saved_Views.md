@@ -23,6 +23,7 @@ Before starting work on this PRD, the implementing agent MUST:
    - Update roadmap when complete
 
 3. **After completion:**
+   - Commit with message format: `feat(PRD-XX): Brief description`
    - Mark this PRD as done on the Kanban board
 
 ---
