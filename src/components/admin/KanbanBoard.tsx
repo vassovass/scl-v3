@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import { filterBySource, FeedbackFilterState, DEFAULT_FILTER_STATE } from "@/lib/filters/feedbackFilters";
+import { TYPE_COLORS, RELEASE_OPTIONS } from "@/lib/badges";
 import UniversalFilters, { FILTER_PRESETS } from "@/components/shared/UniversalFilters";
 
 interface FeedbackItem {
@@ -20,13 +21,6 @@ interface FeedbackItem {
     users?: { nickname: string } | null;
 }
 
-const RELEASE_OPTIONS: { id: string; label: string; color: string }[] = [
-    { id: "now", label: "🔥 Now", color: "bg-rose-500/20 text-rose-400" },
-    { id: "next", label: "⏭️ Next", color: "bg-amber-500/20 text-amber-400" },
-    { id: "later", label: "📅 Later", color: "bg-sky-500/20 text-sky-400" },
-    { id: "future", label: "🔮 Future", color: "bg-slate-500/20 text-slate-400" },
-];
-
 interface KanbanColumn {
     id: string;
     title: string;
@@ -40,15 +34,6 @@ const COLUMNS: { id: string; title: string }[] = [
     { id: "review", title: "👀 Review" },
     { id: "done", title: "✅ Done" },
 ];
-
-const TYPE_COLORS: Record<string, string> = {
-    bug: "bg-rose-500/20 text-rose-400 border-rose-500/30",
-    feature: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-    improvement: "bg-sky-500/20 text-sky-400 border-sky-500/30",
-    general: "bg-slate-500/20 text-slate-400 border-slate-500/30",
-    positive: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-    negative: "bg-red-500/20 text-red-400 border-red-500/30",
-};
 
 interface KanbanBoardProps {
     initialItems: FeedbackItem[];

@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from "react";
 import UniversalFilters, { FILTER_PRESETS } from "@/components/shared/UniversalFilters";
 import { FeedbackFilterState, DEFAULT_FILTER_STATE } from "@/lib/filters/feedbackFilters";
+import { BADGE_CONFIG, getBadgeClass, getBadgeConfig } from "@/lib/badges";
 
 interface RoadmapItem {
     id: string;
@@ -21,26 +22,12 @@ interface RoadmapItem {
     completion_status: string;
 }
 
-// Status badge styling
-const STATUS_BADGES: Record<string, { label: string; className: string; pulse?: boolean }> = {
-    in_progress: { label: "● Building Now", className: "text-sky-400 bg-sky-500/20", pulse: true },
-    pending_review: { label: "⏳ Awaiting Review", className: "text-amber-400 bg-amber-500/20" },
-    verified: { label: "✓ Verified", className: "text-emerald-400 bg-emerald-500/20" },
-    needs_work: { label: "⚠ Needs Work", className: "text-rose-400 bg-rose-500/20" },
-};
-
 const COLUMNS = [
     { id: "now", label: "🔥 Now", description: "In active development" },
     { id: "next", label: "⏭️ Next", description: "Coming soon" },
     { id: "later", label: "📅 Later", description: "On the roadmap" },
     { id: "done", label: "✅ Done", description: "Recently shipped" },
 ];
-
-const TYPE_BADGES: Record<string, string> = {
-    feature: "text-amber-400",
-    improvement: "text-sky-400",
-    bug: "text-rose-400",
-};
 
 interface RoadmapViewProps {
     items: RoadmapItem[];
@@ -273,15 +260,15 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                                                         <span className="animate-pulse">●</span> Building Now
                                                     </span>
                                                 )}
-                                                {!item.is_agent_working && STATUS_BADGES[item.completion_status] && item.completion_status !== "backlog" && item.completion_status !== "done" && (
-                                                    <span className={`inline-flex items-center gap-1 text-[9px] uppercase font-medium px-1.5 py-0.5 rounded mb-1 ${STATUS_BADGES[item.completion_status].className}`}>
-                                                        {STATUS_BADGES[item.completion_status].pulse && <span className="animate-pulse">●</span>}
-                                                        {STATUS_BADGES[item.completion_status].label.replace("● ", "")}
+                                                {!item.is_agent_working && getBadgeConfig('status', item.completion_status) && item.completion_status !== "backlog" && item.completion_status !== "done" && (
+                                                    <span className={`inline-flex items-center gap-1 text-[9px] uppercase font-medium px-1.5 py-0.5 rounded mb-1 ${getBadgeClass('status', item.completion_status)}`}>
+                                                        {getBadgeConfig('status', item.completion_status)?.pulse && <span className="animate-pulse">●</span>}
+                                                        {getBadgeConfig('status', item.completion_status)?.label.replace("● ", "")}
                                                     </span>
                                                 )}
 
                                                 {/* Type badge */}
-                                                <span className={`text-[9px] uppercase font-medium ${TYPE_BADGES[item.type] || "text-slate-400"}`}>
+                                                <span className={`text-[9px] uppercase font-medium ${getBadgeClass('type', item.type) || "text-slate-400"}`}>
                                                     {item.type}
                                                 </span>
 

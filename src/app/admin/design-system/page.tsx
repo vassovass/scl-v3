@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import Link from "next/link";
 import { Spinner } from "@/components/ui/Spinner";
+import { Badge } from "@/components/ui/Badge";
 
 /**
  * SUPERADMIN-ONLY: Design System & Brand Guidelines
@@ -429,6 +430,99 @@ export default function DesignSystemPage() {
                                 <span className="stat-value">100+</span>
                                 <span className="stat-label">Athletes</span>
                             </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Badge Component Section */}
+                <section className="mb-16">
+                    <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+                        Badge Component
+                    </h2>
+
+                    <div className="glass-card p-6">
+                        <p className="text-sm text-slate-400 mb-6">
+                            Centralized badge system used across Kanban, Roadmap, and Leaderboard. All badges are defined in <code className="text-sky-400">src/lib/badges.ts</code>.
+                        </p>
+
+                        {/* Type Badges */}
+                        <div className="mb-6">
+                            <h3 className="text-sm font-medium text-slate-300 mb-3">Type Badges</h3>
+                            <div className="flex flex-wrap gap-2">
+                                <Badge category="type" value="bug" />
+                                <Badge category="type" value="feature" />
+                                <Badge category="type" value="improvement" />
+                                <Badge category="type" value="general" />
+                                <Badge category="type" value="positive" />
+                                <Badge category="type" value="negative" />
+                            </div>
+                        </div>
+
+                        {/* Status Badges */}
+                        <div className="mb-6">
+                            <h3 className="text-sm font-medium text-slate-300 mb-3">Status Badges</h3>
+                            <div className="flex flex-wrap gap-2">
+                                <Badge category="status" value="backlog" />
+                                <Badge category="status" value="todo" />
+                                <Badge category="status" value="in_progress" />
+                                <Badge category="status" value="review" />
+                                <Badge category="status" value="done" />
+                            </div>
+                        </div>
+
+                        {/* Release Badges */}
+                        <div className="mb-6">
+                            <h3 className="text-sm font-medium text-slate-300 mb-3">Release Badges</h3>
+                            <div className="flex flex-wrap gap-2">
+                                <Badge category="release" value="now" />
+                                <Badge category="release" value="next" />
+                                <Badge category="release" value="later" />
+                                <Badge category="release" value="future" />
+                            </div>
+                        </div>
+
+                        {/* Achievement Badges */}
+                        <div className="mb-6">
+                            <h3 className="text-sm font-medium text-slate-300 mb-3">Achievement Badges</h3>
+                            <div className="flex flex-wrap gap-2">
+                                <Badge category="achievement" value="leader" />
+                                <Badge category="achievement" value="most_improved" />
+                                <Badge category="achievement" value="streak_7" />
+                                <Badge category="achievement" value="streak_30" />
+                                <Badge category="achievement" value="million_club" />
+                            </div>
+                        </div>
+
+                        {/* Size Variants */}
+                        <div className="mb-6 pt-6 border-t border-slate-700">
+                            <h3 className="text-sm font-medium text-slate-300 mb-3">Size Variants</h3>
+                            <div className="flex flex-wrap items-center gap-4">
+                                <div className="text-center">
+                                    <Badge category="type" value="bug" size="sm" />
+                                    <p className="text-xs text-slate-500 mt-1">sm</p>
+                                </div>
+                                <div className="text-center">
+                                    <Badge category="type" value="bug" size="md" />
+                                    <p className="text-xs text-slate-500 mt-1">md (default)</p>
+                                </div>
+                                <div className="text-center">
+                                    <Badge category="type" value="bug" size="lg" />
+                                    <p className="text-xs text-slate-500 mt-1">lg</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Usage */}
+                        <div className="pt-6 border-t border-slate-700">
+                            <p className="text-xs text-slate-500 mb-4">Usage:</p>
+                            <pre className="text-xs text-slate-400 bg-slate-900 p-4 rounded-lg overflow-x-auto">
+                                {`import { Badge } from "@/components/ui/Badge";
+
+<Badge category="type" value="bug" />
+<Badge category="status" value="in_progress" size="sm" />
+<Badge category="release" value="now" showLabel={false} />`}
+                            </pre>
                         </div>
                     </div>
                 </section>

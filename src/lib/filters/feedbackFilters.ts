@@ -55,23 +55,8 @@ export const TARGET_RELEASE_OPTIONS = [
     { value: "future", label: "💭 Future" },
 ] as const;
 
-// Color mappings for badges
-export const TYPE_COLORS: Record<string, string> = {
-    bug: "bg-rose-500/10 text-rose-400",
-    feature: "bg-amber-500/10 text-amber-400",
-    improvement: "bg-sky-500/10 text-sky-400",
-    general: "bg-slate-500/10 text-slate-400",
-    positive: "bg-emerald-500/10 text-emerald-400",
-    negative: "bg-red-500/10 text-red-400",
-};
-
-export const STATUS_COLORS: Record<string, string> = {
-    backlog: "text-slate-500",
-    todo: "text-slate-400",
-    in_progress: "text-sky-400",
-    review: "text-amber-400",
-    done: "text-emerald-400",
-};
+// Color mappings for badges - re-exported from central config
+export { TYPE_COLORS, STATUS_COLORS } from '@/lib/badges';
 
 // Type definitions
 export interface FeedbackFilterState {

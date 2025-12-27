@@ -7,6 +7,26 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2025-12-27]
+
+### Added
+
+- **PRD 6: Badge & Color System** - Centralized badge configuration eliminating duplicates
+  - `src/lib/badges.ts` - Single source of truth for all badge definitions (type, status, release, achievement)
+  - `src/components/ui/Badge.tsx` - Reusable badge component with size variants
+  - Utility functions: `getBadgeClass()`, `getBadgeConfig()`, `getBadgeLabel()`, `getBadgeIcon()`
+  - Backward-compatible exports: `TYPE_COLORS`, `STATUS_COLORS`, `RELEASE_OPTIONS`, `BADGE_INFO`
+  - Design system page updated with Badge component examples
+
+### Changed
+
+- `feedbackFilters.ts` - Now re-exports colors from `badges.ts`
+- `KanbanBoard.tsx` - Uses central `badges.ts` for TYPE_COLORS and RELEASE_OPTIONS
+- `RoadmapView.tsx` - Uses `getBadgeConfig()` and `getBadgeClass()` from badges.ts
+- `leaderboard/page.tsx` - Imports BADGE_INFO from `badges.ts`
+
+---
+
 ## [2025-12-26]
 
 ### Added
