@@ -47,39 +47,28 @@ export function FeedbackWidget() {
         e.preventDefault();
         setStatus("submitting");
 
-        const payload = {
-            type,
-            subject: subject || "Quick Feedback",
-            description,
-            page_url: window.location.href,
-            screenshot,
-        };
-
-        console.log("[FeedbackWidget] Submitting:", { ...payload, screenshot: screenshot ? "[has screenshot]" : null });
-
         try {
             const res = await fetch("/api/feedback", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
+                body: JSON.stringify({
+                    type,
+                    subject: subject || "Quick Feedback",
+                    description,
+                    page_url: window.location.href, // full URL
+                    screenshot,
+                }),
             });
 
-            const data = await res.json();
-            console.log("[FeedbackWidget] Response:", { status: res.status, ok: res.ok, data });
+            if (!res.ok) throw new Error("Failed to submit");
 
-            if (!res.ok) {
-                console.error("[FeedbackWidget] Error response:", data);
-                throw new Error(data.error || "Failed to submit");
-            }
-
-            console.log("[FeedbackWidget] Success! ID:", data.id);
             setStatus("success");
             setTimeout(() => {
                 setIsOpen(false);
             }, 2000);
         } catch (err) {
             setStatus("error");
-            console.error("[FeedbackWidget] Submit error:", err);
+            console.error(err);
         }
     };
 
