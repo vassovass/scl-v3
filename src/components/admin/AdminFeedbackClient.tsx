@@ -27,6 +27,7 @@ interface FeedbackItem {
     target_release: string;
     user_id: string | null;
     users?: { nickname: string } | null;
+    screenshot_url: string | null;
 }
 
 interface AdminFeedbackClientProps {
@@ -72,8 +73,8 @@ export default function AdminFeedbackClient({ initialItems }: AdminFeedbackClien
                     <button
                         onClick={() => handleViewChange("list")}
                         className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${view === "list"
-                                ? "bg-sky-500/20 text-sky-400 border border-sky-500/30"
-                                : "text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
+                            ? "bg-sky-500/20 text-sky-400 border border-sky-500/30"
+                            : "text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
                             }`}
                         title="List View"
                     >
@@ -85,8 +86,8 @@ export default function AdminFeedbackClient({ initialItems }: AdminFeedbackClien
                     <button
                         onClick={() => handleViewChange("kanban")}
                         className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${view === "kanban"
-                                ? "bg-sky-500/20 text-sky-400 border border-sky-500/30"
-                                : "text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
+                            ? "bg-sky-500/20 text-sky-400 border border-sky-500/30"
+                            : "text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
                             }`}
                         title="Kanban View"
                     >
