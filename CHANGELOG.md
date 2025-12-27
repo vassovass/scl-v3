@@ -17,6 +17,17 @@ All notable changes to StepLeague v3.
   - Utility functions: `getBadgeClass()`, `getBadgeConfig()`, `getBadgeLabel()`, `getBadgeIcon()`
   - Backward-compatible exports: `TYPE_COLORS`, `STATUS_COLORS`, `RELEASE_OPTIONS`, `BADGE_INFO`
   - Design system page updated with Badge component examples
+- **PRD 7: Navigation Across All Pages** - Consistent NavHeader on all pages
+  - 8 new layout files: `admin/`, `roadmap/`, `feedback/`, `settings/`, `beta/`, `privacy/`, `security/`, `terms/`
+  - NavHeader adapts for logged-in (full menu) vs non-logged-in (logo + Sign in) users
+  - GlobalFooter included on all pages
+  - Admin dropdown visible to superadmins on every page
+- **PRD 7 Part B: Menu Locations System** - WordPress-style context-aware menus
+  - `MenuLocation` type: `public_header`, `app_header`, `admin_header`, `footer`
+  - `PUBLIC_MENU` for marketing pages (Features, Roadmap, Beta Info)
+  - `MENU_LOCATIONS` config maps locations to menu sets
+  - `detectMenuLocation()` auto-detects appropriate menu based on pathname
+  - `NavHeader` accepts optional `location` prop for override
 
 ### Changed
 

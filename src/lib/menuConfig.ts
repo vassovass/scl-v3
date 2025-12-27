@@ -63,6 +63,38 @@ export interface MenuDefinition {
 }
 
 // ----------------------------
+// Menu Locations (WordPress-style)
+// ----------------------------
+
+/**
+ * Menu location types - where menus can be displayed
+ * Similar to WordPress menu locations (Primary, Footer, etc.)
+ */
+export type MenuLocation =
+    | 'public_header'    // Public/marketing pages (/, /privacy, /terms, /beta)
+    | 'app_header'       // Authenticated app pages (/dashboard, /league/*)
+    | 'admin_header'     // Admin pages (/admin/*)
+    | 'footer';          // Global footer (all pages)
+
+/**
+ * Configuration for each menu location
+ */
+export interface MenuLocationConfig {
+    /** Which menu IDs to display at this location */
+    menus: (keyof typeof MENUS)[];
+    /** Show the logo */
+    showLogo: boolean;
+    /** Show sign-in button for non-authenticated users */
+    showSignIn: boolean;
+    /** Show user menu for authenticated users */
+    showUserMenu: boolean;
+    /** Show admin menu for superadmins */
+    showAdminMenu: boolean;
+    /** Optional: CSS class to add to the header */
+    className?: string;
+}
+
+// ----------------------------
 // Role Utilities
 // ----------------------------
 
@@ -293,6 +325,19 @@ export const FOOTER_LEGAL: MenuDefinition = {
 };
 
 /**
+ * Public/Marketing header menu (for non-authenticated pages)
+ * Shown on: /, /privacy, /terms, /security, /beta
+ */
+export const PUBLIC_MENU: MenuDefinition = {
+    id: 'public',
+    items: [
+        { id: 'public-features', label: 'Features', href: '/#features', icon: '✨', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
+        { id: 'public-roadmap', label: 'Roadmap', href: '/roadmap', icon: '🗺️', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
+        { id: 'public-beta', label: 'Beta Info', href: '/beta', icon: '🚧', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
+    ]
+};
+
+/**
  * All menus exported as a single object
  */
 export const MENUS = {
@@ -300,10 +345,88 @@ export const MENUS = {
     help: HELP_MENU,
     user: USER_MENU,
     admin: ADMIN_MENU,
+    public: PUBLIC_MENU,
     footerNavigation: FOOTER_NAVIGATION,
     footerAccount: FOOTER_ACCOUNT,
     footerLegal: FOOTER_LEGAL,
 } as const;
+
+// ----------------------------
+// Menu Locations Configuration
+// ----------------------------
+
+/**
+ * Configuration for each menu location
+ * Defines which menus appear where and what UI elements to show
+ */
+export const MENU_LOCATIONS: Record<MenuLocation, MenuLocationConfig> = {
+    public_header: {
+        menus: ['public'],
+        showLogo: true,
+        showSignIn: true,
+        showUserMenu: true,      // Show if logged in
+        showAdminMenu: true,     // Show if superadmin
+    },
+    app_header: {
+        menus: ['main', 'help'],
+        showLogo: true,
+        showSignIn: true,
+        showUserMenu: true,
+        showAdminMenu: true,
+    },
+    admin_header: {
+        menus: ['main', 'help'],
+        showLogo: true,
+        showSignIn: true,
+        showUserMenu: true,
+        showAdminMenu: true,
+        className: 'admin-header',
+    },
+    footer: {
+        menus: ['footerNavigation', 'footerAccount', 'footerLegal'],
+        showLogo: true,
+        showSignIn: false,
+        showUserMenu: false,
+        showAdminMenu: false,
+    },
+};
+
+/**
+ * Detect menu location based on pathname
+ * Used by NavHeader to auto-select appropriate menu configuration
+ */
+export function detectMenuLocation(pathname: string): MenuLocation {
+    // Admin pages
+    if (pathname.startsWith('/admin')) {
+        return 'admin_header';
+    }
+
+    // App pages (authenticated user areas)
+    if (
+        pathname.startsWith('/dashboard') ||
+        pathname.startsWith('/league') ||
+        pathname.startsWith('/settings') ||
+        pathname.startsWith('/join')
+    ) {
+        return 'app_header';
+    }
+
+    // Public/marketing pages
+    const publicPages = ['/', '/privacy', '/terms', '/security', '/beta', '/roadmap', '/feedback'];
+    if (publicPages.includes(pathname) || publicPages.some(p => pathname === p)) {
+        return 'public_header';
+    }
+
+    // Default to app header for unknown pages
+    return 'app_header';
+}
+
+/**
+ * Get menu configuration for a location
+ */
+export function getMenuConfig(location: MenuLocation): MenuLocationConfig {
+    return MENU_LOCATIONS[location];
+}
 
 // ----------------------------
 // Legacy Compatibility
@@ -313,3 +436,4 @@ export const MENUS = {
 export const LEAGUE_MENU_ITEMS = MAIN_MENU.items.find(i => i.id === 'league')?.children ?? [];
 export const ACTIONS_MENU_ITEMS = MAIN_MENU.items.find(i => i.id === 'actions')?.children ?? [];
 export const FOOTER_LINKS = [...FOOTER_LEGAL.items, { id: 'roadmap', label: 'Roadmap', href: '/roadmap', icon: '🗺️' }];
+

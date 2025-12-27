@@ -2,15 +2,20 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { createClient } from "@/lib/supabase/client";
 import { MenuRenderer } from "./MenuRenderer";
 import { MobileMenu } from "./MobileMenu";
-import { MenuItem, UserRole, MENUS } from "@/lib/menuConfig";
+import { MenuItem, UserRole, MENUS, MenuLocation, detectMenuLocation, MENU_LOCATIONS } from "@/lib/menuConfig";
 import { APP_CONFIG } from "@/lib/config";
 
-export function NavHeader() {
+interface NavHeaderProps {
+    /** Override auto-detected menu location */
+    location?: MenuLocation;
+}
+
+export function NavHeader({ location: locationOverride }: NavHeaderProps = {}) {
     const { user, session, signOut } = useAuth();
     const pathname = usePathname();
     const router = useRouter();
@@ -26,6 +31,14 @@ export function NavHeader() {
 
     // Determine user role for menu filtering
     const userRole: UserRole = !session ? 'guest' : isSuperadmin ? 'superadmin' : 'member';
+
+    // Detect menu location based on pathname or use override
+    const menuLocation = useMemo(() =>
+        locationOverride ?? detectMenuLocation(pathname),
+        [locationOverride, pathname]
+    );
+    const locationConfig = MENU_LOCATIONS[menuLocation];
+    const isPublicLocation = menuLocation === 'public_header';
 
     useEffect(() => {
         if (!user) {
@@ -260,7 +273,23 @@ export function NavHeader() {
                     </div>
                 )}
 
-                {!session && (
+                {/* Public menu for non-authenticated users on public pages */}
+                {!session && isPublicLocation && (
+                    <div className="hidden md:flex items-center gap-4">
+                        {MENUS.public.items.map((item) => (
+                            <Link
+                                key={item.id}
+                                href={item.href || '#'}
+                                className="text-sm text-slate-400 hover:text-slate-200 transition-colors"
+                            >
+                                {item.icon} {item.label}
+                            </Link>
+                        ))}
+                    </div>
+                )}
+
+                {/* Sign in button */}
+                {!session && locationConfig.showSignIn && (
                     <Link
                         href="/sign-in"
                         className="rounded-lg bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 shadow-lg shadow-sky-500/20"

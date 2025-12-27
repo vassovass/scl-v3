@@ -1,4 +1,4 @@
-# PRD 07: Navigation Across All Pages
+# PRD 07: Navigation & Menu Locations System
 
 > **Order:** 7 of 17  
 > **Previous:** [PRD 6: Badge & Color System](./PRD_06_Badge_Color_System.md)  
@@ -15,8 +15,6 @@ Before starting work on this PRD, the implementing agent MUST:
    - `src/lib/menuConfig.ts` - The existing modular menu system
    - `src/components/navigation/NavHeader.tsx` - Current navigation header
    - `src/app/(dashboard)/layout.tsx` - Dashboard layout with navigation
-   - `src/app/roadmap/page.tsx` - Roadmap page (may lack navigation)
-   - `src/app/admin/kanban/page.tsx` - Kanban page
 
 2. **Follow documentation rules:**
    - Update `CHANGELOG.md` with all changes
@@ -31,113 +29,163 @@ Before starting work on this PRD, the implementing agent MUST:
 
 ## Outcome
 
-The navigation header (with admin dropdown menu) is consistently available across all pages of the site, including:
-
-- Public roadmap page (`/roadmap`)
-- Admin feedback page (`/admin/feedback`)
-- Admin kanban page (`/admin/kanban`)
-- All other pages
+1. Navigation header consistently available across all pages
+2. **WordPress-style menu locations** - different menu configurations for different page contexts
+3. Easy to configure which menu appears where
 
 ---
 
-## Problem Statement
+## Part A: Navigation Coverage ✅ COMPLETE
 
-Currently, some pages may not have the full navigation system:
+All pages now have navigation via layout files:
 
-- The `(dashboard)` route group includes `NavHeader` in its layout
-- But standalone pages like `/roadmap`, `/admin/*` might not have it
-- Users navigating to these pages lose access to the menu system
-
----
-
-## What is Needed
-
-### 1. Audit Navigation Coverage
-
-Check which pages currently have `NavHeader`:
-
-| Page/Route | Has Navigation? |
-|------------|-----------------|
-| `/dashboard` | ✅ Yes (via layout) |
-| `/league/[id]/*` | ✅ Yes (via layout) |
-| `/roadmap` | ❓ Check |
-| `/admin/kanban` | ❓ Check |
-| `/admin/feedback` | ❓ Check |
-| `/admin/design-system` | ❓ Check |
-| `/feedback` | ❓ Check |
-| `/settings/profile` | ❓ Check |
-
-### 2. Ensure Consistent Navigation
-
-Options:
-
-1. **Move pages into `(dashboard)` route group** - if they need auth
-2. **Add NavHeader directly** - for public pages
-3. **Create a shared layout** - for admin pages
-
-### 3. Admin Dropdown Always Available
-
-When logged in as SuperAdmin:
-
-- The admin dropdown should appear in navigation on ALL pages
-- Uses the existing `ADMIN_MENU` from `menuConfig.ts`
+| Page/Route | Status |
+|------------|--------|
+| `/dashboard`, `/league/*` | ✅ Via `(dashboard)/layout.tsx` |
+| `/admin/*` | ✅ Via `admin/layout.tsx` |
+| `/roadmap` | ✅ Via `roadmap/layout.tsx` |
+| `/feedback` | ✅ Via `feedback/layout.tsx` |
+| `/settings/*` | ✅ Via `settings/layout.tsx` |
+| `/beta`, `/privacy`, `/security`, `/terms` | ✅ Via individual layouts |
 
 ---
 
-## Implementation Notes
+## Part B: Menu Locations System (NEW)
 
-### Existing System (DO NOT REBUILD)
+### Problem
 
-The menu system already exists in `src/lib/menuConfig.ts`:
+Currently, `NavHeader` shows the same menu structure everywhere and only adapts via user role. There's no way to show **different menus for different page contexts** like WordPress allows.
 
-- Role-based visibility
-- Admin menu configuration
-- Just ensure it's rendered everywhere
+### What is Needed
 
-### Route Groups
+#### 1. Menu Location Types
 
-```
-src/app/
-├── (dashboard)/         # Has NavHeader in layout ✅
-│   ├── dashboard/
-│   ├── league/
-│   └── ...
-├── admin/               # May need NavHeader added
-│   ├── kanban/
-│   ├── feedback/
-│   └── design-system/
-└── roadmap/             # May need NavHeader added
+Define distinct menu locations in `menuConfig.ts`:
+
+```typescript
+export type MenuLocation = 
+  | 'public_header'    // Public/marketing pages (/, /privacy, /terms)
+  | 'app_header'       // Authenticated app pages (/dashboard, /league/*)
+  | 'admin_header'     // Admin pages (/admin/*)
+  | 'footer'           // Global footer
+  | 'mobile';          // Mobile drawer menu
+
+export const MENU_LOCATIONS: Record<MenuLocation, MenuLocationConfig> = {
+  public_header: {
+    menus: ['public'],           // Show simplified public menu
+    showLogo: true,
+    showSignIn: true,            // Show sign-in CTA
+    showUserMenu: false,         // Hide when logged out
+  },
+  app_header: {
+    menus: ['main', 'help'],     // Full app navigation
+    showLogo: true,
+    showUserMenu: true,
+    showAdminMenu: true,         // If superadmin
+  },
+  admin_header: {
+    menus: ['main', 'help', 'admin'],
+    showLogo: true,
+    showUserMenu: true,
+    highlight: 'admin',          // Highlight admin context
+  },
+  // ...
+};
 ```
 
+#### 2. Public Menu Definition
+
+Add a simplified menu for public/marketing pages:
+
+```typescript
+export const PUBLIC_MENU: MenuDefinition = {
+  id: 'public',
+  items: [
+    { id: 'features', label: 'Features', href: '/#features' },
+    { id: 'roadmap', label: 'Roadmap', href: '/roadmap' },
+    { id: 'beta', label: 'Beta Info', href: '/beta' },
+  ]
+};
+```
+
+#### 3. NavHeader Enhancement
+
+Update `NavHeader` to accept a `location` prop:
+
+```tsx
+interface NavHeaderProps {
+  location?: MenuLocation;  // Default: auto-detect from path
+}
+
+export function NavHeader({ location }: NavHeaderProps) {
+  // Auto-detect location if not provided
+  const detectedLocation = location ?? detectMenuLocation(pathname);
+  const config = MENU_LOCATIONS[detectedLocation];
+  
+  // Render based on config
+  return (
+    <header>
+      {config.showLogo && <Logo />}
+      {config.menus.map(menuId => <MenuRenderer menuId={menuId} />)}
+      {config.showSignIn && !session && <SignInButton />}
+      {config.showUserMenu && session && <UserMenu />}
+    </header>
+  );
+}
+```
+
+#### 4. Location Detection Helper
+
+```typescript
+export function detectMenuLocation(pathname: string): MenuLocation {
+  if (pathname.startsWith('/admin')) return 'admin_header';
+  if (pathname.startsWith('/dashboard') || pathname.startsWith('/league')) return 'app_header';
+  if (['/', '/privacy', '/terms', '/security', '/beta'].includes(pathname)) return 'public_header';
+  // Default to app header for authenticated pages
+  return 'app_header';
+}
+```
+
 ---
 
-## Files to Check/Modify
+## Files to Create/Modify
 
 | File | Action |
 |------|--------|
-| `src/app/(dashboard)/layout.tsx` | REFERENCE - See how NavHeader is used |
-| `src/app/admin/layout.tsx` | CREATE or MODIFY - Add NavHeader for admin pages |
-| `src/app/roadmap/layout.tsx` | CREATE or MODIFY - Add NavHeader |
-| `src/app/feedback/layout.tsx` | CHECK - May need NavHeader |
+| `src/lib/menuConfig.ts` | MODIFY - Add MenuLocation types, PUBLIC_MENU, MENU_LOCATIONS config |
+| `src/components/navigation/NavHeader.tsx` | MODIFY - Add location prop, use MENU_LOCATIONS config |
+| `src/app/admin/design-system/page.tsx` | MODIFY - Document menu locations |
 
 ---
 
 ## Success Criteria
 
-- [ ] Navigation header appears on `/roadmap` page
-- [ ] Navigation header appears on all `/admin/*` pages
-- [ ] Admin dropdown menu visible for SuperAdmins on all pages
-- [ ] Mobile menu works on all pages
-- [ ] No duplicate navigation headers
+### Part A (Complete)
+
+- [x] Navigation header appears on all pages
+- [x] Admin dropdown visible for SuperAdmins everywhere
+- [x] Mobile menu works on all pages
+- [x] No duplicate navigation headers
+
+### Part B (Menu Locations)
+
+- [ ] `MenuLocation` type defined in `menuConfig.ts`
+- [ ] `PUBLIC_MENU` created for marketing pages
+- [ ] `MENU_LOCATIONS` config maps locations to menu sets
+- [ ] `NavHeader` accepts optional `location` prop
+- [ ] Auto-detection works based on pathname
+- [ ] Public pages show simplified menu (Features, Roadmap, Beta Info)
+- [ ] App pages show full navigation
+- [ ] Admin pages highlight admin context
 - [ ] Build passes (`npm run build`)
 
 ---
 
 ## Out of Scope
 
-- Changing navigation design/styling
-- Adding new menu items
-- Changing menu behavior
+- Database-driven menu configuration (future enhancement)
+- Drag-and-drop menu builder UI
+- Per-page menu overrides (use location prop if needed)
 
 ---
 
@@ -145,4 +193,6 @@ src/app/
 
 | Date | Section | Change |
 |------|---------|--------|
+| 2025-12-27 | Part B | Added WordPress-style menu locations system |
+| 2025-12-27 | Part A | Completed - 8 layout files created |
 | 2025-12-26 | Initial | Created PRD for consistent navigation |
