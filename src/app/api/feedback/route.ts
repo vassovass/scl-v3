@@ -64,7 +64,7 @@ export const POST = withApiHandler({
         page_url: page_url || null,
         screenshot_url: screenshotUrl,
         user_agent: request.headers.get("user-agent"),
-        status: "new",
+        status: "pending",
         board_status: "backlog", // Ensure it appears in kanban
     };
 
