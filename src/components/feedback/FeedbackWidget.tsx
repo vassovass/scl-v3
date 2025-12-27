@@ -47,28 +47,39 @@ export function FeedbackWidget() {
         e.preventDefault();
         setStatus("submitting");
 
+        const payload = {
+            type,
+            subject: subject || "Quick Feedback",
+            description,
+            page_url: window.location.href,
+            screenshot,
+        };
+
+        console.log("[FeedbackWidget] Submitting:", { ...payload, screenshot: screenshot ? "[has screenshot]" : null });
+
         try {
             const res = await fetch("/api/feedback", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    type,
-                    subject: subject || "Quick Feedback",
-                    description,
-                    page_url: window.location.href, // full URL
-                    screenshot,
-                }),
+                body: JSON.stringify(payload),
             });
 
-            if (!res.ok) throw new Error("Failed to submit");
+            const data = await res.json();
+            console.log("[FeedbackWidget] Response:", { status: res.status, ok: res.ok, data });
 
+            if (!res.ok) {
+                console.error("[FeedbackWidget] Error response:", data);
+                throw new Error(data.error || "Failed to submit");
+            }
+
+            console.log("[FeedbackWidget] Success! ID:", data.id);
             setStatus("success");
             setTimeout(() => {
                 setIsOpen(false);
             }, 2000);
         } catch (err) {
             setStatus("error");
-            console.error(err);
+            console.error("[FeedbackWidget] Submit error:", err);
         }
     };
 
@@ -121,12 +132,12 @@ export function FeedbackWidget() {
                                         type="button"
                                         onClick={() => setType(t)}
                                         className={`flex-1 rounded-md py-1.5 text-xs font-medium transition ${type === t
-                                                ? t === "bug"
-                                                    ? "bg-rose-500/20 text-rose-400"
-                                                    : t === "feature"
-                                                        ? "bg-amber-500/20 text-amber-400"
-                                                        : "bg-sky-500/20 text-sky-400"
-                                                : "text-slate-400 hover:text-slate-200"
+                                            ? t === "bug"
+                                                ? "bg-rose-500/20 text-rose-400"
+                                                : t === "feature"
+                                                    ? "bg-amber-500/20 text-amber-400"
+                                                    : "bg-sky-500/20 text-sky-400"
+                                            : "text-slate-400 hover:text-slate-200"
                                             }`}
                                     >
                                         {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -167,8 +178,8 @@ export function FeedbackWidget() {
                                     type="button"
                                     onClick={handleCapture}
                                     className={`flex flex-1 items-center justify-center gap-2 rounded-lg border border-dashed px-3 py-2 text-xs transition ${screenshot
-                                            ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
-                                            : "border-slate-700 text-slate-400 hover:border-slate-600 hover:text-slate-300"
+                                        ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
+                                        : "border-slate-700 text-slate-400 hover:border-slate-600 hover:text-slate-300"
                                         }`}
                                 >
                                     {screenshot ? (
