@@ -28,12 +28,20 @@ export interface FilterConfig {
 
 // Preset configurations for common pages
 export const FILTER_PRESETS = {
-    // Admin Feedback page - all filters
+    // Admin Feedback page - all filters except source (user feedback only)
     adminFeedback: {
         type: true,
         status: true,
         visibility: true,
-        source: true,
+        date: true,
+        search: true,
+    } as FilterConfig,
+
+    // User feedback page - no source filter (always user-submitted)
+    userFeedbackOnly: {
+        type: true,
+        status: true,
+        visibility: true,
         date: true,
         search: true,
     } as FilterConfig,

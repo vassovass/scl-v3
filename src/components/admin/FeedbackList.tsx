@@ -2,8 +2,9 @@
 
 import { useState, useCallback, useMemo } from "react";
 import UniversalFilters, { FILTER_PRESETS } from "@/components/shared/UniversalFilters";
-import { FeedbackFilterState, DEFAULT_FILTER_STATE, TYPE_COLORS, STATUS_COLORS } from "@/lib/filters/feedbackFilters";
+import { FeedbackFilterState, DEFAULT_FILTER_STATE, BOARD_STATUS_OPTIONS } from "@/lib/filters/feedbackFilters";
 import { useFetch } from "@/hooks/useFetch";
+import { Badge } from "@/components/ui/Badge";
 
 interface FeedbackItem {
     id: string;
@@ -36,12 +37,46 @@ interface ApiResponse {
     error?: string;
 }
 
-export default function FeedbackList() {
+interface FeedbackListProps {
+    /** When true, only shows user-submitted feedback (user_id IS NOT NULL) */
+    userFeedbackOnly?: boolean;
+}
+
+// Check if item is new (created in last 24 hours)
+function isNewItem(createdAt: string): boolean {
+    const created = new Date(createdAt);
+    const now = new Date();
+    const hoursDiff = (now.getTime() - created.getTime()) / (1000 * 60 * 60);
+    return hoursDiff < 24;
+}
+
+// Skeleton loader component
+function FeedbackSkeleton() {
+    return (
+        <div className="animate-pulse space-y-4">
+            {[1, 2, 3].map((i) => (
+                <div key={i} className="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                        <div className="h-5 w-16 bg-slate-700 rounded" />
+                        <div className="h-5 w-20 bg-slate-700 rounded" />
+                        <div className="h-5 w-24 bg-slate-700 rounded" />
+                    </div>
+                    <div className="h-5 w-3/4 bg-slate-700 rounded mb-2" />
+                    <div className="h-4 w-full bg-slate-800 rounded" />
+                    <div className="h-4 w-2/3 bg-slate-800 rounded mt-1" />
+                </div>
+            ))}
+        </div>
+    );
+}
+
+export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListProps) {
     const [pagination, setPagination] = useState({
         page: 1,
         limit: 50,
     });
     const [filters, setFilters] = useState<FeedbackFilterState>(DEFAULT_FILTER_STATE);
+    const [updatingId, setUpdatingId] = useState<string | null>(null);
 
     const queryParams = useMemo(() => {
         const params = new URLSearchParams();
@@ -54,10 +89,15 @@ export default function FeedbackList() {
         if (filters.dateFrom) params.set("dateFrom", filters.dateFrom);
         if (filters.dateTo) params.set("dateTo", filters.dateTo);
 
-        return params.toString();
-    }, [pagination.page, pagination.limit, filters]);
+        // Always filter to user-submitted only when userFeedbackOnly is true
+        if (userFeedbackOnly) {
+            params.set("source", "user_submitted");
+        }
 
-    const { data: apiData, loading, error: fetchError } = useFetch<ApiResponse>(`/api/admin/kanban?${queryParams}`);
+        return params.toString();
+    }, [pagination.page, pagination.limit, filters, userFeedbackOnly]);
+
+    const { data: apiData, loading, error: fetchError, refetch } = useFetch<ApiResponse>(`/api/admin/kanban?${queryParams}`);
     const error = fetchError ? fetchError.message : null;
 
     const items = useMemo(() => {
@@ -69,8 +109,8 @@ export default function FeedbackList() {
             filtered = filtered.filter((item: FeedbackItem) => item.is_public === isPublicBool);
         }
 
-        // Client-side filter for source (user_submitted has user_id, admin_created doesn't)
-        if (filters.source) {
+        // Client-side filter for source if needed (when not using userFeedbackOnly)
+        if (!userFeedbackOnly && filters.source) {
             if (filters.source === "user_submitted") {
                 filtered = filtered.filter((item: FeedbackItem) => item.user_id !== null);
             } else if (filters.source === "admin_created") {
@@ -78,17 +118,52 @@ export default function FeedbackList() {
             }
         }
         return filtered;
-    }, [apiData, filters.isPublic, filters.source]);
+    }, [apiData, filters.isPublic, filters.source, userFeedbackOnly]);
 
     const totalCount = apiData?.pagination?.total || items.length;
     const totalPages = apiData?.pagination?.totalPages || 1;
-
-
 
     const handleFiltersChange = useCallback((newFilters: FeedbackFilterState) => {
         setFilters(newFilters);
         setPagination(prev => ({ ...prev, page: 1 })); // Reset to page 1 on filter change
     }, []);
+
+    // Quick action: Toggle public visibility
+    const togglePublic = async (itemId: string, currentState: boolean) => {
+        setUpdatingId(itemId);
+        try {
+            await fetch("/api/admin/kanban", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: itemId, is_public: !currentState }),
+            });
+            refetch();
+        } catch (error) {
+            console.error("Failed to toggle public:", error);
+        }
+        setUpdatingId(null);
+    };
+
+    // Quick action: Change status
+    const changeStatus = async (itemId: string, newStatus: string) => {
+        setUpdatingId(itemId);
+        try {
+            const completedAt = newStatus === "done" ? new Date().toISOString() : null;
+            await fetch("/api/admin/kanban", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id: itemId,
+                    board_status: newStatus,
+                    completed_at: completedAt,
+                }),
+            });
+            refetch();
+        } catch (error) {
+            console.error("Failed to change status:", error);
+        }
+        setUpdatingId(null);
+    };
 
     if (error) {
         return (
@@ -100,111 +175,145 @@ export default function FeedbackList() {
 
     return (
         <div className="space-y-6">
-            {/* Filters */}
+            {/* Filters - use userFeedbackOnly preset when applicable */}
             <UniversalFilters
-                config={FILTER_PRESETS.adminFeedback}
+                config={userFeedbackOnly ? FILTER_PRESETS.userFeedbackOnly : FILTER_PRESETS.adminFeedback}
                 onFiltersChange={handleFiltersChange}
                 totalCount={totalCount}
                 filteredCount={items.length}
             />
 
-            {/* Loading state */}
-            {loading && (
-                <div className="flex items-center justify-center py-12">
-                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-sky-500 border-t-transparent" />
-                </div>
-            )}
+            {/* Loading state with skeleton */}
+            {loading && <FeedbackSkeleton />}
 
             {/* Feedback list */}
             {!loading && (
                 <div className="grid gap-4">
-                    {items.map((item) => (
-                        <div
-                            key={item.id}
-                            className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 transition hover:border-slate-700"
-                        >
-                            <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
-                                <div className="flex flex-wrap items-center gap-2 md:gap-3">
-                                    {/* Type badge */}
-                                    <span className={`rounded-md px-2 py-1 text-xs font-medium uppercase tracking-wider ${TYPE_COLORS[item.type] || TYPE_COLORS.general}`}>
-                                        {item.type}
-                                    </span>
+                    {items.map((item) => {
+                        const isNew = isNewItem(item.created_at);
+                        const isUpdating = updatingId === item.id;
 
-                                    {/* Status badge */}
-                                    <span className={`text-xs uppercase ${STATUS_COLORS[item.board_status] || STATUS_COLORS.backlog}`}>
-                                        {item.board_status?.replace("_", " ")}
-                                    </span>
+                        return (
+                            <div
+                                key={item.id}
+                                className={`rounded-xl border bg-slate-900/50 p-5 transition hover:border-slate-700 ${isNew
+                                        ? "border-sky-500/50 ring-1 ring-sky-500/20"
+                                        : "border-slate-800"
+                                    } ${isUpdating ? "opacity-60" : ""}`}
+                            >
+                                <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
+                                    <div className="flex flex-wrap items-center gap-2 md:gap-3">
+                                        {/* NEW badge */}
+                                        {isNew && (
+                                            <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-sky-400 animate-pulse">
+                                                NEW
+                                            </span>
+                                        )}
 
-                                    {/* Public indicator */}
-                                    {item.is_public && (
-                                        <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-xs text-sky-400">
-                                            🌐 Public
+                                        {/* Type badge using Badge component */}
+                                        <Badge category="type" value={item.type} size="sm" />
+
+                                        {/* Status - inline editable dropdown */}
+                                        <select
+                                            value={item.board_status || "backlog"}
+                                            onChange={(e) => changeStatus(item.id, e.target.value)}
+                                            disabled={isUpdating}
+                                            className="text-xs uppercase bg-slate-800/80 border border-slate-700 rounded px-2 py-1 text-slate-300 focus:border-sky-500 focus:outline-none cursor-pointer hover:border-slate-600 transition"
+                                            title="Change status"
+                                        >
+                                            {BOARD_STATUS_OPTIONS.filter(opt => opt.value).map(opt => (
+                                                <option key={opt.value} value={opt.value}>
+                                                    {opt.label}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        {/* Date */}
+                                        <span className="text-xs text-slate-500">
+                                            {new Date(item.created_at).toLocaleDateString()}
                                         </span>
-                                    )}
 
-                                    {/* Date */}
-                                    <span className="text-xs text-slate-500">
-                                        {new Date(item.created_at).toLocaleDateString()}
-                                    </span>
+                                        {/* User */}
+                                        {item.user_id && item.users && (
+                                            <span className="text-xs text-slate-400">
+                                                by {item.users.nickname || item.users.display_name || "User"}
+                                            </span>
+                                        )}
+                                    </div>
 
-                                    {/* User */}
-                                    {item.user_id && item.users && (
-                                        <span className="text-xs text-slate-400">
-                                            by {item.users.nickname || item.users.display_name || "User"}
-                                        </span>
-                                    )}
+                                    {/* Quick actions */}
+                                    <div className="flex items-center gap-2">
+                                        {/* Toggle roadmap visibility */}
+                                        <button
+                                            onClick={() => togglePublic(item.id, item.is_public)}
+                                            disabled={isUpdating}
+                                            className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium transition ${item.is_public
+                                                    ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                                                    : "bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-300"
+                                                }`}
+                                            title={item.is_public ? "Remove from roadmap" : "Add to roadmap"}
+                                        >
+                                            {item.is_public ? "🌐 Public" : "🔒 Private"}
+                                        </button>
+                                    </div>
                                 </div>
+
+                                {/* Subject */}
+                                {item.subject && (
+                                    <h3 className="mb-2 font-semibold text-slate-200">{item.subject}</h3>
+                                )}
+
+                                {/* Description */}
+                                <p className="whitespace-pre-wrap text-sm text-slate-300 line-clamp-3">
+                                    {item.description}
+                                </p>
+
+                                {/* Page URL */}
+                                {item.page_url && (
+                                    <div className="mt-3 text-xs text-slate-500">
+                                        Page:{" "}
+                                        <a
+                                            href={item.page_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="hover:text-sky-400 hover:underline"
+                                        >
+                                            {item.page_url}
+                                        </a>
+                                    </div>
+                                )}
+
+                                {/* Screenshot */}
+                                {item.screenshot_url && (
+                                    <div className="mt-4">
+                                        <details className="group">
+                                            <summary className="cursor-pointer text-xs font-medium text-sky-500 hover:text-sky-400">
+                                                View Screenshot
+                                            </summary>
+                                            <div className="mt-2 overflow-hidden rounded-lg border border-slate-700">
+                                                <img
+                                                    src={item.screenshot_url}
+                                                    alt="Feedback screenshot"
+                                                    className="max-h-96 w-auto object-contain"
+                                                />
+                                            </div>
+                                        </details>
+                                    </div>
+                                )}
                             </div>
-
-                            {/* Subject */}
-                            {item.subject && (
-                                <h3 className="mb-2 font-semibold text-slate-200">{item.subject}</h3>
-                            )}
-
-                            {/* Description */}
-                            <p className="whitespace-pre-wrap text-sm text-slate-300 line-clamp-3">
-                                {item.description}
-                            </p>
-
-                            {/* Page URL */}
-                            {item.page_url && (
-                                <div className="mt-3 text-xs text-slate-500">
-                                    Page:{" "}
-                                    <a
-                                        href={item.page_url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="hover:text-sky-400 hover:underline"
-                                    >
-                                        {item.page_url}
-                                    </a>
-                                </div>
-                            )}
-
-                            {/* Screenshot */}
-                            {item.screenshot_url && (
-                                <div className="mt-4">
-                                    <details className="group">
-                                        <summary className="cursor-pointer text-xs font-medium text-sky-500 hover:text-sky-400">
-                                            View Screenshot
-                                        </summary>
-                                        <div className="mt-2 overflow-hidden rounded-lg border border-slate-700">
-                                            <img
-                                                src={item.screenshot_url}
-                                                alt="Feedback screenshot"
-                                                className="max-h-96 w-auto object-contain"
-                                            />
-                                        </div>
-                                    </details>
-                                </div>
-                            )}
-                        </div>
-                    ))}
+                        );
+                    })}
 
                     {/* Empty state */}
                     {items.length === 0 && (
-                        <div className="py-12 text-center text-slate-500">
-                            No feedback matches your filters.
+                        <div className="py-12 text-center">
+                            <div className="text-4xl mb-3">📭</div>
+                            <p className="text-slate-400 font-medium">No feedback found</p>
+                            <p className="text-sm text-slate-500 mt-1">
+                                {userFeedbackOnly
+                                    ? "No user feedback matches your filters."
+                                    : "Try adjusting your filters to see more items."}
+                            </p>
                         </div>
                     )}
                 </div>

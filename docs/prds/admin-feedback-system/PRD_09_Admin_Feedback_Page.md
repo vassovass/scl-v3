@@ -49,6 +49,14 @@ The admin feedback page **already exists** with:
 
 ## What is Needed (Polish Only)
 
+### 0. User Feedback Only (CRITICAL)
+
+The `/admin/feedback` page must show **only user-submitted feedback** (items where `user_id IS NOT NULL`):
+
+- This page is for triaging real user feedback
+- Admin-created tasks/features remain on `/admin/kanban` only
+- Remove the "Source" filter from this page (not needed since it's always user-submitted)
+
 ### 1. View Toggle
 
 - Clear toggle between List and Kanban views
@@ -124,4 +132,6 @@ Each feedback item should allow:
 
 | Date | Section | Change |
 |------|---------|--------|
+| 2025-12-28 | Implementation | Completed - AdminFeedbackClient, FeedbackList updates, user-only filter |
+| 2025-12-28 | Requirements | Added user feedback only requirement (user_id IS NOT NULL) |
 | 2025-12-26 | Initial | Created PRD for admin feedback page polish |

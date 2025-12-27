@@ -7,6 +7,29 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2025-12-28]
+
+### Added
+
+- **PRD 9: Admin Feedback Page Polish** - Enhanced user feedback management
+  - `AdminFeedbackClient.tsx` - View toggle (List/Kanban) with localStorage persistence
+  - User feedback page now shows only user-submitted feedback (user_id IS NOT NULL)
+  - Inline status dropdown for quick status changes
+  - Roadmap visibility toggle (🌐/🔒) on each item
+  - "NEW" badge with highlight for items < 24 hours old
+  - Skeleton loader during data fetch
+  - Empty state with icon
+  - Uses Badge component from PRD 06
+  - Non-superadmins redirected to dashboard (access control)
+
+### Changed
+
+- `FeedbackList.tsx` - Added `userFeedbackOnly` prop, quick actions, Badge integration
+- `UniversalFilters.tsx` - Added `userFeedbackOnly` preset (no source filter)
+- `/admin/feedback` page - Now fetches only user-submitted feedback, uses AdminFeedbackClient
+
+---
+
 ## [2025-12-27]
 
 ### Added
