@@ -28,6 +28,12 @@ All notable changes to StepLeague v3.
 - `UniversalFilters.tsx` - Added `userFeedbackOnly` preset (no source filter)
 - `/admin/feedback` page - Now fetches only user-submitted feedback, uses AdminFeedbackClient
 
+### Fixed
+
+- **Feedback API** - Now returns proper error on insert failure instead of silent success
+- **Kanban API** - Added `source` filter support (`user_submitted` / `admin_created`)
+- **Feedback submission** - Now sets `board_status: "backlog"` so items appear in kanban
+
 ---
 
 ## [2025-12-27]

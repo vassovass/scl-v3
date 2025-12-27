@@ -1,5 +1,6 @@
 import { withApiHandler } from "@/lib/api/handler";
 import { z } from "zod";
+import { badRequest } from "@/lib/api";
 
 const feedbackSchema = z.object({
     type: z.enum(["bug", "feature", "general", "positive", "negative"]),
@@ -19,6 +20,15 @@ export const POST = withApiHandler({
 }, async ({ user, body, adminClient, request }) => {
     const { type, subject, description, page_url, screenshot } = body;
 
+    console.log("[Feedback API] Submitting feedback:", {
+        type,
+        subject,
+        hasUser: !!user,
+        userId: user?.id,
+        page_url,
+        hasScreenshot: !!screenshot,
+    });
+
     // Upload screenshot if provided
     let screenshotUrl: string | null = null;
     if (screenshot && screenshot.startsWith("data:image")) {
@@ -34,37 +44,44 @@ export const POST = withApiHandler({
                     upsert: false,
                 });
 
-            if (!uploadError && uploadData) {
+            if (uploadError) {
+                console.error("[Feedback API] Screenshot upload error:", uploadError);
+            } else if (uploadData) {
                 const { data: urlData } = adminClient.storage.from("uploads").getPublicUrl(uploadData.path);
                 screenshotUrl = urlData.publicUrl;
             }
         } catch (err) {
-            console.error("Screenshot upload failed:", err);
+            console.error("[Feedback API] Screenshot upload failed:", err);
         }
     }
 
     // Insert feedback record
-    const { error: insertError } = await adminClient
+    const insertData = {
+        user_id: user?.id || null,
+        type,
+        subject: subject || null,
+        description,
+        page_url: page_url || null,
+        screenshot_url: screenshotUrl,
+        user_agent: request.headers.get("user-agent"),
+        status: "new",
+        board_status: "backlog", // Ensure it appears in kanban
+    };
+
+    console.log("[Feedback API] Inserting:", insertData);
+
+    const { data, error: insertError } = await adminClient
         .from("feedback")
-        .insert({
-            user_id: user?.id || null,
-            type,
-            subject: subject || null,
-            description,
-            page_url: page_url || null,
-            screenshot_url: screenshotUrl,
-            user_agent: request.headers.get("user-agent"),
-            status: "new",
-        });
+        .insert(insertData)
+        .select()
+        .single();
 
     if (insertError) {
-        console.error("Insert error:", insertError);
-        // Fallback logging
-        console.log("=== FEEDBACK RECEIVED (DB Error) ===");
-        console.log("Type:", type);
-        console.log("Desc:", description);
-        console.log("URL:", page_url);
+        console.error("[Feedback API] Insert error:", insertError);
+        return badRequest(`Failed to submit feedback: ${insertError.message}`);
     }
 
-    return { success: true };
+    console.log("[Feedback API] Success:", data?.id);
+    return { success: true, id: data?.id };
 });
+

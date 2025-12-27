@@ -72,6 +72,7 @@ export const GET = withApiHandler({
     const search = searchParams.get("search");
     const dateFrom = searchParams.get("dateFrom");
     const dateTo = searchParams.get("dateTo");
+    const source = searchParams.get("source"); // user_submitted or admin_created
     const sortBy = searchParams.get("sortBy") || "priority_order";
     const sortOrder = searchParams.get("sortOrder") === "desc" ? false : true;
 
@@ -87,6 +88,13 @@ export const GET = withApiHandler({
     if (dateTo) query = query.lte("created_at", dateTo);
     if (search) {
         query = query.or(`subject.ilike.%${search}%,description.ilike.%${search}%`);
+    }
+
+    // Source filter: user_submitted = has user_id, admin_created = no user_id
+    if (source === "user_submitted") {
+        query = query.not("user_id", "is", null);
+    } else if (source === "admin_created") {
+        query = query.is("user_id", null);
     }
 
     // Apply sorting
