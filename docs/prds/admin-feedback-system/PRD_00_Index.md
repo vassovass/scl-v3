@@ -78,6 +78,14 @@
 
 ---
 
+### Phase 6: Core League Features
+
+| # | PRD | Outcome |
+|---|-----|---------|
+| 18 | [League Start Date](./PRD_18_League_Start_Date.md) | League owners set when step counting begins |
+
+---
+
 ## Scope Clarification
 
 **User Feedback** = Items submitted by users through:
