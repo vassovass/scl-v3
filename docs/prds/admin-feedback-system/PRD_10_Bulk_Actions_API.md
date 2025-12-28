@@ -151,4 +151,5 @@ export const PATCH = withApiHandler({
 
 | Date | Section | Change |
 |------|---------|--------|
+| 2025-12-28 | Implementation | Completed - Zod schemas, PATCH bulk update, POST archive |
 | 2025-12-26 | Initial | Created PRD for bulk actions API |

@@ -1,78 +1,78 @@
-import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
-import { json, badRequest, unauthorized } from "@/lib/api";
-import { NextRequest } from "next/server";
+/**
+ * Bulk Feedback API
+ * 
+ * PATCH /api/admin/feedback/bulk - Bulk update feedback items
+ */
 
-// POST: Bulk update multiple feedback items at once
-export async function POST(request: NextRequest) {
-    try {
-        const supabase = await createServerSupabaseClient();
-        const { data: { user } } = await supabase.auth.getUser();
+import { withApiHandler } from "@/lib/api/handler";
+import { bulkUpdateSchema } from "@/lib/schemas/feedback";
 
-        if (!user) return unauthorized();
+export const dynamic = 'force-dynamic';
 
-        // Check if superadmin
-        const { data: isAdmin } = await supabase.rpc("is_superadmin");
-        if (!isAdmin) return unauthorized("Superadmin access required");
+/**
+ * PATCH /api/admin/feedback/bulk
+ * Bulk update multiple feedback/kanban items (superadmin only)
+ * 
+ * Request body:
+ * {
+ *   ids: string[];      // UUIDs of items to update (1-100)
+ *   updates: {
+ *     board_status?: "backlog" | "todo" | "in_progress" | "review" | "done";
+ *     priority_order?: number;
+ *     is_public?: boolean;
+ *     target_release?: "now" | "next" | "later" | "future" | null;
+ *   }
+ * }
+ * 
+ * Response:
+ * {
+ *   success: true;
+ *   updated: number;  // Count of items updated
+ * }
+ */
+export const PATCH = withApiHandler({
+    auth: 'superadmin',
+    schema: bulkUpdateSchema,
+}, async ({ body, adminClient }) => {
+    const { ids, updates } = body;
 
-        const body = await request.json();
-        const { ids, updates } = body;
+    // Build update object
+    const updateData: Record<string, unknown> = {
+        updated_at: new Date().toISOString(),
+    };
 
-        // Validate input
-        if (!ids || !Array.isArray(ids) || ids.length === 0) {
-            return badRequest("Missing or empty 'ids' array");
-        }
-        if (!updates || typeof updates !== "object") {
-            return badRequest("Missing 'updates' object");
-        }
-        if (ids.length > 100) {
-            return badRequest("Maximum 100 items per bulk operation");
-        }
-
-        // Build update object with only allowed fields
-        const allowedFields = [
-            "board_status",
-            "priority_order",
-            "is_public",
-            "completed_at",
-            "target_release",
-            "completion_status"
-        ];
-
-        const sanitizedUpdates: Record<string, any> = {
-            updated_at: new Date().toISOString(),
-        };
-
-        for (const field of allowedFields) {
-            if (updates[field] !== undefined) {
-                sanitizedUpdates[field] = updates[field];
-            }
-        }
-
-        // If only updated_at was set, no valid fields provided
-        if (Object.keys(sanitizedUpdates).length === 1) {
-            return badRequest("No valid update fields provided. Allowed: " + allowedFields.join(", "));
-        }
-
-        // Perform bulk update using admin client
-        const adminClient = createAdminClient();
-        const { data, error, count } = await adminClient
-            .from("feedback")
-            .update(sanitizedUpdates)
-            .in("id", ids)
-            .select("id, board_status, is_public, priority_order");
-
-        if (error) {
-            console.error("Bulk update error:", error);
-            return badRequest(error.message);
-        }
-
-        return json({
-            success: true,
-            updated: data?.length || 0,
-            data
-        });
-    } catch (error: any) {
-        console.error("Bulk API error:", error);
-        return badRequest(error.message || "Unknown error");
+    if (updates.board_status !== undefined) {
+        updateData.board_status = updates.board_status;
     }
-}
+    if (updates.priority_order !== undefined) {
+        updateData.priority_order = updates.priority_order;
+    }
+    if (updates.is_public !== undefined) {
+        updateData.is_public = updates.is_public;
+    }
+    if (updates.target_release !== undefined) {
+        updateData.target_release = updates.target_release;
+    }
+
+    // If marking as done, set completed_at
+    if (updates.board_status === "done") {
+        updateData.completed_at = new Date().toISOString().split("T")[0];
+    }
+
+    // Atomic bulk update using .in()
+    const { data, error } = await adminClient
+        .from("feedback")
+        .update(updateData)
+        .in("id", ids)
+        .select("id");
+
+    if (error) {
+        console.error("Bulk update error:", error);
+        return { success: false, error: error.message, updated: 0 };
+    }
+
+    return {
+        success: true,
+        updated: data?.length ?? 0,
+    };
+});

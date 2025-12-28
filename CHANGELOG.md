@@ -21,6 +21,12 @@ All notable changes to StepLeague v3.
   - Empty state with icon
   - Uses Badge component from PRD 06
   - Non-superadmins redirected to dashboard (access control)
+- **PRD 10: Bulk Actions API** - Backend APIs for bulk operations
+  - `src/lib/schemas/feedback.ts` - Zod schemas for bulk operations
+  - `PATCH /api/admin/feedback/bulk` - Bulk update (status, priority, visibility, release)
+  - `POST /api/admin/feedback/bulk/archive` - Bulk archive items to "done" status
+  - Atomic operations with proper validation (1-100 items per request)
+  - Uses `withApiHandler` for consistent auth/error handling
 
 ### Changed
 
