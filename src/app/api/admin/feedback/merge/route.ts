@@ -89,7 +89,7 @@ export const POST = withApiHandler({
     const { error: archiveError } = await adminClient
         .from("feedback")
         .update({
-            board_status: "done", // Mark as done/archived
+            board_status: "merged", // Mark as merged (hidden from board)
             merged_into_id: primaryId,
             updated_at: new Date().toISOString(),
         })

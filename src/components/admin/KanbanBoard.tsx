@@ -7,6 +7,7 @@ import { TYPE_COLORS, RELEASE_OPTIONS } from "@/lib/badges";
 import UniversalFilters, { FILTER_PRESETS } from "@/components/shared/UniversalFilters";
 import BulkActionsBar from "./BulkActionsBar";
 import MergeModal from "./MergeModal";
+import KanbanCard from "./KanbanCard";
 
 interface FeedbackItem {
     id: string;
@@ -372,8 +373,8 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                             {...provided.droppableProps}
                             className="flex gap-4 overflow-x-auto pb-4 h-[calc(100vh-140px)] items-start"
                         >
-                            {columns.map((column, index) => (
-                                <Draggable key={column.id} draggableId={column.id} index={index}>
+                            {columns.map((column, colIndex) => (
+                                <Draggable key={column.id} draggableId={column.id} index={colIndex}>
                                     {(provided) => (
                                         <div
                                             ref={provided.innerRef}
@@ -399,90 +400,15 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                                                             }`}
                                                     >
                                                         {column.items.map((item, index) => (
-                                                            <Draggable key={item.id} draggableId={item.id} index={index}>
-                                                                {(provided, snapshot) => (
-                                                                    <div
-                                                                        ref={provided.innerRef}
-                                                                        {...provided.draggableProps}
-                                                                        {...provided.dragHandleProps}
-                                                                        className={`p-3 mb-2 bg-slate-800/80 rounded-lg border transition-all ${snapshot.isDragging
-                                                                            ? "border-sky-500 shadow-lg shadow-sky-500/20"
-                                                                            : selectedIds.has(item.id)
-                                                                                ? "border-sky-500 ring-1 ring-sky-500/30 bg-sky-500/10"
-                                                                                : "border-slate-700 hover:border-slate-600"
-                                                                            }`}
-                                                                    >
-                                                                        <div className="flex items-start justify-between gap-2 mb-2">
-                                                                            <div className="flex items-center gap-1">
-                                                                                {/* Selection checkbox */}
-                                                                                <input
-                                                                                    type="checkbox"
-                                                                                    checked={selectedIds.has(item.id)}
-                                                                                    onChange={(e) => toggleSelection(item.id, e as unknown as React.MouseEvent)}
-                                                                                    onClick={(e) => e.stopPropagation()}
-                                                                                    className="w-3.5 h-3.5 rounded border-slate-600 bg-slate-800 text-sky-500 focus:ring-sky-500 focus:ring-offset-0 cursor-pointer"
-                                                                                    title="Select item"
-                                                                                />
-                                                                                <span
-                                                                                    className={`text-[10px] px-1.5 py-0.5 rounded border uppercase font-medium ${TYPE_COLORS[item.type] || TYPE_COLORS.general
-                                                                                        }`}
-                                                                                >
-                                                                                    {item.type}
-                                                                                </span>
-                                                                                <button
-                                                                                    onClick={() => cycleRelease(item.id, item.target_release || "later")}
-                                                                                    className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${RELEASE_OPTIONS.find((r) => r.id === item.target_release)?.color || RELEASE_OPTIONS[2].color
-                                                                                        }`}
-                                                                                    title="Click to change release target"
-                                                                                >
-                                                                                    {RELEASE_OPTIONS.find((r) => r.id === item.target_release)?.label || "📅 Later"}
-                                                                                </button>
-                                                                            </div>
-                                                                            <button
-                                                                                onClick={() => togglePublic(item.id, item.is_public)}
-                                                                                className={`text-xs px-1.5 py-0.5 rounded transition-colors ${item.is_public
-                                                                                    ? "bg-emerald-500/20 text-emerald-400"
-                                                                                    : "bg-slate-700 text-slate-400 hover:text-slate-300"
-                                                                                    }`}
-                                                                                title={item.is_public ? "Public on roadmap" : "Private"}
-                                                                            >
-                                                                                {item.is_public ? "🌐" : "🔒"}
-                                                                            </button>
-                                                                        </div>
-
-                                                                        <h4 className="text-sm font-medium text-slate-200 line-clamp-2 mb-1">
-                                                                            {item.subject}
-                                                                        </h4>
-
-                                                                        <p className="text-xs text-slate-400 line-clamp-2">
-                                                                            {item.description}
-                                                                        </p>
-
-                                                                        <div className="mt-2 text-[10px] text-slate-500 flex items-center justify-between">
-                                                                            <div className="flex items-center gap-2">
-                                                                                <span>{new Date(item.created_at).toLocaleDateString()}</span>
-                                                                                {item.screenshot_url && (
-                                                                                    <a
-                                                                                        href={item.screenshot_url}
-                                                                                        target="_blank"
-                                                                                        rel="noopener noreferrer"
-                                                                                        className="text-emerald-400 hover:text-emerald-300 transition-colors"
-                                                                                        title="View Screenshot"
-                                                                                        onClick={(e) => e.stopPropagation()}
-                                                                                    >
-                                                                                        📷
-                                                                                    </a>
-                                                                                )}
-                                                                            </div>
-                                                                            {item.users?.nickname && (
-                                                                                <span className="text-slate-400">
-                                                                                    👤 {item.users.nickname}
-                                                                                </span>
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-                                                            </Draggable>
+                                                            <KanbanCard
+                                                                key={item.id}
+                                                                item={item}
+                                                                index={index}
+                                                                isSelected={selectedIds.has(item.id)}
+                                                                onToggleSelection={toggleSelection}
+                                                                onTogglePublic={togglePublic}
+                                                                onCycleRelease={cycleRelease}
+                                                            />
                                                         ))}
                                                         {provided.placeholder}
                                                     </div>

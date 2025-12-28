@@ -13,6 +13,7 @@ export const boardStatusSchema = z.enum([
     "in_progress",
     "review",
     "done",
+    "merged",
 ]);
 
 // Valid target releases
