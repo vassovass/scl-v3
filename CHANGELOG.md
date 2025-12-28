@@ -11,6 +11,28 @@ All notable changes to StepLeague v3.
 
 ### Added
 
+- **Homepage Responsiveness & Animations** - Improved above-the-fold experience
+  - New animation utilities: `animate-fade-slide`, `animate-slide-up` with staggered delays
+  - `@media (prefers-reduced-motion)` support for accessibility
+  - `hero-image-container` class for edge-to-edge mobile layout
+  - `section-full-width` utility for breaking out of containers
+- **Mobile Public Menu** - Hamburger menu now appears for non-authenticated users on public pages
+  - Animated slide-down drawer with Features, Roadmap, Beta Info links
+  - Sign in button included in mobile drawer
+
+### Changed
+
+- **Homepage hero** - Uses CSS variable `--bg-base` for light mode compatibility
+- **Typography** - Fixed "League" text descender clipping with `leading-[1.1] pb-2`
+- **Public Nav Menu** - Removed emojis for sleeker appearance, added animated underline on hover
+- **NavHeader** - Hamburger button now shows for public pages, not just authenticated users
+
+---
+
+## [2025-12-28]
+
+### Added
+
 - **PRD 9: Admin Feedback Page Polish** - Enhanced user feedback management
   - `AdminFeedbackClient.tsx` - View toggle (List/Kanban) with localStorage persistence
   - User feedback page now shows only user-submitted feedback (user_id IS NOT NULL)
