@@ -17,9 +17,7 @@ export async function GET(request: Request) {
         await adminClient.from("users").upsert({
           id: user.id,
           display_name: user.user_metadata?.full_name || user.email?.split("@")[0] || null,
-          units: "metric",
-          is_superadmin: false,
-        }, { onConflict: "id" });
+        }, { onConflict: "id", ignoreDuplicates: false });
       }
       return NextResponse.redirect(`${origin}${next}`);
     }
