@@ -152,11 +152,11 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                     </span>
                 </Link>
 
-                {/* Mobile hamburger button */}
-                {session && (
+                {/* Mobile hamburger button - shown for authenticated users OR public pages */}
+                {(session || isPublicLocation) && (
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        className="md:hidden p-2 rounded-lg text-slate-400 hover:bg-slate-800 transition-colors"
+                        className="md:hidden p-2 rounded-lg text-slate-400 hover:bg-slate-800/50 transition-colors"
                         aria-label="Toggle menu"
                     >
                         {mobileMenuOpen ? (
@@ -292,16 +292,16 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                     </div>
                 )}
 
-                {/* Public menu for non-authenticated users on public pages */}
+                {/* Public menu for non-authenticated users on public pages - sleek text links */}
                 {!session && isPublicLocation && (
-                    <div className="hidden md:flex items-center gap-4">
+                    <div className="hidden md:flex items-center gap-6">
                         {MENUS.public.items.map((item) => (
                             <Link
                                 key={item.id}
                                 href={item.href || '#'}
-                                className="text-sm text-slate-400 hover:text-slate-200 transition-colors"
+                                className="text-sm font-medium text-slate-300 hover:text-white transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-sky-400 hover:after:w-full after:transition-all after:duration-300"
                             >
-                                {item.icon} {item.label}
+                                {item.label}
                             </Link>
                         ))}
                     </div>
@@ -318,7 +318,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                 )}
             </nav>
 
-            {/* Mobile Menu Drawer */}
+            {/* Mobile Menu Drawer - for authenticated users */}
             {session && mobileMenuOpen && (
                 <MobileMenu
                     isOpen={mobileMenuOpen}
@@ -331,6 +331,31 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                     isSigningOut={signingOut}
                     onMenuAction={handleMenuAction}
                 />
+            )}
+
+            {/* Mobile Menu Drawer - for public pages (non-authenticated) */}
+            {!session && isPublicLocation && mobileMenuOpen && (
+                <div className="md:hidden absolute top-full left-0 right-0 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 animate-fade-in">
+                    <nav className="px-4 py-4 space-y-1">
+                        {MENUS.public.items.map((item) => (
+                            <Link
+                                key={item.id}
+                                href={item.href || '#'}
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="block px-4 py-3 text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors"
+                            >
+                                {item.label}
+                            </Link>
+                        ))}
+                        <Link
+                            href="/sign-in"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="block mt-4 px-4 py-3 text-center text-base font-semibold text-black bg-sky-500 hover:bg-sky-400 rounded-lg transition-colors"
+                        >
+                            Sign in
+                        </Link>
+                    </nav>
+                </div>
             )}
         </header>
     );
