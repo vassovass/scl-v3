@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { NavHeader } from "@/components/navigation/NavHeader";
 import { GlobalFooter } from "@/components/layout/GlobalFooter";
 import { OnboardingProvider } from "@/components/providers/OnboardingProvider";
+import AIChatPanel from "@/components/admin/AIChatPanel";
 
 export default function AdminLayout({
     children,
@@ -17,6 +18,7 @@ export default function AdminLayout({
                     <NavHeader />
                     <main className="flex-1">{children}</main>
                     <GlobalFooter />
+                    <AIChatPanel />
                 </div>
             </OnboardingProvider>
         </Suspense>

@@ -7,6 +7,25 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2025-12-29]
+
+### Added
+
+- **PRD 12: Merge Items & AI Chat** - Advanced feedback consolidation and assistance
+  - **Merge Items Feature**: Admins can now merge multiple feedback items into a primary one
+    - Transfers all attachments (screenshots) from secondary items to primary
+    - Combines vote counts and archives secondary items
+    - AI-assisted description generation using Gemini 2.5 Flash
+  - **Interactive AI Chat Panel**: Persistent, collapsible chat assistant
+    - Accessible globally in admin area via floating button
+    - Context-aware: can analyze feedback, kanban, and roadmap items
+    - Powered by Gemini with multimodality (understands screenshot context)
+  - **Merge API**: `POST /api/admin/feedback/merge` with `preview` mode
+  - **AI Chat API**: `POST /api/ai/chat` for conversational interactions
+  - `MergeModal` component with diff-like preview and "Generate with AI" button
+
+---
+
 ## [2025-12-28]
 
 ### Added

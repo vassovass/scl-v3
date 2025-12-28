@@ -6,6 +6,7 @@ import { filterBySource, FeedbackFilterState, DEFAULT_FILTER_STATE } from "@/lib
 import { TYPE_COLORS, RELEASE_OPTIONS } from "@/lib/badges";
 import UniversalFilters, { FILTER_PRESETS } from "@/components/shared/UniversalFilters";
 import BulkActionsBar from "./BulkActionsBar";
+import MergeModal from "./MergeModal";
 
 interface FeedbackItem {
     id: string;
@@ -46,6 +47,7 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
     const [isUpdating, setIsUpdating] = useState(false);
     const [filters, setFilters] = useState<FeedbackFilterState>(DEFAULT_FILTER_STATE);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const [showMergeModal, setShowMergeModal] = useState(false);
 
     // Toggle selection for a single item
     const toggleSelection = useCallback((id: string, e: React.MouseEvent) => {
@@ -503,6 +505,18 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                 onBulkStatusChange={handleBulkStatusChange}
                 onBulkArchive={handleBulkArchive}
                 onBulkTogglePublic={handleBulkTogglePublic}
+                onMerge={() => setShowMergeModal(true)}
+            />
+
+            {/* Merge Modal */}
+            <MergeModal
+                isOpen={showMergeModal}
+                onClose={() => setShowMergeModal(false)}
+                onSuccess={() => {
+                    clearSelection();
+                    window.location.reload();
+                }}
+                items={initialItems.filter(i => selectedIds.has(i.id))}
             />
         </div>
     );

@@ -65,3 +65,37 @@ export type BulkUpdateInput = z.infer<typeof bulkUpdateSchema>;
 export type BulkArchiveInput = z.infer<typeof bulkArchiveSchema>;
 export type BoardStatus = z.infer<typeof boardStatusSchema>;
 export type TargetRelease = z.infer<typeof targetReleaseSchema>;
+
+// =============================================================================
+// Merge & AI Operations
+// =============================================================================
+
+/**
+ * Schema for merge operation
+ * POST /api/admin/feedback/merge
+ */
+export const mergeSchema = z.object({
+    primaryId: z.string().uuid("Invalid primary ID"),
+    secondaryIds: z
+        .array(z.string().uuid())
+        .min(1, "At least one item to merge is required")
+        .max(99, "Maximum 99 items to merge"),
+    mergedDescription: z.string().optional(),
+    useAI: z.boolean().optional(),
+    preview: z.boolean().optional(),
+});
+
+/**
+ * Schema for AI chat
+ * POST /api/ai/chat
+ */
+export const aiChatSchema = z.object({
+    message: z.string().min(1, "Message is required"),
+    conversationHistory: z.array(z.object({
+        role: z.enum(['user', 'assistant']),
+        content: z.string(),
+    })).optional(),
+});
+
+export type MergeInput = z.infer<typeof mergeSchema>;
+export type AIChatInput = z.infer<typeof aiChatSchema>;

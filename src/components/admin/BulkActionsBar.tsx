@@ -9,6 +9,7 @@ interface BulkActionsBarProps {
     onBulkStatusChange: (status: string) => Promise<void>;
     onBulkArchive: () => Promise<void>;
     onBulkTogglePublic: (isPublic: boolean) => Promise<void>;
+    onMerge?: () => void;
 }
 
 /**
@@ -21,6 +22,7 @@ export default function BulkActionsBar({
     onBulkStatusChange,
     onBulkArchive,
     onBulkTogglePublic,
+    onMerge,
 }: BulkActionsBarProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [showStatusDropdown, setShowStatusDropdown] = useState(false);
@@ -92,6 +94,18 @@ export default function BulkActionsBar({
                         </div>
                     )}
                 </div>
+
+                {/* Merge button (2+ items) */}
+                {selectedCount >= 2 && onMerge && (
+                    <button
+                        onClick={onMerge}
+                        disabled={isLoading}
+                        className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-purple-400 bg-purple-500/20 hover:bg-purple-500/30 rounded-lg transition disabled:opacity-50"
+                        title="Merge selected items"
+                    >
+                        ⚡ Merge
+                    </button>
+                )}
 
                 {/* Visibility buttons */}
                 <button
