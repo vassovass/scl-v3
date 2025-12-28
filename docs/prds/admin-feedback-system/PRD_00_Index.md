@@ -86,6 +86,14 @@
 
 ---
 
+### Phase 7: Enhanced Card Experience
+
+| # | PRD | Outcome |
+|---|-----|---------|
+| 19 | [Expandable Cards with Image Paste](./PRD_19_Expandable_Cards_Image_Paste.md) | Click to expand cards, paste screenshots |
+
+---
+
 ## Scope Clarification
 
 **User Feedback** = Items submitted by users through:
@@ -112,5 +120,6 @@
 
 | Date | Section | Change |
 |------|---------|--------|
+| 2025-12-28 | Phase 7 | Added PRD 19: Expandable Cards with Image Paste |
 | 2025-12-26 | Restructure | Reorganized PRDs 4+ with unification priorities |
 | 2025-12-26 | Initial | Original index with PRDs 1-9 |
