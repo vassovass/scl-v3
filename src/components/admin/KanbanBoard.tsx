@@ -5,6 +5,7 @@ import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea
 import { filterBySource, FeedbackFilterState, DEFAULT_FILTER_STATE } from "@/lib/filters/feedbackFilters";
 import { TYPE_COLORS, RELEASE_OPTIONS } from "@/lib/badges";
 import UniversalFilters, { FILTER_PRESETS } from "@/components/shared/UniversalFilters";
+import BulkActionsBar from "./BulkActionsBar";
 
 interface FeedbackItem {
     id: string;
@@ -44,6 +45,68 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
     const [columns, setColumns] = useState<KanbanColumn[]>([]);
     const [isUpdating, setIsUpdating] = useState(false);
     const [filters, setFilters] = useState<FeedbackFilterState>(DEFAULT_FILTER_STATE);
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+    // Toggle selection for a single item
+    const toggleSelection = useCallback((id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setSelectedIds(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    }, []);
+
+    // Clear selection
+    const clearSelection = useCallback(() => {
+        setSelectedIds(new Set());
+    }, []);
+
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                clearSelection();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [clearSelection]);
+
+    // Bulk actions using PRD 10 API
+    const handleBulkStatusChange = async (status: string) => {
+        const ids = Array.from(selectedIds);
+        await fetch("/api/admin/feedback/bulk", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ids, updates: { board_status: status } }),
+        });
+        clearSelection();
+        window.location.reload();
+    };
+
+    const handleBulkArchive = async () => {
+        const ids = Array.from(selectedIds);
+        await fetch("/api/admin/feedback/bulk/archive", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ids }),
+        });
+        clearSelection();
+        window.location.reload();
+    };
+
+    const handleBulkTogglePublic = async (isPublic: boolean) => {
+        const ids = Array.from(selectedIds);
+        await fetch("/api/admin/feedback/bulk", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ids, updates: { is_public: isPublic } }),
+        });
+        clearSelection();
+        window.location.reload();
+    };
 
     // Handle filter changes from UniversalFilters
     const handleFiltersChange = useCallback((newFilters: FeedbackFilterState) => {
@@ -342,11 +405,22 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                                                                         {...provided.dragHandleProps}
                                                                         className={`p-3 mb-2 bg-slate-800/80 rounded-lg border transition-all ${snapshot.isDragging
                                                                             ? "border-sky-500 shadow-lg shadow-sky-500/20"
-                                                                            : "border-slate-700 hover:border-slate-600"
+                                                                            : selectedIds.has(item.id)
+                                                                                ? "border-sky-500 ring-1 ring-sky-500/30 bg-sky-500/10"
+                                                                                : "border-slate-700 hover:border-slate-600"
                                                                             }`}
                                                                     >
                                                                         <div className="flex items-start justify-between gap-2 mb-2">
                                                                             <div className="flex items-center gap-1">
+                                                                                {/* Selection checkbox */}
+                                                                                <input
+                                                                                    type="checkbox"
+                                                                                    checked={selectedIds.has(item.id)}
+                                                                                    onChange={(e) => toggleSelection(item.id, e as unknown as React.MouseEvent)}
+                                                                                    onClick={(e) => e.stopPropagation()}
+                                                                                    className="w-3.5 h-3.5 rounded border-slate-600 bg-slate-800 text-sky-500 focus:ring-sky-500 focus:ring-offset-0 cursor-pointer"
+                                                                                    title="Select item"
+                                                                                />
                                                                                 <span
                                                                                     className={`text-[10px] px-1.5 py-0.5 rounded border uppercase font-medium ${TYPE_COLORS[item.type] || TYPE_COLORS.general
                                                                                         }`}
@@ -421,6 +495,15 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                     )}
                 </Droppable>
             </DragDropContext>
+
+            {/* Bulk Actions Bar */}
+            <BulkActionsBar
+                selectedCount={selectedIds.size}
+                onClear={clearSelection}
+                onBulkStatusChange={handleBulkStatusChange}
+                onBulkArchive={handleBulkArchive}
+                onBulkTogglePublic={handleBulkTogglePublic}
+            />
         </div>
     );
 }

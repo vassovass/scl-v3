@@ -27,6 +27,12 @@ All notable changes to StepLeague v3.
   - `POST /api/admin/feedback/bulk/archive` - Bulk archive items to "done" status
   - Atomic operations with proper validation (1-100 items per request)
   - Uses `withApiHandler` for consistent auth/error handling
+- **PRD 11: Multi-Select UI** - Bulk selection in admin views
+  - `BulkActionsBar.tsx` - Floating action bar with status/archive/visibility controls
+  - Checkboxes on FeedbackList items with select-all header
+  - Checkboxes on KanbanBoard cards with selection highlighting
+  - Keyboard shortcuts: Escape to clear, Ctrl+A to select all (list view)
+  - Selection clears automatically after bulk action
 
 ### Changed
 

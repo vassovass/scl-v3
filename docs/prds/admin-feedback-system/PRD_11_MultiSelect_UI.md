@@ -143,4 +143,5 @@ const handleBulkStatusChange = async (status: string) => {
 
 | Date | Section | Change |
 |------|---------|--------|
+| 2025-12-28 | Implementation | Completed - BulkActionsBar, checkboxes in list/kanban, keyboard shortcuts |
 | 2025-12-26 | Initial | Created PRD for multi-select UI |

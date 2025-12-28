@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import UniversalFilters, { FILTER_PRESETS } from "@/components/shared/UniversalFilters";
 import { FeedbackFilterState, DEFAULT_FILTER_STATE, BOARD_STATUS_OPTIONS } from "@/lib/filters/feedbackFilters";
 import { useFetch } from "@/hooks/useFetch";
 import { Badge } from "@/components/ui/Badge";
+import BulkActionsBar from "./BulkActionsBar";
 
 interface FeedbackItem {
     id: string;
@@ -77,6 +78,47 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
     });
     const [filters, setFilters] = useState<FeedbackFilterState>(DEFAULT_FILTER_STATE);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+    // Toggle selection for a single item
+    const toggleSelection = useCallback((id: string) => {
+        setSelectedIds(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    }, []);
+
+    // Select/deselect all visible items
+    const toggleSelectAll = useCallback(() => {
+        setSelectedIds(prev => {
+            if (prev.size === items.length && items.length > 0) {
+                return new Set();
+            }
+            return new Set(items.map((item: FeedbackItem) => item.id));
+        });
+    }, []);
+
+    // Clear selection
+    const clearSelection = useCallback(() => {
+        setSelectedIds(new Set());
+    }, []);
+
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                clearSelection();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+                e.preventDefault();
+                toggleSelectAll();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [clearSelection, toggleSelectAll]);
 
     const queryParams = useMemo(() => {
         const params = new URLSearchParams();
@@ -165,6 +207,40 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
         setUpdatingId(null);
     };
 
+    // Bulk actions using PRD 10 API
+    const handleBulkStatusChange = async (status: string) => {
+        const ids = Array.from(selectedIds);
+        await fetch("/api/admin/feedback/bulk", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ids, updates: { board_status: status } }),
+        });
+        clearSelection();
+        refetch();
+    };
+
+    const handleBulkArchive = async () => {
+        const ids = Array.from(selectedIds);
+        await fetch("/api/admin/feedback/bulk/archive", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ids }),
+        });
+        clearSelection();
+        refetch();
+    };
+
+    const handleBulkTogglePublic = async (isPublic: boolean) => {
+        const ids = Array.from(selectedIds);
+        await fetch("/api/admin/feedback/bulk", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ids, updates: { is_public: isPublic } }),
+        });
+        clearSelection();
+        refetch();
+    };
+
     if (error) {
         return (
             <div className="rounded-lg bg-rose-500/10 border border-rose-500/30 p-4 text-rose-400">
@@ -186,23 +262,55 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
             {/* Loading state with skeleton */}
             {loading && <FeedbackSkeleton />}
 
+            {/* Select All Header */}
+            {!loading && items.length > 0 && (
+                <div className="flex items-center gap-3 text-sm text-slate-400">
+                    <label className="flex items-center gap-2 cursor-pointer hover:text-slate-200 transition">
+                        <input
+                            type="checkbox"
+                            checked={selectedIds.size === items.length && items.length > 0}
+                            onChange={toggleSelectAll}
+                            className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-sky-500 focus:ring-sky-500 focus:ring-offset-0"
+                        />
+                        Select All ({items.length})
+                    </label>
+                    {selectedIds.size > 0 && (
+                        <span className="text-sky-400">
+                            {selectedIds.size} selected
+                        </span>
+                    )}
+                </div>
+            )}
+
             {/* Feedback list */}
             {!loading && (
                 <div className="grid gap-4">
                     {items.map((item) => {
                         const isNew = isNewItem(item.created_at);
                         const isUpdating = updatingId === item.id;
+                        const isSelected = selectedIds.has(item.id);
 
                         return (
                             <div
                                 key={item.id}
                                 className={`rounded-xl border bg-slate-900/50 p-5 transition hover:border-slate-700 ${isNew
-                                        ? "border-sky-500/50 ring-1 ring-sky-500/20"
+                                    ? "border-sky-500/50 ring-1 ring-sky-500/20"
+                                    : isSelected
+                                        ? "border-sky-500 ring-1 ring-sky-500/30 bg-sky-500/5"
                                         : "border-slate-800"
                                     } ${isUpdating ? "opacity-60" : ""}`}
                             >
                                 <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
                                     <div className="flex flex-wrap items-center gap-2 md:gap-3">
+                                        {/* Checkbox */}
+                                        <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            onChange={() => toggleSelection(item.id)}
+                                            className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-sky-500 focus:ring-sky-500 focus:ring-offset-0 cursor-pointer"
+                                            onClick={(e) => e.stopPropagation()}
+                                        />
+
                                         {/* NEW badge */}
                                         {isNew && (
                                             <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-sky-400 animate-pulse">
@@ -248,8 +356,8 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                                             onClick={() => togglePublic(item.id, item.is_public)}
                                             disabled={isUpdating}
                                             className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium transition ${item.is_public
-                                                    ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-                                                    : "bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-300"
+                                                ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                                                : "bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-300"
                                                 }`}
                                             title={item.is_public ? "Remove from roadmap" : "Add to roadmap"}
                                         >
@@ -341,6 +449,15 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                     </button>
                 </div>
             )}
+
+            {/* Bulk Actions Bar */}
+            <BulkActionsBar
+                selectedCount={selectedIds.size}
+                onClear={clearSelection}
+                onBulkStatusChange={handleBulkStatusChange}
+                onBulkArchive={handleBulkArchive}
+                onBulkTogglePublic={handleBulkTogglePublic}
+            />
         </div>
     );
 }
