@@ -35,63 +35,59 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-[rgb(var(--bg-base))] text-white overflow-hidden">
       {/* === HERO SECTION === */}
-      <section className="relative min-h-screen flex items-center">
+      <section className="relative min-h-screen flex items-center overflow-hidden">
         {/* Background gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-sky-900/20 via-transparent to-purple-900/20" />
 
-        {/* Hero content - split layout */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-0">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-            {/* Left: Text content */}
-            <div className="text-center lg:text-left order-2 lg:order-1">
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] pb-2 animate-fade-slide">
-                <span className="block text-white">Step</span>
-                <span className="block bg-gradient-to-r from-sky-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent pb-1">
-                  League
-                </span>
-              </h1>
+        {/* Hero content - asymmetric layout: contained text, edge-to-edge image */}
+        <div className="relative z-10 w-full grid lg:grid-cols-2 items-center">
+          {/* Left: Text content - contained with padding */}
+          <div className="text-center lg:text-left order-2 lg:order-1 px-6 lg:pl-12 xl:pl-24 py-20 lg:py-0">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] pb-2 animate-fade-slide">
+              <span className="block text-white">Step</span>
+              <span className="block bg-gradient-to-r from-sky-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent pb-1">
+                League
+              </span>
+            </h1>
 
-              <p className="mt-6 text-xl sm:text-2xl font-light text-slate-300 animate-fade-slide animate-delay-100">
-                Compete. Track. Win.
-              </p>
+            <p className="mt-6 text-xl sm:text-2xl font-light text-slate-300 animate-fade-slide animate-delay-100">
+              Compete. Track. Win.
+            </p>
 
-              <p className="mt-4 text-lg text-slate-400 max-w-lg mx-auto lg:mx-0 animate-fade-slide animate-delay-200">
-                {APP_CONFIG.tagline}. Upload step screenshots, get AI-verified,
-                and climb the leaderboard against friends.
-              </p>
+            <p className="mt-4 text-lg text-slate-400 max-w-lg mx-auto lg:mx-0 animate-fade-slide animate-delay-200">
+              {APP_CONFIG.tagline}. Upload step screenshots, get AI-verified,
+              and climb the leaderboard against friends.
+            </p>
 
-              {/* CTAs */}
-              <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-slide animate-delay-300">
-                <Link
-                  href="/sign-up"
-                  className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-black bg-gradient-to-r from-sky-400 to-cyan-400 rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(56,189,248,0.4)]"
-                >
-                  Get Started Free
-                </Link>
-                <Link
-                  href="/sign-in"
-                  className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white border-2 border-slate-600 rounded-full transition-all duration-300 hover:border-sky-400 hover:text-sky-400"
-                >
-                  Sign In
-                </Link>
-              </div>
+            {/* CTAs */}
+            <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-slide animate-delay-300">
+              <Link
+                href="/sign-up"
+                className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-black bg-gradient-to-r from-sky-400 to-cyan-400 rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(56,189,248,0.4)]"
+              >
+                Get Started Free
+              </Link>
+              <Link
+                href="/sign-in"
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white border-2 border-slate-600 rounded-full transition-all duration-300 hover:border-sky-400 hover:text-sky-400"
+              >
+                Sign In
+              </Link>
             </div>
+          </div>
 
-            {/* Right: Hero image - edge-to-edge on mobile */}
-            <div className="relative order-1 lg:order-2 animate-fade-in animate-delay-200">
-              <div className="relative hero-image-container lg:w-full lg:max-w-lg lg:mx-auto aspect-square">
-                {/* Glow effect behind image */}
-                <div className="absolute inset-0 bg-gradient-to-r from-sky-500/30 to-purple-500/30 blur-3xl rounded-full scale-75" />
+          {/* Right: Hero image - extends to right edge */}
+          <div className="relative order-1 lg:order-2 h-[50vh] lg:h-screen animate-fade-in animate-delay-200">
+            {/* Glow effect behind image */}
+            <div className="absolute inset-0 bg-gradient-to-r from-sky-500/20 to-purple-500/20 blur-3xl" />
 
-                <Image
-                  src="/images/hero-fitness.png"
-                  alt="Step tracking on smartwatch"
-                  fill
-                  className="object-contain relative z-10 drop-shadow-2xl"
-                  priority
-                />
-              </div>
-            </div>
+            <Image
+              src="/images/hero-fitness.png"
+              alt="Step tracking on smartwatch"
+              fill
+              className="object-cover object-center relative z-10"
+              priority
+            />
           </div>
         </div>
 
