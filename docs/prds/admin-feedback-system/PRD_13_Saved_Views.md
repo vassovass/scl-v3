@@ -106,6 +106,34 @@ interface SavedView {
 }
 ```
 
+### Implementation Best Practices (2024-2025 Research)
+
+**Architecture:**
+
+- Use custom hook (`useSavedViews()`) for logic reusability
+- Separate presentational components from container logic
+- Implement error handling with try-catch for `QuotaExceededError`
+
+**Accessibility (WCAG 2.2):**
+
+- Full keyboard navigation: Tab, Enter, Space, Arrow keys, Escape
+- ARIA attributes: `aria-haspopup="menu"`, `aria-expanded`, `role="menu"`
+- Focus management: trap focus in menu, return to trigger on close
+- Visual focus indicators using `:focus-visible`
+- Minimum 24x24px touch targets for mobile
+
+**Theming:**
+
+- Use CSS variables exclusively (no hardcoded colors)
+- Leverage existing `--menu-*` variables from `globals.css`
+- Support both dark (default) and light themes via `data-theme` attribute
+
+**Performance:**
+
+- Use `useMemo` for filtered/sorted views
+- Use `useCallback` for event handlers
+- Lazy load views (only on mount)
+
 ---
 
 ## Files to Create/Modify

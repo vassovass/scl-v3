@@ -11,6 +11,7 @@ import {
     FeedbackFilterState,
     DEFAULT_FILTER_STATE,
 } from "@/lib/filters/feedbackFilters";
+import SavedViewsDropdown from "@/components/admin/SavedViewsDropdown";
 
 /**
  * Configuration for which filters to show on a given page.
@@ -83,6 +84,8 @@ interface UniversalFiltersProps {
     className?: string;
     /** Compact mode for smaller spaces */
     compact?: boolean;
+    /** Enable saved views dropdown */
+    enableSavedViews?: boolean;
 }
 
 export default function UniversalFilters({
@@ -92,6 +95,7 @@ export default function UniversalFilters({
     filteredCount,
     className = "",
     compact = false,
+    enableSavedViews = false,
 }: UniversalFiltersProps) {
     const [filters, setFilters] = useState<FeedbackFilterState>(DEFAULT_FILTER_STATE);
     const [datePreset, setDatePreset] = useState("");
@@ -145,6 +149,19 @@ export default function UniversalFilters({
         setDatePreset("");
     }, []);
 
+    // Handle applying saved views
+    const handleApplyView = useCallback((viewFilters: FeedbackFilterState) => {
+        setFilters(viewFilters);
+        setSearchInput(viewFilters.search || "");
+
+        // Set date preset if applicable
+        if (viewFilters.dateFrom || viewFilters.dateTo) {
+            setDatePreset("custom");
+        } else {
+            setDatePreset("");
+        }
+    }, []);
+
     // Count active filters
     const activeFilterCount = useMemo(() => {
         return [
@@ -164,6 +181,14 @@ export default function UniversalFilters({
 
     return (
         <div className={`space-y-3 ${className}`}>
+            {/* Saved Views Dropdown */}
+            {enableSavedViews && (
+                <SavedViewsDropdown
+                    currentFilters={filters}
+                    onViewApply={handleApplyView}
+                />
+            )}
+
             {/* Search bar (if enabled) */}
             {config.search && (
                 <div className="relative">

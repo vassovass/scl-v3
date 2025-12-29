@@ -257,6 +257,7 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                 onFiltersChange={handleFiltersChange}
                 totalCount={totalCount}
                 filteredCount={items.length}
+                enableSavedViews={true}
             />
 
             {/* Loading state with skeleton */}

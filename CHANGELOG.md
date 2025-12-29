@@ -23,6 +23,17 @@ All notable changes to StepLeague v3.
   - **Merge API**: `POST /api/admin/feedback/merge` with `preview` mode
   - **AI Chat API**: `POST /api/ai/chat` for conversational interactions
   - `MergeModal` component with diff-like preview and "Generate with AI" button
+- **PRD 13: Saved Views** - Save and restore filter combinations
+  - localStorage-based storage (`src/lib/filters/savedViews.ts`)
+  - Dropdown component (`src/components/admin/SavedViewsDropdown.tsx`)
+  - Preset views: All Items, New This Week, Public Roadmap
+  - WCAG 2.2 accessible with keyboard navigation and ARIA
+  - Integrated into UniversalFilters and enabled on `/admin/feedback`
+  
+### Changed
+
+- `UniversalFilters.tsx` - Added `enableSavedViews` prop
+- `FeedbackList.tsx` - Enabled saved views feature
   
 ### Fixed
 
