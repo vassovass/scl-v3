@@ -23,6 +23,10 @@ All notable changes to StepLeague v3.
   - **Merge API**: `POST /api/admin/feedback/merge` with `preview` mode
   - **AI Chat API**: `POST /api/ai/chat` for conversational interactions
   - `MergeModal` component with diff-like preview and "Generate with AI" button
+  
+### Fixed
+
+- **Auth Redirect** - Confirmed `window.location.origin` usage and identified Supabase Site URL configuration as the fix for Vercel URL redirects
 
 ---
 
