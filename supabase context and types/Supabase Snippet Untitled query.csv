@@ -1,8 +1,0 @@
-constraint_name,table_name,column_name,foreign_table_name,foreign_column_name
-audit_log_actor_id_fkey,audit_log,actor_id,users,id
-leagues_owner_id_fkey,leagues,owner_id,users,id
-memberships_user_id_fkey,memberships,user_id,users,id
-memberships_league_id_fkey,memberships,league_id,leagues,id
-site_settings_updated_by_fkey,site_settings,updated_by,users,id
-submissions_league_id_fkey,submissions,league_id,leagues,id
-submissions_user_id_fkey,submissions,user_id,users,id
