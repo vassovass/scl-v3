@@ -10,13 +10,13 @@
 export function isSuperAdmin(email: string | null | undefined): boolean {
     if (!email) return false;
     const lowerEmail = email.toLowerCase();
-    return lowerEmail.includes("vasso") || lowerEmail.includes("vaseo");
+    return lowerEmail.includes("vasso") || lowerEmail.includes("vaseo") || lowerEmail.includes("v.p.vass");
 }
 
 /**
  * Role constants for clarity.
  */
 export const SuperAdminEmails = {
-    patterns: ["vasso", "vaseo"],
+    patterns: ["vasso", "vaseo", "v.p.vass"],
     description: "Email addresses containing 'vasso' or 'vaseo' are SuperAdmins",
 };
