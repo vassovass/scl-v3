@@ -489,13 +489,10 @@ function DropdownItemContent({
                             className={`absolute top-0 min-w-[200px] max-h-[60vh] overflow-y-auto py-2 
                                 bg-slate-900 
                                 border border-slate-700 
-                                rounded-xl shadow-xl shadow-black/50 z-50 
+                                rounded-xl shadow-xl shadow-black/50 z-[100]
                                 animate-in fade-in duration-150
                                 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent
-                                ${submenuPosition === 'right'
-                                    ? 'left-full ml-1 slide-in-from-left-2'
-                                    : 'right-full mr-1 slide-in-from-right-2'
-                                }`}
+                                right-full mr-1`}
                         >
                             {item.children.map(child => (
                                 <DropdownItem
