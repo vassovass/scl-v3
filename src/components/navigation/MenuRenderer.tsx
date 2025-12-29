@@ -478,35 +478,42 @@ function DropdownItemContent({
 
                 {/* Submenu - auto-positions left or right based on viewport */}
                 {isSubmenuOpen && (
-                    <div
-                        ref={submenuRef}
-                        className={`absolute top-0 min-w-[200px] max-h-[60vh] overflow-y-auto py-2 
-                            bg-slate-900 
-                            border border-slate-700 
-                            rounded-xl shadow-xl shadow-black/50 z-50 
-                            animate-in fade-in duration-150
-                            scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent
-                            ${submenuPosition === 'right'
-                                ? 'left-full ml-1 slide-in-from-left-2'
-                                : 'right-full mr-1 slide-in-from-right-2'
-                            }`}
-                    >
-                        {item.children.map(child => (
-                            <DropdownItem
-                                key={child.id}
-                                item={child}
-                                isActive={isActive}
-                                isActivePrefix={isActivePrefix}
-                                onItemClick={onItemClick}
-                                userRole={userRole}
-                                leagueId={leagueId}
-                                onAction={onAction}
-                                currentPath={currentPath}
-                                onClose={onClose}
-                                depth={(depth || 0) + 1}
-                            />
-                        ))}
-                    </div>
+                    <>
+                        {/* Invisible bridge to maintain hover when moving to submenu */}
+                        <div
+                            className={`absolute top-0 h-full w-4 ${submenuPosition === 'right' ? 'left-full' : 'right-full'}`}
+                            aria-hidden="true"
+                        />
+                        <div
+                            ref={submenuRef}
+                            className={`absolute top-0 min-w-[200px] max-h-[60vh] overflow-y-auto py-2 
+                                bg-slate-900 
+                                border border-slate-700 
+                                rounded-xl shadow-xl shadow-black/50 z-50 
+                                animate-in fade-in duration-150
+                                scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent
+                                ${submenuPosition === 'right'
+                                    ? 'left-full ml-1 slide-in-from-left-2'
+                                    : 'right-full mr-1 slide-in-from-right-2'
+                                }`}
+                        >
+                            {item.children.map(child => (
+                                <DropdownItem
+                                    key={child.id}
+                                    item={child}
+                                    isActive={isActive}
+                                    isActivePrefix={isActivePrefix}
+                                    onItemClick={onItemClick}
+                                    userRole={userRole}
+                                    leagueId={leagueId}
+                                    onAction={onAction}
+                                    currentPath={currentPath}
+                                    onClose={onClose}
+                                    depth={(depth || 0) + 1}
+                                />
+                            ))}
+                        </div>
+                    </>
                 )}
             </div>
         );
