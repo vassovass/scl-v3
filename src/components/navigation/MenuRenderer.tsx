@@ -451,21 +451,15 @@ function DropdownItemContent({
         }
     }, [isSubmenuOpen]);
 
-    // Has children - render as nested submenu
+    // Has children - render as nested submenu (pure CSS hover, no React state)
     if (item.children && item.children.length > 0) {
         return (
-            <div
-                ref={triggerRef}
-                className="relative group"
-                onMouseEnter={() => setIsSubmenuOpen(true)}
-                onMouseLeave={() => setIsSubmenuOpen(false)}
-            >
+            <div className="submenu-trigger group/submenu">
                 <button
                     className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors
-                        ${isSubmenuOpen
-                            ? "bg-[var(--menu-item-hover-bg,theme(colors.slate.800))] text-[var(--menu-item-hover-text,white)]"
-                            : "text-[var(--menu-item-text,theme(colors.slate.300))] hover:bg-[var(--menu-item-hover-bg,theme(colors.slate.800))] hover:text-[var(--menu-item-hover-text,white)]"
-                        }`}
+                        text-[rgb(var(--menu-item-text))] 
+                        hover:bg-[rgb(var(--menu-item-hover-bg))] hover:text-[rgb(var(--menu-item-hover-text))]
+                        group-hover/submenu:bg-[rgb(var(--menu-item-hover-bg))] group-hover/submenu:text-[rgb(var(--menu-item-hover-text))]`}
                     data-module-id={`menu-${item.id}`}
                     data-module-name={item.label}
                 >
@@ -473,45 +467,27 @@ function DropdownItemContent({
                         {item.icon && <span>{item.icon}</span>}
                         <span>{item.label}</span>
                     </span>
-                    <span className={`text-xs opacity-60 transition-transform ${submenuPosition === 'left' ? 'rotate-180' : ''}`}>▶</span>
+                    <span className="text-xs opacity-60">◀</span>
                 </button>
 
-                {/* Submenu - auto-positions left or right based on viewport */}
-                {isSubmenuOpen && (
-                    <>
-                        {/* Invisible bridge to maintain hover when moving to submenu */}
-                        <div
-                            className={`absolute top-0 h-full w-4 ${submenuPosition === 'right' ? 'left-full' : 'right-full'}`}
-                            aria-hidden="true"
+                {/* Submenu - always rendered, shown via CSS on hover */}
+                <div className="submenu-panel submenu-panel-left scrollbar-thin">
+                    {item.children.map(child => (
+                        <DropdownItem
+                            key={child.id}
+                            item={child}
+                            isActive={isActive}
+                            isActivePrefix={isActivePrefix}
+                            onItemClick={onItemClick}
+                            userRole={userRole}
+                            leagueId={leagueId}
+                            onAction={onAction}
+                            currentPath={currentPath}
+                            onClose={onClose}
+                            depth={(depth || 0) + 1}
                         />
-                        <div
-                            ref={submenuRef}
-                            className={`absolute top-0 min-w-[200px] max-h-[60vh] overflow-y-auto py-2 
-                                bg-slate-900 
-                                border border-slate-700 
-                                rounded-xl shadow-xl shadow-black/50 z-[100]
-                                animate-in fade-in duration-150
-                                scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent
-                                right-full mr-1`}
-                        >
-                            {item.children.map(child => (
-                                <DropdownItem
-                                    key={child.id}
-                                    item={child}
-                                    isActive={isActive}
-                                    isActivePrefix={isActivePrefix}
-                                    onItemClick={onItemClick}
-                                    userRole={userRole}
-                                    leagueId={leagueId}
-                                    onAction={onAction}
-                                    currentPath={currentPath}
-                                    onClose={onClose}
-                                    depth={(depth || 0) + 1}
-                                />
-                            ))}
-                        </div>
-                    </>
-                )}
+                    ))}
+                </div>
             </div>
         );
     }

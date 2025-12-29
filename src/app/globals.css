@@ -609,3 +609,56 @@ body {
 .border-sky-500 {
   border-color: rgb(var(--brand-primary));
 }
+
+/* ============================================
+   MENU SUBMENU SYSTEM
+   Pure CSS hover-based submenus (no JS state)
+   Usage: .submenu-trigger.group/submenu > .submenu-panel
+   ============================================ */
+
+/* Submenu trigger wrapper */
+.submenu-trigger {
+  position: relative;
+}
+
+/* Submenu panel - hidden by default, shown on parent hover */
+.submenu-panel {
+  position: absolute;
+  top: 0;
+  min-width: 200px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+  background: rgb(var(--menu-bg));
+  border: 1px solid rgb(var(--menu-border));
+  border-radius: var(--radius-xl);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+  z-index: calc(var(--z-dropdown) + 10);
+
+  /* Hidden state */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-4px);
+  transition: all var(--transition-fast) ease;
+  pointer-events: none;
+}
+
+/* Position to the left of trigger (default for right-aligned menus) */
+.submenu-panel-left {
+  right: 100%;
+  margin-right: 0.25rem;
+}
+
+/* Position to the right of trigger */
+.submenu-panel-right {
+  left: 100%;
+  margin-left: 0.25rem;
+}
+
+/* Show on hover - using Tailwind group/submenu scoping */
+.group\/submenu:hover>.submenu-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  pointer-events: auto;
+}
