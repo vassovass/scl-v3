@@ -9,6 +9,13 @@ All notable changes to StepLeague v3.
 
 ## [2025-12-31]
 
+### Changed
+
+- **Leaderboard API** - Migrated `/api/leaderboard` to `withApiHandler` pattern (fixes Vercel static rendering error)
+  - Removed manual auth/membership checks (now handled by handler)
+  - Extended `withApiHandler` to support `league_id` from URL query params
+  - Eliminated `export const dynamic = 'force-dynamic'` workaround
+
 ### Added
 
 - **PRD 14: Analytics GTM & GA4** - Comprehensive analytics infrastructure

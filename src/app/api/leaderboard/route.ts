@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
-import { json, badRequest, unauthorized, forbidden, serverError } from "@/lib/api";
+import { withApiHandler } from "@/lib/api/handler";
+import { badRequest } from "@/lib/api";
+import { createAdminClient } from "@/lib/supabase/server";
 import { presetToDateRange, calculateStreak, type PeriodPreset } from "@/lib/utils/periods";
 
 const querySchema = z.object({
@@ -51,243 +52,210 @@ interface ComparisonResult {
 }
 
 // GET /api/leaderboard
-export async function GET(request: Request) {
-  try {
-    const url = new URL(request.url);
-    const rawParams = Object.fromEntries(url.searchParams.entries());
-    const parsed = querySchema.safeParse(rawParams);
+export const GET = withApiHandler({
+  auth: 'league_member',  // Handler checks membership via query param
+}, async ({ request, adminClient }) => {
+  const url = new URL(request.url);
+  const rawParams = Object.fromEntries(url.searchParams.entries());
+  const parsed = querySchema.safeParse(rawParams);
 
-    if (!parsed.success) {
-      console.error("Validation error:", parsed.error);
-      return badRequest("Invalid query parameters");
-    }
-
-    const {
-      league_id, period, period_b,
-      start_date, end_date, start_date_b, end_date_b,
-      verified, metric, sort_by, limit, offset
-    } = parsed.data;
-
-    const supabase = await createServerSupabaseClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return unauthorized();
-    }
-
-    const adminClient = createAdminClient();
-
-    // Check membership
-    const { data: membership } = await adminClient
-      .from("memberships")
-      .select("role")
-      .eq("league_id", league_id)
-      .eq("user_id", user.id)
-      .single();
-
-    // Check for super admin status
-    const { data: userProfile } = await adminClient
-      .from("users")
-      .select("is_superadmin")
-      .eq("id", user.id)
-      .single();
-
-    const isSuperAdmin = userProfile?.is_superadmin ?? false;
-
-    if (!membership && !isSuperAdmin) {
-      return forbidden("You are not a member of this league");
-    }
-
-    // Resolve period A dates
-    const rangeA = period === "custom" && start_date && end_date
-      ? { start: start_date, end: end_date }
-      : presetToDateRange(period as PeriodPreset);
-
-    // Resolve period B dates (for comparison mode)
-    const rangeB = period_b
-      ? (period_b === "custom" && start_date_b && end_date_b
-        ? { start: start_date_b, end: end_date_b }
-        : presetToDateRange(period_b as PeriodPreset))
-      : null;
-
-    // Fetch period A data (includes real users)
-    const statsA = await fetchPeriodStats(adminClient, league_id, rangeA, verified);
-
-    // Fetch period B data if comparison mode
-    const statsB = rangeB ? await fetchPeriodStats(adminClient, league_id, rangeB, verified) : null;
-
-    // Fetch proxy member stats for period A
-    const proxyStatsA = await fetchProxyMemberStats(adminClient, league_id, rangeA, verified);
-
-    // Fetch proxy member stats for period B if comparison mode
-    const proxyStatsB = rangeB ? await fetchProxyMemberStats(adminClient, league_id, rangeB, verified) : null;
-
-    // Calculate streaks for all users
-    const allUserIds = Array.from(new Set([...Array.from(statsA.keys()), ...Array.from(statsB?.keys() || [])]));
-
-    // Fetch all submission dates for streak calculation
-    const { data: allSubmissions } = await adminClient
-      .from("submissions")
-      .select("user_id, for_date")
-      .eq("league_id", league_id)
-      .is("proxy_member_id", null) // Only real user submissions for streaks
-      .order("for_date", { ascending: false });
-
-    const userSubmissionDates = new Map<string, string[]>();
-    for (const sub of allSubmissions || []) {
-      if (!userSubmissionDates.has(sub.user_id)) {
-        userSubmissionDates.set(sub.user_id, []);
-      }
-      userSubmissionDates.get(sub.user_id)!.push(sub.for_date);
-    }
-
-    // Fetch user records (streaks, lifetime steps)
-    const { data: userRecords } = await adminClient
-      .from("user_records")
-      .select("user_id, current_streak, total_steps_lifetime")
-      .in("user_id", allUserIds);
-
-    const recordsMap = new Map(userRecords?.map(r => [r.user_id, r]));
-
-    // Build results
-    const results: ComparisonResult[] = [];
-
-    for (const userId of allUserIds) {
-      const a = statsA.get(userId);
-      const b = statsB?.get(userId) || null;
-
-      if (!a) continue; // Need at least period A data
-
-      // Calculate improvement percentage
-      let improvementPct: number | null = null;
-      if (b && b.total_steps > 0) {
-        improvementPct = ((a.total_steps - b.total_steps) / b.total_steps) * 100;
-      }
-
-      // Calculate common days steps (only for days both periods have submissions)
-      let commonDaysStepsA: number | null = null;
-      let commonDaysStepsB: number | null = null;
-      if (b) {
-        const commonDates = a.submission_dates.filter(d => b.submission_dates.includes(d));
-        if (commonDates.length > 0) {
-          commonDaysStepsA = commonDates.reduce((sum, d) => sum + (a.steps_by_date.get(d) || 0), 0);
-          commonDaysStepsB = commonDates.reduce((sum, d) => sum + (b.steps_by_date.get(d) || 0), 0);
-        }
-      }
-
-      // Calculate streak from period (fallback)
-      const periodStreak = calculateStreak(userSubmissionDates.get(userId) || []);
-      const record = recordsMap.get(userId);
-      const currentStreak = record?.current_streak ?? periodStreak; // Use DB streak if avail
-      const lifetimeSteps = record?.total_steps_lifetime ?? 0;
-
-      results.push({
-        user_id: userId,
-        display_name: a.display_name,
-        nickname: a.nickname,
-        period_a: { ...a, streak: periodStreak }, // Keep period streak in stats object for context? Or update?
-        period_b: b,
-        improvement_pct: improvementPct,
-        common_days_steps_a: commonDaysStepsA,
-        common_days_steps_b: commonDaysStepsB,
-        badges: [],
-        rank: 0,
-        current_streak: currentStreak,
-        total_steps_lifetime: Number(lifetimeSteps),
-        is_proxy: false,
-      });
-    }
-
-    // Add proxy members to results
-    for (const [proxyId, proxyStats] of Array.from(proxyStatsA.entries())) {
-      const proxyB = proxyStatsB?.get(proxyId) || null;
-
-      // Calculate improvement percentage for proxy
-      let improvementPct: number | null = null;
-      if (proxyB && proxyB.total_steps > 0) {
-        improvementPct = ((proxyStats.total_steps - proxyB.total_steps) / proxyB.total_steps) * 100;
-      }
-
-      results.push({
-        user_id: proxyStats.user_id, // Already prefixed with "proxy:"
-        display_name: proxyStats.display_name,
-        nickname: null,
-        period_a: { ...proxyStats, streak: 0 },
-        period_b: proxyB,
-        improvement_pct: improvementPct,
-        common_days_steps_a: null,
-        common_days_steps_b: null,
-        badges: [],
-        rank: 0,
-        current_streak: 0, // Proxies don't have streaks
-        total_steps_lifetime: 0, // Proxies don't have lifetime stats
-        is_proxy: true,
-      });
-    }
-
-    // Sort results
-    results.sort((a, b) => {
-      switch (sort_by) {
-        case "improvement":
-          return (b.improvement_pct ?? -Infinity) - (a.improvement_pct ?? -Infinity);
-        case "average":
-          return b.period_a.average_per_day - a.period_a.average_per_day;
-        case "streak":
-          return b.period_a.streak - a.period_a.streak;
-        case "steps":
-        default:
-          return b.period_a.total_steps - a.period_a.total_steps;
-      }
-    });
-
-    // Assign ranks
-    results.forEach((r, i) => { r.rank = i + 1; });
-
-    // Assign badges
-    assignBadges(results);
-
-    // Calculate totals
-    const totalSteps = results.reduce((sum, r) => sum + r.period_a.total_steps, 0);
-
-    // Calculate total days in period
-    const totalDaysInPeriod = rangeA ? calculateDaysBetween(rangeA.start, rangeA.end) : null;
-
-    return json({
-      leaderboard: results.slice(offset, offset + limit).map(r => ({
-        rank: r.rank,
-        user_id: r.user_id,
-        display_name: r.nickname || r.display_name, // Prefer nickname
-        nickname: r.nickname,
-        total_steps: r.period_a.total_steps,
-        days_submitted: r.period_a.days_submitted,
-        total_days_in_period: totalDaysInPeriod,
-        average_per_day: Math.round(r.period_a.average_per_day),
-        verified_days: r.period_a.verified_days,
-        unverified_days: r.period_a.unverified_days,
-        streak: r.period_a.streak,
-        period_b_steps: r.period_b?.total_steps ?? null,
-        period_b_days: r.period_b?.days_submitted ?? null,
-        improvement_pct: r.improvement_pct !== null ? Math.round(r.improvement_pct * 10) / 10 : null,
-        common_days_steps_a: r.common_days_steps_a,
-        common_days_steps_b: r.common_days_steps_b,
-        badges: r.badges,
-        is_proxy: r.is_proxy ?? false, // Indicate if this is a proxy member
-      })),
-      meta: {
-        total_members: results.length,
-        team_total_steps: totalSteps,
-        total_days_in_period: totalDaysInPeriod,
-        period_a: rangeA,
-        period_b: rangeB,
-        limit,
-        offset,
-      },
-    });
-  } catch (error) {
-    console.error("Leaderboard error:", error);
-    return serverError(error instanceof Error ? error.message : "Unknown error");
+  if (!parsed.success) {
+    console.error("Validation error:", parsed.error);
+    return badRequest("Invalid query parameters");
   }
-}
+
+  const {
+    league_id, period, period_b,
+    start_date, end_date, start_date_b, end_date_b,
+    verified, metric, sort_by, limit, offset
+  } = parsed.data;
+
+  // Resolve period A dates
+  const rangeA = period === "custom" && start_date && end_date
+    ? { start: start_date, end: end_date }
+    : presetToDateRange(period as PeriodPreset);
+
+  // Resolve period B dates (for comparison mode)
+  const rangeB = period_b
+    ? (period_b === "custom" && start_date_b && end_date_b
+      ? { start: start_date_b, end: end_date_b }
+      : presetToDateRange(period_b as PeriodPreset))
+    : null;
+
+  // Fetch period A data (includes real users)
+  const statsA = await fetchPeriodStats(adminClient, league_id, rangeA, verified);
+
+  // Fetch period B data if comparison mode
+  const statsB = rangeB ? await fetchPeriodStats(adminClient, league_id, rangeB, verified) : null;
+
+  // Fetch proxy member stats for period A
+  const proxyStatsA = await fetchProxyMemberStats(adminClient, league_id, rangeA, verified);
+
+  // Fetch proxy member stats for period B if comparison mode
+  const proxyStatsB = rangeB ? await fetchProxyMemberStats(adminClient, league_id, rangeB, verified) : null;
+
+  // Calculate streaks for all users
+  const allUserIds = Array.from(new Set([...Array.from(statsA.keys()), ...Array.from(statsB?.keys() || [])]));
+
+  // Fetch all submission dates for streak calculation
+  const { data: allSubmissions } = await adminClient
+    .from("submissions")
+    .select("user_id, for_date")
+    .eq("league_id", league_id)
+    .is("proxy_member_id", null) // Only real user submissions for streaks
+    .order("for_date", { ascending: false });
+
+  const userSubmissionDates = new Map<string, string[]>();
+  for (const sub of allSubmissions || []) {
+    if (!userSubmissionDates.has(sub.user_id)) {
+      userSubmissionDates.set(sub.user_id, []);
+    }
+    userSubmissionDates.get(sub.user_id)!.push(sub.for_date);
+  }
+
+  // Fetch user records (streaks, lifetime steps)
+  const { data: userRecords } = await adminClient
+    .from("user_records")
+    .select("user_id, current_streak, total_steps_lifetime")
+    .in("user_id", allUserIds);
+
+  const recordsMap = new Map(userRecords?.map(r => [r.user_id, r]));
+
+  // Build results
+  const results: ComparisonResult[] = [];
+
+  for (const userId of allUserIds) {
+    const a = statsA.get(userId);
+    const b = statsB?.get(userId) || null;
+
+    if (!a) continue; // Need at least period A data
+
+    // Calculate improvement percentage
+    let improvementPct: number | null = null;
+    if (b && b.total_steps > 0) {
+      improvementPct = ((a.total_steps - b.total_steps) / b.total_steps) * 100;
+    }
+
+    // Calculate common days steps (only for days both periods have submissions)
+    let commonDaysStepsA: number | null = null;
+    let commonDaysStepsB: number | null = null;
+    if (b) {
+      const commonDates = a.submission_dates.filter(d => b.submission_dates.includes(d));
+      if (commonDates.length > 0) {
+        commonDaysStepsA = commonDates.reduce((sum, d) => sum + (a.steps_by_date.get(d) || 0), 0);
+        commonDaysStepsB = commonDates.reduce((sum, d) => sum + (b.steps_by_date.get(d) || 0), 0);
+      }
+    }
+
+    // Calculate streak from period (fallback)
+    const periodStreak = calculateStreak(userSubmissionDates.get(userId) || []);
+    const record = recordsMap.get(userId);
+    const currentStreak = record?.current_streak ?? periodStreak; // Use DB streak if avail
+    const lifetimeSteps = record?.total_steps_lifetime ?? 0;
+
+    results.push({
+      user_id: userId,
+      display_name: a.display_name,
+      nickname: a.nickname,
+      period_a: { ...a, streak: periodStreak }, // Keep period streak in stats object for context? Or update?
+      period_b: b,
+      improvement_pct: improvementPct,
+      common_days_steps_a: commonDaysStepsA,
+      common_days_steps_b: commonDaysStepsB,
+      badges: [],
+      rank: 0,
+      current_streak: currentStreak,
+      total_steps_lifetime: Number(lifetimeSteps),
+      is_proxy: false,
+    });
+  }
+
+  // Add proxy members to results
+  for (const [proxyId, proxyStats] of Array.from(proxyStatsA.entries())) {
+    const proxyB = proxyStatsB?.get(proxyId) || null;
+
+    // Calculate improvement percentage for proxy
+    let improvementPct: number | null = null;
+    if (proxyB && proxyB.total_steps > 0) {
+      improvementPct = ((proxyStats.total_steps - proxyB.total_steps) / proxyB.total_steps) * 100;
+    }
+
+    results.push({
+      user_id: proxyStats.user_id, // Already prefixed with "proxy:"
+      display_name: proxyStats.display_name,
+      nickname: null,
+      period_a: { ...proxyStats, streak: 0 },
+      period_b: proxyB,
+      improvement_pct: improvementPct,
+      common_days_steps_a: null,
+      common_days_steps_b: null,
+      badges: [],
+      rank: 0,
+      current_streak: 0, // Proxies don't have streaks
+      total_steps_lifetime: 0, // Proxies don't have lifetime stats
+      is_proxy: true,
+    });
+  }
+
+  // Sort results
+  results.sort((a, b) => {
+    switch (sort_by) {
+      case "improvement":
+        return (b.improvement_pct ?? -Infinity) - (a.improvement_pct ?? -Infinity);
+      case "average":
+        return b.period_a.average_per_day - a.period_a.average_per_day;
+      case "streak":
+        return b.period_a.streak - a.period_a.streak;
+      case "steps":
+      default:
+        return b.period_a.total_steps - a.period_a.total_steps;
+    }
+  });
+
+  // Assign ranks
+  results.forEach((r, i) => { r.rank = i + 1; });
+
+  // Assign badges
+  assignBadges(results);
+
+  // Calculate totals
+  const totalSteps = results.reduce((sum, r) => sum + r.period_a.total_steps, 0);
+
+  // Calculate total days in period
+  const totalDaysInPeriod = rangeA ? calculateDaysBetween(rangeA.start, rangeA.end) : null;
+
+  return {
+    leaderboard: results.slice(offset, offset + limit).map(r => ({
+      rank: r.rank,
+      user_id: r.user_id,
+      display_name: r.nickname || r.display_name, // Prefer nickname
+      nickname: r.nickname,
+      total_steps: r.period_a.total_steps,
+      days_submitted: r.period_a.days_submitted,
+      total_days_in_period: totalDaysInPeriod,
+      average_per_day: Math.round(r.period_a.average_per_day),
+      verified_days: r.period_a.verified_days,
+      unverified_days: r.period_a.unverified_days,
+      streak: r.period_a.streak,
+      period_b_steps: r.period_b?.total_steps ?? null,
+      period_b_days: r.period_b?.days_submitted ?? null,
+      improvement_pct: r.improvement_pct !== null ? Math.round(r.improvement_pct * 10) / 10 : null,
+      common_days_steps_a: r.common_days_steps_a,
+      common_days_steps_b: r.common_days_steps_b,
+      badges: r.badges,
+      is_proxy: r.is_proxy ?? false, // Indicate if this is a proxy member
+    })),
+    meta: {
+      total_members: results.length,
+      team_total_steps: totalSteps,
+      total_days_in_period: totalDaysInPeriod,
+      period_a: rangeA,
+      period_b: rangeB,
+      limit,
+      offset,
+    },
+  };
+});
 
 async function fetchPeriodStats(
   client: ReturnType<typeof createAdminClient>,

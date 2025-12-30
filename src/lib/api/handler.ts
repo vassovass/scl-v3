@@ -184,9 +184,15 @@ export function withApiHandler<T extends z.ZodType>(
                     }
                 }
 
-                // Fallback to URL params
+                // Fallback to URL route params (e.g., /api/leagues/[id])
                 if (!leagueId) {
                     leagueId = params.id;
+                }
+
+                // Fallback to URL search params (e.g., /api/leaderboard?league_id=xxx)
+                if (!leagueId) {
+                    const url = new URL(request.url);
+                    leagueId = url.searchParams.get('league_id') ?? undefined;
                 }
 
                 if (!leagueId) {
