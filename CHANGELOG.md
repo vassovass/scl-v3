@@ -22,16 +22,13 @@ All notable changes to StepLeague v3.
   - `vanilla-cookieconsent@3.0.1` (pinned) for GDPR/CCPA cookie consent
   - `GoogleTagManager.tsx` - GTM script with Consent Mode v2 defaults
   - `CookieConsentBanner.tsx` - Cookie consent banner with category toggles
-  - `analytics.ts` - Analytics hub with typed tracking methods:
-    - Conversion tracking (sign_up, league_created, steps_submitted)
-    - Component-level tracking (trackComponentView, trackInteraction)
-    - Module namespaces (leaderboard, kanban, filters, settings)
-    - AI feature tracking (verification, chatbot, suggestions)
-    - Support/chat tracking (Intercom-ready)
-    - A/B experiment tracking (GrowthBook/PostHog ready)
     - Performance and error tracking
   - User identity management for cross-tool per-user analytics
   - No frontend delays - all via GTM dataLayer
+  - **Event Tracking**:
+    - Authentication (login, sign_up, logout) with method and user_id differentiation
+    - Conversion events: `league_created`, `league_joined`, `steps_submitted`
+    - Full GTM Data Layer integration for all key actions
 - **Analytics & Tracking Framework** in AGENTS.md
   - Prescriptive naming conventions (snake_case events, PascalCase components)
   - Data attribute conventions for GTM auto-tracking

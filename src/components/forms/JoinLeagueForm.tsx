@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { analytics } from "@/lib/analytics";
 
 interface JoinLeagueFormProps {
     prefilledCode?: string;
@@ -46,6 +47,7 @@ export function JoinLeagueForm({ prefilledCode = "" }: JoinLeagueFormProps) {
                 return;
             }
 
+            analytics.leagueJoined(data.league_id, 'invite');
             router.push(`/league/${data.league_id}`);
         } catch {
             setError("Something went wrong");

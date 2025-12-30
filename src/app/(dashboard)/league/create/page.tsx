@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Spinner } from "@/components/ui/Spinner";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
+import { analytics } from "@/lib/analytics";
 
 // Form field configuration - easy to extend for future fields
 interface LeagueFormData {
@@ -57,6 +58,7 @@ export default function CreateLeaguePage() {
             }
 
             // Success - redirect to the new league
+            analytics.leagueCreated(data.league.id, formData.name.trim());
             router.push(`/league/${data.league.id}`);
         } catch (err) {
             setError(err instanceof Error ? err.message : "Something went wrong");

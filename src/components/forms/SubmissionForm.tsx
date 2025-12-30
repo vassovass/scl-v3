@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import imageCompression from "browser-image-compression";
 import { apiRequest, ApiError } from "@/lib/api/client";
 import { DatePicker } from "@/components/ui/DatePicker";
+import { analytics } from "@/lib/analytics";
 
 interface SubmissionFormProps {
     leagueId: string;
@@ -233,6 +234,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
             });
 
             // Success - clear form
+            analytics.stepsSubmitted(stepsNumber, leagueId);
             setFile(null);
             setFlagged(false);
             setFlagReason("");
