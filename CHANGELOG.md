@@ -7,6 +7,47 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2025-12-31]
+
+### Added
+
+- **PRD 14: Analytics GTM & GA4** - Comprehensive analytics infrastructure
+  - `vanilla-cookieconsent@3.0.1` (pinned) for GDPR/CCPA cookie consent
+  - `GoogleTagManager.tsx` - GTM script with Consent Mode v2 defaults
+  - `CookieConsentBanner.tsx` - Cookie consent banner with category toggles
+  - `analytics.ts` - Analytics hub with typed tracking methods:
+    - Conversion tracking (sign_up, league_created, steps_submitted)
+    - Component-level tracking (trackComponentView, trackInteraction)
+    - Module namespaces (leaderboard, kanban, filters, settings)
+    - AI feature tracking (verification, chatbot, suggestions)
+    - Support/chat tracking (Intercom-ready)
+    - A/B experiment tracking (GrowthBook/PostHog ready)
+    - Performance and error tracking
+  - User identity management for cross-tool per-user analytics
+  - No frontend delays - all via GTM dataLayer
+- **Analytics & Tracking Framework** in AGENTS.md
+  - Prescriptive naming conventions (snake_case events, PascalCase components)
+  - Data attribute conventions for GTM auto-tracking
+  - Event category taxonomy
+  - Module-specific tracking patterns
+  - Future tools integration guide (Hotjar, PostHog, etc.)
+- **PRD Documentation Updates** - Reordered PRDs 14-20
+  - Analytics moved to PRD 14 (immediate next priority)
+  - Page Layout System → PRD 15
+  - Export Utility → PRD 16
+  - Public Roadmap Polish → PRD 17
+  - Documentation → PRD 18
+  - League Start Date → PRD 19
+  - Expandable Cards → PRD 20
+
+### Changed
+
+- `src/app/layout.tsx` - Added GTM and CookieConsent components
+- `.env.example` - Added GTM/GA4 environment variable documentation
+- `AGENTS.md` - Added comprehensive Analytics & Tracking section
+
+---
+
 ## [2025-12-29]
 
 ### Added
