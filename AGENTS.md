@@ -475,6 +475,152 @@ This ensures documentation stays current for future sessions and developers.
 
 ---
 
+## 📊 Analytics & Tracking (MANDATORY)
+
+> **Architecture:** All analytics runs through GTM dataLayer → GTM forwards to GA4, Hotjar, PostHog, etc.
+> **No direct SDK integrations** = no frontend performance impact.
+
+### Core Principle
+
+**EVERY user interaction should be trackable.** When building new components:
+
+1. Import the analytics utility
+2. Add tracking calls for key user actions
+3. Follow the naming conventions below
+
+### How to Add Tracking
+
+```typescript
+import { analytics, trackInteraction, trackComponentView } from '@/lib/analytics';
+
+// For conversions/key actions - use typed methods
+analytics.signUp('google');
+analytics.leagueCreated(leagueId, leagueName);
+analytics.ai.verificationCompleted('approved', 0.95, 1200);
+
+// For component interactions - use generic helpers
+trackComponentView('LeaderboardCard', 'league_page');
+trackInteraction('SubmitButton', 'click', 'submit_steps_btn');
+```
+
+### 🏷️ Event Naming Conventions (MANDATORY)
+
+| Rule | Format | Examples |
+|------|--------|----------|
+| **Event names** | `snake_case`, lowercase | `sign_up`, `league_created`, `steps_submitted` |
+| **Category** | Noun, lowercase | `conversion`, `engagement`, `ai`, `support`, `error` |
+| **Action** | Verb, lowercase | `view`, `click`, `submit`, `complete`, `error` |
+| **Component** | PascalCase (React component name) | `LeaderboardCard`, `KanbanBoard`, `FeedbackForm` |
+| **Parameters** | `snake_case` | `league_id`, `step_count`, `error_type` |
+
+### 🏷️ Data Attribute Conventions (for GTM auto-tracking)
+
+When you need GTM to auto-track clicks without code:
+
+```html
+<!-- Format: data-track-[action]="[event_name]" -->
+<button data-track-click="cta_get_started" data-track-location="hero">
+  Get Started
+</button>
+
+<!-- For forms -->
+<form data-track-submit="feedback_submitted" data-track-type="bug">
+```
+
+| Attribute | Purpose | Example |
+|-----------|---------|---------|
+| `data-track-click` | Track click events | `data-track-click="cta_signup"` |
+| `data-track-submit` | Track form submissions | `data-track-submit="feedback_submitted"` |
+| `data-track-view` | Track element visibility | `data-track-view="pricing_section"` |
+| `data-track-*` | Additional parameters | `data-track-location="header"` |
+
+### Event Categories
+
+| Category | When to Use | Example Events |
+|----------|-------------|----------------|
+| `conversion` | User completes key goal | `sign_up`, `league_created`, `steps_submitted` |
+| `engagement` | User interacts meaningfully | `cta_clicked`, `page_view`, `roadmap_voted` |
+| `navigation` | User moves between pages | `page_view`, `menu_opened` |
+| `filter` | User filters/searches | `filter_applied`, `saved_view_loaded` |
+| `ai` | AI features used | `ai_verification_completed`, `ai_chatbot_query` |
+| `support` | Support/help interactions | `support_chat_opened`, `article_viewed` |
+| `experiment` | A/B test tracking | `experiment_viewed`, `experiment_converted` |
+| `performance` | Technical metrics | `page_performance`, `api_performance` |
+| `error` | Errors occurred | `error_occurred` |
+
+### Module-Specific Tracking
+
+Each major module has its own namespace in `analytics`:
+
+```typescript
+// Leaderboard
+analytics.leaderboard.viewed(leagueId, 'weekly');
+analytics.leaderboard.periodChanged(leagueId, 'daily');
+
+// Kanban
+analytics.kanban.cardMoved(itemId, 'backlog', 'in_progress');
+analytics.kanban.cardClicked(itemId, 'bug');
+
+// Filters
+analytics.filters.applied('status', 'in_progress', 'feedback_page');
+analytics.filters.savedViewLoaded('Urgent Bugs');
+
+// AI Features
+analytics.ai.verificationStarted(imageSize, leagueId);
+analytics.ai.verificationCompleted('approved', 0.95, 1200, leagueId);
+
+// Support/Chat
+analytics.support.chatOpened('widget');
+analytics.support.messageSent('question');
+```
+
+### User Identity (CRITICAL for per-user analytics)
+
+```typescript
+import { identifyUser, clearUser } from '@/lib/analytics';
+
+// After login/signup - enables per-user tracking across all tools
+identifyUser(user.id, {
+  email: user.email,
+  created_at: user.created_at,
+  // Add any traits useful for segmentation
+});
+
+// On logout
+clearUser();
+```
+
+### Adding New Tracking
+
+When adding a new trackable feature:
+
+1. **Check if method exists** in `src/lib/analytics.ts`
+2. **If not, add it** following the existing pattern
+3. **Add to correct namespace** (create new namespace if needed)
+4. **Follow naming conventions** above
+5. **Document in this section** if it's a new category
+
+### Files Reference
+
+| File | Purpose |
+|------|---------|
+| `src/lib/analytics.ts` | All tracking methods live here |
+| `src/components/analytics/GoogleTagManager.tsx` | GTM script with consent defaults |
+| `src/components/analytics/CookieConsent.tsx` | Cookie consent banner (GDPR) |
+| `.env.example` | Environment variables for GTM/GA4 IDs |
+
+### Future Tools (add in GTM, no code changes needed)
+
+- **Heatmaps:** Hotjar, FullStory, Microsoft Clarity
+- **A/B Testing:** GrowthBook, PostHog, Optimizely
+- **Session Recording:** LogRocket, Sentry
+- **Support:** Intercom, Crisp, Zendesk
+- **Product Analytics:** Amplitude, Mixpanel
+
+> **Key insight:** Because everything goes through dataLayer, adding new tools is a GTM config change - no code deployment needed.
+
+---
+
 ## Related Files
 
 | File | Purpose |
@@ -485,9 +631,10 @@ This ensures documentation stays current for future sessions and developers.
 | [CLAUDE.md](./CLAUDE.md) | Claude-specific notes (references this file) |
 | [.cursor/rules/](./cursor/rules/) | Cursor IDE rules |
 | [globals.css](./src/app/globals.css) | Design tokens, CSS variables, utility classes |
+| [analytics.ts](./src/lib/analytics.ts) | **Analytics tracking methods** - All event tracking lives here |
 | [/admin/design-system](./src/app/admin/design-system/page.tsx) | **Live component examples** (superadmin only) - UPDATE when adding/changing components |
 | **AI Artifacts Folder** | `docs/artifacts/` - All AI-generated planning docs, decisions, task lists (version controlled) |
 
 ---
 
-*Last updated: 2025-12-24. This file is the canonical source for AI agents.*
+*Last updated: 2025-12-31. This file is the canonical source for AI agents.*
