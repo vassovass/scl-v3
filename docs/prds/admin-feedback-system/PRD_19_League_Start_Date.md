@@ -1,7 +1,8 @@
-# PRD 18: League Start Date
+# PRD 19: League Start Date
 
-> **Order:** 18 of 18  
-> **Previous:** [PRD 17: Documentation](./PRD_17_Documentation.md)
+> **Order:** 19 of 20  
+> **Previous:** [PRD 18: Documentation](./PRD_18_Documentation.md)  
+> **Next:** [PRD 20: Expandable Cards with Image Paste](./PRD_20_Expandable_Cards_Image_Paste.md)
 
 ---
 

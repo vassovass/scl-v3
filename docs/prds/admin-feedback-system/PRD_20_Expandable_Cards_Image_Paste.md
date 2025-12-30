@@ -1,7 +1,7 @@
-# PRD 19: Expandable Cards with Image Paste
+# PRD 20: Expandable Cards with Image Paste
 
-> **Order:** 19 of 19  
-> **Previous:** [PRD 18: League Start Date](./PRD_18_League_Start_Date.md)
+> **Order:** 20 of 20 (Final)  
+> **Previous:** [PRD 19: League Start Date](./PRD_19_League_Start_Date.md)
 
 ---
 
