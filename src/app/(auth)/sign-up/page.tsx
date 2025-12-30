@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { APP_CONFIG } from "@/lib/config";
+import { analytics } from "@/lib/analytics";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -45,6 +46,8 @@ export default function SignUpPage() {
     // Check if email confirmation is required
     // When email confirm is enabled, user will be created but session will be null
     if (data?.user && !data?.session) {
+      // Track sign-up (email confirmation pending)
+      analytics.signUp('email');
       setSuccess("Check your email for a confirmation link to complete your registration.");
       setLoading(false);
       return;
@@ -56,6 +59,9 @@ export default function SignUpPage() {
       setLoading(false);
       return;
     }
+
+    // Track successful sign-up (auto signed in)
+    analytics.signUp('email');
 
     // Auto sign-in after signup (Supabase does this by default when email confirm is disabled)
     router.push("/dashboard");

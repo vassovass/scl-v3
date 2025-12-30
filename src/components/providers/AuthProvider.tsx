@@ -1,9 +1,10 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import type { Session, User } from "@supabase/supabase-js";
+import type { Session, User, AuthChangeEvent } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
+import { analytics, identifyUser, clearUser } from "@/lib/analytics";
 
 interface AuthContextValue {
   user: User | null;
@@ -20,24 +21,77 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Track if user was already identified (prevent duplicate events)
+  const identifiedUserRef = useRef<string | null>(null);
+
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session ?? null);
+      const initialSession = data.session ?? null;
+      setSession(initialSession);
       setLoading(false);
+
+      // Identify user if already logged in
+      if (initialSession?.user && identifiedUserRef.current !== initialSession.user.id) {
+        identifyUser(initialSession.user.id, {
+          email: initialSession.user.email || '',
+          created_at: initialSession.user.created_at || '',
+        });
+        identifiedUserRef.current = initialSession.user.id;
+      }
     });
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, newSession) => {
       setSession(newSession);
+
+      // Handle analytics based on auth event
+      handleAuthAnalytics(event, newSession);
     });
 
     return () => {
       subscription.unsubscribe();
     };
   }, [supabase]);
+
+  // Handle analytics for different auth events
+  const handleAuthAnalytics = (event: AuthChangeEvent, newSession: Session | null) => {
+    switch (event) {
+      case 'SIGNED_IN':
+        if (newSession?.user && identifiedUserRef.current !== newSession.user.id) {
+          // Identify user for per-user tracking across all tools
+          identifyUser(newSession.user.id, {
+            email: newSession.user.email || '',
+            created_at: newSession.user.created_at || '',
+          });
+          identifiedUserRef.current = newSession.user.id;
+
+          // Track login event
+          const provider = newSession.user.app_metadata?.provider;
+          analytics.login(provider === 'google' ? 'google' : 'email');
+        }
+        break;
+
+      case 'SIGNED_OUT':
+        // Clear user identity
+        clearUser();
+        identifiedUserRef.current = null;
+        analytics.logout();
+        break;
+
+      case 'USER_UPDATED':
+        // Re-identify with updated info
+        if (newSession?.user) {
+          identifyUser(newSession.user.id, {
+            email: newSession.user.email || '',
+            created_at: newSession.user.created_at || '',
+          });
+        }
+        break;
+    }
+  };
 
   const signOut = async (redirectTo = "/sign-in?signedOut=true") => {
     await supabase.auth.signOut();
