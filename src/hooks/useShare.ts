@@ -31,6 +31,11 @@ export function useShare(options: UseShareOptions = {}) {
         const url = data.url || (typeof window !== "undefined" ? window.location.href : "");
         const fullMessage = `${data.text}\n${url}`;
 
+        // Track in analytics immediately (capture intent)
+        if (options.contentType) {
+            analytics.share(options.contentType, options.itemId, platform);
+        }
+
         try {
             switch (platform) {
                 case "native":
@@ -68,11 +73,6 @@ export function useShare(options: UseShareOptions = {}) {
             }
 
             options.onShare?.(platform);
-
-            // Track in analytics if content type is provided
-            if (options.contentType) {
-                analytics.share(options.contentType, options.itemId, platform);
-            }
         } catch (error) {
             console.error("Share failed:", error);
             options.onError?.(error);
