@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, Suspense } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
@@ -8,6 +8,7 @@ import { DatePicker } from "@/components/ui/DatePicker";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
 import { ShareAchievementButton, AchievementData } from "@/components/ui/AchievementShareCard";
 import { useUserStats } from "@/hooks/useUserStats";
+import { useFilterPersistence } from "@/hooks/useFilterPersistence";
 import { APP_CONFIG } from "@/lib/config";
 import { BADGE_INFO } from "@/lib/badges";
 
@@ -67,7 +68,42 @@ function formatDate(dateStr: string) {
   return new Date(dateStr + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-export default function LeaderboardPage() {
+// Loading skeleton component
+function LeaderboardSkeleton() {
+  return (
+    <div className="min-h-screen bg-slate-950">
+      <div className="border-b border-slate-800 bg-slate-900/30">
+        <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
+          <div className="h-7 w-32 bg-slate-800 rounded animate-pulse" />
+          <div className="h-5 w-24 bg-slate-800 rounded animate-pulse" />
+        </div>
+      </div>
+      <div className="mx-auto max-w-3xl px-6 py-8">
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-16 bg-slate-800/50 rounded-lg animate-pulse" />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Filter defaults
+const FILTER_DEFAULTS = {
+  period: "this_week" as PeriodPreset,
+  sort_by: "steps" as SortBy,
+  verified: "all" as VerifiedFilter,
+  period_b: "",
+  compare: "",
+  start_date: "",
+  end_date: "",
+  start_date_b: "",
+  end_date_b: "",
+};
+
+// Main leaderboard content - uses useSearchParams so needs Suspense
+function LeaderboardContent() {
   const params = useParams();
   const leagueId = params.id as string;
   const { session } = useAuth();
@@ -77,22 +113,28 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Filters
-  const [period, setPeriod] = useState<PeriodPreset>("this_week");
-  const [periodB, setPeriodB] = useState<PeriodPreset | null>(null);
-  const [comparisonMode, setComparisonMode] = useState(false);
-  const [verifiedFilter, setVerifiedFilter] = useState<VerifiedFilter>("all");
-  const [sortBy, setSortBy] = useState<SortBy>("steps");
+  // Use persistent filters
+  const { filters, setFilter, setFilters, isHydrated } = useFilterPersistence({
+    storageKey: 'leaderboard',
+    contextId: leagueId,
+    defaults: FILTER_DEFAULTS,
+    urlParamKeys: ['period', 'sort_by', 'verified', 'period_b', 'compare'],
+  });
 
-  // Custom dates
-  const [customStartA, setCustomStartA] = useState("");
-  const [customEndA, setCustomEndA] = useState("");
-  const [customStartB, setCustomStartB] = useState("");
-  const [customEndB, setCustomEndB] = useState("");
+  const period = filters.period as PeriodPreset;
+  const sortBy = filters.sort_by as SortBy;
+  const verifiedFilter = filters.verified as VerifiedFilter;
+  const periodB = filters.period_b as PeriodPreset | "";
+  const comparisonMode = filters.compare === "true";
+  const customStartA = filters.start_date;
+  const customEndA = filters.end_date;
+  const customStartB = filters.start_date_b;
+  const customEndB = filters.end_date_b;
+
   const { stats: userStats } = useUserStats();
 
   const fetchLeaderboard = useCallback(async () => {
-    if (!session) return;
+    if (!session || !isHydrated) return;
 
     setLoading(true);
     setError(null);
@@ -129,25 +171,59 @@ export default function LeaderboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [session, leagueId, period, periodB, verifiedFilter, sortBy, comparisonMode, customStartA, customEndA, customStartB, customEndB]);
+  }, [session, isHydrated, leagueId, period, periodB, verifiedFilter, sortBy, comparisonMode, customStartA, customEndA, customStartB, customEndB]);
 
   useEffect(() => {
+    if (!isHydrated) return;
     if (period === "custom" && (!customStartA || !customEndA)) {
       setLoading(false);
       return;
     }
     fetchLeaderboard();
-  }, [fetchLeaderboard, period, customStartA, customEndA]);
+  }, [fetchLeaderboard, isHydrated, period, customStartA, customEndA]);
 
   const toggleComparison = () => {
-    setComparisonMode(!comparisonMode);
-    if (!comparisonMode && !periodB) {
+    const newCompare = !comparisonMode;
+    const updates: Partial<typeof FILTER_DEFAULTS> = { compare: newCompare ? "true" : "" };
+
+    if (newCompare && !periodB) {
       // Auto-select comparison period
-      if (period === "this_week") setPeriodB("last_week");
-      else if (period === "this_month") setPeriodB("last_month");
-      else setPeriodB("last_week");
+      if (period === "this_week") updates.period_b = "last_week";
+      else if (period === "this_month") updates.period_b = "last_month";
+      else updates.period_b = "last_week";
     }
+
+    setFilters(updates);
   };
+
+  const handlePeriodChange = (newPeriod: PeriodPreset) => {
+    setFilter('period', newPeriod);
+  };
+
+  const handleSortChange = (newSort: SortBy) => {
+    setFilter('sort_by', newSort);
+  };
+
+  const handleVerifiedChange = (newVerified: VerifiedFilter) => {
+    setFilter('verified', newVerified);
+  };
+
+  const handlePeriodBChange = (newPeriodB: PeriodPreset) => {
+    setFilter('period_b', newPeriodB);
+  };
+
+  const handleCustomDateA = (start: string, end: string) => {
+    setFilters({ start_date: start, end_date: end });
+  };
+
+  const handleCustomDateB = (start: string, end: string) => {
+    setFilters({ start_date_b: start, end_date_b: end });
+  };
+
+  // Show skeleton until hydrated
+  if (!isHydrated) {
+    return <LeaderboardSkeleton />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-950">
@@ -169,7 +245,7 @@ export default function LeaderboardPage() {
               <label className="text-sm text-slate-400">Period:</label>
               <select
                 value={period}
-                onChange={(e) => setPeriod(e.target.value as PeriodPreset)}
+                onChange={(e) => handlePeriodChange(e.target.value as PeriodPreset)}
                 className="rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100"
                 style={{ colorScheme: "dark" }}
               >
@@ -192,8 +268,18 @@ export default function LeaderboardPage() {
             {/* Custom Date Range A */}
             {period === "custom" && (
               <div className="mt-4 flex flex-wrap gap-4">
-                <DatePicker value={customStartA} onChange={setCustomStartA} label="From" max={customEndA || undefined} />
-                <DatePicker value={customEndA} onChange={setCustomEndA} label="To" min={customStartA} />
+                <DatePicker
+                  value={customStartA}
+                  onChange={(v) => handleCustomDateA(v, customEndA)}
+                  label="From"
+                  max={customEndA || undefined}
+                />
+                <DatePicker
+                  value={customEndA}
+                  onChange={(v) => handleCustomDateA(customStartA, v)}
+                  label="To"
+                  min={customStartA}
+                />
               </div>
             )}
 
@@ -203,8 +289,8 @@ export default function LeaderboardPage() {
                 <div className="flex flex-wrap items-center gap-3">
                   <label className="text-sm text-slate-400">Compare to:</label>
                   <select
-                    value={periodB || ""}
-                    onChange={(e) => setPeriodB(e.target.value as PeriodPreset)}
+                    value={periodB}
+                    onChange={(e) => handlePeriodBChange(e.target.value as PeriodPreset)}
                     className="rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100"
                     style={{ colorScheme: "dark" }}
                   >
@@ -215,8 +301,18 @@ export default function LeaderboardPage() {
                 </div>
                 {periodB === "custom" && (
                   <div className="mt-4 flex flex-wrap gap-4">
-                    <DatePicker value={customStartB} onChange={setCustomStartB} label="From" max={customEndB || undefined} />
-                    <DatePicker value={customEndB} onChange={setCustomEndB} label="To" min={customStartB} />
+                    <DatePicker
+                      value={customStartB}
+                      onChange={(v) => handleCustomDateB(v, customEndB)}
+                      label="From"
+                      max={customEndB || undefined}
+                    />
+                    <DatePicker
+                      value={customEndB}
+                      onChange={(v) => handleCustomDateB(customStartB, v)}
+                      label="To"
+                      min={customStartB}
+                    />
                   </div>
                 )}
               </div>
@@ -234,7 +330,7 @@ export default function LeaderboardPage() {
             {(["steps", "improvement", "average", "streak"] as SortBy[]).map(s => (
               <button
                 key={s}
-                onClick={() => setSortBy(s)}
+                onClick={() => handleSortChange(s)}
                 className={`px-2 py-1 text-xs rounded-md transition ${sortBy === s
                   ? "bg-sky-600/20 text-sky-400 border border-sky-600"
                   : "bg-slate-800 text-slate-400 border border-slate-700"
@@ -251,7 +347,7 @@ export default function LeaderboardPage() {
             {(["all", "verified", "unverified"] as VerifiedFilter[]).map(f => (
               <button
                 key={f}
-                onClick={() => setVerifiedFilter(f)}
+                onClick={() => handleVerifiedChange(f)}
                 className={`px-2 py-1 text-xs rounded-md transition ${verifiedFilter === f
                   ? "bg-emerald-600/20 text-emerald-400 border border-emerald-600"
                   : "bg-slate-800 text-slate-400 border border-slate-700"
@@ -414,5 +510,14 @@ export default function LeaderboardPage() {
         )}
       </div>
     </div>
+  );
+}
+
+// Wrapper component with Suspense boundary (required for useSearchParams)
+export default function LeaderboardPage() {
+  return (
+    <Suspense fallback={<LeaderboardSkeleton />}>
+      <LeaderboardContent />
+    </Suspense>
   );
 }

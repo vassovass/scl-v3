@@ -11,7 +11,28 @@ All notable changes to StepLeague v3.
 
 ### Added
 
+- **Universal Filter Persistence System** - Filters now survive page refresh and are shareable via URL
+  - `useFilterPersistence` hook - Generic, reusable hook for persisting any filter state
+  - `filterStorage.ts` - localStorage utilities for per-page/context filter preferences
+  - URL params as primary source (shareable, bookmarkable)
+  - localStorage fallback for user preferences when no URL params present
+  - Hydration handling to prevent SSR/client mismatch
+
+### Fixed
+
+- **Leaderboard Period Reset** - Fixed bug where selecting "All Time" and refreshing would reset to "This Week"
+  - Migrated leaderboard page to use `useFilterPersistence` hook
+  - All filters (period, sort, verified) now persist in URL
+  - Added Suspense boundary for proper hydration
+
+---
+
+## [2025-12-31]
+
+### Added
+
 - **PRD 15: Page Layout System** - Reusable, modular page structure components
+
   - `PageLayout.tsx` - Orchestrator for header, loading, empty, and content states
   - `PageHeader.tsx` - Title, subtitle, actions, breadcrumbs with analytics tracking
   - `EmptyState.tsx` - Configurable empty state with icons, descriptions, and CTAs
