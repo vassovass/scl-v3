@@ -352,6 +352,30 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                             Saving...
                         </span>
                     )}
+                    {/* Help tooltip explaining Kanban → Roadmap mapping */}
+                    <div className="relative group">
+                        <button
+                            className="flex items-center justify-center w-7 h-7 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 text-sm rounded-lg border border-slate-700 hover:border-slate-600 transition-colors"
+                            title="How this maps to public roadmap"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </button>
+                        <div className="absolute right-0 top-full mt-2 w-72 p-3 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                            <h4 className="text-sm font-semibold text-slate-200 mb-2">📋 Kanban → 🗺️ Roadmap</h4>
+                            <div className="text-xs text-slate-400 space-y-1.5">
+                                <p><span className="text-sky-400">🌐 Public items</span> appear on /roadmap</p>
+                                <div className="border-t border-slate-700 pt-1.5 mt-1.5">
+                                    <p className="font-medium text-slate-300 mb-1">Column Mapping:</p>
+                                    <p>• <span className="text-amber-400">In Progress</span> → <span className="text-orange-400">🔥 Now</span></p>
+                                    <p>• <span className="text-slate-300">Release tag</span> → Roadmap column</p>
+                                    <p>• <span className="text-emerald-400">Done</span> → <span className="text-emerald-400">✅ Done</span></p>
+                                </div>
+                                <p className="text-slate-500 pt-1">Click 🔒/🌐 to toggle visibility</p>
+                            </div>
+                        </div>
+                    </div>
                     <button
                         onClick={exportToCSV}
                         className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-lg border border-slate-700 hover:border-slate-600 transition-colors"
