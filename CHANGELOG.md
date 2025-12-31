@@ -11,6 +11,11 @@ All notable changes to StepLeague v3.
 
 ### Added
 
+- **Vercel Speed Insights** - Performance metrics collection for Real Experience Score (RES)
+  - Installed `@vercel/speed-insights` package
+  - Added `<SpeedInsights />` component to root layout
+  - Tracks FCP, LCP, INP, CLS, FID, TTFB metrics via Vercel dashboard
+
 - **Universal Filter Persistence System** - Filters now survive page refresh and are shareable via URL
   - `useFilterPersistence` hook - Generic, reusable hook for persisting any filter state
   - `filterStorage.ts` - localStorage utilities for per-page/context filter preferences

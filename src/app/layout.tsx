@@ -3,6 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { FeedbackWidget } from "@/components/feedback/FeedbackWidget";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import {
   GoogleTagManager,
   GoogleTagManagerNoscript,
@@ -40,6 +41,7 @@ export default function RootLayout({
 
         {/* Vercel Analytics (separate from GA4) */}
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
