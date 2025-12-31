@@ -451,15 +451,12 @@ function DropdownItemContent({
         }
     }, [isSubmenuOpen]);
 
-    // Has children - render as nested submenu (pure CSS hover, no React state)
+    // Has children - render as nested submenu (pure inline Tailwind)
     if (item.children && item.children.length > 0) {
         return (
-            <div className="submenu-trigger group/submenu">
+            <div className="relative group/sub">
                 <button
-                    className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors
-                        text-[rgb(var(--menu-item-text))] 
-                        hover:bg-[rgb(var(--menu-item-hover-bg))] hover:text-[rgb(var(--menu-item-hover-text))]
-                        group-hover/submenu:bg-[rgb(var(--menu-item-hover-bg))] group-hover/submenu:text-[rgb(var(--menu-item-hover-text))]`}
+                    className="w-full flex items-center justify-between px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-white group-hover/sub:bg-slate-800 group-hover/sub:text-white transition-colors"
                     data-module-id={`menu-${item.id}`}
                     data-module-name={item.label}
                 >
@@ -470,8 +467,8 @@ function DropdownItemContent({
                     <span className="text-xs opacity-60">◀</span>
                 </button>
 
-                {/* Submenu - always rendered, shown via CSS on hover */}
-                <div className="submenu-panel submenu-panel-left scrollbar-thin">
+                {/* Submenu - inline Tailwind, hidden by default, visible on group hover */}
+                <div className="absolute top-0 right-full mr-1 min-w-[200px] py-2 bg-slate-900 border border-slate-700 rounded-xl shadow-xl z-[100] opacity-0 invisible pointer-events-none group-hover/sub:opacity-100 group-hover/sub:visible group-hover/sub:pointer-events-auto transition-all duration-150">
                     {item.children.map(child => (
                         <DropdownItem
                             key={child.id}
