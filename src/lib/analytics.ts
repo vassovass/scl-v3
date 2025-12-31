@@ -222,6 +222,16 @@ export const analytics = {
         });
     },
 
+    share: (content_type: string, item_id: string | undefined, method: string) => {
+        trackEvent('share', {
+            content_type,
+            item_id,
+            method,
+            category: 'social',
+            action: 'share',
+        });
+    },
+
     // ─────────────────────────────────────────────────────────────────────────
     // ENGAGEMENT
     // ─────────────────────────────────────────────────────────────────────────

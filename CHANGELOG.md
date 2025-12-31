@@ -28,6 +28,7 @@ All notable changes to StepLeague v3.
   - **Event Tracking**:
     - Authentication (login, sign_up, logout) with method and user_id differentiation
     - Conversion events: `league_created`, `league_joined`, `steps_submitted`
+    - Engagement events: `share` (achievements, invites, analytics page)
     - Full GTM Data Layer integration for all key actions
 - **Analytics & Tracking Framework** in AGENTS.md
   - Prescriptive naming conventions (snake_case events, PascalCase components)

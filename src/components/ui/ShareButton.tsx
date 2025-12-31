@@ -13,6 +13,10 @@ interface ShareButtonProps {
     children?: React.ReactNode;
     /** Additional CSS classes */
     className?: string;
+    /** Content type for analytics */
+    contentType?: string;
+    /** ID of the shared item */
+    itemId?: string;
 }
 
 
@@ -27,9 +31,14 @@ export function ShareButton({
     url,
     children,
     className = "",
+    contentType,
+    itemId,
 }: ShareButtonProps) {
     const [showMenu, setShowMenu] = useState(false);
-    const { share, copied, supportsNativeShare } = useShare();
+    const { share, copied, supportsNativeShare } = useShare({
+        contentType,
+        itemId
+    });
 
     const shareUrl = url || (typeof window !== "undefined" ? window.location.href : "");
 

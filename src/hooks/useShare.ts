@@ -2,12 +2,18 @@
 
 import { useState, useCallback } from "react";
 import { APP_CONFIG } from "@/lib/config";
+import { analytics } from "@/lib/analytics";
 
 export type SharePlatform = "native" | "whatsapp" | "twitter" | "copy";
+
 
 interface UseShareOptions {
     onShare?: (platform: SharePlatform) => void;
     onError?: (error: unknown) => void;
+    /** Content type for analytics (e.g., 'achievement', 'invite', 'league') */
+    contentType?: string;
+    /** ID of the item being shared */
+    itemId?: string;
 }
 
 interface ShareData {
@@ -62,6 +68,11 @@ export function useShare(options: UseShareOptions = {}) {
             }
 
             options.onShare?.(platform);
+
+            // Track in analytics if content type is provided
+            if (options.contentType) {
+                analytics.share(options.contentType, options.itemId, platform);
+            }
         } catch (error) {
             console.error("Share failed:", error);
             options.onError?.(error);

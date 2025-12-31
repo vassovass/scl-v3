@@ -26,7 +26,9 @@ export function LeagueInviteControl({ inviteCode, leagueName, className = "" }: 
     }, []);
 
     const { share, copied, supportsNativeShare } = useShare({
-        onShare: () => setIsOpen(false)
+        onShare: () => setIsOpen(false),
+        contentType: 'league_invite',
+        itemId: inviteCode
     });
 
     const getInviteUrl = () => {

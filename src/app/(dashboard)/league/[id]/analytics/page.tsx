@@ -66,6 +66,8 @@ export default function LeagueAnalyticsPage() {
                                 <ShareButton
                                     message={generateShareMessage("total_steps", { steps: 100000, period: "month" })}
                                     className="px-3 py-1.5 text-xs sm:px-4 sm:py-2"
+                                    contentType="analytics_page"
+                                    itemId={leagueId}
                                 >
                                     📤 Share
                                 </ShareButton>

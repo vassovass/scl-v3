@@ -32,7 +32,10 @@ interface AchievementShareCardProps {
  * Generates a link with dynamic OG preview for social media.
  */
 export function AchievementShareCard({ achievement, onClose }: AchievementShareCardProps) {
-    const { share, isSharing, copied, supportsNativeShare } = useShare();
+    const { share, isSharing, copied, supportsNativeShare } = useShare({
+        contentType: 'achievement',
+        itemId: achievement.type
+    });
 
     const getEmoji = () => {
         switch (achievement.type) {
