@@ -1,153 +1,71 @@
-# Implementation Plan: Internal Kanban & Public Roadmap
+# Implementation Plan - Page Layout System (PRD 15)
 
-> **Date**: 2025-12-24  
-> **Status**: Pending Implementation  
-> **Category**: Plan / Technical  
-> **Relevance**: Active - next implementation task
+## Goal Description
+Implement a reusable `PageLayout` component system with **analytics tracking**, **SEO optimization**, **A/B testing support**, **theming (dark/light)**, and **accessibility** built-in.
 
----
+## Enhanced Requirements
 
-## Goal
-
-Build an integrated task management and public roadmap system that:
-1. Provides superadmins with a Kanban board for internal task tracking
-2. Shows users a public roadmap with voting (1-10 priority) and comments
-3. Displays completed features with dates (changelog)
-4. **Replaces static ROADMAP.md** with a dynamic, database-driven system
-
----
-
-## User Review Required
-
-> [!IMPORTANT]
-> **ROADMAP.md Replacement**: This plan proposes deprecating the static `ROADMAP.md` file in favor of a database-driven public roadmap page. The existing content will be migrated to the database as seed data.
-
----
+| Category | Implementation |
+|----------|----------------|
+| **Analytics** | `data-track-*` attributes, `trackComponentView()`, action click tracking |
+| **SEO** | Semantic HTML (`<header>`, `<main>`, `<nav>`), unique IDs, proper heading hierarchy |
+| **A/B Testing** | `data-variant` attributes on all key elements |
+| **Theming** | CSS variables via `globals.css`, no hardcoded colors |
+| **Accessibility** | ARIA roles, `aria-label`, `aria-busy`, focus management |
+| **Extensibility** | Slot pattern: `headerSlot`, `beforeContent`, `afterContent` |
 
 ## Proposed Changes
 
-### Database Layer
+### Components (CREATED ✅)
 
-#### [NEW] [20251224000000_extend_feedback_for_kanban.sql](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/supabase/migrations/20251224000000_extend_feedback_for_kanban.sql)
+#### [NEW] [PageHeader.tsx](file:///d:/Vasso/coding projects/SCL v3 AG/scl-v3/src/components/layout/PageHeader.tsx)
+- Title, subtitle, action buttons, breadcrumbs
+- Analytics: `data-track-click`, `data-track-view`, `trackInteraction()`
+- A/B: `data-variant`, `testVariant` prop
+- SEO: `id="page-header-{pageId}"`, `role="banner"`
 
-Extends the existing `feedback` table with:
-- `board_status` - Kanban column (backlog, todo, in_progress, review, done)
-- `is_public` - Whether to show on public roadmap
-- `priority_order` - Admin ordering
-- `completed_at` - When marked done (for changelog)
+#### [NEW] [EmptyState.tsx](file:///d:/Vasso/coding projects/SCL v3 AG/scl-v3/src/components/layout/EmptyState.tsx)
+- Icon, title, description, primary/secondary actions
+- Analytics: `trackComponentView()` on mount
+- Sizes: `sm`, `md`, `lg`
 
-#### [NEW] [20251224000001_create_roadmap_tables.sql](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/supabase/migrations/20251224000001_create_roadmap_tables.sql)
+#### [NEW] [LoadingSkeleton.tsx](file:///d:/Vasso/coding projects/SCL v3 AG/scl-v3/src/components/layout/LoadingSkeleton.tsx)
+- Variants: `list`, `cards`, `table`, `content`, `custom`
+- Composable primitives: `SkeletonLine`, `SkeletonCard`, `SkeletonRow`
+- Accessibility: `aria-busy`, `role="status"`
 
-Creates:
-- `roadmap_votes` - User priority votes (1-10 scale, one per user per item)
-- `roadmap_comments` - User comments on roadmap items
-- RLS policies for authenticated users
+#### [NEW] [PageLayout.tsx](file:///d:/Vasso/coding projects/SCL v3 AG/scl-v3/src/components/layout/PageLayout.tsx)
+- Orchestrates header, loading, empty, and content states
+- Props: `loading`, `isEmpty`, `empty`, `loadingConfig`, slots
+- Padding/maxWidth variants for responsive layouts
 
----
+### Page Migrations (TODO)
 
-### Admin Components
+#### [MODIFY] [admin/feedback/page.tsx](file:///d:/Vasso/coding projects/SCL v3 AG/scl-v3/src/app/admin/feedback/page.tsx)
+- Wrap in `PageLayout` with `title="User Feedback"`
+- Move "Full Kanban Board" to `actions` prop
 
-#### [NEW] [KanbanBoard.tsx](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/src/components/admin/KanbanBoard.tsx)
+#### [MODIFY] [admin/kanban/page.tsx](file:///d:/Vasso/coding projects/SCL v3 AG/scl-v3/src/app/admin/kanban/page.tsx)
+- Wrap in `PageLayout` with `title="Kanban Board"`
+- Move legend to `afterContent` slot
 
-Drag-and-drop Kanban board component with:
-- Columns: Backlog → Todo → In Progress → Review → Done
-- Cards with title, type badge, priority
-- Quick actions: mark public, edit, delete
+#### [MODIFY] [dashboard/page.tsx](file:///d:/Vasso/coding projects/SCL v3 AG/scl-v3/src/app/(dashboard)/dashboard/page.tsx)
+- Wrap in `PageLayout` with `title="Your Leagues"`
+- Use built-in `empty` prop for no-leagues state
 
-#### [NEW] [page.tsx (admin/kanban)](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/src/app/admin/kanban/page.tsx)
+### Documentation
 
-Admin Kanban page, superadmin-only access.
-
-#### [MODIFY] [adminPages.ts](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/src/lib/adminPages.ts)
-
-Add Kanban link to admin navigation.
-
----
-
-### Public Roadmap Components
-
-#### [NEW] [page.tsx (roadmap)](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/src/app/roadmap/page.tsx)
-
-Public roadmap page with three sections:
-1. **Planned** - Upcoming features, sorted by user votes
-2. **In Progress** - Currently being worked on
-3. **Completed** - Changelog with dates
-
-#### [NEW] [RoadmapCard.tsx](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/src/components/roadmap/RoadmapCard.tsx)
-
-Card component showing:
-- Feature title and description
-- Type badge (feature, improvement, etc.)
-- Average priority rating
-- Vote button (1-10 slider)
-- Comment count with expand
-
-#### [NEW] [PriorityVote.tsx](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/src/components/roadmap/PriorityVote.tsx)
-
-1-10 priority voting component with visual feedback.
-
-#### [NEW] [RoadmapComments.tsx](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/src/components/roadmap/RoadmapComments.tsx)
-
-Comment section for authenticated users.
-
----
-
-### API Routes
-
-#### [NEW] [route.ts (api/roadmap)](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/src/app/api/roadmap/route.tsx)
-
-GET: Fetch public roadmap items with aggregated votes.
-
-#### [NEW] [route.ts (api/roadmap/vote)](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/src/app/api/roadmap/vote/route.tsx)
-
-POST: Submit or update priority vote.
-
-#### [NEW] [route.ts (api/roadmap/comments)](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/src/app/api/roadmap/comments/route.tsx)
-
-GET/POST: Fetch and submit comments.
-
-#### [NEW] [route.ts (api/admin/kanban)](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/src/app/api/admin/kanban/route.tsx)
-
-PUT: Update card status, order, visibility (superadmin only).
-
----
-
-### Navigation & Documentation
-
-#### [MODIFY] [navigation.ts](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/src/lib/navigation.ts)
-
-Add public "Roadmap" link to main navigation.
-
-#### [DELETE] [ROADMAP.md](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/ROADMAP.md)
-
-Replace with database-driven system. Content migrated via seed data.
-
-#### [NEW] [seed_roadmap.sql](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/supabase/seed_roadmap.sql)
-
-Seed script to migrate existing ROADMAP.md content to database.
-
----
+#### [MODIFY] [design-system/page.tsx](file:///d:/Vasso/coding projects/SCL v3 AG/scl-v3/src/app/admin/design-system/page.tsx)
+- Add PageLayout section with all variants
 
 ## Verification Plan
 
-### Automated Tests
-- Test Kanban drag-and-drop in browser
-- Test voting persistence
-- Test comment submission
-- Verify RLS policies block unauthorized access
+### Automated
+- `npm run build` passes
 
-### Manual Verification
-1. Create task in Kanban → verify appears in admin view
-2. Mark task as public → verify appears on /roadmap
-3. Vote on item → verify average updates
-4. Add comment → verify displays for others
-5. Mark task done with date → verify in "Completed" section
+### Manual
+- Visit migrated pages, verify header/actions
+- Test loading state (temporarily force `loading={true}`)
+- Test empty state (force `isEmpty={true}`)
+- Verify dark/light mode compatibility
 
----
-
-## Changelog
-
-| Date | Section | Change |
-|------|---------|--------|
-| 2025-12-24 | Database Layer | Fixed migration filenames to use 2025 instead of 2024 |
-| 2025-12-24 | Initial | Created implementation plan with all file changes |

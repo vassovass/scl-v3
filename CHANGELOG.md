@@ -9,6 +9,25 @@ All notable changes to StepLeague v3.
 
 ## [2025-12-31]
 
+### Added
+
+- **PRD 15: Page Layout System** - Reusable, modular page structure components
+  - `PageLayout.tsx` - Orchestrator for header, loading, empty, and content states
+  - `PageHeader.tsx` - Title, subtitle, actions, breadcrumbs with analytics tracking
+  - `EmptyState.tsx` - Configurable empty state with icons, descriptions, and CTAs
+  - `LoadingSkeleton.tsx` - Multiple variants: list, cards, table, content, custom
+  - **Analytics Integration**: `data-track-*` attributes, `trackComponentView()` on mount
+  - **SEO**: Semantic HTML (`<header>`, `<main>`), unique IDs, proper heading hierarchy
+  - **A/B Testing**: `data-variant` attributes for experiment tracking via GTM
+  - **Accessibility**: ARIA roles, `aria-busy`, `aria-label`, focus management
+  - **Extensibility**: Slot pattern (`headerSlot`, `beforeContent`, `afterContent`)
+  - **Sleek Animations**: Uses existing `animate-fade-in`, `animate-fade-slide` utilities
+  - Migrated `/admin/feedback` and `/admin/kanban` pages as proof of concept
+
+---
+
+## [2025-12-31]
+
 ### Changed
 
 - **Leaderboard API** - Migrated `/api/leaderboard` to `withApiHandler` pattern (fixes Vercel static rendering error)
@@ -30,6 +49,12 @@ All notable changes to StepLeague v3.
     - Conversion events: `league_created`, `league_joined`, `steps_submitted`
     - Engagement events: `share` (achievements, invites, analytics page)
     - Full GTM Data Layer integration for all key actions
+
+### Fixed
+
+- **Share Event Tracking** - Fixed race condition where share events weren't tracked
+  - Moved tracking to capture "intent" immediately on click
+  - Ensures events fire even if user cancels native share dialog
 - **Analytics & Tracking Framework** in AGENTS.md
   - Prescriptive naming conventions (snake_case events, PascalCase components)
   - Data attribute conventions for GTM auto-tracking

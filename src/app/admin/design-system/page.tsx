@@ -662,6 +662,26 @@ export default function DesignSystemPage() {
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                    <code className="text-sky-400">PageLayout</code>
+                                    <p className="text-xs text-slate-500 mt-1">Orchestrator for header, loading, empty, and content states</p>
+                                    <p className="text-xs text-slate-600 mt-1">layout/PageLayout.tsx</p>
+                                </div>
+                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                    <code className="text-sky-400">PageHeader</code>
+                                    <p className="text-xs text-slate-500 mt-1">Title, subtitle, actions, breadcrumbs with analytics</p>
+                                    <p className="text-xs text-slate-600 mt-1">layout/PageHeader.tsx</p>
+                                </div>
+                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                    <code className="text-sky-400">EmptyState</code>
+                                    <p className="text-xs text-slate-500 mt-1">Configurable empty state with icons, descriptions, CTAs</p>
+                                    <p className="text-xs text-slate-600 mt-1">layout/EmptyState.tsx</p>
+                                </div>
+                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                    <code className="text-sky-400">LoadingSkeleton</code>
+                                    <p className="text-xs text-slate-500 mt-1">Multiple variants: list, cards, table, content</p>
+                                    <p className="text-xs text-slate-600 mt-1">layout/LoadingSkeleton.tsx</p>
+                                </div>
+                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
                                     <code className="text-sky-400">GlobalFooter</code>
                                     <p className="text-xs text-slate-500 mt-1">Site-wide footer with navigation links</p>
                                     <p className="text-xs text-slate-600 mt-1">layout/GlobalFooter.tsx</p>

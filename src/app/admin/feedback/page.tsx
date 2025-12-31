@@ -1,6 +1,7 @@
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import AdminFeedbackClient from "@/components/admin/AdminFeedbackClient";
+import { PageLayout } from "@/components/layout/PageLayout";
 
 export const metadata = {
     title: "User Feedback | Admin",
@@ -27,9 +28,17 @@ export default async function AdminFeedbackPage() {
 
     if (error) {
         return (
-            <div className="p-8 text-rose-400">
-                Error loading feedback: {error.message}
-            </div>
+            <PageLayout
+                title="User Feedback"
+                subtitle="Manage and triage user-submitted feedback"
+                pageId="admin_feedback"
+                isEmpty={true}
+                empty={{
+                    icon: "⚠️",
+                    title: "Error loading feedback",
+                    description: error.message,
+                }}
+            />
         );
     }
 
@@ -42,26 +51,35 @@ export default async function AdminFeedbackPage() {
     }));
 
     return (
-        <div className="space-y-6 p-4 md:p-6">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-100">User Feedback</h1>
-                    <p className="text-sm text-slate-400 mt-1">
-                        Manage and triage user-submitted feedback
-                    </p>
-                </div>
-                <a
-                    href="/admin/kanban"
-                    className="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-700 transition self-start"
-                >
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
-                    </svg>
-                    Full Kanban Board
-                </a>
+        <PageLayout
+            title="User Feedback"
+            subtitle="Manage and triage user-submitted feedback"
+            pageId="admin_feedback"
+            actions={[
+                {
+                    id: "view-kanban",
+                    label: "Full Kanban Board",
+                    href: "/admin/kanban",
+                    variant: "secondary",
+                    icon: (
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                        </svg>
+                    ),
+                },
+            ]}
+            isEmpty={items.length === 0}
+            empty={{
+                icon: "📭",
+                title: "No feedback yet",
+                description: "User feedback submissions will appear here once submitted.",
+            }}
+            className="animate-fade-in"
+        >
+            <div className="animate-fade-slide animate-delay-100">
+                <AdminFeedbackClient initialItems={items} />
             </div>
-
-            <AdminFeedbackClient initialItems={items} />
-        </div>
+        </PageLayout>
     );
 }
+

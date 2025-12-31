@@ -1,6 +1,7 @@
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import dynamic from "next/dynamic";
+import { PageLayout } from "@/components/layout/PageLayout";
 
 // Dynamic import to avoid SSR issues with drag-and-drop
 const KanbanBoard = dynamic(() => import("@/components/admin/KanbanBoard"), {
@@ -36,9 +37,17 @@ export default async function AdminKanbanPage() {
 
     if (error) {
         return (
-            <div className="p-8 text-rose-400">
-                Error loading feedback: {error.message}
-            </div>
+            <PageLayout
+                title="Kanban Board"
+                subtitle="Drag cards to update status"
+                pageId="admin_kanban"
+                isEmpty={true}
+                empty={{
+                    icon: "⚠️",
+                    title: "Error loading items",
+                    description: error.message,
+                }}
+            />
         );
     }
 
@@ -50,37 +59,53 @@ export default async function AdminKanbanPage() {
         priority_order: item.priority_order || 0,
     }));
 
-    return (
-        <div className="p-6 space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-100">Kanban Board</h1>
-                    <p className="text-sm text-slate-400 mt-1">
-                        Drag cards to update status. Click 🌐/🔒 to toggle public visibility.
-                    </p>
-                </div>
-                <div className="flex items-center gap-3">
-                    <span className="text-sm text-slate-500">
-                        {items.length} items
-                    </span>
-                    <a
-                        href="/admin/feedback"
-                        className="text-sm text-sky-400 hover:text-sky-300 transition-colors"
-                    >
-                        View Feedback List →
-                    </a>
-                </div>
-            </div>
-
-            <KanbanBoard initialItems={items} />
-
-            <div className="text-xs text-slate-500 mt-4">
-                <strong>Legend:</strong>{" "}
-                <span className="inline-block px-1.5 py-0.5 bg-rose-500/20 text-rose-400 rounded mr-2">Bug</span>
-                <span className="inline-block px-1.5 py-0.5 bg-amber-500/20 text-amber-400 rounded mr-2">Feature</span>
-                <span className="inline-block px-1.5 py-0.5 bg-sky-500/20 text-sky-400 rounded mr-2">Improvement</span>
-                <span className="inline-block px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400 rounded mr-2">🌐 Public</span>
-            </div>
+    // Legend component for afterContent slot
+    const Legend = () => (
+        <div className="text-xs text-slate-500 mt-4 animate-fade-in animate-delay-300">
+            <strong>Legend:</strong>{" "}
+            <span className="inline-block px-1.5 py-0.5 bg-rose-500/20 text-rose-400 rounded mr-2">Bug</span>
+            <span className="inline-block px-1.5 py-0.5 bg-amber-500/20 text-amber-400 rounded mr-2">Feature</span>
+            <span className="inline-block px-1.5 py-0.5 bg-sky-500/20 text-sky-400 rounded mr-2">Improvement</span>
+            <span className="inline-block px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400 rounded mr-2">🌐 Public</span>
         </div>
     );
+
+    return (
+        <PageLayout
+            title="Kanban Board"
+            subtitle="Drag cards to update status. Click 🌐/🔒 to toggle public visibility."
+            pageId="admin_kanban"
+            actions={[
+                {
+                    id: "item-count",
+                    label: `${items.length} items`,
+                    variant: "ghost",
+                    disabled: true,
+                },
+                {
+                    id: "view-feedback-list",
+                    label: "View Feedback List →",
+                    href: "/admin/feedback",
+                    variant: "ghost",
+                },
+            ]}
+            isEmpty={items.length === 0}
+            empty={{
+                icon: "📋",
+                title: "No items yet",
+                description: "Create feedback items or wait for user submissions.",
+                action: {
+                    label: "View Feedback Page",
+                    href: "/admin/feedback",
+                },
+            }}
+            afterContent={<Legend />}
+            className="animate-fade-in"
+        >
+            <div className="animate-fade-slide animate-delay-100">
+                <KanbanBoard initialItems={items} />
+            </div>
+        </PageLayout>
+    );
 }
+
