@@ -86,6 +86,39 @@ export const mergeSchema = z.object({
     preview: z.boolean().optional(),
 });
 
+// =============================================================================
+// Import Operations
+// =============================================================================
+
+/**
+ * Schema for individual import item
+ */
+export const importItemSchema = z.object({
+    id: z.string().optional(), // If present, update; if empty, create
+    type: z.enum(['bug', 'feature', 'general', 'positive', 'negative']).optional(),
+    subject: z.string().min(1).optional(),
+    description: z.string().optional(),
+    board_status: boardStatusSchema.optional(),
+    is_public: z.boolean().optional(),
+    priority_order: z.number().int().optional(),
+    target_release: targetReleaseSchema.nullable().optional(),
+    completed_at: z.string().nullable().optional(),
+});
+
+/**
+ * Schema for bulk import operations
+ * POST /api/admin/feedback/import
+ */
+export const bulkImportSchema = z.object({
+    items: z
+        .array(importItemSchema)
+        .min(1, "At least one item required")
+        .max(500, "Maximum 500 items per import"),
+});
+
+export type ImportItem = z.infer<typeof importItemSchema>;
+export type BulkImportInput = z.infer<typeof bulkImportSchema>;
+
 /**
  * Schema for AI chat
  * POST /api/ai/chat

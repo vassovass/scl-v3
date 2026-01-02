@@ -8,6 +8,10 @@ import UniversalFilters, { FILTER_PRESETS } from "@/components/shared/UniversalF
 import BulkActionsBar from "./BulkActionsBar";
 import MergeModal from "./MergeModal";
 import KanbanCard from "./KanbanCard";
+import ImportModal from "./ImportModal";
+import { useExport } from "@/hooks/useExport";
+import { KANBAN_COLUMNS as EXPORT_COLUMNS } from "@/lib/export/presets";
+import { useRouter } from "next/navigation";
 
 interface FeedbackItem {
     id: string;
@@ -44,11 +48,13 @@ interface KanbanBoardProps {
 }
 
 export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
+    const router = useRouter();
     const [columns, setColumns] = useState<KanbanColumn[]>([]);
     const [isUpdating, setIsUpdating] = useState(false);
     const [filters, setFilters] = useState<FeedbackFilterState>(DEFAULT_FILTER_STATE);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [showMergeModal, setShowMergeModal] = useState(false);
+    const [showImportModal, setShowImportModal] = useState(false);
 
     // Toggle selection for a single item
     const toggleSelection = useCallback((id: string, e: React.MouseEvent) => {
@@ -130,67 +136,16 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
         return items;
     }, [initialItems, filters]);
 
-    // Export all items to CSV
-    const exportToCSV = () => {
-        // Gather all items from all columns
-        const allItems = columns.flatMap((col) => col.items);
+    // Export using PRD 16 hook (replaces 60 lines of inline code)
+    const { exportCSV, isExporting: isExportingCSV } = useExport<FeedbackItem>({
+        filename: 'kanban-export',
+        columns: EXPORT_COLUMNS,
+    });
 
-        // Define CSV headers
-        const headers = [
-            "ID",
-            "Type",
-            "Subject",
-            "Description",
-            "Status",
-            "Is Public",
-            "Priority Order",
-            "Created At",
-            "Completed At",
-            "Target Release",
-            "Submitter",
-        ];
-
-        // Helper to escape CSV fields
-        const escapeCSV = (field: string | null | undefined): string => {
-            if (field === null || field === undefined) return "";
-            const str = String(field);
-            // Escape quotes and wrap in quotes if contains comma, quote, or newline
-            if (str.includes(",") || str.includes('"') || str.includes("\n")) {
-                return `"${str.replace(/"/g, '""')}"`;
-            }
-            return str;
-        };
-
-        // Build CSV rows
-        const rows = allItems.map((item) => [
-            escapeCSV(item.id),
-            escapeCSV(item.type),
-            escapeCSV(item.subject),
-            escapeCSV(item.description),
-            escapeCSV(item.board_status),
-            item.is_public ? "Yes" : "No",
-            String(item.priority_order),
-            escapeCSV(item.created_at),
-            escapeCSV(item.completed_at),
-            escapeCSV(item.target_release),
-            escapeCSV(item.users?.nickname),
-        ]);
-
-        // Combine headers and rows
-        const csvContent = [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
-
-        // Create and download the file
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", `StepLeague-Roadmap-Export-${new Date().toISOString().split("T")[0]}.csv`);
-        link.style.visibility = "hidden";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    };
+    // Get all items for export
+    const getAllItems = useCallback(() => {
+        return columns.flatMap((col) => col.items);
+    }, [columns]);
 
     useEffect(() => {
         // Load column order from local storage
@@ -377,14 +332,25 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                         </div>
                     </div>
                     <button
-                        onClick={exportToCSV}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-lg border border-slate-700 hover:border-slate-600 transition-colors"
+                        onClick={() => setShowImportModal(true)}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-slate-200 text-sm font-medium rounded-lg border border-emerald-600 hover:border-emerald-500 transition-colors"
+                        title="Import items from CSV"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        Import CSV
+                    </button>
+                    <button
+                        onClick={() => exportCSV(getAllItems())}
+                        disabled={isExportingCSV}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-lg border border-slate-700 hover:border-slate-600 transition-colors disabled:opacity-50"
                         title="Export all items to CSV"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>
-                        Export CSV
+                        {isExportingCSV ? 'Exporting...' : 'Export CSV'}
                     </button>
                 </div>
             </div>
@@ -467,6 +433,19 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                     window.location.reload();
                 }}
                 items={initialItems.filter(i => selectedIds.has(i.id))}
+            />
+
+            {/* Import Modal */}
+            <ImportModal<FeedbackItem>
+                isOpen={showImportModal}
+                onClose={() => setShowImportModal(false)}
+                onSuccess={() => {
+                    setShowImportModal(false);
+                    router.refresh();
+                }}
+                endpoint="/api/admin/feedback/import"
+                columns={EXPORT_COLUMNS}
+                title="Import Kanban Items"
             />
         </div>
     );

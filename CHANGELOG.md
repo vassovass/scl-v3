@@ -7,6 +7,37 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-01-02]
+
+### Added
+
+- **PRD 16: Import/Export System** - Comprehensive CSV import/export with round-trip editing support
+
+  **Export System:**
+  - `useExport<T>` hook - Reusable, generic export hook with CSV/JSON support
+  - `presets.ts` - Column definitions with format/parse functions for round-trip
+  - Formula injection prevention (OWASP) - Sanitizes `=`, `+`, `-`, `@` characters
+  - UTF-8 BOM for Excel compatibility
+  - Date in filename (`StepLeague-kanban-export-2026-01-02.csv`)
+  - Analytics tracking (`export_completed` event)
+  - Migrated `KanbanBoard.tsx` (removed 60 lines of inline code)
+  - Migrated `RoadmapView.tsx` (removed 55 lines of inline code)
+
+  **Import System:**
+  - `csvParser.ts` - Robust CSV parsing with quote/newline handling
+  - `useImport<T>` hook - File parsing, preview, validation, API integration
+  - `ImportModal.tsx` - Drag-and-drop upload, preview (update vs create), error display
+  - `/api/admin/feedback/import` - Upsert endpoint (update by ID, create if no ID)
+  - Fuzzy column matching (Title = Subject, Status = board_status)
+  - Import button added to Kanban board (green, next to Export)
+
+  **Architecture:**
+  - Fully generic/modular - works with any entity type via type parameter
+  - Column presets: `KANBAN_COLUMNS`, `ROADMAP_COLUMNS` (extensible for future entities)
+  - Validation via Zod schemas (`bulkImportSchema`)
+
+---
+
 ## [2025-12-31]
 
 ### Added

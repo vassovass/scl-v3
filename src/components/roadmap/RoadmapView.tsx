@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback } from "react";
 import UniversalFilters, { FILTER_PRESETS } from "@/components/shared/UniversalFilters";
 import { FeedbackFilterState, DEFAULT_FILTER_STATE } from "@/lib/filters/feedbackFilters";
 import { BADGE_CONFIG, getBadgeClass, getBadgeConfig } from "@/lib/badges";
+import { useExport } from "@/hooks/useExport";
+import { ROADMAP_COLUMNS } from "@/lib/export/presets";
 
 interface RoadmapItem {
     id: string;
@@ -115,61 +117,11 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
         }
     };
 
-    // Export all items to CSV (SuperAdmin only)
-    const exportToCSV = () => {
-        // Define CSV headers
-        const headers = [
-            "ID",
-            "Type",
-            "Subject",
-            "Description",
-            "Release",
-            "Status",
-            "Avg Priority",
-            "Votes",
-            "Created At",
-            "Completed At",
-        ];
-
-        // Helper to escape CSV fields
-        const escapeCSV = (field: string | null | undefined): string => {
-            if (field === null || field === undefined) return "";
-            const str = String(field);
-            if (str.includes(",") || str.includes('"') || str.includes("\n")) {
-                return `"${str.replace(/"/g, '""')}"`;
-            }
-            return str;
-        };
-
-        // Build CSV rows
-        const rows = items.map((item) => [
-            escapeCSV(item.id),
-            escapeCSV(item.type),
-            escapeCSV(item.subject),
-            escapeCSV(item.description),
-            escapeCSV(item.target_release),
-            escapeCSV(item.board_status),
-            String(item.avg_priority),
-            String(item.vote_count),
-            escapeCSV(item.created_at),
-            escapeCSV(item.completed_at),
-        ]);
-
-        // Combine headers and rows
-        const csvContent = [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
-
-        // Create and download the file
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", `StepLeague-Roadmap-Export-${new Date().toISOString().split("T")[0]}.csv`);
-        link.style.visibility = "hidden";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    };
+    // Export using PRD 16 hook (replaces 55 lines of inline code)
+    const { exportCSV, isExporting: isExportingCSV } = useExport<RoadmapItem>({
+        filename: 'roadmap-export',
+        columns: ROADMAP_COLUMNS,
+    });
 
     return (
         <div className="min-h-screen bg-slate-950">
@@ -189,14 +141,15 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                     </div>
                     <div className="flex items-center gap-2">
                         <button
-                            onClick={exportToCSV}
-                            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg border border-slate-600 transition-colors"
+                            onClick={() => exportCSV(items)}
+                            disabled={isExportingCSV}
+                            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg border border-slate-600 transition-colors disabled:opacity-50"
                             title="Export roadmap to CSV"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                             </svg>
-                            Export CSV
+                            {isExportingCSV ? 'Exporting...' : 'Export CSV'}
                         </button>
                         {isSuperAdmin && (
                             <a
