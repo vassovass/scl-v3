@@ -662,3 +662,29 @@ body {
   transform: translateX(0);
   pointer-events: auto;
 }
+
+/* ============================================
+   ROADMAP MOBILE SCROLL (PRD 17)
+   ============================================ */
+
+/* Horizontal scroll snap for roadmap columns (mobile-first) */
+.roadmap-columns {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.roadmap-column {
+  scroll-snap-align: start;
+}
+
+/* Ensure touch targets are adequate on mobile (44px min) */
+.roadmap-card {
+  min-height: 44px;
+}
+
+/* Focus ring for keyboard navigation (PRD 17 accessibility) */
+.roadmap-card:focus-visible {
+  outline: 2px solid rgb(var(--brand-primary));
+  outline-offset: 2px;
+}

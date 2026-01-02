@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import PriorityVote from "./PriorityVote";
+import Badge from "@/components/ui/Badge";
 
 interface RoadmapItem {
     id: string;
@@ -17,12 +18,7 @@ interface RoadmapItem {
     user_vote: number | null;
 }
 
-const TYPE_COLORS: Record<string, string> = {
-    bug: "bg-rose-500/20 text-rose-400",
-    feature: "bg-amber-500/20 text-amber-400",
-    improvement: "bg-sky-500/20 text-sky-400",
-    general: "bg-slate-500/20 text-slate-400",
-};
+// TYPE_COLORS removed - now using Badge component from PRD 06
 
 interface RoadmapCardProps {
     item: RoadmapItem;
@@ -45,8 +41,8 @@ export default function RoadmapCard({ item, isLoggedIn, isCompleted }: RoadmapCa
     return (
         <div
             className={`p-4 rounded-xl border transition-all ${isCompleted
-                    ? "bg-slate-900/30 border-slate-800/50"
-                    : "bg-slate-900/50 border-slate-800 hover:border-slate-700"
+                ? "bg-slate-900/30 border-slate-800/50"
+                : "bg-slate-900/50 border-slate-800 hover:border-slate-700"
                 }`}
         >
             <div className="flex items-start gap-4">
@@ -71,12 +67,7 @@ export default function RoadmapCard({ item, isLoggedIn, isCompleted }: RoadmapCa
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                        <span
-                            className={`text-xs px-2 py-0.5 rounded-full ${TYPE_COLORS[item.type] || TYPE_COLORS.general
-                                }`}
-                        >
-                            {item.type}
-                        </span>
+                        <Badge category="type" value={item.type} size="sm" />
                         {isCompleted && item.completed_at && (
                             <span className="text-xs text-slate-500">
                                 {new Date(item.completed_at).toLocaleDateString()}

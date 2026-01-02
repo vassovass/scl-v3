@@ -74,7 +74,7 @@
 | # | PRD | Status |
 |---|-----|--------|
 | 16 | [Import/Export System](./PRD_16_Export_Utility.md) | ✅ Complete |
-| **17** | **[Public Roadmap Polish](./PRD_17_Public_Roadmap_Polish.md)** | **🔥 NEXT** |
+| 17 | [Public Roadmap Polish](./PRD_17_Public_Roadmap_Polish.md) | ✅ Complete |
 | 18 | [Documentation](./PRD_18_Documentation.md) | 📋 Planned |
 
 ---

@@ -11,6 +11,25 @@ All notable changes to StepLeague v3.
 
 ### Added
 
+- **PRD 17: Public Roadmap Polish** - Comprehensive UI/UX improvements for the roadmap
+  - **Reusable Celebration System** (`Confetti.tsx`) - Canvas-based, mobile-friendly confetti for achievements and shipping features
+  - **Completion Impulse Chart** (`CompletionMiniChart.tsx`) - Sparkline visualization of shipping velocity in the "Done" column
+  - **Detailed Subscribe Component** (`RoadmapSubscribe.tsx`) - Options for Email (auth redirect) and RSS feed copy
+  - **RSS 2.0 Feed** (`/api/roadmap/rss`) - Feed of recently shipped features
+
+### Changed
+
+- **Roadmap Visuals** - Migrated to theme-aware CSS variables and added color-coded column accents
+- **Badge System** - Migrated `RoadmapCard` to use the standardized `Badge` component
+- **Mobile Experience** - Added horizontal scroll snapping, sticky headers, and larger touch targets (44px min)
+- **Accessibility** - Added ARIA region roles, article roles, visible focus rings, and keyboard navigation support
+
+---
+
+## [2026-01-02]
+
+### Added
+
 - **PRD 16: Import/Export System** - Comprehensive CSV import/export with round-trip editing support
 
   **Export System:**

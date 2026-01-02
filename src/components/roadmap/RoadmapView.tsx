@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import UniversalFilters, { FILTER_PRESETS } from "@/components/shared/UniversalFilters";
 import { FeedbackFilterState, DEFAULT_FILTER_STATE } from "@/lib/filters/feedbackFilters";
 import { BADGE_CONFIG, getBadgeClass, getBadgeConfig } from "@/lib/badges";
 import { useExport } from "@/hooks/useExport";
 import { ROADMAP_COLUMNS } from "@/lib/export/presets";
+import { useConfetti } from "@/components/ui/Confetti";
+import RoadmapSubscribe from "./RoadmapSubscribe";
+import CompletionMiniChart from "./CompletionMiniChart";
 
 interface RoadmapItem {
     id: string;
@@ -31,6 +34,14 @@ const COLUMNS = [
     { id: "done", label: "✅ Done", description: "Recently shipped" },
 ];
 
+// Theme-aware column accent colors (PRD 17)
+const COLUMN_STYLES: Record<string, string> = {
+    now: 'border-t-2 border-rose-500',
+    next: 'border-t-2 border-amber-500',
+    later: 'border-t-2 border-sky-500',
+    done: 'border-t-2 border-emerald-500',
+};
+
 interface RoadmapViewProps {
     items: RoadmapItem[];
     isLoggedIn: boolean;
@@ -42,6 +53,14 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
     const [showAllLater, setShowAllLater] = useState(false);
     const [showAllDone, setShowAllDone] = useState(false);
     const [filters, setFilters] = useState<FeedbackFilterState>(DEFAULT_FILTER_STATE);
+
+    // Celebrate shipped features on first visit (PRD 17)
+    const hasDoneItems = items.some(i => i.board_status === 'done');
+    useConfetti({
+        triggerOnMount: hasDoneItems,
+        onceKey: 'roadmap_shipped',
+        preset: 'roadmap_shipped',
+    });
 
     // Handle filter changes
     const handleFiltersChange = useCallback((newFilters: FeedbackFilterState) => {
@@ -124,9 +143,9 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
     });
 
     return (
-        <div className="min-h-screen bg-slate-950">
+        <div className="min-h-screen bg-[rgb(var(--bg-base))]">
             {/* Header */}
-            <div className="border-b border-slate-800 bg-slate-900/50">
+            <div className="border-b border-[rgb(var(--border-subtle))] bg-[rgb(var(--bg-elevated))]/50">
                 <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
                     <div>
                         <div className="flex items-center gap-3">
@@ -140,6 +159,9 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
+                        {/* PRD 17: Subscribe Component */}
+                        <RoadmapSubscribe />
+
                         <button
                             onClick={() => exportCSV(items)}
                             disabled={isExportingCSV}
@@ -175,22 +197,30 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
             </div>
 
             {/* Kanban Board */}
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto roadmap-columns pb-4">
                 <div className="flex gap-3 p-4 min-w-max">
                     {COLUMNS.map((column) => {
                         const columnItems = getColumnItems(column.id);
                         return (
                             <div
                                 key={column.id}
-                                className="w-72 flex-shrink-0 bg-slate-900/30 rounded-lg border border-slate-800"
+                                className={`w-72 flex-shrink-0 roadmap-column bg-[rgb(var(--bg-elevated))]/30 rounded-lg border border-[rgb(var(--border-subtle))] ${COLUMN_STYLES[column.id]}`}
+                                role="region"
+                                aria-label={`${column.label} column`}
                             >
                                 {/* Column Header */}
-                                <div className="p-3 border-b border-slate-800/50">
+                                <div className="p-3 border-b border-slate-800/50 sticky top-0 bg-[rgb(var(--bg-base))]/95 backdrop-blur z-10">
                                     <div className="flex items-center justify-between">
-                                        <h2 className="font-semibold text-slate-200 text-sm">{column.label}</h2>
-                                        <span className="text-xs text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded">
-                                            {columnItems.length}
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <h2 className="font-semibold text-[rgb(var(--text-primary))] text-sm">{column.label}</h2>
+                                            <span className="text-xs text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded">
+                                                {columnItems.length}
+                                            </span>
+                                        </div>
+                                        {/* PRD 17: Completion Velocity Chart i "Done" column */}
+                                        {column.id === 'done' && (
+                                            <CompletionMiniChart completedItems={columnItems.map(i => ({ completed_at: i.completed_at }))} />
+                                        )}
                                     </div>
                                     <p className="text-[10px] text-slate-500 mt-0.5">{column.description}</p>
                                 </div>
@@ -200,11 +230,19 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                                     {columnItems.map((item) => (
                                         <div
                                             key={item.id}
-                                            className={`rounded-md border transition-colors cursor-pointer ${item.is_agent_working
+                                            role="article"
+                                            tabIndex={0}
+                                            className={`rounded-md border transition-colors cursor-pointer roadmap-card ${item.is_agent_working
                                                 ? "bg-sky-900/40 border-sky-500/50 hover:border-sky-400 ring-1 ring-sky-500/30"
-                                                : "bg-slate-800/60 border-slate-700/50 hover:border-slate-600"
+                                                : "bg-[rgb(var(--bg-card))] border-[rgb(var(--border-subtle))] hover:border-slate-500"
                                                 }`}
                                             onClick={() => setExpandedCard(expandedCard === item.id ? null : item.id)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                    e.preventDefault();
+                                                    setExpandedCard(expandedCard === item.id ? null : item.id);
+                                                }
+                                            }}
                                         >
                                             <div className="p-2.5">
                                                 {/* Status badge */}
