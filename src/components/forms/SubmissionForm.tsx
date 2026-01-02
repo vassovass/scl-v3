@@ -196,7 +196,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
             return;
         }
 
-        if (file.size > 20 * 1024 * 1024) {
+        if (file && file.size > 20 * 1024 * 1024) {
             setError("File too large");
             return;
         }
