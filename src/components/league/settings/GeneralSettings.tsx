@@ -73,45 +73,7 @@ export function GeneralSettings({ league, onChange, disabled }: GeneralSettingsP
                 </select>
             </div>
 
-            {/* Week Start */}
-            <div>
-                <label className="block text-sm font-medium text-slate-300">
-                    Week Starts On
-                </label>
-                <div className="mt-2 flex gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer group">
-                        <input
-                            type="radio"
-                            name="stepweek_start"
-                            value="monday"
-                            checked={league.stepweek_start?.toLowerCase().startsWith("mon")} // Handles "monday", "Monday", "mon"
-                            onChange={() => onChange({ stepweek_start: "monday" })}
-                            disabled={disabled}
-                            className="h-4 w-4 border-slate-700 bg-slate-950 text-sky-500 focus:ring-sky-500"
-                        />
-                        <span className="text-sm text-slate-300 group-hover:text-slate-50 transition">
-                            Monday
-                        </span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer group">
-                        <input
-                            type="radio"
-                            name="stepweek_start"
-                            value="sunday"
-                            checked={league.stepweek_start?.toLowerCase().startsWith("sun")} // Handles "sunday", "Sunday", "sun"
-                            onChange={() => onChange({ stepweek_start: "sunday" })}
-                            disabled={disabled}
-                            className="h-4 w-4 border-slate-700 bg-slate-950 text-sky-500 focus:ring-sky-500"
-                        />
-                        <span className="text-sm text-slate-300 group-hover:text-slate-50 transition">
-                            Sunday
-                        </span>
-                    </label>
-                </div>
-                <p className="mt-1 text-xs text-slate-500">
-                    Changing this will affect how weekly leaderboards are calculated immediately.
-                </p>
-            </div>
+
         </SettingsSection>
     );
 }
