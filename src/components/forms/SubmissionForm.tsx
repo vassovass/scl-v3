@@ -61,10 +61,18 @@ interface PendingVerification {
     attempts: number;
 }
 
+attempts: number;
+}
+
+interface LeagueSettings {
+    allow_manual_entry: boolean;
+    require_verification_photo: boolean;
+}
+
 const MAX_RETRY_ATTEMPTS = 5; // Reduced from 10 - don't spam the API
 const BASE_RETRY_SECONDS = 5; // Base for exponential backoff
 
-export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSubmitted }: SubmissionFormProps) {
+export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSubmitted, settings }: SubmissionFormProps & { settings?: LeagueSettings }) {
     const [date, setDate] = useState<string>(new Date().toISOString().slice(0, 10));
     const [steps, setSteps] = useState<string>("");
     const [partial, setPartial] = useState<boolean>(false);
@@ -182,7 +190,9 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
         setPendingVerification(null);
         setVerificationDetails(null);
 
-        if (!file) {
+        if (!file && (settings?.require_verification_photo !== false)) {
+            // Default to requiring photo if settings are missing or explicitly true
+            // If settings.require_verification_photo is explicitly false, we allow no file
             setError("Please attach a screenshot");
             return;
         }
@@ -200,21 +210,26 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
         setSubmitting(true);
 
         try {
-            let fileToUpload = file;
-            if (file.size > 2 * 1024 * 1024) {
-                fileToUpload = await imageCompression(file, {
-                    maxSizeMB: 2,
-                    maxWidthOrHeight: 1920,
-                    useWebWorker: true,
+            let proofPath = null;
+
+            if (file) {
+                let fileToUpload = file;
+                if (file.size > 2 * 1024 * 1024) {
+                    fileToUpload = await imageCompression(file, {
+                        maxSizeMB: 2,
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                    });
+                }
+
+                const signed = await apiRequest<SignUploadResponse>("proofs/sign-upload", {
+                    method: "POST",
+                    body: JSON.stringify({ content_type: fileToUpload.type }),
                 });
+
+                await uploadToSignedUrl(signed.upload_url, fileToUpload);
+                proofPath = signed.path;
             }
-
-            const signed = await apiRequest<SignUploadResponse>("proofs/sign-upload", {
-                method: "POST",
-                body: JSON.stringify({ content_type: fileToUpload.type }),
-            });
-
-            await uploadToSignedUrl(signed.upload_url, fileToUpload);
 
             const stepsNumber = parseInt(steps, 10) || 0;
 
@@ -225,7 +240,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                     date,
                     steps: stepsNumber,
                     partial,
-                    proof_path: signed.path,
+                    proof_path: proofPath,
                     flagged,
                     flag_reason: flagged ? flagReason : null,
                     overwrite,
@@ -253,7 +268,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                         leagueId,
                         steps: stepsNumber,
                         forDate: date,
-                        proofPath: signed.path,
+                        proofPath: proofPath || "", // This shouldn't happen for rate_limited (implies we called verify, which implies proof exists)
                         retryAt: Date.now() + waitTime * 1000,
                         attempts: 0,
                     });
@@ -263,7 +278,10 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                     setStatus("Submission saved but not verified.");
                 }
             } else if (response.verification?.verified !== undefined) {
+                // ... handled above ... (existing code, no change needed here actually, just referencing context)
+                // actually I need to be careful with the else block below
                 const v = response.verification;
+                // ...
                 setVerificationDetails({
                     verified: v.verified,
                     extractedSteps: v.extracted_steps ?? null,
@@ -278,17 +296,23 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                 if (onSubmitted) {
                     onSubmitted();
                 }
-            } else {
+            } else if (proofPath) {
+                // Only start pending verification if we actually uploaded a proof
                 setStatus("Submission saved! Verification in progress...");
                 setPendingVerification({
                     submissionId: response.submission.id,
                     leagueId,
                     steps: stepsNumber,
                     forDate: date,
-                    proofPath: signed.path,
+                    proofPath: proofPath,
                     retryAt: Date.now() + 3000,
                     attempts: 0,
                 });
+            } else {
+                setStatus("Submission saved successfully!");
+                if (onSubmitted) {
+                    onSubmitted();
+                }
             }
         } catch (err) {
             if (err instanceof ApiError) {
@@ -385,7 +409,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                     accept="image/png,image/jpeg,image/heic"
                     onChange={(event) => setFile(event.target.files?.[0] ?? null)}
                     className="text-sm text-slate-300"
-                    required
+                    required={(settings?.require_verification_photo !== false)} // Default to true if undefined
                 />
                 {file && (
                     <span className="text-xs text-slate-500">

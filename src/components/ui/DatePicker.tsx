@@ -11,6 +11,7 @@ interface DatePickerProps {
     required?: boolean;
     disabled?: boolean;
     className?: string;
+    presets?: { label: string; date: Date }[];
 }
 
 /**
@@ -26,6 +27,7 @@ export function DatePicker({
     required = false,
     disabled = false,
     className = "",
+    presets,
 }: DatePickerProps) {
     const [showQuickSelect, setShowQuickSelect] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -51,18 +53,20 @@ export function DatePicker({
 
         if (diff === 0) return "Today";
         if (diff === 1) return "Yesterday";
-        if (diff <= 7) return `${diff} days ago`;
+        if (diff <= 7 && diff > 0) return `${diff} days ago`;
 
         return date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
     };
 
-    const quickDates = [
+    const defaultPresets = [
         { label: "Today", date: new Date() },
         { label: "Yesterday", date: new Date(Date.now() - 86400000) },
         { label: "2 days ago", date: new Date(Date.now() - 2 * 86400000) },
         { label: "3 days ago", date: new Date(Date.now() - 3 * 86400000) },
         { label: "1 week ago", date: new Date(Date.now() - 7 * 86400000) },
-    ].filter(({ date }) => {
+    ];
+
+    const activePresets = (presets || defaultPresets).filter(({ date }) => {
         const dateStr = date.toISOString().slice(0, 10);
         if (max && dateStr > max) return false;
         if (min && dateStr < min) return false;
@@ -116,7 +120,7 @@ export function DatePicker({
             {/* Quick select dropdown */}
             {showQuickSelect && (
                 <div className="absolute right-0 top-full mt-1 z-20 rounded-md border border-slate-700 bg-slate-800 shadow-lg overflow-hidden min-w-[150px]">
-                    {quickDates.map(({ label, date }) => (
+                    {activePresets.map(({ label, date }) => (
                         <button
                             key={label}
                             type="button"

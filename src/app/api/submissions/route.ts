@@ -8,7 +8,7 @@ const createSchema = z.object({
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     steps: z.number().int().positive(),
     partial: z.boolean().optional().default(false),
-    proof_path: z.string().min(3),
+    proof_path: z.string().min(3).nullable().optional(),
     proxy_member_id: z.string().uuid().optional(),
 });
 
@@ -49,7 +49,7 @@ export async function POST(request: Request): Promise<Response> {
         // Check membership and backfill limit
         const { data: membershipData } = await adminClient
             .from("memberships")
-            .select("role, league:leagues(backfill_limit)")
+            .select("role, league:leagues(backfill_limit, require_verification_photo, allow_manual_entry)")
             .eq("league_id", input.league_id)
             .eq("user_id", user.id)
             .single();
@@ -58,8 +58,18 @@ export async function POST(request: Request): Promise<Response> {
             return forbidden("You are not a member of this league");
         }
 
-        // Check backfill limit
-        const league = membershipData.league as unknown as { backfill_limit: number | null };
+        // Check backfill limit & Settings enforcement
+        const league = membershipData.league as unknown as { backfill_limit: number | null, require_verification_photo: boolean | null, allow_manual_entry: boolean | null };
+
+        // Enforce photo requirement
+        // If require_verification_photo is TRUE (default false) OR allow_manual_entry is FALSE (default true)
+        // Then proof is REQUIRED.
+        const requiresProof = (league?.require_verification_photo === true) || (league?.allow_manual_entry === false);
+
+        if (requiresProof && !input.proof_path) {
+            return badRequest("This league requires a verification photo for all submissions.");
+        }
+
         if (league?.backfill_limit !== null && league?.backfill_limit !== undefined) {
             const limitDays = league.backfill_limit;
             const submissionDate = new Date(input.date);

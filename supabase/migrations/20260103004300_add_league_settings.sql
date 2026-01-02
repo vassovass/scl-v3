@@ -2,7 +2,7 @@
 ALTER TABLE leagues 
 ADD COLUMN IF NOT EXISTS counting_start_date DATE DEFAULT NULL,
 ADD COLUMN IF NOT EXISTS description TEXT DEFAULT NULL,
-ADD COLUMN IF NOT EXISTS is_public BOOLEAN DEFAULT requesting_user_id() IS NOT NULL, -- Defaults to false effectively, but using false explicitly below
+ADD COLUMN IF NOT EXISTS is_public BOOLEAN DEFAULT FALSE,
 ADD COLUMN IF NOT EXISTS allow_manual_entry BOOLEAN DEFAULT TRUE,
 ADD COLUMN IF NOT EXISTS require_verification_photo BOOLEAN DEFAULT FALSE,
 ADD COLUMN IF NOT EXISTS daily_step_goal INTEGER DEFAULT 10000,

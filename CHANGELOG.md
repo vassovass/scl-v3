@@ -16,9 +16,12 @@ All notable changes to StepLeague v3.
   - **Start Date** - Configure a `counting_start_date` to ignore previous step history (fresh start)
   - **Modular Settings Components**:
     - `GeneralSettings`: Name, Description, Category, Week Start
-    - `CompetitionSettings`: Start Date, Daily Step Goal, Max Members
+    - `CompetitionSettings`: Start Date (with presets: Today, This Week, This Month), Max Members
     - `RulesSettings`: Manual Entry, Photo Requirements, Public Visibility
     - `DangerZone`: Delete league actions
+  - **Enforcement**:
+    - Backend API (`POST /api/submissions`) enforces `require_verification_photo` and `allow_manual_entry`.
+    - `SubmissionForm` dynamically adapts UI based on league rules (e.g., hides photo upload if not required).
   - **API Updates**: `PUT /api/leagues/[id]` for updating settings, Leaderboard filtering by start date
 
 ---

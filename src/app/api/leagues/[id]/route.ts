@@ -28,6 +28,7 @@ export async function GET(
             .single();
 
         if (leagueError || !league) {
+            if (leagueError) console.error("Error fetching league:", leagueError);
             return notFound("League not found");
         }
 

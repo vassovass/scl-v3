@@ -17,6 +17,8 @@ interface League {
   invite_code: string;
   stepweek_start: string;
   role?: string;
+  allow_manual_entry?: boolean;
+  require_verification_photo?: boolean;
 }
 
 interface Submission {
@@ -262,6 +264,10 @@ export default function LeaguePage() {
                   proxyMemberId={selectedProxy?.id}
                   proxyDisplayName={selectedProxy?.display_name}
                   onSubmitted={handleSubmissionComplete}
+                  settings={{
+                    allow_manual_entry: league.allow_manual_entry ?? true,
+                    require_verification_photo: league.require_verification_photo ?? false
+                  }}
                 />
               ) : submissionMode === "batch" ? (
                 <BatchSubmissionForm leagueId={leagueId} onSubmitted={handleSubmissionComplete} />
