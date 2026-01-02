@@ -13,6 +13,10 @@ All notable changes to StepLeague v3.
 
 - **PRD 19: League Settings & Start Date** - New modular settings system for leagues
   - **League Settings Page** (`/league/[id]/settings`) for owners/admins
+  - **Refactored Leaderboard Date Selection** - Replaced dual date inputs with a unified `DateRangePicker`
+    - Unified component using `react-day-picker` and `date-fns`
+    - Preserves persistence via URL and localStorage
+    - Added to Design System (`/admin/design-system`)
   - **Start Date** - Configure a `counting_start_date` to ignore previous step history (fresh start)
   - **Modular Settings Components**:
     - `GeneralSettings`: Name, Description, Category, Week Start

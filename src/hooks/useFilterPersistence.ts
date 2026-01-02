@@ -70,8 +70,8 @@ export function useFilterPersistence<T extends Record<string, string>>(
         [urlParamKeys, defaults]
     );
 
-    // Read filters from URL, localStorage, or defaults
-    const filters = useMemo(() => {
+    // Helper to compute current filters from sources
+    const computeFilters = useCallback(() => {
         const result = { ...defaults };
 
         // Try URL params first (highest priority)
@@ -95,9 +95,16 @@ export function useFilterPersistence<T extends Record<string, string>>(
                 });
             }
         }
-
         return result;
     }, [searchParams, defaults, syncKeys, storageKey, contextId]);
+
+    // Optimistic state
+    const [filters, setFiltersState] = useState<T>(defaults);
+
+    // Sync from URL/Storage on mount and when params change
+    useEffect(() => {
+        setFiltersState(computeFilters());
+    }, [computeFilters]);
 
     // Mark as hydrated after first render
     useEffect(() => {
@@ -107,6 +114,10 @@ export function useFilterPersistence<T extends Record<string, string>>(
     // Update URL and optionally localStorage
     const updateFilters = useCallback(
         (newFilters: T) => {
+            console.log("useFilterPersistence: Updating filters:", newFilters);
+            // Optimistic update
+            setFiltersState(newFilters);
+
             // Build new URL params
             const params = new URLSearchParams();
             syncKeys.forEach((key) => {

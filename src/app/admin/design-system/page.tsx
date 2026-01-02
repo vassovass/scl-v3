@@ -551,6 +551,11 @@ export default function DesignSystemPage() {
                                     <p className="text-xs text-slate-600 mt-1">ui/DatePicker.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                    <code className="text-sky-400">DateRangePicker</code>
+                                    <p className="text-xs text-slate-500 mt-1">Calendar date range selection with custom styles</p>
+                                    <p className="text-xs text-slate-600 mt-1">ui/DateRangePicker.tsx</p>
+                                </div>
+                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
                                     <code className="text-sky-400">ShareButton</code>
                                     <p className="text-xs text-slate-500 mt-1">Social sharing with Web Share API fallback</p>
                                     <p className="text-xs text-slate-600 mt-1">ui/ShareButton.tsx</p>
@@ -873,7 +878,7 @@ export default function DesignSystemPage() {
                         or reusable components are added. See <code className="text-sky-400">AGENTS.md</code> for documentation rules.
                     </p>
                 </section>
-            </div>
-        </main>
+            </div >
+        </main >
     );
 }

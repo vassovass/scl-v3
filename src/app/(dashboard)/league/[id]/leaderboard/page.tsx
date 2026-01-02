@@ -4,13 +4,21 @@ import { useEffect, useState, useCallback, Suspense } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { DatePicker } from "@/components/ui/DatePicker";
+import { DateRangePicker } from "@/components/ui/DateRangePicker";
+import { DateRange } from "react-day-picker";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
 import { ShareAchievementButton, AchievementData } from "@/components/ui/AchievementShareCard";
 import { useUserStats } from "@/hooks/useUserStats";
 import { useFilterPersistence } from "@/hooks/useFilterPersistence";
 import { APP_CONFIG } from "@/lib/config";
 import { BADGE_INFO } from "@/lib/badges";
+import { format } from "date-fns";
+
+// ... (Types remain same) ...
+
+// ... (Inside component) ...
+
+
 
 type PeriodPreset =
   | "today" | "yesterday"
@@ -136,15 +144,22 @@ function LeaderboardContent() {
   const fetchLeaderboard = useCallback(async () => {
     if (!session || !isHydrated) return;
 
+    // Log for debugging
+    console.log("Fetching leaderboard with params:", {
+      leagueId, period, periodB, verifiedFilter, sortBy, comparisonMode,
+      customStartA, customEndA, customStartB, customEndB
+    });
+
     setLoading(true);
     setError(null);
-
     try {
       let url = `/api/leaderboard?league_id=${leagueId}&period=${period}&verified=${verifiedFilter}&sort_by=${sortBy}`;
 
       if (period === "custom" && customStartA && customEndA) {
         url += `&start_date=${customStartA}&end_date=${customEndA}`;
       }
+      // ...
+
 
       if (comparisonMode && periodB) {
         url += `&period_b=${periodB}`;
@@ -221,18 +236,21 @@ function LeaderboardContent() {
     setFilter('period_b', newPeriodB);
   };
 
-  const handleCustomDateA = (start: string, end: string) => {
-    // If setting start date and end date is empty, default end to today (or start date)
-    let newEnd = end;
-    if (start && !newEnd) {
-      newEnd = new Date().toISOString().slice(0, 10);
-    }
-    setFilters({ start_date: start, end_date: newEnd });
+  const handleDateRangeChange = (range: DateRange | undefined) => {
+    const start = range?.from ? format(range.from, "yyyy-MM-dd") : "";
+    const end = range?.to ? format(range.to, "yyyy-MM-dd") : "";
+    // cast to any or undefined to fix lint if needed, but defaulting to "" is cleaner if acceptable
+    // Use undefined instead of null to match implicit optional type if that's the issue
+    setFilters({ start_date: start || undefined, end_date: end || undefined });
   };
 
-  const handleCustomDateB = (start: string, end: string) => {
-    setFilters({ start_date_b: start, end_date_b: end });
+  const handleDateRangeBChange = (range: DateRange | undefined) => {
+    const start = range?.from ? format(range.from, "yyyy-MM-dd") : "";
+    const end = range?.to ? format(range.to, "yyyy-MM-dd") : "";
+    setFilters({ start_date_b: start || undefined, end_date_b: end || undefined });
   };
+
+
 
   // Show skeleton until hydrated
   if (!isHydrated) {
@@ -281,18 +299,13 @@ function LeaderboardContent() {
 
             {/* Custom Date Range A */}
             {period === "custom" && (
-              <div className="mt-4 flex flex-wrap gap-4">
-                <DatePicker
-                  value={customStartA}
-                  onChange={(v) => handleCustomDateA(v, customEndA)}
-                  label="From"
-                  max={customEndA || undefined}
-                />
-                <DatePicker
-                  value={customEndA}
-                  onChange={(v) => handleCustomDateA(customStartA, v)}
-                  label="To"
-                  min={customStartA}
+              <div className="mt-4 animate-fade-in">
+                <DateRangePicker
+                  date={{
+                    from: customStartA ? new Date(customStartA + "T12:00:00") : undefined,
+                    to: customEndA ? new Date(customEndA + "T12:00:00") : undefined
+                  }}
+                  onSelect={handleDateRangeChange}
                 />
               </div>
             )}
@@ -314,18 +327,13 @@ function LeaderboardContent() {
                   </select>
                 </div>
                 {periodB === "custom" && (
-                  <div className="mt-4 flex flex-wrap gap-4">
-                    <DatePicker
-                      value={customStartB}
-                      onChange={(v) => handleCustomDateB(v, customEndB)}
-                      label="From"
-                      max={customEndB || undefined}
-                    />
-                    <DatePicker
-                      value={customEndB}
-                      onChange={(v) => handleCustomDateB(customStartB, v)}
-                      label="To"
-                      min={customStartB}
+                  <div className="mt-4 animate-fade-in">
+                    <DateRangePicker
+                      date={{
+                        from: customStartB ? new Date(customStartB + "T12:00:00") : undefined,
+                        to: customEndB ? new Date(customEndB + "T12:00:00") : undefined
+                      }}
+                      onSelect={handleDateRangeBChange}
                     />
                   </div>
                 )}
