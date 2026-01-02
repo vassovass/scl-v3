@@ -95,7 +95,11 @@ export const KANBAN_COLUMNS: ExportColumn[] = [
         format: formatBoolean,
         parse: parseBoolean
     },
-    { key: 'priority_order', header: 'Priority Order' },
+    {
+        key: 'priority_order',
+        header: 'Priority Order',
+        parse: (v) => v ? parseInt(v, 10) : 0
+    },
     { key: 'target_release', header: 'Target Release' },
     {
         key: 'completed_at',
