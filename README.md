@@ -143,6 +143,7 @@ See **[ROADMAP.md](./ROADMAP.md)** for upcoming features.
 | **[AGENTS.md](./AGENTS.md)** | AI assistant context (coding patterns, architecture) |
 | **[CHANGELOG.md](./CHANGELOG.md)** | All changes by date |
 | **[ROADMAP.md](./ROADMAP.md)** | Upcoming features and enhancements |
+| **[ System Docs](./docs/feedback-roadmap-system.md)** | **Architecture & API Reference** |
 | **[CLAUDE.md](./CLAUDE.md)** | Claude-specific notes (references AGENTS.md) |
 
 > **Tip**: Copy `README.md` + `AGENTS.md` into any LLM chat for instant project context.

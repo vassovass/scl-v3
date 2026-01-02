@@ -7,6 +7,17 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-01-03]
+
+### Added
+
+- **PRD 18: Documentation** - Created comprehensive system documentation
+  - **System Overview** (`docs/feedback-roadmap-system.md`) - Architecture, Components, and API reference
+  - **Architecture Diagram** (`docs/diagrams/feedback-flow.md`) - Mermaid graph of data flow
+  - **Documentation Links** - Updated `README.md` and `AGENTS.md` with pointers to new docs
+
+---
+
 ## [2026-01-02]
 
 ### Added

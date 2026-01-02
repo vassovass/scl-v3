@@ -630,6 +630,7 @@ When adding a new trackable feature:
 | [ROADMAP.md](./ROADMAP.md) | Upcoming features and planned work |
 | [CLAUDE.md](./CLAUDE.md) | Claude-specific notes (references this file) |
 | [.cursor/rules/](./cursor/rules/) | Cursor IDE rules |
+| [docs/feedback-roadmap-system.md](./docs/feedback-roadmap-system.md) | **StepLeague System Docs** - Architecture & Component Reference |
 | [globals.css](./src/app/globals.css) | Design tokens, CSS variables, utility classes |
 | [analytics.ts](./src/lib/analytics.ts) | **Analytics tracking methods** - All event tracking lives here |
 | [/admin/design-system](./src/app/admin/design-system/page.tsx) | **Live component examples** (superadmin only) - UPDATE when adding/changing components |
