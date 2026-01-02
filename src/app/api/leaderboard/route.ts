@@ -101,18 +101,24 @@ export const GET = withApiHandler({
     return r;
   };
 
+  // Handle All Time with counting_start_date
+  if (period === "all_time" && countingStartDate) {
+    rangeA = {
+      start: countingStartDate,
+      end: new Date().toISOString().slice(0, 10),
+    };
+  }
+
   // Apply clamping
   rangeA = clampRange(rangeA);
   rangeB = clampRange(rangeB);
 
-  // If rangeA became invalid due to clamping, we might return empty result immediately
-  // But let's let it flow, fetchPeriodStats handles null range well?
-  // fetchPeriodStats type signature says range can be null, but logic might assume valid if passed?
-  // Actually, fetchPeriodStats takes `range: { start: string; end: string } | null`.
-
   // If rangeA is null after clamping (meaning the whole period is before league start),
   // we effectively have no stats.
-  const statsA = rangeA
+  // EXCEPTION: If period is "all_time" and no counting_start_date, rangeA is null by default but we SHOULD fetch all.
+  const shouldFetchA = rangeA !== null || (period === "all_time" && !countingStartDate);
+
+  const statsA = shouldFetchA
     ? await fetchPeriodStats(adminClient, league_id, rangeA, verified)
     : new Map<string, UserStats>(); // Return empty map if out of bounds
 

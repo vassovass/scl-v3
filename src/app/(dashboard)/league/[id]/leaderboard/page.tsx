@@ -197,7 +197,16 @@ function LeaderboardContent() {
   };
 
   const handlePeriodChange = (newPeriod: PeriodPreset) => {
-    setFilter('period', newPeriod);
+    const updates: Partial<typeof FILTER_DEFAULTS> & { period: PeriodPreset } = { period: newPeriod };
+
+    // If switching to custom and no dates set, default to today
+    if (newPeriod === "custom" && !customStartA && !customEndA) {
+      const today = new Date().toISOString().slice(0, 10);
+      updates.start_date = today;
+      updates.end_date = today;
+    }
+
+    setFilters(updates);
   };
 
   const handleSortChange = (newSort: SortBy) => {
@@ -213,7 +222,12 @@ function LeaderboardContent() {
   };
 
   const handleCustomDateA = (start: string, end: string) => {
-    setFilters({ start_date: start, end_date: end });
+    // If setting start date and end date is empty, default end to today (or start date)
+    let newEnd = end;
+    if (start && !newEnd) {
+      newEnd = new Date().toISOString().slice(0, 10);
+    }
+    setFilters({ start_date: start, end_date: newEnd });
   };
 
   const handleCustomDateB = (start: string, end: string) => {
