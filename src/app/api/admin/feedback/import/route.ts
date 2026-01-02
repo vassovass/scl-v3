@@ -11,7 +11,8 @@
  */
 
 import { withApiHandler } from "@/lib/api/handler";
-import { bulkImportSchema, ImportItem } from "@/lib/schemas/feedback";
+import { bulkImportSchema, ImportItem, importItemSchema } from "@/lib/schemas/feedback";
+import { z } from "zod";
 
 export const dynamic = 'force-dynamic';
 
@@ -66,8 +67,25 @@ export const POST = withApiHandler({
     const toUpdate: Array<{ id: string; item: ImportItem }> = [];
     const toCreate: ImportItem[] = [];
 
+    // Validating against relaxed bulk schema's items array
     for (let i = 0; i < items.length; i++) {
-        const item = items[i];
+        const rawItem = items[i];
+
+        // Validate item individually
+        const result = importItemSchema.safeParse(rawItem);
+
+        if (!result.success) {
+            // Validation failed
+            const message = result.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
+            errors.push({
+                row: i + 1, // 1-based index for user friendliness
+                message: `Validation failed: ${message}`
+            });
+            summary.errors++;
+            continue;
+        }
+
+        const item = result.data as ImportItem;
         const id = item.id?.trim();
 
         if (id && id.length > 0) {
@@ -150,7 +168,9 @@ export const POST = withApiHandler({
     }
 
     return {
-        success: errors.length === 0,
+        // Return true if operation completed without throwing entirely,
+        // letting UI handle per-item errors.
+        success: true,
         summary,
         errors,
     };

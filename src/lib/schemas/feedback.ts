@@ -111,7 +111,7 @@ export const importItemSchema = z.object({
  */
 export const bulkImportSchema = z.object({
     items: z
-        .array(importItemSchema)
+        .array(z.any()) // Allow mixed valid/invalid items for partial processing in handler
         .min(1, "At least one item required")
         .max(500, "Maximum 500 items per import"),
 });
