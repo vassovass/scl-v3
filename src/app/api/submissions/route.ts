@@ -150,25 +150,29 @@ export async function POST(request: Request): Promise<Response> {
         }
 
         // Trigger verification (non-blocking, catch errors)
-        const verification = await callVerificationFunction({
-            steps: input.steps,
-            for_date: input.date,
-            proof_path: input.proof_path,
-            league_id: input.league_id,
-            submission_id: submission.id,
-            requester_id: user.id,
-        }).catch((err) => {
-            return {
-                status: 500,
-                ok: false,
-                data: {
-                    code: "internal_error",
-                    message: String(err),
-                    should_retry: false,
-                    retry_after: undefined
-                }
-            };
-        });
+        let verification;
+
+        if (input.proof_path) {
+            verification = await callVerificationFunction({
+                steps: input.steps,
+                for_date: input.date,
+                proof_path: input.proof_path,
+                league_id: input.league_id,
+                submission_id: submission.id,
+                requester_id: user.id,
+            }).catch((err) => {
+                return {
+                    status: 500,
+                    ok: false,
+                    data: {
+                        code: "internal_error",
+                        message: String(err),
+                        should_retry: false,
+                        retry_after: undefined
+                    }
+                };
+            });
+        }
 
         // Fetch updated submission (verification may have updated it)
         const { data: refreshed } = await adminClient
@@ -181,19 +185,21 @@ export async function POST(request: Request): Promise<Response> {
             submission: refreshed ?? submission,
         };
 
-        if (verification.ok) {
-            payload.verification = verification.data;
-        } else {
-            payload.verification_error = {
-                // Map new structure to what client expects, or pass through
-                error: verification.data.code ?? "verification_failed",
-                message: verification.data.message ?? "Verification failed",
-                retry_after: verification.data.retry_after,
-                should_retry: verification.data.should_retry,
-            };
+        if (verification) {
+            if (verification.ok) {
+                payload.verification = verification.data;
+            } else {
+                payload.verification_error = {
+                    // Map new structure to what client expects, or pass through
+                    error: verification.data.code ?? "verification_failed",
+                    message: verification.data.message ?? "Verification failed",
+                    retry_after: verification.data.retry_after,
+                    should_retry: verification.data.should_retry,
+                };
+            }
         }
 
-        const status = verification.ok ? 201 : 202;
+        const status = (verification?.ok ?? true) ? 201 : 202;
         return json(payload, { status });
     } catch (error) {
         console.error("Submission POST error:", error);
