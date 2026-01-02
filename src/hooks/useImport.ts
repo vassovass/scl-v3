@@ -140,16 +140,34 @@ export function useImport<T extends { id?: string }>({
                 body: JSON.stringify({ items }),
             });
 
-            const importResult: ImportResult = await response.json();
+            const responseData = await response.json();
+
+            // Handle API errors that don't match ImportResult shape
+            let importResult: ImportResult;
+
+            if (!response.ok || !responseData.summary) {
+                importResult = {
+                    success: false,
+                    summary: { updated: 0, created: 0, errors: 0 },
+                    errors: [{
+                        message: responseData.error || responseData.message || 'Unknown import error'
+                    }]
+                };
+            } else {
+                importResult = responseData as ImportResult;
+            }
+
             setResult(importResult);
 
-            // Track analytics
-            trackEvent('import_completed', {
-                category: 'admin',
-                items_updated: importResult.summary.updated,
-                items_created: importResult.summary.created,
-                items_errored: importResult.summary.errors,
-            });
+            // Track analytics only if we have a valid summary
+            if (importResult.summary) {
+                trackEvent('import_completed', {
+                    category: 'admin',
+                    items_updated: importResult.summary.updated,
+                    items_created: importResult.summary.created,
+                    items_errored: importResult.summary.errors,
+                });
+            }
 
             if (importResult.success && onSuccess) {
                 onSuccess();
