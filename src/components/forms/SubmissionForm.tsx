@@ -61,8 +61,7 @@ interface PendingVerification {
     attempts: number;
 }
 
-attempts: number;
-}
+
 
 interface LeagueSettings {
     allow_manual_entry: boolean;
