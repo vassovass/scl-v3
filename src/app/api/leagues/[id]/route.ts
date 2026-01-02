@@ -277,7 +277,16 @@ export async function PUT(
         const updates: any = {};
 
         if (typeof body.name === 'string') updates.name = body.name.trim().slice(0, 100);
-        if (body.stepweek_start === 'monday' || body.stepweek_start === 'sunday') updates.stepweek_start = body.stepweek_start;
+        if (typeof body.name === 'string') updates.name = body.name.trim().slice(0, 100);
+        if (body.stepweek_start === 'monday' || body.stepweek_start === 'sunday') {
+            // Capitalize to match typical DB constraints (Monday/Sunday)
+            updates.stepweek_start = body.stepweek_start.charAt(0).toUpperCase() + body.stepweek_start.slice(1);
+        }
+
+        // Also allow passing "Monday" or "Sunday" directly if client sends it
+        if (body.stepweek_start === 'Monday' || body.stepweek_start === 'Sunday') {
+            updates.stepweek_start = body.stepweek_start;
+        }
         if (typeof body.counting_start_date === 'string' || body.counting_start_date === null) updates.counting_start_date = body.counting_start_date;
         if (typeof body.description === 'string' || body.description === null) updates.description = body.description ? body.description.slice(0, 500) : null;
         if (typeof body.category === 'string') updates.category = body.category;

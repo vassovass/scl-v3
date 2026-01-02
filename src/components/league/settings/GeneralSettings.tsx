@@ -84,8 +84,8 @@ export function GeneralSettings({ league, onChange, disabled }: GeneralSettingsP
                             type="radio"
                             name="stepweek_start"
                             value="monday"
-                            checked={league.stepweek_start === "monday"}
-                            onChange={() => onChange({ stepweek_start: "monday" })}
+                            checked={league.stepweek_start === "monday" || league.stepweek_start === "mon"}
+                            onChange={() => onChange({ stepweek_start: "monday" })} // Send 'monday', API maps to 'mon'
                             disabled={disabled}
                             className="h-4 w-4 border-slate-700 bg-slate-950 text-sky-500 focus:ring-sky-500"
                         />
@@ -98,8 +98,8 @@ export function GeneralSettings({ league, onChange, disabled }: GeneralSettingsP
                             type="radio"
                             name="stepweek_start"
                             value="sunday"
-                            checked={league.stepweek_start === "sunday"}
-                            onChange={() => onChange({ stepweek_start: "sunday" })}
+                            checked={league.stepweek_start === "sunday" || league.stepweek_start === "sun"}
+                            onChange={() => onChange({ stepweek_start: "sunday" })} // Send 'sunday', API maps to 'sun'
                             disabled={disabled}
                             className="h-4 w-4 border-slate-700 bg-slate-950 text-sky-500 focus:ring-sky-500"
                         />

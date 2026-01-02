@@ -41,7 +41,7 @@ export type Database = {
         Row: {
           id: string;
           name: string;
-          stepweek_start: "monday" | "sunday";
+          stepweek_start: "monday" | "sunday" | "mon" | "sun";
           invite_code: string;
           owner_id: string;
           created_at: string;
@@ -57,7 +57,7 @@ export type Database = {
         Insert: {
           id?: string;
           name: string;
-          stepweek_start?: "monday" | "sunday";
+          stepweek_start?: "monday" | "sunday" | "mon" | "sun";
           invite_code: string;
           owner_id: string;
           created_at?: string;
@@ -73,7 +73,7 @@ export type Database = {
         Update: {
           id?: string;
           name?: string;
-          stepweek_start?: "monday" | "sunday";
+          stepweek_start?: "monday" | "sunday" | "mon" | "sun";
           invite_code?: string;
           owner_id?: string;
           created_at?: string;
