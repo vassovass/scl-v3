@@ -45,6 +45,14 @@ export type Database = {
           invite_code: string;
           owner_id: string;
           created_at: string;
+          counting_start_date: string | null;
+          description: string | null;
+          is_public: boolean;
+          allow_manual_entry: boolean;
+          require_verification_photo: boolean;
+          daily_step_goal: number;
+          max_members: number;
+          category: string;
         };
         Insert: {
           id?: string;
@@ -53,6 +61,14 @@ export type Database = {
           invite_code: string;
           owner_id: string;
           created_at?: string;
+          counting_start_date?: string | null;
+          description?: string | null;
+          is_public?: boolean;
+          allow_manual_entry?: boolean;
+          require_verification_photo?: boolean;
+          daily_step_goal?: number;
+          max_members?: number;
+          category?: string;
         };
         Update: {
           id?: string;
@@ -61,6 +77,14 @@ export type Database = {
           invite_code?: string;
           owner_id?: string;
           created_at?: string;
+          counting_start_date?: string | null;
+          description?: string | null;
+          is_public?: boolean;
+          allow_manual_entry?: boolean;
+          require_verification_photo?: boolean;
+          daily_step_goal?: number;
+          max_members?: number;
+          category?: string;
         };
         Relationships: [
           {

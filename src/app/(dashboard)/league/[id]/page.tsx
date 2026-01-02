@@ -191,11 +191,20 @@ export default function LeaguePage() {
               leagueName={league.name}
             />
             {canManageProxy && (
-              <ProxyMembersDropdown
-                leagueId={leagueId}
-                selectedProxy={selectedProxy}
-                onSelectProxy={setSelectedProxy}
-              />
+              <>
+                <Link
+                  href={`/league/${leagueId}/settings`}
+                  className="rounded-lg border border-slate-700 bg-slate-800 px-6 py-3 text-sm font-semibold text-slate-300 transition hover:bg-slate-700 hover:text-white"
+                  data-tour="nav-settings"
+                >
+                  ⚙ Settings
+                </Link>
+                <ProxyMembersDropdown
+                  leagueId={leagueId}
+                  selectedProxy={selectedProxy}
+                  onSelectProxy={setSelectedProxy}
+                />
+              </>
             )}
           </div>
         </ModuleFeedback>

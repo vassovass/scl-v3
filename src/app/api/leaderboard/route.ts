@@ -71,19 +71,50 @@ export const GET = withApiHandler({
   } = parsed.data;
 
   // Resolve period A dates
-  const rangeA = period === "custom" && start_date && end_date
+  let rangeA: { start: string; end: string } | null = period === "custom" && start_date && end_date
     ? { start: start_date, end: end_date }
     : presetToDateRange(period as PeriodPreset);
 
   // Resolve period B dates (for comparison mode)
-  const rangeB = period_b
+  let rangeB: { start: string; end: string } | null = period_b
     ? (period_b === "custom" && start_date_b && end_date_b
       ? { start: start_date_b, end: end_date_b }
       : presetToDateRange(period_b as PeriodPreset))
     : null;
 
-  // Fetch period A data (includes real users)
-  const statsA = await fetchPeriodStats(adminClient, league_id, rangeA, verified);
+  // Fetch league settings (counting_start_date)
+  const { data: leagueSettings } = await adminClient
+    .from("leagues")
+    .select("counting_start_date")
+    .eq("id", league_id)
+    .single();
+
+  const countingStartDate = leagueSettings?.counting_start_date;
+
+  // Helper to clamp start date if a counting_start_date is set
+  const clampRange = (r: { start: string; end: string } | null) => {
+    if (!r || !countingStartDate) return r;
+    // If the entire range is before the start date, return null (no valid period)
+    if (r.end < countingStartDate) return null;
+    // If range starts before counting date, clamp it
+    if (r.start < countingStartDate) return { ...r, start: countingStartDate };
+    return r;
+  };
+
+  // Apply clamping
+  rangeA = clampRange(rangeA);
+  rangeB = clampRange(rangeB);
+
+  // If rangeA became invalid due to clamping, we might return empty result immediately
+  // But let's let it flow, fetchPeriodStats handles null range well?
+  // fetchPeriodStats type signature says range can be null, but logic might assume valid if passed?
+  // Actually, fetchPeriodStats takes `range: { start: string; end: string } | null`.
+
+  // If rangeA is null after clamping (meaning the whole period is before league start),
+  // we effectively have no stats.
+  const statsA = rangeA
+    ? await fetchPeriodStats(adminClient, league_id, rangeA, verified)
+    : new Map<string, UserStats>(); // Return empty map if out of bounds
 
   // Fetch period B data if comparison mode
   const statsB = rangeB ? await fetchPeriodStats(adminClient, league_id, rangeB, verified) : null;
@@ -222,7 +253,9 @@ export const GET = withApiHandler({
   const totalSteps = results.reduce((sum, r) => sum + r.period_a.total_steps, 0);
 
   // Calculate total days in period
-  const totalDaysInPeriod = rangeA ? calculateDaysBetween(rangeA.start, rangeA.end) : null;
+  // If rangeA was clamped or null, reflect that? 
+  // Probably best to show the *effective* days in period.
+  const totalDaysInPeriod = rangeA ? calculateDaysBetween(rangeA.start, rangeA.end) : 0;
 
   return {
     leaderboard: results.slice(offset, offset + limit).map(r => ({

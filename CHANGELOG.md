@@ -11,6 +11,22 @@ All notable changes to StepLeague v3.
 
 ### Added
 
+- **PRD 19: League Settings & Start Date** - New modular settings system for leagues
+  - **League Settings Page** (`/league/[id]/settings`) for owners/admins
+  - **Start Date** - Configure a `counting_start_date` to ignore previous step history (fresh start)
+  - **Modular Settings Components**:
+    - `GeneralSettings`: Name, Description, Category, Week Start
+    - `CompetitionSettings`: Start Date, Daily Step Goal, Max Members
+    - `RulesSettings`: Manual Entry, Photo Requirements, Public Visibility
+    - `DangerZone`: Delete league actions
+  - **API Updates**: `PUT /api/leagues/[id]` for updating settings, Leaderboard filtering by start date
+
+---
+
+## [2026-01-03]
+
+### Added
+
 - **PRD 18: Documentation** - Created comprehensive system documentation
   - **System Overview** (`docs/feedback-roadmap-system.md`) - Architecture, Components, and API reference
   - **Architecture Diagram** (`docs/diagrams/feedback-flow.md`) - Mermaid graph of data flow
