@@ -703,6 +703,10 @@ body {
   --rdp-accent-color: rgb(var(--brand-primary));
   --rdp-accent-background-color: rgba(var(--brand-primary), 0.9);
   --rdp-range_middle-background-color: rgba(var(--brand-primary), 0.25);
+  --rdp-range_middle-color: rgb(var(--text-primary));
+  /* CRITICAL: text color for range middle dates */
+  --rdp-range_start-color: white;
+  --rdp-range_end-color: white;
   --rdp-today-color: rgb(var(--brand-primary));
   --rdp-outside-opacity: 0.35;
   --rdp-day-height: 40px;
