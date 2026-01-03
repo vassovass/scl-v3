@@ -735,10 +735,10 @@ body {
   font-weight: 600;
 }
 
-/* RANGE MIDDLE DAYS - dark text on light accent bg */
+/* RANGE MIDDLE DAYS - white text on semi-transparent accent bg */
 .rdp-range_middle .rdp-day_button {
-  color: rgb(var(--text-primary)) !important;
-  background-color: rgba(var(--brand-primary), 0.2) !important;
+  color: white !important;
+  background-color: rgba(var(--brand-primary), 0.35) !important;
 }
 
 /* Range start - rounded left */
