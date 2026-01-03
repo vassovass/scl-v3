@@ -74,7 +74,6 @@
 - **Database**: Supabase (PostgreSQL + RLS)
 - **AI Verification**: Gemini 2.0 Flash (via Supabase Edge Functions)
 - **Hosting**: Vercel
-- **Date Picker**: `react-day-picker` v9 + `date-fns` (⚠️ v9 uses `.rdp-root` class, NOT `.rdp` from v8)
 
 ---
 
