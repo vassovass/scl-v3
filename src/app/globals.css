@@ -692,36 +692,76 @@ body {
 /* ============================================
    REACT-DAY-PICKER v9 THEMING
    Uses CSS variables for dark/light mode support
+   
+   IMPORTANT: v9 uses different class names than v8!
+   - .rdp-root (not .rdp)
+   - .rdp-day_button (not .rdp-day)
    ============================================ */
 
-/* Dark mode (default) */
+/* Base container */
 .rdp-root {
   --rdp-accent-color: rgb(var(--brand-primary));
-  --rdp-accent-background-color: rgba(var(--brand-primary), 0.15);
-  --rdp-range_middle-background-color: rgba(var(--brand-primary), 0.12);
-  --rdp-range_middle-color: rgb(var(--text-primary));
-  --rdp-range_start-color: white;
-  --rdp-range_end-color: white;
+  --rdp-accent-background-color: rgba(var(--brand-primary), 0.9);
+  --rdp-range_middle-background-color: rgba(var(--brand-primary), 0.25);
   --rdp-today-color: rgb(var(--brand-primary));
   --rdp-outside-opacity: 0.35;
   --rdp-day-height: 40px;
   --rdp-day-width: 40px;
 
-  /* Text colors for dark mode */
   color: rgb(var(--text-primary));
   background: rgb(var(--bg-elevated));
   border-radius: var(--radius-lg);
   padding: 0.75rem;
 }
 
-/* Day buttons - ensure good contrast */
+/* Day buttons - base styling */
 .rdp-day_button {
-  color: rgb(var(--text-primary));
+  color: rgb(var(--text-primary)) !important;
   font-weight: 500;
 }
 
 .rdp-day_button:hover:not([disabled]) {
   background-color: rgb(var(--bg-card-hover));
+}
+
+/* SELECTED DAYS (start and end) - white text on accent bg */
+.rdp-selected .rdp-day_button {
+  color: white !important;
+  background-color: rgb(var(--brand-primary)) !important;
+  font-weight: 600;
+}
+
+/* RANGE MIDDLE DAYS - dark text on light accent bg */
+.rdp-range_middle .rdp-day_button {
+  color: rgb(var(--text-primary)) !important;
+  background-color: rgba(var(--brand-primary), 0.2) !important;
+}
+
+/* Range start - rounded left */
+.rdp-range_start .rdp-day_button {
+  border-radius: 6px 0 0 6px;
+}
+
+/* Range end - rounded right */
+.rdp-range_end .rdp-day_button {
+  border-radius: 0 6px 6px 0;
+}
+
+/* Single day selected (start = end) */
+.rdp-range_start.rdp-range_end .rdp-day_button {
+  border-radius: 6px;
+}
+
+/* Days outside current month */
+.rdp-outside .rdp-day_button {
+  color: rgb(var(--text-muted)) !important;
+  opacity: 0.5;
+}
+
+/* Today indicator */
+.rdp-today:not(.rdp-selected) .rdp-day_button {
+  border: 2px solid rgb(var(--brand-primary));
+  border-radius: 6px;
 }
 
 /* Weekday headers */
@@ -752,4 +792,9 @@ body {
 /* Light mode overrides */
 [data-theme="light"] .rdp-root {
   background: rgb(var(--bg-elevated));
+}
+
+[data-theme="light"] .rdp-range_middle .rdp-day_button {
+  color: rgb(15 23 42) !important;
+  /* slate-900 for light mode */
 }
