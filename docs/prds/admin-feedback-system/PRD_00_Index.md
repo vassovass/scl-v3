@@ -95,6 +95,14 @@
 
 ---
 
+### Phase 8: UI Component Library
+
+| # | PRD | Outcome |
+|---|-----|---------|
+| 21 | [shadcn/ui Integration](./PRD_21_shadcn_Integration.md) | Toast notifications, dialogs, accessible dropdowns |
+
+---
+
 ## Scope Clarification
 
 **User Feedback** = Items submitted by users through:
@@ -121,6 +129,7 @@
 
 | Date | Section | Change |
 |------|---------|--------|
+| 2026-01-04 | Phase 8 | Added PRD 21: shadcn/ui Integration |
 | 2025-12-30 | Phase 4 | Added PRD 14: Analytics GTM & GA4 as immediate next priority, renumbered PRDs 14-20 |
 | 2025-12-28 | Phase 7 | Added PRD 19: Expandable Cards with Image Paste |
 | 2025-12-26 | Restructure | Reorganized PRDs 4+ with unification priorities |
