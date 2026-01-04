@@ -300,6 +300,38 @@ All defined in `src/app/globals.css` using CSS custom properties.
 
 ---
 
+## shadcn/ui Components (NEW)
+
+**Status**: Foundation installed, integration in progress
+
+- **Location**: `src/components/ui/`
+- **Installed**: toast, sonner, dialog, dropdown-menu
+- **Config**: `components.json` (New York style, neutral base)
+- **Styling**: Tailwind + CSS variables (dark-first)
+
+### Using shadcn Components
+
+```tsx
+import { useToast } from "@/hooks/use-toast";
+import { Dialog } from "@/components/ui/dialog";
+
+// Replace alert() with toast
+const { toast } = useToast();
+toast({ title: "Success!", description: "Steps submitted" });
+
+// Replace confirm() with Dialog
+<Dialog>...</Dialog>
+```
+
+### Migration Status
+
+- ✅ Components installed
+- ❌ `<Toaster />` not in layout yet (PRD 21 Part A)
+- ❌ `alert()` calls still present (need replacement)
+- ❌ `confirm()` calls still present (need Dialog)
+
+---
+
 ## Common Issues & Fixes
 
 | Issue | Fix |
@@ -313,12 +345,29 @@ All defined in `src/app/globals.css` using CSS custom properties.
 
 ## Commands
 
-**Live URL**: [https://scl-v3.vercel.app/](https://scl-v3.vercel.app/) (auto-deploys from main)
-
 ```bash
 npm run build    # Production build
 npx tsc --noEmit # Type check
 ```
+
+---
+
+## Deployment (Vercel Only)
+
+**IMPORTANT**: This project has NO local development. All testing happens on Vercel.
+
+- **Live URL**: https://scl-v3.vercel.app/
+- **Deployment**: Auto-deploy from `main` branch
+- **Testing**: Always test on deployed URL, NOT localhost
+- **Environment**: All env vars configured in Vercel dashboard
+- **Build errors**: Expected locally without .env.local (ignored)
+
+### Making Changes
+
+1. Push to main: `git push origin main`
+2. Vercel auto-builds and deploys (2-3 minutes)
+3. Test at https://scl-v3.vercel.app/
+4. Check Vercel dashboard for build logs if issues
 
 ---
 
@@ -621,6 +670,25 @@ When adding a new trackable feature:
 
 ---
 
+## Recent Features (2026-01-04)
+
+- ✅ **League Settings System** (PRD 19)
+  - League owners can set start date
+  - Modular settings components pattern
+  - Enforcement in submissions API
+  
+- ✅ **DateRangePicker Component**
+  - Replaced dual date inputs
+  - Standard pattern for all date selection
+  - Location: `src/components/ui/DateRangePicker.tsx`
+  
+- ✅ **shadcn/ui Foundation**
+  - Toast, Dialog, Dropdown components
+  - Theme-aware CSS variables
+  - Ready for integration (PRD 21)
+
+---
+
 ## Related Files
 
 | File | Purpose |
@@ -638,4 +706,4 @@ When adding a new trackable feature:
 
 ---
 
-*Last updated: 2025-12-31. This file is the canonical source for AI agents.*
+*Last updated: 2026-01-04. This file is the canonical source for AI agents.*
