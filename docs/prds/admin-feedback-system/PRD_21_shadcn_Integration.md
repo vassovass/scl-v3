@@ -1,8 +1,17 @@
 # PRD 21: shadcn/ui Integration & Toast System
 
-> **Order:** 21 of 21  
-> **Previous:** [PRD 20: Expandable Cards](./PRD_20_Expandable_Cards_Image_Paste.md)
+> **Order:** 21 of 30  
+> **Previous:** [PRD 20: Expandable Cards](./PRD_20_Expandable_Cards_Image_Paste.md)  
+> **Next:** [PRD 22: User Preferences](./PRD_22_User_Preferences.md)  
 > **Status:** 🟡 In Progress (Foundation complete)
+
+> [!CAUTION]
+> **CRITICAL DEPENDENCY**: This PRD blocks all PRDs 22-30. Complete Parts E (CSS Variables) and G (Theme Toggle) before proceeding to other PRDs.
+
+> [!WARNING]
+> **Risk Mitigation**:
+> - Theme toggle may break existing styles → Test thoroughly in both light/dark modes
+> - CSS variable conflicts → Prioritize Part E unification before Part F expansion
 
 ---
 
@@ -410,6 +419,89 @@ After completing ALL parts, verify these critical flows:
 - [ ] **Admin features**: Kanban drag-drop, feedback management
 - [ ] **Mobile responsive**: All pages work on mobile viewport
 - [ ] **Build passes**: `npm run build` succeeds with no errors
+
+---
+
+### Part G: Theme Toggle UI (Light/Dark Mode)
+
+> **Goal:** Add visible UI for users to switch between light/dark/system themes.
+
+**Dependencies:**
+- Part E (CSS Unification) must be complete first
+- Install `next-themes`: `pnpm add next-themes`
+
+**Components to Create:**
+
+| File | Description |
+|------|-------------|
+| `src/components/theme-provider.tsx` | next-themes wrapper |
+| `src/components/mode-toggle.tsx` | Theme dropdown (Light/Dark/System) |
+
+**Implementation:**
+
+```tsx
+// src/components/theme-provider.tsx
+"use client"
+import { ThemeProvider as NextThemesProvider } from "next-themes"
+
+export function ThemeProvider({ children, ...props }) {
+  return <NextThemesProvider {...props}>{children}</NextThemesProvider>
+}
+
+// src/components/mode-toggle.tsx
+"use client"
+import { Moon, Sun, Monitor } from "lucide-react"
+import { useTheme } from "next-themes"
+import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+
+export function ModeToggle() {
+  const { setTheme } = useTheme()
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          <span className="sr-only">Toggle theme</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => setTheme("light")}>Light</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("dark")}>Dark</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("system")}>System</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+```
+
+**Integration Points:**
+
+| Location | Change | Priority |
+|----------|--------|----------|
+| `src/app/layout.tsx` | Wrap children in `<ThemeProvider attribute="class" defaultTheme="dark" enableSystem>` | Required |
+| `src/components/navigation/NavHeader.tsx` | Add `<ModeToggle />` next to settings | Quick access |
+| `/settings/preferences` (PRD 25) | Add theme selector in preferences | Discoverability |
+| `tailwind.config.js` | Ensure `darkMode: 'selector'` (or 'class') | Required |
+
+> **Best Practice Research:** Theme toggle should appear in **BOTH** locations:
+> - **Header**: For power users who switch frequently (industry standard: GitHub, Notion, Linear)
+> - **Settings**: For discoverability by new users and persistence clarity
+> - This dual placement is recommended by Nielsen Norman Group for frequently-used settings
+
+**FOWT Prevention:**
+- next-themes injects a blocking script in `<head>`
+- Add `suppressHydrationWarning` to `<html>` element
+- Use `mounted` state check in toggle component
+
+**Success Criteria:**
+- [ ] Theme persists across sessions (localStorage)
+- [ ] System preference detection works
+- [ ] No flash of wrong theme on load
+- [ ] Toggle accessible in header AND settings (both required)
+- [ ] Respects `prefers-reduced-motion` for transitions
+
 
 ---
 

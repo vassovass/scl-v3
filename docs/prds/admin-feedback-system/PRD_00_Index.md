@@ -99,7 +99,71 @@
 
 | # | PRD | Outcome |
 |---|-----|---------|
-| 21 | [shadcn/ui Integration](./PRD_21_shadcn_Integration.md) | Toast notifications, dialogs, accessible dropdowns |
+| 21 | [shadcn/ui Integration](./PRD_21_shadcn_Integration.md) | Toast notifications, dialogs, theme toggle, accessible dropdowns |
+
+---
+
+### Phase 9: Settings & Configuration
+
+> **Build these first** - they are dependencies for later PRDs.
+
+| # | PRD | Outcome |
+|---|-----|---------|
+| 22 | [User Preferences System](./PRD_22_User_Preferences.md) | Modular settings architecture |
+| 23 | [SuperAdmin Settings](./PRD_23_SuperAdmin_Settings.md) | App-wide config, feature flags, visibility controls |
+
+---
+
+### Phase 10: UX Flow Improvements
+
+| # | PRD | Outcome |
+|---|-----|---------|
+| 24 | [League Hub Redesign](./PRD_24_League_Hub.md) | Click league → Hub overview (not submit form) |
+| 25 | [Smart Step Reminder](./PRD_25_Step_Reminder.md) | Floating dismissible CTA + streak freeze |
+| 26 | [Unified Progress View](./PRD_26_Unified_Progress.md) | My Progress / League Progress toggle |
+
+---
+
+### Phase 11: Social & Analytics
+
+| # | PRD | Outcome |
+|---|-----|---------|
+| 27 | [Social Encouragement](./PRD_27_Social_Encouragement.md) | High-fives, cheer prompts, encouragement |
+| 28 | [Admin Analytics](./PRD_28_Admin_Analytics.md) | KPI dashboard, charts, CSV/PDF export |
+
+---
+
+### Phase 12: Marketing & Growth
+
+| # | PRD | Outcome |
+|---|-----|---------|
+| 29 | [B2B Landing Pages](./PRD_29_B2B_Landing.md) | /teams landing, waitlist, features |
+| 30 | [SEO Comparison Pages](./PRD_30_SEO_Comparison.md) | /compare hub, competitor comparisons |
+
+---
+
+## Cross-PRD Checklist
+
+> **Every PRD must verify these before marking complete:**
+
+### Theme Awareness
+- [ ] Uses CSS variables (`--background`, `--foreground`, etc.)
+- [ ] Works in both light and dark modes
+- [ ] No hardcoded colors
+- [ ] Tested with theme toggle
+
+### shadcn Usage
+- [ ] Uses shadcn components where applicable
+- [ ] Toast for user feedback
+- [ ] Dialog for confirmations
+
+### Settings Integration
+- [ ] Respects feature flags (PRD 23)
+- [ ] Reads user preferences (PRD 22)
+
+### Documentation
+- [ ] CHANGELOG.md updated
+- [ ] ROADMAP.md updated if completing a roadmap item
 
 ---
 
@@ -120,8 +184,8 @@
 ## Cross-References
 
 - Each PRD links to its previous and next PRD
-- PRDs may be done out of order if dependencies are met
-- Some PRDs add value from earlier PRDs (noted in each)
+- PRDs are numbered in build order (21 → 30)
+- Dependencies noted in each PRD header
 
 ---
 
@@ -129,8 +193,14 @@
 
 | Date | Section | Change |
 |------|---------|--------|
+| 2026-01-05 | Renumbering | Renumbered PRDs 22-28 to match build order |
+| 2026-01-05 | Cross-PRD Checklist | Added theme awareness, shadcn, settings verification |
+| 2026-01-05 | Phase 10-12 | Added PRDs 27-30 (Social, Analytics, B2B, SEO) |
+| 2026-01-05 | Phase 9 | Added PRDs 22-23 (User Preferences, SuperAdmin Settings) |
+| 2026-01-05 | PRD 21 | Added Part G: Theme Toggle UI (Light/Dark mode) |
+| 2026-01-05 | PRD 25 | Added Streak Freeze System (Duolingo model) |
 | 2026-01-04 | Phase 8 | Added PRD 21: shadcn/ui Integration |
-| 2025-12-30 | Phase 4 | Added PRD 14: Analytics GTM & GA4 as immediate next priority, renumbered PRDs 14-20 |
+| 2025-12-30 | Phase 4 | Added PRD 14: Analytics GTM & GA4 |
 | 2025-12-28 | Phase 7 | Added PRD 19: Expandable Cards with Image Paste |
 | 2025-12-26 | Restructure | Reorganized PRDs 4+ with unification priorities |
 | 2025-12-26 | Initial | Original index with PRDs 1-9 |
