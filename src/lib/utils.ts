@@ -1,8 +1,8 @@
-import { type ClassValue, clsx } from "clsx";
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 
-// Simple cn utility for conditional class names
 export function cn(...inputs: ClassValue[]) {
-  return clsx(inputs);
+  return twMerge(clsx(inputs))
 }
 
 // Format date as YYYY-MM-DD

@@ -181,8 +181,8 @@ export function DateRangePicker({ date, onSelect, className = "" }: DateRangePic
           {/* Selection indicator */}
           <div className="px-3 py-2 border-b border-slate-700 text-sm">
             <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${selectingEnd
-                ? "bg-purple-500/20 text-purple-400"
-                : "bg-sky-500/20 text-sky-400"
+              ? "bg-purple-500/20 text-purple-400"
+              : "bg-sky-500/20 text-sky-400"
               }`}>
               {selectingEnd ? "📅 Select end date" : "📅 Select start date"}
             </span>

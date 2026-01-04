@@ -7,6 +7,30 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-01-04]
+
+### Added
+
+- **shadcn/ui Component Library** - Production-ready, accessible UI components
+  - Initialized shadcn/ui with New York style (neutral base color, CSS variables)
+  - **Components Added**:
+    - `toast.tsx` + `use-toast.ts` - Toast notification system
+    - `sonner.tsx` - Alternative toast implementation
+    - `dialog.tsx` - Modal dialogs
+    - `dropdown-menu.tsx` - Accessible dropdown menus
+  - **Configuration**:
+    - `components.json` - shadcn registry settings
+    - Updated `tailwind.config.ts` with shadcn color tokens and `tailwindcss-animate`
+    - Updated `globals.css` with dark-first shadcn CSS variables
+  - **Compatibility Fixes**:
+    - Made dark mode default in shadcn `:root` (matching app's dark-first design)
+    - Added light mode via `[data-theme="light"]` selector (consistent with existing theme system)
+    - Removed body style override to preserve existing theme system
+    - Restored date utilities (`formatDate`, `getTodayUtc`, `getStepWeekRange`) in `utils.ts`
+  - **Dependencies**: `tailwind-merge`, `@radix-ui/react-*` primitives, `lucide-react`, `sonner`
+
+---
+
 ## [2026-01-03]
 
 ### Added
