@@ -18,6 +18,10 @@ All notable changes to StepLeague v3.
   - **Offline Support** - Detected offline status and warns user (submissions queued in future update)
   - **Error Handling** - Standardized `AppError` and `toast` usage in submission flow
 
+- **Roadmap & Documentation Update**
+  - **New Priorities** - Added PRDs for PWA/Offline (22), Global Leaderboard (23), Smart Engagement (24), Pricing (25)
+  - **Restructured PRDs** - Renumbered Phase 9+ (PRDs 26-34) to reflect new build order
+
 ### Changed
 
 - Renamed `/submit` page to `/submit-steps` for clearer URL

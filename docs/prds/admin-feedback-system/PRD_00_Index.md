@@ -103,111 +103,68 @@
 
 ---
 
-### Phase 9: Settings & Configuration
+### Phase 9: PWA & Global Features
 
-> **Build these first** - they are dependencies for later PRDs.
-
-| # | PRD | Outcome |
-|---|-----|---------|
-| 22 | [User Preferences System](./PRD_22_User_Preferences.md) | Modular settings architecture |
-| 23 | [SuperAdmin Settings](./PRD_23_SuperAdmin_Settings.md) | App-wide config, feature flags, visibility controls |
-
----
-
-### Phase 10: UX Flow Improvements
+> **Priority:** "Unfinished Items" (User Request)
 
 | # | PRD | Outcome |
 |---|-----|---------|
-| 24 | [League Hub Redesign](./PRD_24_League_Hub.md) | Click league → Hub overview (not submit form) |
-| 25 | [Smart Step Reminder](./PRD_25_Step_Reminder.md) | Floating dismissible CTA + streak freeze |
-| 26 | [Unified Progress View](./PRD_26_Unified_Progress.md) | My Progress / League Progress toggle |
+| 22 | [PWA & Offline Support](./PRD_22_PWA_Offline.md) | Offline submission queuing, Service Worker |
+| 23 | [Global Leaderboard](./PRD_23_Global_Leaderboard.md) | Platform-wide rankings, Lifetime stats |
+| 24 | [Smart Engagement](./PRD_24_Smart_Engagement.md) | Missed day prompt, Streak warnings |
 
 ---
 
-### Phase 11: Social & Analytics
+### Phase 10: Business & Education (High Priority)
 
 | # | PRD | Outcome |
 |---|-----|---------|
-| 27 | [Social Encouragement](./PRD_27_Social_Encouragement.md) | High-fives, cheer prompts, encouragement |
-| 28 | [Admin Analytics](./PRD_28_Admin_Analytics.md) | KPI dashboard, charts, CSV/PDF export |
+| 25 | [Pricing & How It Works](./PRD_25_Pricing_HowItWorks.md) | Freemium model explanation, Privacy differentiation |
 
 ---
 
-### Phase 12: Marketing & Growth
+### Phase 11: Settings & Configuration
 
 | # | PRD | Outcome |
 |---|-----|---------|
-| 29 | [B2B Landing Pages](./PRD_29_B2B_Landing.md) | /teams landing, waitlist, features |
-| 30 | [SEO Comparison Pages](./PRD_30_SEO_Comparison.md) | /compare hub, competitor comparisons |
+| 26 | [User Preferences System](./PRD_26_User_Preferences.md) | Modular settings architecture |
+| 27 | [SuperAdmin Settings](./PRD_27_SuperAdmin_Settings.md) | App-wide config, feature flags |
+
 ---
 
-### Phase 13: Maintenance & Optimization
+### Phase 12: UX Flow Improvements
 
 | # | PRD | Outcome |
 |---|-----|---------|
-| 31 | [Technical Debt & Optimization](./PRD_31_Technical_Debt.md) | Legacy cleanup, API audits, widget refactor |
+| 28 | [League Hub Redesign](./PRD_28_League_Hub.md) | Click league → Hub overview |
+| 29 | [Unified Progress View](./PRD_29_Unified_Progress.md) | My Progress / League Progress toggle |
 
 ---
 
-## Cross-PRD Checklist
+### Phase 13: Social & Analytics
 
-> **Every PRD must verify these before marking complete:**
-
-### Theme Awareness
-- [ ] Uses CSS variables (`--background`, `--foreground`, etc.)
-- [ ] Works in both light and dark modes
-- [ ] No hardcoded colors
-- [ ] Tested with theme toggle
-
-### shadcn Usage
-- [ ] Uses shadcn components where applicable
-- [ ] Toast for user feedback
-- [ ] Dialog for confirmations
-
-### Settings Integration
-- [ ] Respects feature flags (PRD 23)
-- [ ] Reads user preferences (PRD 22)
-
-### Documentation
-- [ ] CHANGELOG.md updated
-- [ ] ROADMAP.md updated if completing a roadmap item
+| # | PRD | Outcome |
+|---|-----|---------|
+| 30 | [Social Encouragement](./PRD_30_Social_Encouragement.md) | High-fives, cheer prompts |
+| 31 | [Admin Analytics](./PRD_31_Admin_Analytics.md) | KPI dashboard, export |
 
 ---
 
-## Scope Clarification
+### Phase 14: Marketing & Growth
 
-**User Feedback** = Items submitted by users through:
-
-- The `/feedback` page
-- The floating 💬 feedback widget
-- Module feedback (thumbs up/down on UI components)
-
-**Roadmap Items** = User feedback that admins promote to be visible on the public `/roadmap` page.
-
-**This is NOT for:** Developer-created internal tasks or to-do lists.
+| # | PRD | Outcome |
+|---|-----|---------|
+| 32 | [B2B Landing Pages](./PRD_32_B2B_Landing.md) | /teams landing, waitlist |
+| 33 | [SEO Comparison Pages](./PRD_33_SEO_Comparison.md) | /compare hub |
 
 ---
 
-## Cross-References
+### Phase 15: Maintenance
 
-- Each PRD links to its previous and next PRD
-- PRDs are numbered in build order (21 → 30)
-- Dependencies noted in each PRD header
+| # | PRD | Outcome |
+|---|-----|---------|
+| 34 | [Technical Debt](./PRD_34_Technical_Debt.md) | Cleanup & Refactoring |
+
 
 ---
 
-## Changelog
-
-| Date | Section | Change |
-|------|---------|--------|
-| 2026-01-05 | Renumbering | Renumbered PRDs 22-28 to match build order |
-| 2026-01-05 | Cross-PRD Checklist | Added theme awareness, shadcn, settings verification |
-| 2026-01-05 | Phase 10-12 | Added PRDs 27-30 (Social, Analytics, B2B, SEO) |
-| 2026-01-05 | Phase 9 | Added PRDs 22-23 (User Preferences, SuperAdmin Settings) |
-| 2026-01-05 | PRD 21 | Added Part G: Theme Toggle UI (Light/Dark mode) |
-| 2026-01-05 | PRD 25 | Added Streak Freeze System (Duolingo model) |
-| 2026-01-04 | Phase 8 | Added PRD 21: shadcn/ui Integration |
-| 2025-12-30 | Phase 4 | Added PRD 14: Analytics GTM & GA4 |
-| 2025-12-28 | Phase 7 | Added PRD 19: Expandable Cards with Image Paste |
-| 2025-12-26 | Restructure | Reorganized PRDs 4+ with unification priorities |
-| 2025-12-26 | Initial | Original index with PRDs 1-9 |
