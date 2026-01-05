@@ -1,57 +1,36 @@
-# Implementation Plan - Refactor Menu System to Shadcn
+# Theme Toggle Fix Plan
 
-This plan addresses the user request to refactor the menu system to be "modular, scalable, and similar to WordPress" by migrating from the custom `MenuRenderer` to shadcn/ui `DropdownMenu`. This fixes existing navigation and accessibility issues.
+## Goal Description
+The light/dark mode toggle is physically functional (switching attributes) but visually ineffective because:
+1.  Tailwind is configured to look for a `class="dark"` which `next-themes` is not setting (it sets `data-theme="dark"`).
+2.  `src/app/layout.tsx` has hardcoded dark colors (`bg-slate-950 text-slate-50`) that override the theme variables.
 
-## User Review Required
-
-> [!IMPORTANT]
-> This refactor completely replaces `src/components/navigation/MenuRenderer.tsx` with a new `ShadcnMenuRenderer.tsx` for Desktop navigation. Mobile navigation (`MobileMenu.tsx`) is independent and will function as before (it implements its own accordion logic).
+This plan addresses both issues to ensure the toggle correctly switches modes and styles.
 
 ## Proposed Changes
 
-### Navigation Components
+### Configuration
+#### [MODIFY] [tailwind.config.ts](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/tailwind.config.ts)
+- Change `darkMode: ["class"]` to `darkMode: ["selector", '[data-theme="dark"]']` to align with the application's `data-theme` strategy.
 
-#### [NEW] [ShadcnMenuRenderer.tsx](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/src/components/navigation/ShadcnMenuRenderer.tsx)
-- Implements `MenuRendererProps` interface.
-- Uses `DropdownMenu` (Root, Trigger, Content, Item, Sub, SubTrigger, SubContent) from `@/components/ui`.
-- Recursively renders `MenuItem` tree.
-- Handles `requiresLeague` and role filtering via existing schema.
-- Uses `userRole` and `leagueId` for context.
-- Maintains `data-module-id` attributes for analytics.
+### Layout
+#### [MODIFY] [layout.tsx](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/src/app/layout.tsx)
+- Remove `bg-slate-950` and `text-slate-50`.
+- Replace with `bg-background` and `text-foreground` which use the CSS variables defined in `globals.css`.
 
-#### [MODIFY] [NavHeader.tsx](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/src/components/navigation/NavHeader.tsx)
-- Import `ShadcnMenuRenderer`.
-- Replace all `<MenuRenderer ... />` instances with `<ShadcnMenuRenderer ... />`.
-- Ensure props match (especially `onAction`, `isOpen` control).
-
-#### [MODIFY] [MobileMenu.tsx](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/src/components/navigation/MobileMenu.tsx)
-- Remove unused import of `MenuRenderer`.
-
-#### [DELETE] [MenuRenderer.tsx](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/src/components/navigation/MenuRenderer.tsx)
-- Remove the legacy component once migration is verified.
+### Documentation
+#### [MODIFY] [CHANGELOG.md](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/CHANGELOG.md)
+- Log the fix for the theme toggle.
 
 ## Verification Plan
 
 ### Automated Tests
-- Build verification: `npm run build` to ensure no type errors.
+- None (Visual change).
 
 ### Manual Verification
-1. **Desktop Navigation**:
-   - Open "League" dropdown.
-   - Verify sub-items (Submit, Leaderboard) render correctly.
-   - Click "Submit Steps" -> upgrades to `/submit`.
-   - Click "Leaderboard" -> navigates to leaderboard.
-   - Verify keyboard navigation (Enter to open, Arrow keys to move, Enter to select).
-   - Verify clicking outside closes the menu.
-
-2. **Actions Menu**:
-   - Open "Actions" dropdown.
-   - Click "Join League".
-
-3. **Responsiveness**:
-   - Resize to mobile.
-   - Open hamburger menu.
-   - Verify Mobile Menu still works (since it uses separate logic).
-
-4. **Analytics**:
-   - Verify `data-module-id` attributes exist in DOM.
+- **Toggle Check**:
+    - Click the toggle button.
+    - Verify `data-theme` attribute changes on `<html>`.
+    - Verify background color changes from Dark (Slate 950) to Light (White/Slate 50).
+    - Verify text color changes.
+    - Verify Sun/Moon icon visibility toggles correctly.

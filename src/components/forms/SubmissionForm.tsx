@@ -6,6 +6,10 @@ import { apiRequest, ApiError } from "@/lib/api/client";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { analytics } from "@/lib/analytics";
 import { ConflictResolutionDialog, ConflictData } from "@/components/forms/ConflictResolutionDialog";
+import { useOfflineQueue } from "@/hooks/useOfflineQueue";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { WifiOff } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface SubmissionFormProps {
     leagueId: string;
@@ -89,6 +93,28 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
     const [verificationDetails, setVerificationDetails] = useState<VerificationDetails | null>(null);
     const [conflictData, setConflictData] = useState<ConflictData | null>(null);
     const [pendingSubmission, setPendingSubmission] = useState<{ proofPath: string | null; stepsNumber: number } | null>(null);
+
+    // Offline support
+    const [isOffline, setIsOffline] = useState(false);
+    const { addToQueue } = useOfflineQueue();
+    const { user } = useAuth();
+    const { toast } = useToast();
+
+    // Check online status
+    useEffect(() => {
+        setIsOffline(!navigator.onLine);
+
+        const handleOnline = () => setIsOffline(false);
+        const handleOffline = () => setIsOffline(true);
+
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+
+        return () => {
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
+        };
+    }, []);
 
     // Reset overwrite flag when error clears
     useEffect(() => {
@@ -257,16 +283,53 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
         const stepsNumber = parseInt(steps, 10) || 0;
 
         try {
-            if (file) {
-                let fileToUpload = file;
-                if (file.size > 2 * 1024 * 1024) {
-                    fileToUpload = await imageCompression(file, {
-                        maxSizeMB: 2,
-                        maxWidthOrHeight: 1920,
-                        useWebWorker: true,
-                    });
+            let fileToUpload = file;
+            if (file && file.size > 2 * 1024 * 1024) {
+                fileToUpload = await imageCompression(file, {
+                    maxSizeMB: 2,
+                    maxWidthOrHeight: 1920,
+                    useWebWorker: true,
+                });
+            }
+
+            // Handle Offline Submission
+            if (isOffline) {
+                if (!user) {
+                    setError("You must be logged in to save offline.");
+                    setSubmitting(false);
+                    return;
                 }
 
+                try {
+                    await addToQueue({
+                        userId: user.id,
+                        steps: stepsNumber,
+                        date,
+                        proofBlob: fileToUpload || undefined, // Store the blob directly
+                    });
+
+                    toast({
+                        title: "Saved offline",
+                        description: "Your submission has been queued and will sync when you are back online.",
+                        duration: 5000,
+                    });
+
+                    // Reset form
+                    setFile(null);
+                    setSteps("");
+                    if (onSubmitted) onSubmitted();
+                    setStatus("Saved offline. Will sync automatically.");
+                    setSubmitting(false);
+                    return; // Exit early, don't try API
+                } catch (err) {
+                    const msg = err instanceof Error ? err.message : "Failed to save offline";
+                    setError(msg);
+                    setSubmitting(false);
+                    return;
+                }
+            }
+
+            if (fileToUpload) {
                 const signed = await apiRequest<SignUploadResponse>("proofs/sign-upload", {
                     method: "POST",
                     body: JSON.stringify({ content_type: fileToUpload.type }),
@@ -711,10 +774,20 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                 <button
                     type="submit"
                     disabled={submitting || !!pendingVerification}
-                    className="w-full rounded-md bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-60"
+                    className={`w-full rounded-md px-4 py-2 text-sm font-semibold text-slate-950 transition disabled:cursor-not-allowed disabled:opacity-60 ${isOffline
+                        ? "bg-amber-500 hover:bg-amber-400"
+                        : "bg-sky-500 hover:bg-sky-400"
+                        }`}
                     data-tour="submit-button"
                 >
-                    {submitting ? "Submitting..." : pendingVerification ? "Verifying..." : "Submit Steps"}
+                    {submitting ? "Submitting..." : pendingVerification ? "Verifying..." : isOffline ? (
+                        <span className="flex items-center justify-center gap-2">
+                            <WifiOff className="h-4 w-4" />
+                            Save Offline
+                        </span>
+                    ) : (
+                        "Submit Steps"
+                    )}
                 </button>
             </form>
         </>

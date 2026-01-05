@@ -113,6 +113,7 @@
 - [x] User nicknames
 - [x] **Global Step Submissions** (League-agnostic steps)
 - [x] Onboarding flow for new users
+- [x] **PWA & Offline Support** (Offline submission queue, auto-sync, installable)
 
 ---
 

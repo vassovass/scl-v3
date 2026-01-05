@@ -10,6 +10,7 @@ import { MobileMenu } from "./MobileMenu";
 import { ModeToggle } from "@/components/mode-toggle";
 import { MenuItem, UserRole, MENUS, MenuLocation, detectMenuLocation, MENU_LOCATIONS } from "@/lib/menuConfig";
 import { APP_CONFIG } from "@/lib/config";
+import { OfflineIndicator } from "@/components/ui/OfflineIndicator";
 
 interface NavHeaderProps {
     /** Override auto-detected menu location */
@@ -181,6 +182,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                 {/* Desktop Navigation */}
                 {session && (
                     <div className="hidden md:flex items-center gap-1">
+                        <OfflineIndicator />
                         {/* Dashboard Link */}
                         <Link
                             href="/dashboard"

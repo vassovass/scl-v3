@@ -29,7 +29,7 @@ export default function RootLayout({
         {/* GTM: Consent defaults + script (must be in head) */}
         <GoogleTagManager />
       </head>
-      <body className="min-h-screen bg-slate-950 text-slate-50 antialiased">
+      <body className="min-h-screen bg-background text-foreground antialiased">
         {/* GTM noscript fallback (immediately after body open) */}
         <GoogleTagManagerNoscript />
 

@@ -9,7 +9,30 @@ All notable changes to StepLeague v3.
 
 ## [2026-01-05]
 
+### Fixed
+
+- **Theme Toggle Config** - Fixed light/dark mode toggle not working
+  - Updated `tailwind.config.ts` to use `selector` strategy with `data-theme` attribute (required for `next-themes` integration)
+  - Updated `layout.tsx` to use theme-aware variables (`bg-background text-foreground`) instead of hardcoded dark colors
+  - Ensures `dark:` variants and theme switching works correctly
+
+---
+
+## [2026-01-05]
+
 ### Added
+
+- **PRD 22: PWA & Offline Support** - Robust offline submission queue
+  - **Offline Storage** (`src/lib/offline/`) - IndexedDB wrapper using `idb` library
+    - Secure storage of steps, dates, and proof images (blobs)
+    - **Security**: Queue limit (10 items), auto-cleanup (7 days), cleared on logout
+  - **Hooks** (`src/hooks/`)
+    - `useOfflineQueue`: Manages local queue state and storage limits
+    - `useOfflineSync`: Automatic background sync when connection restored (with retries)
+  - **UI Components**
+    - `OfflineIndicator` (`src/components/ui/OfflineIndicator.tsx`): Status badge in NavHeader
+    - `SubmissionForm`: Detects offline status, changes button to "Save Offline" (amber), queues submission
+  - **Infrastructure**: No auth tokens stored locally; secure origin-locked IndexedDB
 
 - **PRD 35: Duplicate Submission Conflict Resolution** - Smart handling of duplicate step entries
   - **ConflictResolutionDialog** (`src/components/forms/ConflictResolutionDialog.tsx`) - Side-by-side comparison modal

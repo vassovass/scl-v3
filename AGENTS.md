@@ -220,6 +220,27 @@ export default function Page() {
 
 ---
 
+### 6. Offline First & PWA
+
+**StepLeague is an Offline-First Application.**
+Users often track steps in gyms or areas with poor signal.
+
+1.  **Submission Queue**: All critical user actions (like submitting steps) MUST support offline queuing.
+    - Use `useOfflineQueue` hook.
+    - Store in IndexedDB (via `src/lib/offline`).
+    - Auto-sync via `useOfflineSync` when online.
+2.  **UI Feedback**:
+    - Show "Offline" badge/indicator (`OfflineIndicator.tsx`).
+    - Change button text to "Save Offline" (amber/yellow) when offline.
+    - NEVER block the user from "submitting" just because they are offline.
+3.  **Storage Security**:
+    - **NO Auth Tokens** in IndexedDB/localStorage.
+    - Queue limit: Max 10 items.
+    - Auto-cleanup: Items >7 days.
+    - Clear offline data on logout.
+
+---
+
 ## Project Structure
 
 ```
