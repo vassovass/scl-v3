@@ -403,6 +403,21 @@ Joyride tour styling uses CSS variables for theme-aware colors:
 
 Both dark and light theme values are defined in `globals.css`.
 
+### When to Use shadcn vs Existing Components
+
+> **Decision Record (PRD 21 Part C)**: We intentionally kept the existing `MenuRenderer` system rather than migrating to shadcn `DropdownMenu`. The current system is modular, accessible, and role-aware.
+
+| Use Case | Use This |
+|----------|----------|
+| Toast notifications | `toast()` from `@/hooks/use-toast` |
+| Confirmation prompts | `ConfirmDialog` component |
+| Navigation dropdowns | Keep existing `MenuRenderer` system |
+| Modal dialogs | `Dialog` from shadcn |
+| Form inputs (new forms) | shadcn form components |
+| Theme toggle | `ModeToggle` component |
+
+**Rule**: Only migrate existing components to shadcn if you're already modifying them for other reasons and the migration provides clear benefit.
+
 ---
 
 ## Common Issues & Fixes

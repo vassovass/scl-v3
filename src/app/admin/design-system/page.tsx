@@ -858,12 +858,109 @@ export default function DesignSystemPage() {
                     </div>
                 </section>
 
+                {/* shadcn/ui Components Section */}
+                <section className="mb-16">
+                    <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
+                        shadcn/ui Components
+                    </h2>
+
+                    <div className="glass-card p-6">
+                        <p className="text-sm text-slate-400 mb-6">
+                            Production-ready, accessible components from shadcn/ui. All components in <code className="text-sky-400">src/components/ui/</code>.
+                        </p>
+
+                        {/* Toast Notifications */}
+                        <div className="mb-6">
+                            <h3 className="text-sm font-medium text-slate-300 mb-3">Toast Notifications</h3>
+                            <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <p className="text-xs text-slate-400 mb-3">Replace all <code className="text-rose-400">alert()</code> calls with <code className="text-sky-400">toast()</code>:</p>
+                                <pre className="text-xs text-slate-400 bg-slate-900 p-3 rounded-lg overflow-x-auto">
+                                    {`import { toast } from "@/hooks/use-toast";
+
+// Success
+toast({ title: "Saved!", description: "Changes applied." });
+
+// Warning
+toast({ title: "Warning", description: "Check input", variant: "destructive" });`}
+                                </pre>
+                            </div>
+                        </div>
+
+                        {/* Confirmation Dialog */}
+                        <div className="mb-6">
+                            <h3 className="text-sm font-medium text-slate-300 mb-3">Confirmation Dialogs</h3>
+                            <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <p className="text-xs text-slate-400 mb-3">Replace <code className="text-rose-400">confirm()</code> with <code className="text-sky-400">ConfirmDialog</code>:</p>
+                                <pre className="text-xs text-slate-400 bg-slate-900 p-3 rounded-lg overflow-x-auto">
+                                    {`import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+
+<ConfirmDialog
+  open={showDelete}
+  onOpenChange={setShowDelete}
+  title="Delete Item?"
+  description="This cannot be undone."
+  variant="destructive"
+  onConfirm={handleDelete}
+  isLoading={isDeleting}
+/>`}
+                                </pre>
+                            </div>
+                        </div>
+
+                        {/* Form Components */}
+                        <div className="mb-6">
+                            <h3 className="text-sm font-medium text-slate-300 mb-3">Form Components</h3>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                    <code className="text-sky-400">input.tsx</code>
+                                    <p className="text-xs text-slate-500 mt-1">Text input field</p>
+                                </div>
+                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                    <code className="text-sky-400">select.tsx</code>
+                                    <p className="text-xs text-slate-500 mt-1">Dropdown select</p>
+                                </div>
+                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                    <code className="text-sky-400">checkbox.tsx</code>
+                                    <p className="text-xs text-slate-500 mt-1">Checkbox input</p>
+                                </div>
+                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                    <code className="text-sky-400">label.tsx</code>
+                                    <p className="text-xs text-slate-500 mt-1">Form labels</p>
+                                </div>
+                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                    <code className="text-sky-400">textarea.tsx</code>
+                                    <p className="text-xs text-slate-500 mt-1">Multi-line text</p>
+                                </div>
+                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                    <code className="text-sky-400">tooltip.tsx</code>
+                                    <p className="text-xs text-slate-500 mt-1">Hover tooltips</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Other Components */}
+                        <div>
+                            <h3 className="text-sm font-medium text-slate-300 mb-3">Other Components</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                    <code className="text-sky-400">dialog.tsx</code>
+                                    <p className="text-xs text-slate-500 mt-1">Modal dialogs (used by ExpandableCardModal)</p>
+                                </div>
+                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                    <code className="text-sky-400">dropdown-menu.tsx</code>
+                                    <p className="text-xs text-slate-500 mt-1">Dropdown menus (used by ModeToggle)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 {/* Theme Support Note */}
                 <section className="glass-card p-6 border-l-4 border-sky-500 mb-16">
                     <h3 className="text-lg font-semibold text-sky-400 mb-2">🌓 Theme Support</h3>
                     <p className="text-sm text-slate-400 mb-3">
-                        All components are built with CSS variables for light/dark mode compatibility.
-                        Currently dark mode is active. Light mode is ready to enable by adding <code className="text-sky-400">data-theme=&quot;light&quot;</code> to the HTML element.
+                        All components use CSS variables for light/dark mode. Use the <strong>theme toggle</strong> in the navigation header to switch between Light, Dark, and System modes.
                     </p>
                     <div className="text-xs text-slate-500">
                         <strong>When adding new components:</strong> Always use CSS variables from <code className="text-sky-400">globals.css</code> instead of hardcoded Tailwind colors.
