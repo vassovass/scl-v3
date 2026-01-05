@@ -143,19 +143,19 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
     });
 
     return (
-        <div className="min-h-screen bg-[rgb(var(--bg-base))]">
+        <div className="min-h-screen bg-background">
             {/* Header */}
-            <div className="border-b border-[rgb(var(--border-subtle))] bg-[rgb(var(--bg-elevated))]/50">
+            <div className="border-b border-border bg-card/50">
                 <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
                     <div>
                         <div className="flex items-center gap-3">
-                            <h1 className="text-xl font-bold text-slate-100">🗺️ Product Roadmap</h1>
-                            <span className="text-xs font-medium text-slate-500 bg-slate-800/50 px-2 py-1 rounded-full border border-slate-700/50">
+                            <h1 className="text-xl font-bold text-foreground">🗺️ Product Roadmap</h1>
+                            <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-full border border-border">
                                 {filteredItems.length} features
                             </span>
                         </div>
-                        <p className="text-sm text-slate-400">
-                            See what we're building. {!isLoggedIn && <a href="/sign-in?redirect=/roadmap" className="text-sky-400 hover:underline">Sign in</a>} to vote on features.
+                        <p className="text-sm text-muted-foreground">
+                            See what we're building. {!isLoggedIn && <a href="/sign-in?redirect=/roadmap" className="text-primary hover:underline">Sign in</a>} to vote on features.
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -165,7 +165,7 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                         <button
                             onClick={() => exportCSV(items)}
                             disabled={isExportingCSV}
-                            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg border border-slate-600 transition-colors disabled:opacity-50"
+                            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-lg border border-border transition-colors disabled:opacity-50"
                             title="Export roadmap to CSV"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -176,7 +176,7 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                         {isSuperAdmin && (
                             <a
                                 href="/admin/kanban"
-                                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-sky-600 hover:bg-sky-500 text-white rounded-lg transition-colors"
+                                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors"
                             >
                                 ✏️ Edit Roadmap
                             </a>
@@ -186,7 +186,7 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
             </div>
 
             {/* Filter bar */}
-            <div className="border-b border-slate-800 bg-slate-900/30">
+            <div className="border-b border-border bg-muted/30">
                 <div className="max-w-7xl mx-auto px-4 py-2">
                     <UniversalFilters
                         config={FILTER_PRESETS.publicRoadmap}
@@ -204,16 +204,16 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                         return (
                             <div
                                 key={column.id}
-                                className={`w-72 flex-shrink-0 roadmap-column bg-[rgb(var(--bg-elevated))]/30 rounded-lg border border-[rgb(var(--border-subtle))] ${COLUMN_STYLES[column.id]}`}
+                                className={`w-72 flex-shrink-0 roadmap-column bg-card/30 rounded-lg border border-border ${COLUMN_STYLES[column.id]}`}
                                 role="region"
                                 aria-label={`${column.label} column`}
                             >
                                 {/* Column Header */}
-                                <div className="p-3 border-b border-slate-800/50 sticky top-0 bg-[rgb(var(--bg-base))]/95 backdrop-blur z-10">
+                                <div className="p-3 border-b border-border sticky top-0 bg-background/95 backdrop-blur z-10">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            <h2 className="font-semibold text-[rgb(var(--text-primary))] text-sm">{column.label}</h2>
-                                            <span className="text-xs text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded">
+                                            <h2 className="font-semibold text-foreground text-sm">{column.label}</h2>
+                                            <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
                                                 {columnItems.length}
                                             </span>
                                         </div>
@@ -222,7 +222,7 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                                             <CompletionMiniChart completedItems={columnItems.map(i => ({ completed_at: i.completed_at }))} />
                                         )}
                                     </div>
-                                    <p className="text-[10px] text-slate-500 mt-0.5">{column.description}</p>
+                                    <p className="text-[10px] text-muted-foreground mt-0.5">{column.description}</p>
                                 </div>
 
                                 {/* Cards */}
@@ -233,8 +233,8 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                                             role="article"
                                             tabIndex={0}
                                             className={`rounded-md border transition-colors cursor-pointer roadmap-card ${item.is_agent_working
-                                                ? "bg-sky-900/40 border-sky-500/50 hover:border-sky-400 ring-1 ring-sky-500/30"
-                                                : "bg-[rgb(var(--bg-card))] border-[rgb(var(--border-subtle))] hover:border-slate-500"
+                                                ? "bg-primary/20 border-primary/50 hover:border-primary ring-1 ring-primary/30"
+                                                : "bg-card border-border hover:border-foreground/50"
                                                 }`}
                                             onClick={() => setExpandedCard(expandedCard === item.id ? null : item.id)}
                                             onKeyDown={(e) => {
@@ -247,7 +247,7 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                                             <div className="p-2.5">
                                                 {/* Status badge */}
                                                 {item.is_agent_working && (
-                                                    <span className="inline-flex items-center gap-1 text-[9px] uppercase font-medium text-sky-400 bg-sky-500/20 px-1.5 py-0.5 rounded mb-1">
+                                                    <span className="inline-flex items-center gap-1 text-[9px] uppercase font-medium text-primary bg-primary/20 px-1.5 py-0.5 rounded mb-1">
                                                         <span className="animate-pulse">●</span> Building Now
                                                     </span>
                                                 )}
@@ -264,14 +264,14 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                                                 </span>
 
                                                 {/* Title */}
-                                                <h3 className="text-sm text-slate-200 font-medium mt-0.5 line-clamp-2">
+                                                <h3 className="text-sm text-foreground font-medium mt-0.5 line-clamp-2">
                                                     {item.subject}
                                                 </h3>
 
                                                 {/* Expanded content */}
                                                 {expandedCard === item.id && (
-                                                    <div className="mt-2 pt-2 border-t border-slate-700/50">
-                                                        <p className="text-xs text-slate-400 mb-2">{item.description}</p>
+                                                    <div className="mt-2 pt-2 border-t border-border">
+                                                        <p className="text-xs text-muted-foreground mb-2">{item.description}</p>
 
                                                         {/* Vote buttons */}
                                                         {column.id !== "done" && (
@@ -285,8 +285,8 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                                                                             handleVote(item.id, p);
                                                                         }}
                                                                         className={`w-6 h-6 text-[10px] rounded transition-colors ${item.user_vote === p
-                                                                            ? "bg-sky-500 text-white"
-                                                                            : "bg-slate-700 text-slate-400 hover:bg-slate-600"
+                                                                            ? "bg-primary text-primary-foreground"
+                                                                            : "bg-secondary text-muted-foreground hover:bg-secondary/80"
                                                                             }`}
                                                                     >
                                                                         {p}
@@ -298,7 +298,7 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                                                 )}
 
                                                 {/* Footer */}
-                                                <div className="flex items-center justify-between mt-2 text-[10px] text-slate-500">
+                                                <div className="flex items-center justify-between mt-2 text-[10px] text-muted-foreground">
                                                     <div className="flex items-center gap-2">
                                                         {item.vote_count > 0 && (
                                                             <span title="Average priority">

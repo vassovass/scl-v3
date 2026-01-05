@@ -156,8 +156,8 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                 <Link href="/dashboard" className="group flex items-center gap-2">
                     <span className="text-xl">👟</span>
                     <span className="text-lg font-bold">
-                        <span className="text-slate-50 transition-colors group-hover:text-sky-400">Step</span>
-                        <span className="text-sky-500 transition-colors group-hover:text-slate-50">League</span>
+                        <span className="text-foreground transition-colors group-hover:text-primary">Step</span>
+                        <span className="text-sky-500 transition-colors group-hover:text-foreground">League</span>
                     </span>
                 </Link>
 
@@ -165,7 +165,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                 {(session || isPublicLocation) && (
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        className="md:hidden p-2 rounded-lg text-slate-400 hover:bg-slate-800/50 transition-colors"
+                        className="md:hidden p-2 rounded-lg text-muted-foreground hover:bg-muted transition-colors"
                         aria-label="Toggle menu"
                     >
                         {mobileMenuOpen ? (

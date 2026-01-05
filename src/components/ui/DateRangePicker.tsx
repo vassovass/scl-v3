@@ -6,69 +6,67 @@ import { DayPicker, DateRange } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 
 // Custom style overrides using our semantic variables
-// We map the react-day-picker Custom Properties to our global variables
-const css = `
-  .rdp {
-    --rdp-cell-size: 40px;
-    --rdp-accent-color: rgb(var(--date-picker-accent));
-    --rdp-background-color: rgb(var(--date-picker-bg));
-    --rdp-accent-color-dark: rgb(var(--date-picker-accent));
-    --rdp-background-color-dark: rgb(var(--date-picker-bg));
-    --rdp-outline: 2px solid rgb(var(--date-picker-accent));
-    --rdp-outline-selected: 2px solid rgb(var(--date-picker-border));
-    margin: 0;
-  }
-  .rdp-day {
-    color: rgb(var(--date-picker-text)) !important;
-    font-weight: 500;
-  }
-  .rdp-day_outside {
-    color: rgb(var(--muted-foreground)) !important;
-    opacity: 0.5;
-  }
-  .rdp-head_cell {
-    color: rgb(var(--muted-foreground));
-    font-weight: 500;
-    font-size: 0.75rem;
-  }
-  .rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
-    background-color: rgb(var(--accent));
-    border-radius: 6px;
-    color: rgb(var(--accent-foreground));
-  }
-  .rdp-day_selected {
-    background-color: var(--rdp-accent-color) !important;
-    color: rgb(var(--primary-foreground)) !important;
-    font-weight: 600;
-  }
-  .rdp-range_middle {
-    background-color: rgba(var(--date-picker-accent), 0.2) !important;
-    color: rgb(var(--date-picker-text)) !important;
-    border-radius: 0;
-  }
-  .rdp-day_range_start {
-    border-radius: 6px 0 0 6px !important;
-  }
-  .rdp-day_range_end {
-    border-radius: 0 6px 6px 0 !important;
-  }
-  .rdp-caption_label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: rgb(var(--date-picker-text));
-  }
-  .rdp-nav_button {
-    color: rgb(var(--muted-foreground));
-  }
-  .rdp-nav_button:hover {
-    color: rgb(var(--date-picker-text));
-    background-color: rgb(var(--accent));
-  }
-  .rdp-day_today:not(.rdp-day_selected) {
-    border: 1px solid rgb(var(--date-picker-accent));
-    border-radius: 6px;
-  }
-`;
+// Inject custom variables for react-day-picker that map to our global theme
+const style = {
+  "--rdp-accent-color": "hsl(var(--date-picker-accent))",
+  "--rdp-background-color": "hsl(var(--date-picker-bg))",
+  "--rdp-accent-color-dark": "hsl(var(--date-picker-accent))",
+  "--rdp-background-color-dark": "hsl(var(--date-picker-bg))",
+  "--rdp-outline": "2px solid hsl(var(--date-picker-accent))",
+  "--rdp-outline-selected": "2px solid hsl(var(--date-picker-border))",
+} as React.CSSProperties;
+
+// We use a style tag to override internal day-picker classes that don't use variables
+const customStyles = `
+    .rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
+        color: hsl(var(--date-picker-text)) !important;
+        background-color: hsl(var(--accent));
+    }
+    .rdp-nav_button {
+        color: hsl(var(--muted-foreground)) !important;
+    }
+    .rdp-caption_label {
+        color: hsl(var(--date-picker-text));
+        font-weight: 600;
+    }
+    .rdp-head_cell {
+        color: hsl(var(--muted-foreground));
+    }
+    .rdp-day_selected, .rdp-day_selected:focus-visible, .rdp-day_selected:hover {
+        background-color: hsl(var(--date-picker-accent));
+        opacity: 1;
+        color: hsl(var(--primary-foreground)) !important;
+    }
+    .rdp-day_today {
+        font-weight: bold;
+        color: hsl(var(--date-picker-text)) !important;
+    }
+    .rdp-day_today:not(.rdp-day_selected) {
+        background-color: transparent;
+        border: 1px solid hsl(var(--date-picker-accent));
+    }
+    .rdp-day_disabled {
+        opacity: 0.5;
+    }
+    .rdp-day_range_middle {
+        background-color: hsl(var(--accent));
+        color: hsl(var(--date-picker-text));
+    }
+    .rdp-day_range_start, .rdp-day_range_end {
+        color: hsl(var(--primary-foreground)) !important;
+    }
+    .rdp-day {
+        color: hsl(var(--date-picker-text));
+    }
+    .rdp-day:hover:not(.rdp-day_selected):not(.rdp-day_range_middle) {
+        color: hsl(var(--date-picker-text));
+        background-color: hsl(var(--accent));
+        cursor: pointer;
+    }
+    .rdp-button {
+        border: 1px solid hsl(var(--date-picker-accent));
+    }
+  `;
 
 interface DateRangePickerProps {
   date: DateRange | undefined;

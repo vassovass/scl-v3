@@ -127,16 +127,17 @@
 }
 
 /* === LIGHT THEME === */
+/* === LIGHT THEME === */
 [data-theme="light"] {
-  /* Page Backgrounds - Pure White for "Strava/Apple" look */
-  --background: 0 0% 100%;
-  /* white #ffffff */
+  /* Page Backgrounds - Soft Off-White for Depth */
+  --background: 210 40% 98%;
+  /* slate-50 #f8fafc */
   --foreground: 222.2 84% 4.9%;
-  /* slate-950 #020617 (High contrast) */
-  --bg-base: 0 0% 100%;
-  /* white */
+  /* slate-950 #020617 */
+  --bg-base: 210 40% 98%;
+  /* slate-50 */
 
-  /* Surface / Cards */
+  /* Surface / Cards - Pure White for Contrast against Slate-50 */
   --card: 0 0% 100%;
   /* white */
   --card-foreground: 222.2 84% 4.9%;

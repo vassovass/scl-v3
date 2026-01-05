@@ -61,8 +61,8 @@ export default function CompletionMiniChart({ completedItems, weeks = 12 }: Comp
                     <div
                         key={i}
                         className={`flex-1 rounded-t-sm transition-all duration-300 ${count > 0
-                                ? 'bg-[rgb(var(--success))]'
-                                : 'bg-[rgb(var(--border-default))] opacity-30'
+                            ? 'bg-emerald-500'
+                            : 'bg-border opacity-30'
                             }`}
                         style={{ height: `${heightPct}%` }}
                     />

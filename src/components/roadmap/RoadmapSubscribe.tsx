@@ -35,7 +35,7 @@ export default function RoadmapSubscribe() {
         <div className="relative">
             <button
                 onClick={() => setShowOptions(!showOptions)}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[rgb(var(--bg-elevated))] hover:bg-[rgb(var(--bg-card-hover))] text-[rgb(var(--text-primary))] rounded-lg border border-[rgb(var(--border-subtle))] transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-card hover:bg-muted/50 text-foreground rounded-lg border border-border transition-colors"
                 aria-haspopup="true"
                 aria-expanded={showOptions}
             >
@@ -49,42 +49,42 @@ export default function RoadmapSubscribe() {
                         className="fixed inset-0 z-10"
                         onClick={() => setShowOptions(false)}
                     />
-                    <div className="absolute right-0 top-full mt-2 w-64 bg-[rgb(var(--bg-card))] border border-[rgb(var(--border-subtle))] rounded-xl shadow-lg z-20 overflow-hidden animate-fade-in">
-                        <div className="p-3 border-b border-[rgb(var(--border-subtle))] bg-[rgb(var(--bg-elevated))]/50">
-                            <h3 className="text-xs font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider">
+                    <div className="absolute right-0 top-full mt-2 w-64 bg-card border border-border rounded-xl shadow-lg z-20 overflow-hidden animate-fade-in">
+                        <div className="p-3 border-b border-border bg-muted/50">
+                            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                 Stay Updated
                             </h3>
                         </div>
 
-                        <div className="p-2 space-y-1">
+                        <div className="p-2 space-y-1 bg-card">
                             {/* Email Option */}
                             <a
                                 href="/sign-in?redirect=/roadmap"
-                                className="flex items-center gap-3 w-full p-2 text-sm text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--bg-elevated))] rounded-lg transition-colors text-left"
+                                className="flex items-center gap-3 w-full p-2 text-sm text-foreground hover:bg-muted rounded-lg transition-colors text-left"
                             >
                                 <span className="text-lg">📧</span>
                                 <div>
                                     <div className="font-medium">Via Email</div>
-                                    <div className="text-xs text-[rgb(var(--text-secondary))]">Get notified of major releases</div>
+                                    <div className="text-xs text-muted-foreground">Get notified of major releases</div>
                                 </div>
                             </a>
 
                             {/* RSS Option */}
                             <button
                                 onClick={handleCopyRss}
-                                className="flex items-center gap-3 w-full p-2 text-sm text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--bg-elevated))] rounded-lg transition-colors text-left group"
+                                className="flex items-center gap-3 w-full p-2 text-sm text-foreground hover:bg-muted rounded-lg transition-colors text-left group"
                             >
                                 <span className="text-lg">📡</span>
                                 <div className="flex-1 min-w-0">
                                     <div className="font-medium flex items-center justify-between">
                                         <span>RSS Feed</span>
                                         {copied && (
-                                            <span className="text-[10px] text-[rgb(var(--success))] font-bold bg-[rgb(var(--success))]/10 px-1.5 py-0.5 rounded">
+                                            <span className="text-[10px] text-emerald-500 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded">
                                                 COPIED
                                             </span>
                                         )}
                                     </div>
-                                    <div className="text-xs text-[rgb(var(--text-secondary))] truncate">
+                                    <div className="text-xs text-muted-foreground truncate">
                                         {getRssUrl().replace(/^https?:\/\//, '')}
                                     </div>
                                 </div>
