@@ -267,7 +267,7 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
         setIsUpdating(false);
     };
 
-    const togglePublic = async (itemId: string, currentState: boolean) => {
+    const togglePublic = useCallback(async (itemId: string, currentState: boolean) => {
         setIsUpdating(true);
         try {
             await fetch("/api/admin/kanban", {
@@ -288,9 +288,9 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
             console.error("Failed to toggle public:", error);
         }
         setIsUpdating(false);
-    };
+    }, []);
 
-    const cycleRelease = async (itemId: string, currentRelease: string) => {
+    const cycleRelease = useCallback(async (itemId: string, currentRelease: string) => {
         const currentIndex = RELEASE_OPTIONS.findIndex((r) => r.id === currentRelease);
         const nextIndex = (currentIndex + 1) % RELEASE_OPTIONS.length;
         const nextRelease = RELEASE_OPTIONS[nextIndex].id;
@@ -315,7 +315,7 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
             console.error("Failed to update release:", error);
         }
         setIsUpdating(false);
-    };
+    }, []);
 
     return (
         <div className="relative h-full flex flex-col">

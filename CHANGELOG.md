@@ -33,6 +33,7 @@ All notable changes to StepLeague v3.
     - KanbanBoard: Double-click card opens modal, attachment count badge
     - FeedbackList: Click row opens modal with full details
     - PRD Index updated (18, 19 marked complete; 20 in progress)
+  - **Performance**: Optimized Kanban board interactions (fixed INP issue) by memoizing card handlers.
 
 ---
 
