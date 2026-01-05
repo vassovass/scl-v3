@@ -39,30 +39,29 @@ export function InstallPrompt({ className }: InstallPromptProps = {}) {
         return (
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                    <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className={`gap-2 ${className}`}>
-                            <Download className="h-4 w-4" />
-                            Install App
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Install StepLeague</DialogTitle>
-                            <DialogDescription>
-                                Install the app on your iPhone for the best experience.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="flex flex-col gap-4 text-sm mt-2">
-                            <div className="flex items-center gap-3">
-                                <Share className="h-5 w-5 text-sky-500" />
-                                <p>1. Tap the <strong>Share</strong> button in the menu bar.</p>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <PlusSquare className="h-5 w-5 text-sky-500" />
-                                <p>2. Scroll down and tap <strong>Add to Home Screen</strong>.</p>
-                            </div>
+                    <Button variant="outline" size="sm" className={`gap-2 ${className}`}>
+                        <Download className="h-4 w-4" />
+                        Install App
+                    </Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Install StepLeague</DialogTitle>
+                        <DialogDescription>
+                            Install the app on your iPhone for the best experience.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex flex-col gap-4 text-sm mt-2">
+                        <div className="flex items-center gap-3">
+                            <Share className="h-5 w-5 text-sky-500" />
+                            <p>1. Tap the <strong>Share</strong> button in the menu bar.</p>
                         </div>
-                    </DialogContent>
+                        <div className="flex items-center gap-3">
+                            <PlusSquare className="h-5 w-5 text-sky-500" />
+                            <p>2. Scroll down and tap <strong>Add to Home Screen</strong>.</p>
+                        </div>
+                    </div>
+                </DialogContent>
             </Dialog>
         );
     }
