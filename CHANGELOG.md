@@ -34,6 +34,7 @@ All notable changes to StepLeague v3.
     - FeedbackList: Click row opens modal with full details
     - PRD Index updated (18, 19 marked complete; 20 in progress)
   - **Performance**: Optimized Kanban board interactions (fixed INP issue) by memoizing card handlers.
+  - **UX**: Replaced jarring full-page reloads with seamless `router.refresh()` for Kanban bulk actions.
 
 ---
 

@@ -117,7 +117,7 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
             body: JSON.stringify({ ids, updates: { board_status: status } }),
         });
         clearSelection();
-        window.location.reload();
+        router.refresh();
     };
 
     const handleBulkArchive = async () => {
@@ -128,7 +128,7 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
             body: JSON.stringify({ ids }),
         });
         clearSelection();
-        window.location.reload();
+        router.refresh();
     };
 
     const handleBulkTogglePublic = async (isPublic: boolean) => {
@@ -139,7 +139,7 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
             body: JSON.stringify({ ids, updates: { is_public: isPublic } }),
         });
         clearSelection();
-        window.location.reload();
+        router.refresh();
     };
 
     // Handle filter changes from UniversalFilters
@@ -262,7 +262,7 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
         } catch (error) {
             console.error("Failed to update:", error);
             // Revert on error
-            window.location.reload();
+            router.refresh();
         }
         setIsUpdating(false);
     };
@@ -456,7 +456,7 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                 onClose={() => setShowMergeModal(false)}
                 onSuccess={() => {
                     clearSelection();
-                    window.location.reload();
+                    router.refresh();
                 }}
                 items={initialItems.filter(i => selectedIds.has(i.id))}
             />
