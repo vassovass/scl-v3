@@ -147,8 +147,8 @@ export function DateRangePicker({ date, onSelect, className = "" }: DateRangePic
   };
 
   return (
-    <div className={`relative ${className}`} ref={containerRef}>
-      <style>{css}</style>
+    <div className={`relative ${className}`} ref={containerRef} style={style}>
+      <style>{customStyles}</style>
 
       <div className="flex items-center gap-2">
         <button

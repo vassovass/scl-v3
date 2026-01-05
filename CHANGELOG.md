@@ -16,6 +16,19 @@ All notable changes to StepLeague v3.
   - Updated `layout.tsx` to use theme-aware variables (`bg-background text-foreground`) instead of hardcoded dark colors
   - Ensures `dark:` variants and theme switching works correctly
 
+### Fixed - Emergency UI Repair
+- **Light Mode Palette** - Softened from Stark White to Slate-50
+  - Updated `globals.css` to use `hsl(210 40% 98%)` for background to reduce glare
+  - Kept Cards as Pure White `hsl(0 0% 100%)` for proper depth and contrast
+- **Component Styling** - Fixed "Invisible/Broken" UI in Light Mode
+  - **RoadmapView**: Replaced legacy `bg-[rgb(var(--bg-base))]` with `bg-background`
+  - **DateRangePicker**: Replaced injected CSS string interpolation with valid HSL values
+  - **NavHeader/Footer**: Fixed Logo hover state to be visible in both Light (Black) and Dark (White) modes
+  - **Universal**: Removed all instances of hardcoded `slate-950` backgrounds in favor of `bg-card` or `bg-background`
+- **Build Fix** - Fixed `DateRangePicker` variable mismatch
+  - Resolved `Cannot find name 'css'` type error by updating variable reference to `customStyles`
+  - Applied missing `style` prop to container for component-specific variables
+
 ---
 
 ## [2026-01-05]
