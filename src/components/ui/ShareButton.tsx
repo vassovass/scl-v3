@@ -24,7 +24,7 @@ interface ShareButtonProps {
 
 /**
  * Social share button with Web Share API and fallbacks.
- * Supports WhatsApp, Twitter/X, and copy-to-clipboard.
+ * Supports WhatsApp, X, and copy-to-clipboard.
  */
 export function ShareButton({
     message,
@@ -68,11 +68,11 @@ export function ShareButton({
                         WhatsApp
                     </button>
                     <button
-                        onClick={() => handleShareClick("twitter")}
+                        onClick={() => handleShareClick("x")}
                         className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800"
                     >
-                        <span className="text-lg">🐦</span>
-                        Twitter / X
+                        <span className="text-lg font-bold">𝕏</span>
+                        X
                     </button>
                     <button
                         onClick={() => handleShareClick("copy")}

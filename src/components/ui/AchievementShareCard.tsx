@@ -139,8 +139,8 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
         share({ text: shareMessage, url: shareUrl }, "whatsapp");
     }, [shareMessage, shareUrl, share]);
 
-    const shareToTwitter = useCallback(() => {
-        share({ text: shareMessage, url: shareUrl }, "twitter");
+    const shareToX = useCallback(() => {
+        share({ text: shareMessage, url: shareUrl }, "x");
     }, [shareMessage, shareUrl, share]);
 
     const copyLink = useCallback(() => {
@@ -199,11 +199,11 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
                             WhatsApp
                         </button>
                         <button
-                            onClick={shareToTwitter}
+                            onClick={shareToX}
                             className="flex flex-col items-center gap-1 rounded-xl bg-slate-700 px-3 py-2 text-xs font-medium text-white hover:bg-slate-600 transition"
                         >
-                            <span className="text-lg">🐦</span>
-                            Twitter
+                            <span className="text-lg font-bold">𝕏</span>
+                            X
                         </button>
                         <button
                             onClick={copyLink}

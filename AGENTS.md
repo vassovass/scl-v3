@@ -280,7 +280,7 @@ scl-v3/
 - ✅ Analytics dashboard (calendar heatmap, daily breakdown with 3/5/7-day grouping)
 - ✅ User nicknames and profile settings
 - ✅ Global feedback system (floating 💬 widget with screenshot)
-- ✅ Social sharing (Web Share API + WhatsApp/Twitter)
+- ✅ Social sharing (Web Share API + WhatsApp/X)
 - ✅ **Modular menu system** (role-based, unlimited nesting, feedback integration)
 - ✅ Mobile-responsive navigation (hamburger menu, accordion submenus)
 - ✅ Guided onboarding system (Joyride)

@@ -37,7 +37,7 @@ export function LeagueInviteControl({ inviteCode, leagueName, className = "" }: 
 
     const inviteText = `Join me in ${leagueName} on ${APP_CONFIG.name}!`;
 
-    const handleShare = (platform: "native" | "whatsapp" | "twitter" | "copy") => {
+    const handleShare = (platform: "native" | "whatsapp" | "x" | "copy") => {
         share({
             title: `Join ${leagueName}`,
             text: inviteText,
@@ -89,11 +89,11 @@ export function LeagueInviteControl({ inviteCode, leagueName, className = "" }: 
                     </button>
 
                     <button
-                        onClick={() => handleShare("twitter")}
-                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-slate-200 hover:bg-sky-900/30 hover:text-sky-400 transition"
+                        onClick={() => handleShare("x")}
+                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-900/30 hover:text-white transition"
                     >
-                        <span className="text-lg">🐦</span>
-                        Twitter
+                        <span className="text-lg font-bold">𝕏</span>
+                        X
                     </button>
 
                     {supportsNativeShare && (

@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { APP_CONFIG } from "@/lib/config";
 import { analytics } from "@/lib/analytics";
 
-export type SharePlatform = "native" | "whatsapp" | "twitter" | "copy";
+export type SharePlatform = "native" | "whatsapp" | "x" | "copy";
 
 
 interface UseShareOptions {
@@ -60,9 +60,10 @@ export function useShare(options: UseShareOptions = {}) {
                     window.open(waUrl, "_blank", "noopener,noreferrer");
                     break;
 
-                case "twitter":
-                    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(data.text)}&url=${encodeURIComponent(url)}`;
-                    window.open(twitterUrl, "_blank", "noopener,noreferrer");
+                case "x":
+                    // Note: twitter.com/intent/tweet URL is still used for X sharing (backward compatible)
+                    const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(data.text)}&url=${encodeURIComponent(url)}`;
+                    window.open(xUrl, "_blank", "noopener,noreferrer");
                     break;
 
                 case "copy":

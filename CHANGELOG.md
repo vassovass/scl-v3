@@ -9,6 +9,20 @@ All notable changes to StepLeague v3.
 
 ## [2026-01-05]
 
+### Changed
+
+- **Social Sharing Rebranding** - Updated all Twitter references to X (platform rebrand)
+  - `useShare.ts` - Changed `SharePlatform` type from `"twitter"` to `"x"`
+  - `ShareButton.tsx` - Updated button label and icon (🐦 → 𝕏)
+  - `AchievementShareCard.tsx` - Renamed `shareToTwitter` → `shareToX`, updated UI
+  - `LeagueInviteControl.tsx` - Updated share platform type and button
+  - `AGENTS.md` - Updated Key Features list
+  - Note: API URL remains `twitter.com/intent/tweet` for backward compatibility (recommended by X)
+
+---
+
+## [2026-01-05]
+
 ### Added
 
 - **Global Step Submissions (League-Agnostic)** - Submit steps once, applies to all leagues
@@ -617,7 +631,7 @@ All notable changes to StepLeague v3.
 ### Added
 
 - **Analytics Dashboard** with calendar heatmap and daily breakdown table
-- **ShareButton** component (Web Share API + WhatsApp/Twitter fallback)
+- **ShareButton** component (Web Share API + WhatsApp/X fallback)
 - **Daily breakdown API** with flexible grouping (3-day, 5-day, weekly)
 - **Calendar API** for monthly submission coverage
 - **Mobile hamburger menu** with slide-out drawer
