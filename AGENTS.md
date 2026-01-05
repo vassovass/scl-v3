@@ -405,13 +405,13 @@ Both dark and light theme values are defined in `globals.css`.
 
 ### When to Use shadcn vs Existing Components
 
-> **Decision Record (PRD 21 Part C)**: We intentionally kept the existing `MenuRenderer` system rather than migrating to shadcn `DropdownMenu`. The current system is modular, accessible, and role-aware.
+> **Decision Record (PRD 21 Part C)**: We are migrating the navigation system to shadcn `DropdownMenu` to ensure accessibility, consistent behavior, and eliminate INP blocking issues found in the custom implementation.
 
 | Use Case | Use This |
 |----------|----------|
 | Toast notifications | `toast()` from `@/hooks/use-toast` |
 | Confirmation prompts | `ConfirmDialog` component |
-| Navigation dropdowns | Keep existing `MenuRenderer` system |
+| Navigation dropdowns | shadcn `DropdownMenu` (via new renderer) |
 | Modal dialogs | `Dialog` from shadcn |
 | Form inputs (new forms) | shadcn form components |
 | Theme toggle | `ModeToggle` component |

@@ -187,30 +187,8 @@ export default function SubmitPage() {
 
             {/* Main */}
             <main className="mx-auto max-w-3xl px-6 py-12">
-                {/* League Selector - shown if user has multiple leagues */}
-                {leagues.length > 1 && (
-                    <ModuleFeedback moduleId="submit-league-selector" moduleName="League Selector">
-                        <div className="mb-8 rounded-lg border border-slate-800 bg-slate-900/50 p-4">
-                            <label className="block text-sm font-medium text-slate-400 mb-2">
-                                Submitting steps to:
-                            </label>
-                            <select
-                                value={selectedLeagueId}
-                                onChange={(e) => setSelectedLeagueId(e.target.value)}
-                                className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                            >
-                                {leagues.map((league) => (
-                                    <option key={league.id} value={league.id}>
-                                        {league.name}
-                                    </option>
-                                ))}
-                            </select>
-                            <p className="mt-2 text-xs text-slate-500">
-                                💡 Steps you submit will count toward this league&apos;s leaderboard.
-                            </p>
-                        </div>
-                    </ModuleFeedback>
-                )}
+                {/* League Selector - REMOVED (Global Submission) */}
+                {/* Steps are now applied to all leagues automatically */}
 
                 {/* Submit Steps Section */}
                 <ModuleFeedback moduleId="submission-form" moduleName="Step Submission Form">

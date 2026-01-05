@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { User } from "@supabase/supabase-js";
-import { MenuRenderer } from "./MenuRenderer";
+// import { MenuRenderer } from "./MenuRenderer"; // Removed legacy renderer import
 import { MenuItem, UserRole, MENUS, prepareMenuItems } from "@/lib/menuConfig";
 
 interface MobileMenuProps {

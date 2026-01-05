@@ -1,20 +1,20 @@
-# PRD 19: League Start Date
+# PRD 21: shadcn/ui Integration & Menu Refactor
 
-## Database
-- [ ] Create migration for `counting_start_date` in `leagues` table <!-- id: 0 -->
-
-## Backend
-- [ ] Update `src/types/database.ts` with new column <!-- id: 1 -->
-- [ ] Update `src/app/api/leagues/[id]/route.ts` to handle `counting_start_date` update <!-- id: 2 -->
-- [ ] Update Leaderboard logic to filter by `counting_start_date` <!-- id: 3 -->
-    - [ ] Check `src/app/api/leaderboard/route.ts` or relevant RPC function
-
-## Frontend
-- [ ] Update League Settings UI to include Date Picker for `counting_start_date` <!-- id: 4 -->
-- [ ] Verify Leaderboard view respects the start date <!-- id: 5 -->
+## Key Tasks
+- [x] Initial setup: install shadcn/ui, config, globals.css <!-- id: 0 -->
+- [x] Part A: Toast System (`toast()` + `Toaster`) <!-- id: 1 -->
+- [x] Part B: Confirm Dialog (`ConfirmDialog`) <!-- id: 2 -->
+- [x] Part C: Navigation Refactor (`ShadcnMenuRenderer` + `DropdownMenu`) <!-- id: 3 -->
+    - [x] Create `ShadcnMenuRenderer` component
+    - [x] Update `NavHeader` to use new component
+    - [x] Fix Theme Toggle INP issue
+    - [x] Verify Mobile implementation independence
+- [x] Part D: Form Components (Input, Select, etc.) <!-- id: 4 -->
+- [x] Part E: Theme Toggle (`ModeToggle` + `ThemeProvider`) <!-- id: 5 -->
+- [x] Fixes: Navigation click issue, SVG animation block <!-- id: 6 -->
 
 ## Verification
-- [ ] Verify migration runs successfully <!-- id: 6 -->
-- [ ] Verify setting start date in UI persists <!-- id: 7 -->
-- [ ] Verify steps before start date are excluded from leaderboard <!-- id: 8 -->
-- [ ] Verify steps after start date are included <!-- id: 9 -->
+- [x] Verify Toast notifications work <!-- id: 7 -->
+- [x] Verify Menu Navigation works (click -> navigate) <!-- id: 8 -->
+- [x] Verify Theme switching is performant <!-- id: 9 -->
+- [x] Build check (`npm run build`) <!-- id: 10 -->

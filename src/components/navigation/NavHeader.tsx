@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { createClient } from "@/lib/supabase/client";
-import { MenuRenderer } from "./MenuRenderer";
+import { ShadcnMenuRenderer } from "./ShadcnMenuRenderer";
 import { MobileMenu } from "./MobileMenu";
 import { ModeToggle } from "@/components/mode-toggle";
 import { MenuItem, UserRole, MENUS, MenuLocation, detectMenuLocation, MENU_LOCATIONS } from "@/lib/menuConfig";
@@ -207,7 +207,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                         {/* League Menu */}
                         {currentLeagueId && (
                             <div data-tour="nav-league-menu">
-                                <MenuRenderer
+                                <ShadcnMenuRenderer
                                     menuId="main"
                                     items={MENUS.main.items.find(i => i.id === 'league')?.children}
                                     variant="dropdown"
@@ -225,7 +225,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
 
                         {/* Actions Menu */}
                         <div data-tour="nav-actions-menu">
-                            <MenuRenderer
+                            <ShadcnMenuRenderer
                                 items={MENUS.main.items.find(i => i.id === 'actions')?.children}
                                 variant="dropdown"
                                 userRole={userRole}
@@ -240,7 +240,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                         </div>
 
                         {/* Help Menu (with onboarding tours) */}
-                        <MenuRenderer
+                        <ShadcnMenuRenderer
                             menuId="help"
                             variant="dropdown"
                             userRole={userRole}
@@ -255,7 +255,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
 
                         {/* SuperAdmin Menu */}
                         {isSuperadmin && (
-                            <MenuRenderer
+                            <ShadcnMenuRenderer
                                 menuId="admin"
                                 variant="dropdown"
                                 userRole={userRole}
@@ -276,7 +276,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
 
                         {/* User Menu */}
                         <div className="ml-2" data-tour="nav-user-menu">
-                            <MenuRenderer
+                            <ShadcnMenuRenderer
                                 menuId="user"
                                 variant="dropdown"
                                 userRole={userRole}

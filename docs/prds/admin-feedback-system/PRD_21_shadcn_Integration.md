@@ -90,13 +90,17 @@ grep -r "alert(" src/ --include="*.tsx" --include="*.ts"
 | Delete confirmations | League delete, feedback archive, etc. |
 | Modal standardization | Use Dialog as base for existing modals |
 
-### Part C: Dropdown Migration (Optional)
+### Part C: Dropdown Migration (REQUIRED)
+
+> **Decision Update:** The custom `MenuRenderer` caused navigation and accessibility issues (INP blocking, click handling conflicts). We are now migrating fully to shadcn `DropdownMenu`.
 
 | Task | Description |
 |------|-------------|
-| Audit existing dropdowns | NavHeader, settings, filters |
-| Evaluate migration | Only migrate if accessibility benefits |
-| Preserve behavior | Maintain existing UX patterns |
+| Create `ShadcnMenuRenderer` | New component mapping `menuConfig` to shadcn components |
+| Implement Nested Menus | Use `DropdownMenuSub` for recursive items |
+| Migrate `NavHeader` | Replace old renderer with new one |
+| Verify Accessibility | Ensure keyboard nav and screen readers work |
+| Remove legacy code | Delete old `MenuRenderer` once replaced |
 
 ### Part D: Design System Update
 
