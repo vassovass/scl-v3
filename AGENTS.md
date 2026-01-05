@@ -181,6 +181,43 @@ export default function Page() {
 }
 ```
 
+### 5. Error Handling (NEW)
+
+**MANDATORY:** Use the new `AppError` system for all error handling.
+
+1.  **Throwing Errors:**
+
+    ```typescript
+    import { AppError, ErrorCode } from "@/lib/errors";
+
+    // Throw specific error code
+    throw new AppError({
+      code: ErrorCode.UPLOAD_TOO_LARGE,
+      message: "File exceeds 5MB limit",
+      context: { size: file.size },
+      recoverable: true,
+    });
+    ```
+
+2.  **Catching & Reporting:**
+
+    ```typescript
+    import { normalizeError, reportErrorClient } from "@/lib/errors";
+
+    try {
+      await doSomething();
+    } catch (err) {
+      // 1. Normalize to AppError
+      const appError = normalizeError(err, ErrorCode.UNKNOWN_ERROR);
+
+      // 2. Report (logs to console/server)
+      reportErrorClient(appError);
+
+      // 3. Show user-friendly message
+      toast.error(appError.toUserMessage());
+    }
+    ```
+
 ---
 
 ## Project Structure
