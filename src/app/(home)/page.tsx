@@ -179,7 +179,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-foreground">AI-Powered Verification</h3>
-                    <p className="text-muted-foreground mt-1">Screenshots are verified by AI to prevent cheating and ensure fair competition.</p>>
+                    <p className="text-muted-foreground mt-1">Screenshots are verified by AI to prevent cheating and ensure fair competition.</p>
                   </div>
                 </div>
 
