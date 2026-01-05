@@ -5,6 +5,7 @@ import imageCompression from "browser-image-compression";
 import { apiRequest, ApiError } from "@/lib/api/client";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { analytics } from "@/lib/analytics";
+import { ConflictResolutionDialog, ConflictData } from "@/components/forms/ConflictResolutionDialog";
 
 interface SubmissionFormProps {
     leagueId: string;
@@ -86,6 +87,8 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
     const [estimatedWaitSeconds, setEstimatedWaitSeconds] = useState(0);
     const [showWaitConfirm, setShowWaitConfirm] = useState(false);
     const [verificationDetails, setVerificationDetails] = useState<VerificationDetails | null>(null);
+    const [conflictData, setConflictData] = useState<ConflictData | null>(null);
+    const [pendingSubmission, setPendingSubmission] = useState<{ proofPath: string | null; stepsNumber: number } | null>(null);
 
     // Reset overwrite flag when error clears
     useEffect(() => {
@@ -181,6 +184,48 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
         }
     };
 
+    const handleConflictResolve = async (action: "keep_existing" | "use_incoming") => {
+        if (!conflictData || !pendingSubmission) return;
+
+        if (action === "keep_existing") {
+            setConflictData(null);
+            setPendingSubmission(null);
+            setStatus("Kept existing submission.");
+            return;
+        }
+
+        // action === "use_incoming" - resubmit with overwrite
+        setSubmitting(true);
+        try {
+            const response = await apiRequest<SubmissionResponse>("submissions", {
+                method: "POST",
+                body: JSON.stringify({
+                    league_id: leagueId,
+                    date: conflictData.date,
+                    steps: pendingSubmission.stepsNumber,
+                    partial,
+                    proof_path: pendingSubmission.proofPath,
+                    flagged,
+                    flag_reason: flagged ? flagReason : null,
+                    overwrite: true,
+                    proxy_member_id: proxyMemberId || undefined,
+                }),
+            });
+
+            setConflictData(null);
+            setPendingSubmission(null);
+            setFile(null);
+            analytics.stepsSubmitted(pendingSubmission.stepsNumber, leagueId);
+            setStatus("Submission replaced successfully!");
+            if (onSubmitted) onSubmitted();
+        } catch (err) {
+            const msg = err instanceof ApiError ? err.message : "Failed to replace submission";
+            setError(msg);
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError(null);
@@ -208,9 +253,10 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
 
         setSubmitting(true);
 
-        try {
-            let proofPath = null;
+        let proofPath: string | null = null;
+        const stepsNumber = parseInt(steps, 10) || 0;
 
+        try {
             if (file) {
                 let fileToUpload = file;
                 if (file.size > 2 * 1024 * 1024) {
@@ -229,8 +275,6 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                 await uploadToSignedUrl(signed.upload_url, fileToUpload);
                 proofPath = signed.path;
             }
-
-            const stepsNumber = parseInt(steps, 10) || 0;
 
             const response = await apiRequest<SubmissionResponse>("submissions", {
                 method: "POST",
@@ -316,7 +360,51 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
         } catch (err) {
             if (err instanceof ApiError) {
                 if (err.status === 409) {
-                    setError("A submission already exists for this date. Check 'Overwrite existing submission' to update it.");
+                    // Fetch existing submission to show conflict dialog
+                    try {
+                        const conflictCheck = await apiRequest<{
+                            conflicts: Array<{
+                                date: string;
+                                existing: {
+                                    id: string;
+                                    for_date: string;
+                                    steps: number;
+                                    verified: boolean | null;
+                                    proof_path: string | null;
+                                    created_at: string;
+                                };
+                            }>;
+                        }>("submissions/check-conflict", {
+                            method: "POST",
+                            body: JSON.stringify({
+                                dates: [date],
+                                league_id: leagueId || null,
+                            }),
+                        });
+
+                        if (conflictCheck.conflicts.length > 0) {
+                            const existing = conflictCheck.conflicts[0].existing;
+                            setConflictData({
+                                date,
+                                existing: {
+                                    id: existing.id,
+                                    steps: existing.steps,
+                                    verified: existing.verified,
+                                    proof_path: existing.proof_path,
+                                    created_at: existing.created_at,
+                                },
+                                incoming: {
+                                    steps: stepsNumber,
+                                    proof_path: proofPath,
+                                },
+                            });
+                            setPendingSubmission({ proofPath, stepsNumber });
+                        } else {
+                            setError("A submission already exists for this date.");
+                        }
+                    } catch {
+                        setError("A submission already exists for this date. Check 'Overwrite existing submission' to update it.");
+                    }
                 } else {
                     setError(parseApiMessage(err.payload) ?? `Request failed (${err.status})`);
                 }
@@ -331,291 +419,305 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/60 p-4 shadow-lg">
-            <div data-tour="date-picker">
-                <DatePicker
-                    value={date}
-                    onChange={setDate}
-                    label="Date"
-                    required
-                />
-            </div>
-
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center" data-tour="steps-input">
-                <label className="text-sm font-medium text-slate-300" htmlFor="submission-steps">
-                    Steps
-                </label>
-                <input
-                    id="submission-steps"
-                    type="number"
-                    min={1}
-                    value={steps}
-                    onChange={(e) => setSteps(e.target.value)}
-                    placeholder="Enter the step count from your screenshot"
-                    className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-slate-50 placeholder:text-slate-500 focus:border-sky-500 focus:outline-none"
-                    required
-                />
-            </div>
-
-            <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                    <input
-                        id="submission-partial"
-                        type="checkbox"
-                        checked={partial}
-                        onChange={(e) => setPartial(e.target.checked)}
-                        className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-sky-500 focus:ring-sky-500"
+        <>
+            <ConflictResolutionDialog
+                open={!!conflictData}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setConflictData(null);
+                        setPendingSubmission(null);
+                    }
+                }}
+                conflict={conflictData}
+                onResolve={handleConflictResolve}
+                isLoading={submitting}
+            />
+            <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/60 p-4 shadow-lg">
+                <div data-tour="date-picker">
+                    <DatePicker
+                        value={date}
+                        onChange={setDate}
+                        label="Date"
+                        required
                     />
-                    <label htmlFor="submission-partial" className="text-sm text-slate-300">
-                        Mark as partial day
-                    </label>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <input
-                        id="submission-flagged"
-                        type="checkbox"
-                        checked={flagged}
-                        onChange={(e) => setFlagged(e.target.checked)}
-                        className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-rose-500 focus:ring-rose-500"
-                    />
-                    <label htmlFor="submission-flagged" className="text-sm text-rose-300">
-                        Image extraction is correct (Flag as incorrect)
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center" data-tour="steps-input">
+                    <label className="text-sm font-medium text-slate-300" htmlFor="submission-steps">
+                        Steps
                     </label>
+                    <input
+                        id="submission-steps"
+                        type="number"
+                        min={1}
+                        value={steps}
+                        onChange={(e) => setSteps(e.target.value)}
+                        placeholder="Enter the step count from your screenshot"
+                        className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-slate-50 placeholder:text-slate-500 focus:border-sky-500 focus:outline-none"
+                        required
+                    />
                 </div>
 
-                {flagged && (
-                    <div className="pl-6">
-                        <textarea
-                            value={flagReason}
-                            onChange={(e) => setFlagReason(e.target.value)}
-                            placeholder="Describe what is wrong with the extraction..."
-                            className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:border-rose-500 focus:outline-none"
-                            rows={2}
-                            required={flagged}
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                        <input
+                            id="submission-partial"
+                            type="checkbox"
+                            checked={partial}
+                            onChange={(e) => setPartial(e.target.checked)}
+                            className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-sky-500 focus:ring-sky-500"
                         />
+                        <label htmlFor="submission-partial" className="text-sm text-slate-300">
+                            Mark as partial day
+                        </label>
                     </div>
-                )}
-            </div>
 
-            <div className="flex flex-col gap-2" data-tour="screenshot-upload">
-                <label className="text-sm font-medium text-slate-300" htmlFor="submission-proof">
-                    Screenshot (PNG, JPG, HEIC)
-                </label>
-                <input
-                    id="submission-proof"
-                    type="file"
-                    accept="image/png,image/jpeg,image/heic"
-                    onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-                    className="text-sm text-slate-300"
-                    required={(settings?.require_verification_photo !== false)} // Default to true if undefined
-                />
-                {file && (
-                    <span className="text-xs text-slate-500">
-                        {file.name} • {(file.size / 1024 / 1024).toFixed(2)} MB
-                    </span>
-                )}
-            </div>
-
-            {error && (
-                <div className="rounded-md border border-rose-700 bg-rose-900/30 p-3">
-                    <div className="flex items-start justify-between gap-2">
-                        <p className="text-sm text-rose-400 break-all whitespace-pre-wrap font-mono">{error}</p>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                navigator.clipboard.writeText(error);
-                            }}
-                            className="shrink-0 rounded px-2 py-1 text-xs text-rose-400 hover:bg-rose-800/50 transition"
-                            title="Copy error message"
-                        >
-                            Copy
-                        </button>
+                    <div className="flex items-center gap-2">
+                        <input
+                            id="submission-flagged"
+                            type="checkbox"
+                            checked={flagged}
+                            onChange={(e) => setFlagged(e.target.checked)}
+                            className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-rose-500 focus:ring-rose-500"
+                        />
+                        <label htmlFor="submission-flagged" className="text-sm text-rose-300">
+                            Image extraction is correct (Flag as incorrect)
+                        </label>
                     </div>
-                    {error.includes("already exists") && (
-                        <div className="mt-2 flex items-center gap-2">
-                            <input
-                                id="submission-overwrite"
-                                type="checkbox"
-                                checked={overwrite}
-                                onChange={(e) => setOverwrite(e.target.checked)}
-                                className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-sky-500 focus:ring-sky-500"
+
+                    {flagged && (
+                        <div className="pl-6">
+                            <textarea
+                                value={flagReason}
+                                onChange={(e) => setFlagReason(e.target.value)}
+                                placeholder="Describe what is wrong with the extraction..."
+                                className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:border-rose-500 focus:outline-none"
+                                rows={2}
+                                required={flagged}
                             />
-                            <label htmlFor="submission-overwrite" className="text-sm text-sky-300 font-medium cursor-pointer">
-                                Overwrite existing submission
-                            </label>
                         </div>
                     )}
                 </div>
-            )}
-            {status && <p className="text-sm text-sky-400">{status}</p>}
 
-            {/* Verification details feedback */}
-            {verificationDetails && (
-                <div className={`rounded-md border p-4 ${verificationDetails.verified
-                    ? "border-emerald-700 bg-emerald-900/30"
-                    : "border-rose-700 bg-rose-900/30"
-                    }`}>
-                    <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 space-y-2">
-                            {verificationDetails.verified ? (
-                                <p className="text-sm font-medium text-emerald-400">
-                                    ✓ Verification successful
-                                </p>
-                            ) : (
-                                <p className="text-sm font-medium text-rose-400">
-                                    ✗ Verification failed
-                                </p>
-                            )}
+                <div className="flex flex-col gap-2" data-tour="screenshot-upload">
+                    <label className="text-sm font-medium text-slate-300" htmlFor="submission-proof">
+                        Screenshot (PNG, JPG, HEIC)
+                    </label>
+                    <input
+                        id="submission-proof"
+                        type="file"
+                        accept="image/png,image/jpeg,image/heic"
+                        onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+                        className="text-sm text-slate-300"
+                        required={(settings?.require_verification_photo !== false)} // Default to true if undefined
+                    />
+                    {file && (
+                        <span className="text-xs text-slate-500">
+                            {file.name} • {(file.size / 1024 / 1024).toFixed(2)} MB
+                        </span>
+                    )}
+                </div>
 
-                            {/* Step comparison */}
-                            <div className="text-sm space-y-1">
-                                {verificationDetails.extractedSteps !== null ? (
-                                    <p className={verificationDetails.verified ? "text-slate-300" : "text-rose-300"}>
-                                        <span className="text-slate-400">Screenshot shows:</span>{" "}
-                                        <span className="font-semibold">
-                                            {verificationDetails.extractedSteps.toLocaleString()} steps
-                                        </span>
-                                    </p>
-                                ) : (
-                                    <p className="text-amber-400">
-                                        ⚠ Could not detect step count from screenshot
-                                    </p>
-                                )}
-
-                                <p className="text-slate-400">
-                                    You submitted:{" "}
-                                    <span className="text-slate-200 font-semibold">
-                                        {verificationDetails.claimedSteps.toLocaleString()} steps
-                                    </span>
-                                </p>
-
-                                {verificationDetails.difference !== null && verificationDetails.tolerance !== null && (
-                                    <p className="text-slate-500 text-xs mt-1">
-                                        Difference: {verificationDetails.difference.toLocaleString()}
-                                        {" "}(max allowed: {verificationDetails.tolerance.toLocaleString()})
-                                    </p>
-                                )}
-                            </div>
-
-                            {/* Date comparison if different */}
-                            {verificationDetails.extractedDate &&
-                                verificationDetails.extractedDate !== verificationDetails.claimedDate && (
-                                    <div className="text-sm mt-2 pt-2 border-t border-slate-700">
-                                        <p className="text-amber-400">
-                                            ⚠ Date mismatch detected
-                                        </p>
-                                        <p className="text-slate-400 mt-1">
-                                            Screenshot date: <span className="text-amber-300 font-medium">{verificationDetails.extractedDate}</span>
-                                            {" "}• Submitted: <span className="text-slate-300">{verificationDetails.claimedDate}</span>
-                                        </p>
-                                    </div>
-                                )}
-
-                            {/* Notes (collapsed by default) */}
-                            {verificationDetails.notes && !verificationDetails.verified && (
-                                <details className="mt-2 text-xs">
-                                    <summary className="text-slate-500 cursor-pointer hover:text-slate-400">
-                                        Technical details
-                                    </summary>
-                                    <p className="mt-1 text-slate-400 bg-slate-800/50 rounded p-2 font-mono">
-                                        {verificationDetails.notes}
-                                    </p>
-                                </details>
-                            )}
-                        </div>
-
-                        {/* Report Issue button for failed verifications */}
-                        {!verificationDetails.verified && (
+                {error && (
+                    <div className="rounded-md border border-rose-700 bg-rose-900/30 p-3">
+                        <div className="flex items-start justify-between gap-2">
+                            <p className="text-sm text-rose-400 break-all whitespace-pre-wrap font-mono">{error}</p>
                             <button
                                 type="button"
                                 onClick={() => {
-                                    const issueDetails = [
-                                        `Verification Issue Report`,
-                                        `========================`,
-                                        `Date: ${new Date().toISOString()}`,
-                                        ``,
-                                        `Submitted: ${verificationDetails.claimedSteps} steps on ${verificationDetails.claimedDate}`,
-                                        `Detected: ${verificationDetails.extractedSteps ?? 'N/A'} steps`,
-                                        `Detected Date: ${verificationDetails.extractedDate ?? 'N/A'}`,
-                                        `Difference: ${verificationDetails.difference ?? 'N/A'}`,
-                                        `Tolerance: ${verificationDetails.tolerance ?? 'N/A'}`,
-                                        ``,
-                                        `Notes: ${verificationDetails.notes ?? 'None'}`,
-                                    ].join('\n');
-                                    navigator.clipboard.writeText(issueDetails);
-                                    // Use toast instead of alert
-                                    import("@/hooks/use-toast").then(({ toast }) => {
-                                        toast({
-                                            title: "Copied!",
-                                            description: "Issue details copied to clipboard. Paste in email or support ticket.",
-                                        });
-                                    });
+                                    navigator.clipboard.writeText(error);
                                 }}
-                                className="shrink-0 rounded-md border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-slate-700 hover:border-slate-500"
+                                className="shrink-0 rounded px-2 py-1 text-xs text-rose-400 hover:bg-rose-800/50 transition"
+                                title="Copy error message"
                             >
-                                📋 Report Issue
+                                Copy
                             </button>
+                        </div>
+                        {error.includes("already exists") && (
+                            <div className="mt-2 flex items-center gap-2">
+                                <input
+                                    id="submission-overwrite"
+                                    type="checkbox"
+                                    checked={overwrite}
+                                    onChange={(e) => setOverwrite(e.target.checked)}
+                                    className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-sky-500 focus:ring-sky-500"
+                                />
+                                <label htmlFor="submission-overwrite" className="text-sm text-sky-300 font-medium cursor-pointer">
+                                    Overwrite existing submission
+                                </label>
+                            </div>
                         )}
                     </div>
-                </div>
-            )}
+                )}
+                {status && <p className="text-sm text-sky-400">{status}</p>}
 
-            {/* Pending verification status */}
-            {pendingVerification && !showWaitConfirm && (
-                <div className="rounded-md border border-amber-700 bg-amber-900/30 p-3">
-                    <p className="text-sm text-amber-300">
-                        Verification in progress...
-                        {estimatedWaitSeconds > 0 && (
-                            <span className="ml-1">
-                                (retrying in {formatWaitTime(estimatedWaitSeconds)})
-                            </span>
-                        )}
-                    </p>
-                    <p className="mt-1 text-xs text-amber-400/70">
-                        Keep this tab open to complete verification.
-                    </p>
-                </div>
-            )}
+                {/* Verification details feedback */}
+                {verificationDetails && (
+                    <div className={`rounded-md border p-4 ${verificationDetails.verified
+                        ? "border-emerald-700 bg-emerald-900/30"
+                        : "border-rose-700 bg-rose-900/30"
+                        }`}>
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 space-y-2">
+                                {verificationDetails.verified ? (
+                                    <p className="text-sm font-medium text-emerald-400">
+                                        ✓ Verification successful
+                                    </p>
+                                ) : (
+                                    <p className="text-sm font-medium text-rose-400">
+                                        ✗ Verification failed
+                                    </p>
+                                )}
 
-            {/* Wait confirmation dialog */}
-            {showWaitConfirm && (
-                <div className="rounded-md border border-amber-700 bg-amber-900/30 p-4">
-                    <p className="text-sm font-medium text-amber-300">
-                        High traffic detected
-                    </p>
-                    <p className="mt-1 text-sm text-amber-400/80">
-                        Verification is estimated to take {formatWaitTime(estimatedWaitSeconds)}.
-                        Would you like to wait? You must keep this tab open.
-                    </p>
-                    <div className="mt-3 flex gap-2">
-                        <button
-                            type="button"
-                            onClick={handleConfirmWait}
-                            className="rounded-md bg-amber-600 px-3 py-1.5 text-sm font-medium text-slate-950 transition hover:bg-amber-500"
-                        >
-                            Yes, wait
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleCancelWait}
-                            className="rounded-md border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm font-medium text-slate-300 transition hover:bg-slate-700"
-                        >
-                            Skip verification
-                        </button>
+                                {/* Step comparison */}
+                                <div className="text-sm space-y-1">
+                                    {verificationDetails.extractedSteps !== null ? (
+                                        <p className={verificationDetails.verified ? "text-slate-300" : "text-rose-300"}>
+                                            <span className="text-slate-400">Screenshot shows:</span>{" "}
+                                            <span className="font-semibold">
+                                                {verificationDetails.extractedSteps.toLocaleString()} steps
+                                            </span>
+                                        </p>
+                                    ) : (
+                                        <p className="text-amber-400">
+                                            ⚠ Could not detect step count from screenshot
+                                        </p>
+                                    )}
+
+                                    <p className="text-slate-400">
+                                        You submitted:{" "}
+                                        <span className="text-slate-200 font-semibold">
+                                            {verificationDetails.claimedSteps.toLocaleString()} steps
+                                        </span>
+                                    </p>
+
+                                    {verificationDetails.difference !== null && verificationDetails.tolerance !== null && (
+                                        <p className="text-slate-500 text-xs mt-1">
+                                            Difference: {verificationDetails.difference.toLocaleString()}
+                                            {" "}(max allowed: {verificationDetails.tolerance.toLocaleString()})
+                                        </p>
+                                    )}
+                                </div>
+
+                                {/* Date comparison if different */}
+                                {verificationDetails.extractedDate &&
+                                    verificationDetails.extractedDate !== verificationDetails.claimedDate && (
+                                        <div className="text-sm mt-2 pt-2 border-t border-slate-700">
+                                            <p className="text-amber-400">
+                                                ⚠ Date mismatch detected
+                                            </p>
+                                            <p className="text-slate-400 mt-1">
+                                                Screenshot date: <span className="text-amber-300 font-medium">{verificationDetails.extractedDate}</span>
+                                                {" "}• Submitted: <span className="text-slate-300">{verificationDetails.claimedDate}</span>
+                                            </p>
+                                        </div>
+                                    )}
+
+                                {/* Notes (collapsed by default) */}
+                                {verificationDetails.notes && !verificationDetails.verified && (
+                                    <details className="mt-2 text-xs">
+                                        <summary className="text-slate-500 cursor-pointer hover:text-slate-400">
+                                            Technical details
+                                        </summary>
+                                        <p className="mt-1 text-slate-400 bg-slate-800/50 rounded p-2 font-mono">
+                                            {verificationDetails.notes}
+                                        </p>
+                                    </details>
+                                )}
+                            </div>
+
+                            {/* Report Issue button for failed verifications */}
+                            {!verificationDetails.verified && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const issueDetails = [
+                                            `Verification Issue Report`,
+                                            `========================`,
+                                            `Date: ${new Date().toISOString()}`,
+                                            ``,
+                                            `Submitted: ${verificationDetails.claimedSteps} steps on ${verificationDetails.claimedDate}`,
+                                            `Detected: ${verificationDetails.extractedSteps ?? 'N/A'} steps`,
+                                            `Detected Date: ${verificationDetails.extractedDate ?? 'N/A'}`,
+                                            `Difference: ${verificationDetails.difference ?? 'N/A'}`,
+                                            `Tolerance: ${verificationDetails.tolerance ?? 'N/A'}`,
+                                            ``,
+                                            `Notes: ${verificationDetails.notes ?? 'None'}`,
+                                        ].join('\n');
+                                        navigator.clipboard.writeText(issueDetails);
+                                        // Use toast instead of alert
+                                        import("@/hooks/use-toast").then(({ toast }) => {
+                                            toast({
+                                                title: "Copied!",
+                                                description: "Issue details copied to clipboard. Paste in email or support ticket.",
+                                            });
+                                        });
+                                    }}
+                                    className="shrink-0 rounded-md border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-slate-700 hover:border-slate-500"
+                                >
+                                    📋 Report Issue
+                                </button>
+                            )}
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            <button
-                type="submit"
-                disabled={submitting || !!pendingVerification}
-                className="w-full rounded-md bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-60"
-                data-tour="submit-button"
-            >
-                {submitting ? "Submitting..." : pendingVerification ? "Verifying..." : "Submit Steps"}
-            </button>
-        </form>
+                {/* Pending verification status */}
+                {pendingVerification && !showWaitConfirm && (
+                    <div className="rounded-md border border-amber-700 bg-amber-900/30 p-3">
+                        <p className="text-sm text-amber-300">
+                            Verification in progress...
+                            {estimatedWaitSeconds > 0 && (
+                                <span className="ml-1">
+                                    (retrying in {formatWaitTime(estimatedWaitSeconds)})
+                                </span>
+                            )}
+                        </p>
+                        <p className="mt-1 text-xs text-amber-400/70">
+                            Keep this tab open to complete verification.
+                        </p>
+                    </div>
+                )}
+
+                {/* Wait confirmation dialog */}
+                {showWaitConfirm && (
+                    <div className="rounded-md border border-amber-700 bg-amber-900/30 p-4">
+                        <p className="text-sm font-medium text-amber-300">
+                            High traffic detected
+                        </p>
+                        <p className="mt-1 text-sm text-amber-400/80">
+                            Verification is estimated to take {formatWaitTime(estimatedWaitSeconds)}.
+                            Would you like to wait? You must keep this tab open.
+                        </p>
+                        <div className="mt-3 flex gap-2">
+                            <button
+                                type="button"
+                                onClick={handleConfirmWait}
+                                className="rounded-md bg-amber-600 px-3 py-1.5 text-sm font-medium text-slate-950 transition hover:bg-amber-500"
+                            >
+                                Yes, wait
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleCancelWait}
+                                className="rounded-md border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm font-medium text-slate-300 transition hover:bg-slate-700"
+                            >
+                                Skip verification
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                <button
+                    type="submit"
+                    disabled={submitting || !!pendingVerification}
+                    className="w-full rounded-md bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-60"
+                    data-tour="submit-button"
+                >
+                    {submitting ? "Submitting..." : pendingVerification ? "Verifying..." : "Submit Steps"}
+                </button>
+            </form>
+        </>
     );
 }
 
@@ -652,3 +754,4 @@ function formatWaitTime(seconds: number): string {
     }
     return `${minutes}m ${remainingSeconds}s`;
 }
+

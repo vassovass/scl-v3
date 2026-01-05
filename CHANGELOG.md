@@ -9,6 +9,35 @@ All notable changes to StepLeague v3.
 
 ## [2026-01-05]
 
+### Added
+
+- **PRD 35: Duplicate Submission Conflict Resolution** - Smart handling of duplicate step entries
+  - **ConflictResolutionDialog** (`src/components/forms/ConflictResolutionDialog.tsx`) - Side-by-side comparison modal
+    - Shows existing vs new submission with verification status
+    - Smart default recommendations (favors verified screenshots over manual entries)
+    - Clear visual indicators for verified (✓), unverified (⏳), screenshot (📷), manual (✎)
+  - **BatchConflictTable** (`src/components/forms/BatchConflictTable.tsx`) - Bulk conflict resolution UI
+    - Selectable rows with per-row action dropdowns (Keep/Use New/Skip)
+    - Bulk action toolbar for "Keep All Existing", "Use All New", "Skip All"
+    - Smart pre-selection based on verification status
+  - **Conflict Check API** (`/api/submissions/check-conflict`) - Pre-submission conflict detection
+    - Checks if submissions exist for given dates
+    - Returns existing submission details for UI comparison
+  - **Resolve API** (`/api/submissions/resolve`) - Bulk conflict resolution endpoint
+    - Supports keep_existing, use_incoming, skip actions
+    - Triggers verification for screenshot submissions
+    - Uses `withApiHandler` pattern for consistency
+  - **useConflictCheck Hook** (`src/hooks/useConflictCheck.ts`) - Reusable conflict handling logic
+    - `checkConflicts()` and `resolveConflicts()` functions
+    - Smart default helpers: `getSmartDefault()`, `getRecommendationMessage()`
+  - **SubmissionForm Integration** - Dialog appears on 409 conflict instead of error message
+    - User can choose to keep existing or replace with new submission
+    - Cleaner UX than previous "overwrite" checkbox approach
+
+---
+
+## [2026-01-05]
+
 ### Changed
 
 - **Social Sharing Rebranding** - Updated all Twitter references to X (platform rebrand)
