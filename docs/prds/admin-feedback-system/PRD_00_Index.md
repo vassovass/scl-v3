@@ -165,6 +165,14 @@
 |---|-----|---------|
 | 34 | [Technical Debt](./PRD_34_Technical_Debt.md) | Cleanup & Refactoring |
 
+---
+
+### Phase 16: Data Integrity
+
+| # | PRD | Outcome |
+|---|-----|---------|
+| 35 | [Duplicate Submission Resolution](./PRD_35_Duplicate_Resolution.md) | Conflict detection, smart resolution UI |
 
 ---
+
 

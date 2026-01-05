@@ -15,4 +15,14 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+const withPWA = require("@ducanh2912/next-pwa").default({
+  dest: "public",
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === "development",
+  // Exclude API and Admin routes from SW caching to avoid stale administrative data
+  buildExcludes: [/middleware-manifest\.json$/],
+  publicExcludes: ['!api/**/*', '!admin/**/*'],
+});
+
+module.exports = withPWA(nextConfig);

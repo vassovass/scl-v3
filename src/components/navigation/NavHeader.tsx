@@ -11,6 +11,7 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { MenuItem, UserRole, MENUS, MenuLocation, detectMenuLocation, MENU_LOCATIONS } from "@/lib/menuConfig";
 import { APP_CONFIG } from "@/lib/config";
 import { OfflineIndicator } from "@/components/ui/OfflineIndicator";
+import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 
 interface NavHeaderProps {
     /** Override auto-detected menu location */
@@ -182,6 +183,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                 {/* Desktop Navigation */}
                 {session && (
                     <div className="hidden md:flex items-center gap-1">
+                        <InstallPrompt />
                         <OfflineIndicator />
                         {/* Dashboard Link */}
                         <Link

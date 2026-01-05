@@ -32,6 +32,9 @@ All notable changes to StepLeague v3.
   - **UI Components**
     - `OfflineIndicator` (`src/components/ui/OfflineIndicator.tsx`): Status badge in NavHeader
     - `SubmissionForm`: Detects offline status, changes button to "Save Offline" (amber), queues submission
+  - **PWA Polish**
+    - **Service Worker**: `@ducanh2912/next-pwa` for offline App Shell caching (app opens offline)
+    - **Install Prompt**: Smart "Install App" button in Header & Mobile Menu (iOS/Android awareness)
   - **Infrastructure**: No auth tokens stored locally; secure origin-locked IndexedDB
 
 - **PRD 35: Duplicate Submission Conflict Resolution** - Smart handling of duplicate step entries

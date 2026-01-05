@@ -238,6 +238,9 @@ Users often track steps in gyms or areas with poor signal.
     - Queue limit: Max 10 items.
     - Auto-cleanup: Items >7 days.
     - Clear offline data on logout.
+4.  **PWA Features**:
+    - **Install Prompt**: Use `InstallPrompt` (via `usePWA`) in Nav/Menu. Mobile-first (iOS instructions vs Android prompt).
+    - **Service Worker**: `@ducanh2912/next-pwa` handles App Shell caching. Do not manually register SW.
 
 ---
 

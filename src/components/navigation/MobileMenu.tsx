@@ -5,6 +5,7 @@ import { useState } from "react";
 import { User } from "@supabase/supabase-js";
 // import { MenuRenderer } from "./MenuRenderer"; // Removed legacy renderer import
 import { MenuItem, UserRole, MENUS, prepareMenuItems } from "@/lib/menuConfig";
+import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 
 interface MobileMenuProps {
     isOpen: boolean;
@@ -165,6 +166,11 @@ export function MobileMenu({
                             {link.label}
                         </Link>
                     ))}
+                </div>
+
+                {/* Install App Button */}
+                <div className="pt-2">
+                    <InstallPrompt className="w-full justify-start px-4 py-3 h-auto font-medium" />
                 </div>
 
                 {/* Sign Out */}
