@@ -8,16 +8,16 @@ description: How to test the deployed application in browser
 
 ## Deployed URL
 
-The app is deployed at: **https://scl-v3.vercel.app/**
+The app is deployed at: **https://stepleague.app**
 
 ## When to use localhost vs deployed URL
 
-- **localhost:3000** - Only for quick checks while actively developing with `npm run dev`
-- **https://scl-v3.vercel.app/** - For all verification, QA testing, and browser automation
+- **https://stepleague.app** - For all verification, QA testing, and browser automation
 
 ## Browser Testing Steps
 
 // turbo-all
+0. Wait 60 seconds for Vercel to deploy AFTER pushed commit
 1. Navigate to https://stepleague.app
 2. Sign in with test credentials if needed
 3. Perform verification steps on the deployed site
