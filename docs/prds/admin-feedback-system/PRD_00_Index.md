@@ -91,7 +91,7 @@
 
 | # | PRD | Status |
 |---|-----|--------|
-| 20 | [Expandable Cards with Image Paste](./PRD_20_Expandable_Cards_Image_Paste.md) | 🔄 In Progress |
+| 20 | [Expandable Cards with Image Paste](./PRD_20_Expandable_Cards_Image_Paste.md) | ✅ Complete |
 
 ---
 
@@ -139,6 +139,13 @@
 |---|-----|---------|
 | 29 | [B2B Landing Pages](./PRD_29_B2B_Landing.md) | /teams landing, waitlist, features |
 | 30 | [SEO Comparison Pages](./PRD_30_SEO_Comparison.md) | /compare hub, competitor comparisons |
+---
+
+### Phase 13: Maintenance & Optimization
+
+| # | PRD | Outcome |
+|---|-----|---------|
+| 31 | [Technical Debt & Optimization](./PRD_31_Technical_Debt.md) | Legacy cleanup, API audits, widget refactor |
 
 ---
 

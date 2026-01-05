@@ -5,6 +5,7 @@
 > **Status:** 📋 Proposed  
 > **Phase:** Marketing & Growth  
 > **Depends on:** PRD 29 (for internal linking)
+> **Next:** [PRD 31: Technical Debt](./PRD_31_Technical_Debt.md)
 
 ---
 
