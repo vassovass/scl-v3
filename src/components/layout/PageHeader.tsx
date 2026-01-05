@@ -90,7 +90,7 @@ export function PageHeader({
             {/* Breadcrumbs */}
             {breadcrumbs.length > 0 && (
                 <nav
-                    className="page-header__breadcrumbs flex items-center gap-2 text-sm text-slate-400 mb-2"
+                    className="page-header__breadcrumbs flex items-center gap-2 text-sm text-muted-foreground mb-2"
                     aria-label="Breadcrumb"
                 >
                     {breadcrumbs.map((crumb, idx) => (
@@ -98,7 +98,7 @@ export function PageHeader({
                             {crumb.href ? (
                                 <Link
                                     href={crumb.href}
-                                    className="hover:text-sky-400 transition-colors"
+                                    className="hover:text-primary transition-colors"
                                     data-track-click={`breadcrumb_${crumb.label.toLowerCase().replace(/\s+/g, '_')}`}
                                 >
                                     {crumb.label}
@@ -107,7 +107,7 @@ export function PageHeader({
                                 <span>{crumb.label}</span>
                             )}
                             {idx < breadcrumbs.length - 1 && (
-                                <span className="text-slate-600" aria-hidden="true">›</span>
+                                <span className="text-muted-foreground/50" aria-hidden="true">›</span>
                             )}
                         </React.Fragment>
                     ))}
@@ -120,12 +120,12 @@ export function PageHeader({
                 <div className="page-header__title-section">
                     <h1
                         id={`page-title-${analyticsPageId}`}
-                        className="text-2xl font-bold text-slate-100"
+                        className="text-2xl font-bold text-foreground"
                     >
                         {title}
                     </h1>
                     {subtitle && (
-                        <p className="text-sm text-slate-400 mt-1">
+                        <p className="text-sm text-muted-foreground mt-1">
                             {subtitle}
                         </p>
                     )}
@@ -150,9 +150,9 @@ export function PageHeader({
                             const baseClasses = 'inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition';
 
                             const variantClasses = {
-                                primary: 'bg-sky-500 text-slate-950 hover:bg-sky-400 disabled:opacity-50 disabled:cursor-not-allowed',
-                                secondary: 'bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700',
-                                ghost: 'text-sky-400 hover:text-sky-300 hover:bg-slate-800/50',
+                                primary: 'bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed',
+                                secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border',
+                                ghost: 'text-primary hover:text-primary/80 hover:bg-accent',
                             };
 
                             const classes = `${baseClasses} ${variantClasses[action.variant || 'secondary']}`;

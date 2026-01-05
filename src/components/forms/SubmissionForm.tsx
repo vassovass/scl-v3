@@ -495,7 +495,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                 onResolve={handleConflictResolve}
                 isLoading={submitting}
             />
-            <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/60 p-4 shadow-lg">
+            <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-border bg-card/60 p-4 shadow-lg">
                 <div data-tour="date-picker">
                     <DatePicker
                         value={date}
@@ -506,7 +506,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                 </div>
 
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center" data-tour="steps-input">
-                    <label className="text-sm font-medium text-slate-300" htmlFor="submission-steps">
+                    <label className="text-sm font-medium text-foreground" htmlFor="submission-steps">
                         Steps
                     </label>
                     <input
@@ -516,7 +516,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                         value={steps}
                         onChange={(e) => setSteps(e.target.value)}
                         placeholder="Enter the step count from your screenshot"
-                        className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-slate-50 placeholder:text-slate-500 focus:border-sky-500 focus:outline-none"
+                        className="w-full rounded-md border border-border bg-background px-3 py-2 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
                         required
                     />
                 </div>
@@ -528,9 +528,9 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                             type="checkbox"
                             checked={partial}
                             onChange={(e) => setPartial(e.target.checked)}
-                            className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-sky-500 focus:ring-sky-500"
+                            className="h-4 w-4 rounded border-border bg-background text-primary focus:ring-primary"
                         />
-                        <label htmlFor="submission-partial" className="text-sm text-slate-300">
+                        <label htmlFor="submission-partial" className="text-sm text-foreground">
                             Mark as partial day
                         </label>
                     </div>
@@ -541,9 +541,9 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                             type="checkbox"
                             checked={flagged}
                             onChange={(e) => setFlagged(e.target.checked)}
-                            className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-rose-500 focus:ring-rose-500"
+                            className="h-4 w-4 rounded border-border bg-background text-rose-500 focus:ring-rose-500"
                         />
-                        <label htmlFor="submission-flagged" className="text-sm text-rose-300">
+                        <label htmlFor="submission-flagged" className="text-sm text-rose-400">
                             Image extraction is correct (Flag as incorrect)
                         </label>
                     </div>
@@ -554,7 +554,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                                 value={flagReason}
                                 onChange={(e) => setFlagReason(e.target.value)}
                                 placeholder="Describe what is wrong with the extraction..."
-                                className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:border-rose-500 focus:outline-none"
+                                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-rose-500 focus:outline-none"
                                 rows={2}
                                 required={flagged}
                             />
@@ -563,7 +563,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                 </div>
 
                 <div className="flex flex-col gap-2" data-tour="screenshot-upload">
-                    <label className="text-sm font-medium text-slate-300" htmlFor="submission-proof">
+                    <label className="text-sm font-medium text-foreground" htmlFor="submission-proof">
                         Screenshot (PNG, JPG, HEIC)
                     </label>
                     <input
@@ -571,11 +571,11 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                         type="file"
                         accept="image/png,image/jpeg,image/heic"
                         onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-                        className="text-sm text-slate-300"
+                        className="text-sm text-foreground"
                         required={(settings?.require_verification_photo !== false)} // Default to true if undefined
                     />
                     {file && (
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-muted-foreground">
                             {file.name} • {(file.size / 1024 / 1024).toFixed(2)} MB
                         </span>
                     )}
@@ -612,7 +612,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                         )}
                     </div>
                 )}
-                {status && <p className="text-sm text-sky-400">{status}</p>}
+                {status && <p className="text-sm text-primary">{status}</p>}
 
                 {/* Verification details feedback */}
                 {verificationDetails && (
@@ -635,8 +635,8 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                                 {/* Step comparison */}
                                 <div className="text-sm space-y-1">
                                     {verificationDetails.extractedSteps !== null ? (
-                                        <p className={verificationDetails.verified ? "text-slate-300" : "text-rose-300"}>
-                                            <span className="text-slate-400">Screenshot shows:</span>{" "}
+                                        <p className={verificationDetails.verified ? "text-foreground" : "text-rose-300"}>
+                                            <span className="text-muted-foreground">Screenshot shows:</span>{" "}
                                             <span className="font-semibold">
                                                 {verificationDetails.extractedSteps.toLocaleString()} steps
                                             </span>
@@ -647,15 +647,15 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                                         </p>
                                     )}
 
-                                    <p className="text-slate-400">
+                                    <p className="text-muted-foreground">
                                         You submitted:{" "}
-                                        <span className="text-slate-200 font-semibold">
+                                        <span className="text-foreground font-semibold">
                                             {verificationDetails.claimedSteps.toLocaleString()} steps
                                         </span>
                                     </p>
 
                                     {verificationDetails.difference !== null && verificationDetails.tolerance !== null && (
-                                        <p className="text-slate-500 text-xs mt-1">
+                                        <p className="text-muted-foreground text-xs mt-1">
                                             Difference: {verificationDetails.difference.toLocaleString()}
                                             {" "}(max allowed: {verificationDetails.tolerance.toLocaleString()})
                                         </p>
@@ -665,13 +665,13 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                                 {/* Date comparison if different */}
                                 {verificationDetails.extractedDate &&
                                     verificationDetails.extractedDate !== verificationDetails.claimedDate && (
-                                        <div className="text-sm mt-2 pt-2 border-t border-slate-700">
+                                        <div className="text-sm mt-2 pt-2 border-t border-border">
                                             <p className="text-amber-400">
                                                 ⚠ Date mismatch detected
                                             </p>
-                                            <p className="text-slate-400 mt-1">
+                                            <p className="text-muted-foreground mt-1">
                                                 Screenshot date: <span className="text-amber-300 font-medium">{verificationDetails.extractedDate}</span>
-                                                {" "}• Submitted: <span className="text-slate-300">{verificationDetails.claimedDate}</span>
+                                                {" "}• Submitted: <span className="text-foreground">{verificationDetails.claimedDate}</span>
                                             </p>
                                         </div>
                                     )}
@@ -679,10 +679,10 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                                 {/* Notes (collapsed by default) */}
                                 {verificationDetails.notes && !verificationDetails.verified && (
                                     <details className="mt-2 text-xs">
-                                        <summary className="text-slate-500 cursor-pointer hover:text-slate-400">
+                                        <summary className="text-muted-foreground cursor-pointer hover:text-foreground">
                                             Technical details
                                         </summary>
-                                        <p className="mt-1 text-slate-400 bg-slate-800/50 rounded p-2 font-mono">
+                                        <p className="mt-1 text-muted-foreground bg-muted/50 rounded p-2 font-mono">
                                             {verificationDetails.notes}
                                         </p>
                                     </details>
@@ -716,7 +716,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                                             });
                                         });
                                     }}
-                                    className="shrink-0 rounded-md border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-slate-700 hover:border-slate-500"
+                                    className="shrink-0 rounded-md border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-foreground transition hover:bg-accent hover:border-border/80"
                                 >
                                     📋 Report Issue
                                 </button>
@@ -763,7 +763,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                             <button
                                 type="button"
                                 onClick={handleCancelWait}
-                                className="rounded-md border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm font-medium text-slate-300 transition hover:bg-slate-700"
+                                className="rounded-md border border-border bg-secondary px-3 py-1.5 text-sm font-medium text-foreground transition hover:bg-accent"
                             >
                                 Skip verification
                             </button>
@@ -774,9 +774,9 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                 <button
                     type="submit"
                     disabled={submitting || !!pendingVerification}
-                    className={`w-full rounded-md px-4 py-2 text-sm font-semibold text-slate-950 transition disabled:cursor-not-allowed disabled:opacity-60 ${isOffline
+                    className={`w-full rounded-md px-4 py-2 text-sm font-semibold text-primary-foreground transition disabled:cursor-not-allowed disabled:opacity-60 ${isOffline
                         ? "bg-amber-500 hover:bg-amber-400"
-                        : "bg-sky-500 hover:bg-sky-400"
+                        : "bg-primary hover:bg-primary/90"
                         }`}
                     data-tour="submit-button"
                 >

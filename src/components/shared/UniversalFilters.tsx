@@ -176,8 +176,8 @@ export default function UniversalFilters({
     }, [filters, config]);
 
     const selectClass = compact
-        ? "rounded-lg border border-slate-700 bg-slate-800/50 px-2 py-1 text-xs text-slate-200 focus:border-sky-500 focus:outline-none"
-        : "rounded-lg border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-slate-200 focus:border-sky-500 focus:outline-none";
+        ? "rounded-lg border border-border bg-secondary/50 px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+        : "rounded-lg border border-border bg-secondary/50 px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none";
 
     return (
         <div className={`space-y-3 ${className}`}>
@@ -197,10 +197,10 @@ export default function UniversalFilters({
                         value={searchInput}
                         onChange={(e) => setSearchInput(e.target.value)}
                         placeholder="Search in title and description..."
-                        className="w-full rounded-lg border border-slate-700 bg-slate-800/50 px-4 py-2.5 pl-10 text-sm text-slate-200 placeholder-slate-500 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                        className="w-full rounded-lg border border-border bg-secondary/50 px-4 py-2.5 pl-10 text-sm text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                     />
                     <svg
-                        className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+                        className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -305,7 +305,7 @@ export default function UniversalFilters({
                                     onChange={(e) => setFilters(prev => ({ ...prev, dateFrom: e.target.value }))}
                                     className={selectClass}
                                 />
-                                <span className="text-slate-500 text-xs">to</span>
+                                <span className="text-muted-foreground text-xs">to</span>
                                 <input
                                     type="date"
                                     value={filters.dateTo}
@@ -321,7 +321,7 @@ export default function UniversalFilters({
                 {activeFilterCount > 0 && (
                     <button
                         onClick={clearAllFilters}
-                        className="flex items-center gap-1 rounded-lg bg-slate-700/50 px-2 py-1 text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition"
+                        className="flex items-center gap-1 rounded-lg bg-muted px-2 py-1 text-xs text-foreground hover:bg-accent transition"
                     >
                         <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -333,7 +333,7 @@ export default function UniversalFilters({
 
             {/* Results count */}
             {filteredCount !== undefined && totalCount !== undefined && (
-                <div className="text-xs text-slate-500">
+                <div className="text-xs text-muted-foreground">
                     Showing {filteredCount} of {totalCount} items
                     {activeFilterCount > 0 && ` (${activeFilterCount} filter${activeFilterCount > 1 ? "s" : ""} active)`}
                 </div>

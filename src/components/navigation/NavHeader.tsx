@@ -154,10 +154,12 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
             <nav ref={navRef} className="mx-auto flex max-w-6xl items-center justify-between px-4 h-14">
                 {/* Logo */}
                 <Link href="/dashboard" className="group flex items-center gap-2">
-                    <span className="text-xl">👟</span>
+                    <span className="text-xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-10deg]">
+                        <span className="inline-block transition-all duration-300 group-hover:drop-shadow-[0_0_8px_hsl(var(--primary))]">👟</span>
+                    </span>
                     <span className="text-lg font-bold">
-                        <span className="text-foreground transition-colors group-hover:text-primary">Step</span>
-                        <span className="text-sky-500 transition-colors group-hover:text-foreground">League</span>
+                        <span className="text-foreground transition-colors duration-300 group-hover:text-primary">Step</span>
+                        <span className="text-primary transition-colors duration-300 group-hover:text-foreground">League</span>
                     </span>
                 </Link>
 
@@ -190,8 +192,8 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                             href="/dashboard"
                             data-tour="nav-dashboard"
                             className={`px-3 py-2 text-sm rounded-lg transition-colors duration-200 ${pathname === "/dashboard"
-                                ? "bg-sky-600/20 text-sky-400 font-medium"
-                                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                                ? "bg-primary/20 text-primary font-medium"
+                                : "text-muted-foreground hover:text-foreground hover:bg-accent"
                                 }`}
                         >
                             Dashboard
@@ -201,8 +203,8 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                         <Link
                             href="/roadmap"
                             className={`px-3 py-2 text-sm rounded-lg transition-colors duration-200 ${pathname === "/roadmap"
-                                ? "bg-sky-600/20 text-sky-400 font-medium"
-                                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                                ? "bg-primary/20 text-primary font-medium"
+                                : "text-muted-foreground hover:text-foreground hover:bg-accent"
                                 }`}
                         >
                             🗺️ Roadmap
@@ -286,10 +288,10 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                                 userRole={userRole}
                                 trigger={
                                     <div className="flex items-center gap-2">
-                                        <span className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-emerald-500 flex items-center justify-center text-white text-sm font-medium shadow-md ring-2 ring-slate-950 group-hover:ring-slate-800 transition-all">
+                                        <span className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-emerald-500 flex items-center justify-center text-white text-sm font-medium shadow-md ring-2 ring-background group-hover:ring-accent transition-all">
                                             {displayName[0]?.toUpperCase()}
                                         </span>
-                                        <span className="text-[10px] text-slate-500">▼</span>
+                                        <span className="text-[10px] text-muted-foreground">▼</span>
                                     </div>
                                 }
                                 isOpen={openDropdown === 'user'}
@@ -313,7 +315,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                             <Link
                                 key={item.id}
                                 href={item.href || '#'}
-                                className="text-sm font-medium text-slate-300 hover:text-white transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-sky-400 hover:after:w-full after:transition-all after:duration-300"
+                                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary hover:after:w-full after:transition-all after:duration-300"
                             >
                                 {item.label}
                             </Link>
@@ -325,7 +327,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                 {!session && locationConfig.showSignIn && (
                     <Link
                         href="/sign-in"
-                        className="rounded-lg bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 shadow-lg shadow-sky-500/20"
+                        className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 shadow-lg shadow-primary/20"
                     >
                         Sign in
                     </Link>
@@ -349,14 +351,14 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
 
             {/* Mobile Menu Drawer - for public pages (non-authenticated) */}
             {!session && isPublicLocation && mobileMenuOpen && (
-                <div className="md:hidden absolute top-full left-0 right-0 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 animate-fade-in">
+                <div className="md:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-md border-b border-border animate-fade-in">
                     <nav className="px-4 py-4 space-y-1">
                         {MENUS.public.items.map((item) => (
                             <Link
                                 key={item.id}
                                 href={item.href || '#'}
                                 onClick={() => setMobileMenuOpen(false)}
-                                className="block px-4 py-3 text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors"
+                                className="block px-4 py-3 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-lg transition-colors"
                             >
                                 {item.label}
                             </Link>
@@ -364,7 +366,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                         <Link
                             href="/sign-in"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="block mt-4 px-4 py-3 text-center text-base font-semibold text-black bg-sky-500 hover:bg-sky-400 rounded-lg transition-colors"
+                            className="block mt-4 px-4 py-3 text-center text-base font-semibold text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg transition-colors"
                         >
                             Sign in
                         </Link>

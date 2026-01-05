@@ -133,8 +133,8 @@ export function ShadcnMenuRenderer({
                     className={cn(
                         "flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors duration-200 outline-none",
                         isOpen
-                            ? "bg-slate-800 text-sky-400"
-                            : "text-slate-400 hover:text-slate-200 hover:bg-slate-800",
+                            ? "bg-accent text-primary"
+                            : "text-muted-foreground hover:text-foreground hover:bg-accent",
                         className
                     )}
                     data-module-id={`menu-trigger-${menuId || 'custom'}`}
@@ -151,7 +151,7 @@ export function ShadcnMenuRenderer({
 
             <DropdownMenuContent
                 align={align === "right" ? "end" : "start"}
-                className="bg-slate-900 border-slate-700 min-w-[200px]"
+                className="bg-popover border-border min-w-[200px]"
                 sideOffset={8}
             >
                 <RenderMenuItems
@@ -184,7 +184,7 @@ function RenderMenuItems({
         <>
             {items.map((item, index) => {
                 // Separator
-                const separator = item.dividerBefore ? <DropdownMenuSeparator className="bg-slate-800" /> : null;
+                const separator = item.dividerBefore ? <DropdownMenuSeparator className="bg-border" /> : null;
 
                 // Submenu
                 if (item.children && item.children.length > 0) {
@@ -193,12 +193,12 @@ function RenderMenuItems({
                             {separator}
                             <DropdownMenuSub>
                                 <DropdownMenuSubTrigger
-                                    className="text-slate-300 focus:text-white focus:bg-slate-800 data-[state=open]:bg-slate-800 data-[state=open]:text-white cursor-pointer"
+                                    className="text-foreground focus:text-foreground focus:bg-accent data-[state=open]:bg-accent data-[state=open]:text-foreground cursor-pointer"
                                 >
                                     {item.icon && <span className="mr-2">{item.icon}</span>}
                                     <span>{item.label}</span>
                                 </DropdownMenuSubTrigger>
-                                <DropdownMenuSubContent className="bg-slate-900 border-slate-700">
+                                <DropdownMenuSubContent className="bg-popover border-border">
                                     <RenderMenuItems
                                         items={item.children}
                                         onAction={onAction}
@@ -236,8 +236,8 @@ function DropdownItem({
 
     // Base styles
     const className = cn(
-        "cursor-pointer focus:bg-slate-800 focus:text-white",
-        active ? "bg-sky-600/20 text-sky-400 focus:bg-sky-600/30 focus:text-sky-300" : "text-slate-300"
+        "cursor-pointer focus:bg-accent focus:text-foreground",
+        active ? "bg-primary/20 text-primary focus:bg-primary/30 focus:text-primary" : "text-foreground"
     );
 
     if (item.href && !item.onClick) {
@@ -253,7 +253,7 @@ function DropdownItem({
                     {item.icon && <span className="mr-2">{item.icon}</span>}
                     <span className="flex-1">{item.label}</span>
                     {item.description && (
-                        <span className="ml-2 text-xs text-slate-500">{item.description}</span>
+                        <span className="ml-2 text-xs text-muted-foreground">{item.description}</span>
                     )}
                 </Link>
             </DropdownMenuItem>
@@ -285,8 +285,8 @@ function SimpleMenuItem({
     const baseClass = cn(
         "px-3 py-2 text-sm rounded-lg transition-colors duration-200",
         isActive
-            ? "bg-sky-600/20 text-sky-400 font-medium"
-            : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+            ? "bg-primary/20 text-primary font-medium"
+            : "text-muted-foreground hover:text-foreground hover:bg-accent"
     );
 
     if (item.href && !item.onClick) {

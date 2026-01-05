@@ -94,8 +94,8 @@ export function EmptyState({
         const isPrimary = actionItem.variant === 'primary' || (type === 'primary' && !actionItem.variant);
 
         const classes = isPrimary
-            ? 'inline-flex items-center gap-2 rounded-lg bg-sky-500 px-5 py-2.5 text-sm font-medium text-slate-950 transition hover:bg-sky-400'
-            : 'inline-flex items-center gap-2 rounded-lg border border-slate-700 px-5 py-2.5 text-sm font-medium text-slate-300 transition hover:border-slate-500 hover:bg-slate-800/50';
+            ? 'inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90'
+            : 'inline-flex items-center gap-2 rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-foreground transition hover:border-border/80 hover:bg-accent';
 
         if (actionItem.href) {
             return (
@@ -128,7 +128,7 @@ export function EmptyState({
     return (
         <div
             id={`empty-state-${context}`}
-            className={`empty-state rounded-xl border border-slate-800 bg-slate-900/50 text-center ${sizeClasses[size]} ${className}`}
+            className={`empty-state rounded-xl border border-border bg-card/50 text-center ${sizeClasses[size]} ${className}`}
             data-track-view={`empty_state_${context}`}
             data-variant={testVariant}
             data-context={context}
@@ -143,13 +143,13 @@ export function EmptyState({
             )}
 
             {/* Title */}
-            <h3 className={`empty-state__title font-semibold text-slate-200 ${titleSizes[size]}`}>
+            <h3 className={`empty-state__title font-semibold text-foreground ${titleSizes[size]}`}>
                 {title}
             </h3>
 
             {/* Description */}
             {description && (
-                <p className="empty-state__description mt-2 text-sm text-slate-400 max-w-md mx-auto">
+                <p className="empty-state__description mt-2 text-sm text-muted-foreground max-w-md mx-auto">
                     {description}
                 </p>
             )}

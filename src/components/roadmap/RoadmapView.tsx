@@ -259,7 +259,7 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                                                 )}
 
                                                 {/* Type badge */}
-                                                <span className={`text-[9px] uppercase font-medium ${getBadgeClass('type', item.type) || "text-slate-400"}`}>
+                                                <span className={`text-[9px] uppercase font-medium ${getBadgeClass('type', item.type) || "text-muted-foreground"}`}>
                                                     {item.type}
                                                 </span>
 
@@ -276,7 +276,7 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                                                         {/* Vote buttons */}
                                                         {column.id !== "done" && (
                                                             <div className="flex items-center gap-1 mt-2">
-                                                                <span className="text-[10px] text-slate-500 mr-1">Priority:</span>
+                                                                <span className="text-[10px] text-muted-foreground mr-1">Priority:</span>
                                                                 {[1, 3, 5, 7, 10].map((p) => (
                                                                     <button
                                                                         key={p}
@@ -318,7 +318,7 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                                     ))}
 
                                     {columnItems.length === 0 && (
-                                        <div className="text-center py-6 text-xs text-slate-600">
+                                        <div className="text-center py-6 text-xs text-muted-foreground">
                                             No items
                                         </div>
                                     )}
@@ -356,8 +356,8 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
             </div>
 
             {/* Legend */}
-            <div className="border-t border-slate-800 p-4 text-center text-xs text-slate-500">
-                Click a card to expand • {isLoggedIn ? "Click priority buttons to vote" : <a href="/sign-in?redirect=/roadmap" className="text-sky-400 hover:underline">Sign in to vote</a>}
+            <div className="border-t border-border p-4 text-center text-xs text-muted-foreground">
+                Click a card to expand • {isLoggedIn ? "Click priority buttons to vote" : <a href="/sign-in?redirect=/roadmap" className="text-primary hover:underline">Sign in to vote</a>}
             </div>
         </div>
     );

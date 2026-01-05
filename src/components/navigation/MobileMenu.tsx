@@ -68,8 +68,8 @@ export function MobileMenu({
                 href="/dashboard"
                 onClick={onClose}
                 className={`block px-4 py-3 rounded-xl text-sm font-medium transition-colors ${isActive("/dashboard")
-                    ? "bg-sky-500/10 text-sky-400 border border-sky-500/20"
-                    : "text-slate-300 hover:bg-slate-800"
+                    ? "bg-primary/10 text-primary border border-primary/20"
+                    : "text-muted-foreground hover:bg-accent"
                     }`}
             >
                 📊 Dashboard
@@ -130,7 +130,7 @@ export function MobileMenu({
             )}
 
             {/* User Account Section */}
-            <div className="pt-4 border-t border-slate-800 space-y-1">
+            <div className="pt-4 border-t border-border space-y-1">
                 <div className="px-4 py-2 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-emerald-500 flex items-center justify-center text-white font-medium shadow-lg">
                         {displayName[0]?.toUpperCase()}
@@ -159,7 +159,7 @@ export function MobileMenu({
                             key={link.id}
                             href={link.href || '#'}
                             onClick={onClose}
-                            className="text-center py-2 text-xs text-slate-500 hover:bg-slate-800 rounded-md transition-colors"
+                            className="text-center py-2 text-xs text-muted-foreground hover:bg-accent rounded-md transition-colors"
                             data-module-id={`menu-${link.id}`}
                             data-module-name={link.label}
                         >
@@ -284,7 +284,7 @@ function MobileMenuItem({
                     <span className={`text-xs transition-transform ${isExpanded ? 'rotate-180' : ''}`}>▼</span>
                 </button>
                 {isExpanded && (
-                    <div className="ml-4 mt-1 space-y-1 border-l border-slate-800 pl-2">
+                    <div className="ml-4 mt-1 space-y-1 border-l border-border pl-2">
                         {item.children.map(child => (
                             <MobileMenuItem
                                 key={child.id}
@@ -316,7 +316,7 @@ function MobileMenuItem({
                 {item.icon && <span className="mr-2">{item.icon}</span>}
                 <span>{item.label}</span>
                 {item.description && (
-                    <span className="ml-2 text-xs text-slate-500">{item.description}</span>
+                    <span className="ml-2 text-xs text-muted-foreground">{item.description}</span>
                 )}
             </button>
         );
@@ -334,7 +334,7 @@ function MobileMenuItem({
             {item.icon && <span className="mr-2">{item.icon}</span>}
             <span>{item.label}</span>
             {item.description && (
-                <span className="ml-2 text-xs text-slate-500">{item.description}</span>
+                <span className="ml-2 text-xs text-muted-foreground">{item.description}</span>
             )}
         </Link>
     );
@@ -355,7 +355,7 @@ function MobileLink({
         return (
             <button
                 onClick={() => onAction(item.onClick!, item)}
-                className="block w-full text-left px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                className="block w-full text-left px-4 py-3 rounded-lg text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
                 data-module-id={`menu-${item.id}`}
                 data-module-name={item.label}
             >
@@ -369,7 +369,7 @@ function MobileLink({
         <Link
             href={item.href || '#'}
             onClick={onClose}
-            className="block px-4 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+            className="block px-4 py-3 rounded-lg text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
             data-module-id={`menu-${item.id}`}
             data-module-name={item.label}
         >

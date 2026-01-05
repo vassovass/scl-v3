@@ -82,7 +82,7 @@ export function ConfirmDialog({
                         type="button"
                         onClick={() => onOpenChange(false)}
                         disabled={isLoading}
-                        className="rounded-lg border border-slate-600 bg-transparent px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 disabled:opacity-50 transition"
+                        className="rounded-lg border border-border bg-transparent px-4 py-2 text-sm font-medium text-foreground hover:bg-accent disabled:opacity-50 transition"
                     >
                         {cancelText}
                     </button>
@@ -90,7 +90,7 @@ export function ConfirmDialog({
                         type="button"
                         onClick={handleConfirm}
                         disabled={isLoading}
-                        className={`rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 ${confirmButtonClasses}`}
+                        className={`rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background ${confirmButtonClasses}`}
                     >
                         {isLoading ? "Loading..." : confirmText}
                     </button>

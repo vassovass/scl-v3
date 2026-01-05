@@ -32,7 +32,7 @@ export interface LoadingSkeletonProps {
 export function SkeletonLine({ width = '100%', height = '1rem' }: { width?: string; height?: string }) {
     return (
         <div
-            className="skeleton-line animate-pulse rounded bg-slate-700/50"
+            className="skeleton-line animate-pulse rounded bg-muted"
             style={{ width, height }}
             aria-hidden="true"
         />
@@ -41,7 +41,7 @@ export function SkeletonLine({ width = '100%', height = '1rem' }: { width?: stri
 
 export function SkeletonCard() {
     return (
-        <div className="skeleton-card rounded-xl border border-slate-800 bg-slate-900/30 p-6 animate-pulse">
+        <div className="skeleton-card rounded-xl border border-border bg-card/30 p-6 animate-pulse">
             <SkeletonLine width="60%" height="1.25rem" />
             <div className="mt-3 space-y-2">
                 <SkeletonLine width="100%" height="0.875rem" />
@@ -57,7 +57,7 @@ export function SkeletonCard() {
 
 export function SkeletonRow() {
     return (
-        <div className="skeleton-row flex items-center gap-4 rounded-lg border border-slate-800 bg-slate-900/30 p-4 animate-pulse">
+        <div className="skeleton-row flex items-center gap-4 rounded-lg border border-border bg-card/30 p-4 animate-pulse">
             <SkeletonLine width="2rem" height="2rem" />
             <div className="flex-1 space-y-2">
                 <SkeletonLine width="40%" height="1rem" />
@@ -142,9 +142,9 @@ export function LoadingSkeleton({
 
             {/* Table skeleton */}
             {variant === 'table' && (
-                <div className="loading-skeleton__table overflow-hidden rounded-lg border border-slate-800">
+                <div className="loading-skeleton__table overflow-hidden rounded-lg border border-border">
                     <table className="w-full">
-                        <thead className="bg-slate-900/50">
+                        <thead className="bg-muted/50">
                             <tr>
                                 {Array.from({ length: columns }).map((_, idx) => (
                                     <th key={idx} className="px-4 py-3 text-left">
@@ -153,7 +153,7 @@ export function LoadingSkeleton({
                                 ))}
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-800">
+                        <tbody className="divide-y divide-border">
                             {Array.from({ length: rows }).map((_, idx) => (
                                 <SkeletonTableRow key={idx} columns={columns} />
                             ))}

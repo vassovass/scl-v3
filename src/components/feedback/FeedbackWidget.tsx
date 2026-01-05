@@ -100,13 +100,13 @@ export function FeedbackWidget() {
 
             {/* Form */}
             {isOpen && (
-                <div className="w-80 rounded-2xl border border-slate-700 bg-slate-900/95 p-4 shadow-2xl backdrop-blur-md sm:w-96">
+                <div className="w-80 rounded-2xl border border-border bg-popover/95 p-4 shadow-2xl backdrop-blur-md sm:w-96">
                     {/* Header */}
                     <div className="mb-4 flex items-center justify-between">
-                        <h3 className="font-semibold text-slate-100">Send Feedback</h3>
+                        <h3 className="font-semibold text-foreground">Send Feedback</h3>
                         <button
                             onClick={() => setIsOpen(false)}
-                            className="rounded-full p-1 text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+                            className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
                         >
                             ✕
                         </button>
@@ -118,12 +118,12 @@ export function FeedbackWidget() {
                                 ✓
                             </div>
                             <p className="text-emerald-400">Feedback sent!</p>
-                            <p className="text-xs text-slate-400">Thank you for helping us improve.</p>
+                            <p className="text-xs text-muted-foreground">Thank you for helping us improve.</p>
                         </div>
                     ) : (
                         <form onSubmit={handleSubmit} className="space-y-3">
                             {/* Type Selection */}
-                            <div className="flex gap-2 rounded-lg bg-slate-950/50 p-1">
+                            <div className="flex gap-2 rounded-lg bg-muted/50 p-1">
                                 {(["general", "bug", "feature"] as const).map((t) => (
                                     <button
                                         key={t}
@@ -134,8 +134,8 @@ export function FeedbackWidget() {
                                                 ? "bg-rose-500/20 text-rose-400"
                                                 : t === "feature"
                                                     ? "bg-amber-500/20 text-amber-400"
-                                                    : "bg-sky-500/20 text-sky-400"
-                                            : "text-slate-400 hover:text-slate-200"
+                                                    : "bg-primary/20 text-primary"
+                                            : "text-muted-foreground hover:text-foreground"
                                             }`}
                                     >
                                         {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -150,7 +150,7 @@ export function FeedbackWidget() {
                                     placeholder="Subject (optional)"
                                     value={subject}
                                     onChange={(e) => setSubject(e.target.value)}
-                                    className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-200 focus:border-sky-500 focus:outline-none"
+                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
                                 />
                             </div>
                             <div>
@@ -166,7 +166,7 @@ export function FeedbackWidget() {
                                     rows={3}
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
-                                    className="w-full resize-none rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-200 focus:border-sky-500 focus:outline-none"
+                                    className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
                                 />
                             </div>
 
@@ -178,7 +178,7 @@ export function FeedbackWidget() {
                                     disabled={isCapturing}
                                     className={`flex flex-1 items-center justify-center gap-2 rounded-lg border border-dashed px-3 py-2 text-xs transition ${screenshot
                                         ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
-                                        : "border-slate-700 text-slate-400 hover:border-slate-600 hover:text-slate-300"
+                                        : "border-border text-muted-foreground hover:border-border/80 hover:text-foreground"
                                         }`}
                                 >
                                     {screenshot ? (

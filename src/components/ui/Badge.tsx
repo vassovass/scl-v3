@@ -43,7 +43,7 @@ export function Badge({
     if (!config) {
         // Fallback for unknown values
         return (
-            <span className={`inline-flex items-center rounded font-medium uppercase bg-slate-500/20 text-slate-400 ${SIZE_CLASSES[size]} ${className}`}>
+            <span className={`inline-flex items-center rounded font-medium uppercase bg-muted text-muted-foreground ${SIZE_CLASSES[size]} ${className}`}>
                 {value}
             </span>
         );
