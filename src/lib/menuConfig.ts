@@ -195,7 +195,7 @@ export const MAIN_MENU: MenuDefinition = {
             icon: '🏆',
             requiresLeague: true,
             children: [
-                { id: 'league-submit', label: 'Submit Steps', href: '/league/[id]', icon: '📝' },
+                { id: 'league-submit', label: 'Submit Steps', href: '/submit', icon: '📝' },
                 { id: 'league-leaderboard', label: 'Leaderboard', href: '/league/[id]/leaderboard', icon: '🏆' },
                 { id: 'league-analytics', label: 'Analytics', href: '/league/[id]/analytics', icon: '📊' },
             ]

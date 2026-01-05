@@ -497,7 +497,6 @@ function DropdownItemContent({
             <Link
                 href={item.href}
                 className={baseClass}
-                onClick={() => onClose?.()}
                 data-module-id={`menu-${item.id}`}
                 data-module-name={item.label}
                 target={item.external ? "_blank" : undefined}

@@ -44,8 +44,9 @@ export function ModeToggle() {
                     className="relative inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-700 bg-slate-800/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-slate-900"
                     aria-label="Toggle theme"
                 >
-                    <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                    <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                    {/* GPU-accelerated transitions to prevent INP blocking */}
+                    <Sun className="h-4 w-4 opacity-100 dark:opacity-0 transition-opacity duration-150" style={{ willChange: 'opacity' }} />
+                    <Moon className="absolute h-4 w-4 opacity-0 dark:opacity-100 transition-opacity duration-150" style={{ willChange: 'opacity' }} />
                     <span className="sr-only">Toggle theme</span>
                 </button>
             </DropdownMenuTrigger>
