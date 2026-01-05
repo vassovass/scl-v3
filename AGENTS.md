@@ -337,35 +337,71 @@ All defined in `src/app/globals.css` using CSS custom properties.
 
 ---
 
-## shadcn/ui Components (NEW)
+## shadcn/ui Components
 
-**Status**: Foundation installed, integration in progress
+**Status**: ✅ Fully integrated (PRD 21 complete)
 
 - **Location**: `src/components/ui/`
-- **Installed**: toast, sonner, dialog, dropdown-menu
 - **Config**: `components.json` (New York style, neutral base)
-- **Styling**: Tailwind + CSS variables (dark-first)
+- **Styling**: Tailwind + CSS variables (dark-first, light via `data-theme="light"`)
 
-### Using shadcn Components
+### Installed Components
+
+| Component | Purpose |
+|-----------|---------|
+| `toast.tsx` + `use-toast.ts` | Notification toasts |
+| `toaster.tsx` | Toast container (in layout.tsx) |
+| `dialog.tsx` | Modal dialogs |
+| `confirm-dialog.tsx` | Reusable confirmation dialogs |
+| `dropdown-menu.tsx` | Dropdown menus |
+| `input.tsx`, `label.tsx`, `textarea.tsx` | Form inputs |
+| `select.tsx`, `checkbox.tsx` | Form controls |
+| `tooltip.tsx` | Tooltips |
+
+### Usage Patterns
 
 ```tsx
-import { useToast } from "@/hooks/use-toast";
-import { Dialog } from "@/components/ui/dialog";
-
-// Replace alert() with toast
-const { toast } = useToast();
+// ✅ Toast notifications (replace alert())
+import { toast } from "@/hooks/use-toast";
 toast({ title: "Success!", description: "Steps submitted" });
+toast({ title: "Error", variant: "destructive" }); // Red error toast
 
-// Replace confirm() with Dialog
-<Dialog>...</Dialog>
+// ✅ Confirmation dialogs (replace confirm())
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+<ConfirmDialog
+  open={showDelete}
+  onOpenChange={setShowDelete}
+  title="Delete Item?"
+  description="This action cannot be undone."
+  variant="destructive"
+  onConfirm={handleDelete}
+  isLoading={isDeleting}
+/>
 ```
 
-### Migration Status
+### Theme Toggle
 
-- ✅ Components installed
-- ❌ `<Toaster />` not in layout yet (PRD 21 Part A)
-- ❌ `alert()` calls still present (need replacement)
-- ❌ `confirm()` calls still present (need Dialog)
+The theme system uses `next-themes` with `data-theme` attribute:
+
+- **Provider**: `ThemeProvider` in `layout.tsx`
+- **Toggle**: `ModeToggle` component in NavHeader
+- **Options**: Light / Dark / System (auto-detects OS preference)
+
+### Joyride CSS Variables (Guided Tours)
+
+Joyride tour styling uses CSS variables for theme-aware colors:
+
+| Variable | Purpose | Dark Theme Value |
+|----------|---------|------------------|
+| `--joyride-bg` | Tooltip background | slate-800 |
+| `--joyride-text` | Tooltip text | slate-100 |
+| `--joyride-primary` | Primary buttons | sky-500 |
+| `--joyride-primary-text` | Primary button text | slate-900 |
+| `--joyride-secondary-text` | Back/skip buttons | slate-400 |
+| `--joyride-beacon` | Beacon pulse color | sky-500 |
+| `--joyride-overlay` | Overlay color | black (with alpha) |
+
+Both dark and light theme values are defined in `globals.css`.
 
 ---
 

@@ -96,6 +96,22 @@
   /* sky-400 */
   --menu-scrollbar: 71 85 105;
   /* slate-600 */
+
+  /* Joyride (Guided Tours) - Dark Theme */
+  --joyride-bg: 30 41 59;
+  /* slate-800 - tooltip background */
+  --joyride-text: 241 245 249;
+  /* slate-100 - tooltip text */
+  --joyride-primary: 14 165 233;
+  /* sky-500 - primary buttons */
+  --joyride-primary-text: 15 23 42;
+  /* slate-900 - primary button text */
+  --joyride-secondary-text: 148 163 184;
+  /* slate-400 - back/skip buttons */
+  --joyride-beacon: 14 165 233;
+  /* sky-500 - beacon pulse color */
+  --joyride-overlay: 0 0 0;
+  /* black - overlay color (with alpha) */
 }
 
 /* === LIGHT THEME (Future) === */
@@ -146,6 +162,22 @@
   /* sky-600 */
   --menu-scrollbar: 203 213 225;
   /* slate-300 */
+
+  /* Joyride (Guided Tours) - Light Theme */
+  --joyride-bg: 255 255 255;
+  /* white - tooltip background */
+  --joyride-text: 15 23 42;
+  /* slate-900 - tooltip text */
+  --joyride-primary: 2 132 199;
+  /* sky-600 - primary buttons (darker for contrast) */
+  --joyride-primary-text: 255 255 255;
+  /* white - primary button text */
+  --joyride-secondary-text: 100 116 139;
+  /* slate-500 - back/skip buttons */
+  --joyride-beacon: 2 132 199;
+  /* sky-600 - beacon pulse color */
+  --joyride-overlay: 0 0 0;
+  /* black - overlay color (with alpha) */
 }
 
 /* ============================================

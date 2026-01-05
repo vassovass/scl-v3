@@ -11,6 +11,38 @@ All notable changes to StepLeague v3.
 
 ### Added
 
+- **PRD 21: shadcn/ui Integration & Toast System** - Modern notification and dialog system
+  - **Toast Notifications** - Replaced all browser `alert()` calls with shadcn toasts
+    - Added `<Toaster />` to root layout
+    - Success toasts: clipboard copy confirmations, proxy member links
+    - Warning toasts: tour navigation requirements
+    - Info toasts: placeholder functionality messages
+  - **Confirmation Dialogs** - Replaced browser `confirm()` with accessible dialogs
+    - New `ConfirmDialog` component (`src/components/ui/confirm-dialog.tsx`)
+    - Supports destructive variant for delete actions
+    - Loading state for async operations
+  - **Form Components** - Installed 6 new shadcn form primitives
+    - `input.tsx`, `select.tsx`, `checkbox.tsx`, `label.tsx`, `textarea.tsx`, `tooltip.tsx`
+  - **Theme Toggle** - Light/Dark/System mode switcher
+    - `ThemeProvider` wrapper using `next-themes` with `data-theme` attribute
+    - `ModeToggle` dropdown component in NavHeader
+    - Theme persists across sessions
+  - **Joyride CSS Variables** - Tour styling now theme-aware
+    - Added `--joyride-*` variables for dark and light modes in globals.css
+    - Variables reference existing color tokens for consistency
+  - **Files Modified/Created**:
+    - `src/app/layout.tsx` - Added Toaster, ThemeProvider
+    - `src/components/ui/confirm-dialog.tsx` - New reusable confirmation dialog
+    - `src/components/theme-provider.tsx` - next-themes wrapper
+    - `src/components/mode-toggle.tsx` - Theme switcher dropdown
+    - `src/components/navigation/NavHeader.tsx` - Added ModeToggle, replaced alert with toast
+    - `src/components/league/ProxyMemberManagement.tsx` - ConfirmDialog, toast notifications
+    - `src/components/league/settings/DangerZone.tsx` - Toast notification
+    - `src/components/forms/SubmissionForm.tsx` - Toast notification
+    - `src/app/(dashboard)/league/[id]/page.tsx` - Toast notification
+    - `src/app/globals.css` - Joyride CSS variables
+
+
 - **PRD 20: Expandable Cards with Image Paste** - Click-to-expand cards with attachment support
   - **ExpandableCardModal** (`src/components/admin/ExpandableCardModal.tsx`) - Full detail view modal using shadcn Dialog
     - Editable title, description, status, priority, release target

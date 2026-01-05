@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { FeedbackWidget } from "@/components/feedback/FeedbackWidget";
+import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import {
@@ -22,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* GTM: Consent defaults + script (must be in head) */}
         <GoogleTagManager />
@@ -31,10 +33,13 @@ export default function RootLayout({
         {/* GTM noscript fallback (immediately after body open) */}
         <GoogleTagManagerNoscript />
 
-        <AuthProvider>
-          {children}
-          <FeedbackWidget />
-        </AuthProvider>
+        <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem>
+          <AuthProvider>
+            {children}
+            <FeedbackWidget />
+            <Toaster />
+          </AuthProvider>
+        </ThemeProvider>
 
         {/* Cookie consent banner (renders at bottom of page) */}
         <CookieConsentBanner />

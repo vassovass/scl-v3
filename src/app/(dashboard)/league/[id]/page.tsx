@@ -361,7 +361,13 @@ export default function LeaguePage() {
                                           sub.verification_notes ?? 'None',
                                         ].join('\n');
                                         navigator.clipboard.writeText(issueDetails);
-                                        alert('Issue details copied to clipboard!');
+                                        // Use toast instead of alert
+                                        import("@/hooks/use-toast").then(({ toast }) => {
+                                          toast({
+                                            title: "Copied!",
+                                            description: "Issue details copied to clipboard.",
+                                          });
+                                        });
                                       }}
                                       className="mt-2 rounded-md border border-slate-600 bg-slate-700 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-slate-600"
                                     >

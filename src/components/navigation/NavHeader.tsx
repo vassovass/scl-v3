@@ -7,6 +7,7 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { createClient } from "@/lib/supabase/client";
 import { MenuRenderer } from "./MenuRenderer";
 import { MobileMenu } from "./MobileMenu";
+import { ModeToggle } from "@/components/mode-toggle";
 import { MenuItem, UserRole, MENUS, MenuLocation, detectMenuLocation, MENU_LOCATIONS } from "@/lib/menuConfig";
 import { APP_CONFIG } from "@/lib/config";
 
@@ -91,7 +92,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
     const displayName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "User";
 
     // Handle menu actions (tours, sign out, etc.)
-    const handleMenuAction = (actionName: string, item: MenuItem) => {
+    const handleMenuAction = async (actionName: string, item: MenuItem) => {
         if (actionName === 'signOut') {
             handleSignOut();
             return;
@@ -119,7 +120,13 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
             if (targetPath) {
                 // For league pages, ensure we have a league ID
                 if ((tourId === 'member' || tourId === 'leaderboard' || tourId === 'admin') && !currentLeagueId) {
-                    alert("Please navigate to a league first to see this tour.");
+                    // Import toast dynamically, show warning toast instead of alert
+                    const { toast } = await import("@/hooks/use-toast");
+                    toast({
+                        title: "Navigate to a league first",
+                        description: "This tour requires being on a league page.",
+                        variant: "destructive",
+                    });
                     return;
                 }
 
@@ -289,6 +296,9 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                                 align="right"
                             />
                         </div>
+
+                        {/* Theme Toggle */}
+                        <ModeToggle />
                     </div>
                 )}
 

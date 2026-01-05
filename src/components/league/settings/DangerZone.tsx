@@ -2,6 +2,7 @@
 
 import { League } from "@/types/database";
 import { SettingsSection } from "./SettingsSection";
+import { toast } from "@/hooks/use-toast";
 
 interface DangerZoneProps {
     league: League;
@@ -11,7 +12,10 @@ interface DangerZoneProps {
 export function DangerZone({ league, disabled }: DangerZoneProps) {
     // Placeholder for delete/archive logic
     const handleDelete = () => {
-        alert("Delete league functionality is not fully implemented yet.");
+        toast({
+            title: "Coming soon",
+            description: "Delete league functionality is not fully implemented yet.",
+        });
     };
 
     return (

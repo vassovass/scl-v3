@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { toast } from "@/hooks/use-toast";
 
 interface ProxyMember {
     id: string;
@@ -38,6 +40,10 @@ export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagem
     const [linkingProxy, setLinkingProxy] = useState<ProxyMember | null>(null);
     const [selectedUserId, setSelectedUserId] = useState<string>("");
     const [linking, setLinking] = useState(false);
+
+    // Delete confirmation state
+    const [deletingProxyId, setDeletingProxyId] = useState<string | null>(null);
+    const [deleting, setDeleting] = useState(false);
 
     const canManage = userRole === "owner" || userRole === "admin";
 
@@ -107,22 +113,30 @@ export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagem
         }
     };
 
-    const handleDelete = async (proxyId: string) => {
-        if (!confirm("Are you sure you want to delete this proxy member?")) return;
+    const handleDeleteConfirm = async () => {
+        if (!deletingProxyId) return;
 
+        setDeleting(true);
         try {
-            const res = await fetch(`/api/leagues/${leagueId}/proxy-members?proxy_id=${proxyId}`, {
+            const res = await fetch(`/api/leagues/${leagueId}/proxy-members?proxy_id=${deletingProxyId}`, {
                 method: "DELETE",
             });
 
             if (res.ok) {
                 fetchProxyMembers();
+                toast({
+                    title: "Proxy deleted",
+                    description: "Proxy member has been removed.",
+                });
             } else {
                 const errData = await res.json();
                 setError(errData.error || "Failed to delete proxy member");
             }
         } catch (err) {
             setError("Failed to delete proxy member");
+        } finally {
+            setDeleting(false);
+            setDeletingProxyId(null);
         }
     };
 
@@ -141,7 +155,10 @@ export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagem
 
             if (res.ok) {
                 const data = await res.json();
-                alert(`Successfully linked! ${data.transferred_submissions} submissions transferred.`);
+                toast({
+                    title: "Successfully linked!",
+                    description: `${data.transferred_submissions} submissions transferred.`,
+                });
                 setLinkingProxy(null);
                 setSelectedUserId("");
                 fetchProxyMembers();
@@ -226,7 +243,7 @@ export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagem
                                     🔗 Link to User
                                 </button>
                                 <button
-                                    onClick={() => handleDelete(proxy.id)}
+                                    onClick={() => setDeletingProxyId(proxy.id)}
                                     className="rounded-lg border border-slate-600 px-3 py-1.5 text-xs font-medium text-slate-400 hover:border-rose-500 hover:text-rose-400 transition"
                                     title={proxy.submission_count > 0 ? "Cannot delete proxy with submissions" : "Delete proxy"}
                                 >
@@ -321,6 +338,20 @@ export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagem
                     </div>
                 </div>
             )}
+
+            {/* Delete Confirmation Dialog */}
+            <ConfirmDialog
+                open={!!deletingProxyId}
+                onOpenChange={(open) => {
+                    if (!open) setDeletingProxyId(null);
+                }}
+                title="Delete Proxy Member?"
+                description="This will permanently delete this proxy member. This action cannot be undone."
+                confirmText="Delete"
+                variant="destructive"
+                onConfirm={handleDeleteConfirm}
+                isLoading={deleting}
+            />
         </div>
     );
 }

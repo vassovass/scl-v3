@@ -544,7 +544,13 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                                         `Notes: ${verificationDetails.notes ?? 'None'}`,
                                     ].join('\n');
                                     navigator.clipboard.writeText(issueDetails);
-                                    alert('Issue details copied to clipboard! You can paste this in an email or support ticket.');
+                                    // Use toast instead of alert
+                                    import("@/hooks/use-toast").then(({ toast }) => {
+                                        toast({
+                                            title: "Copied!",
+                                            description: "Issue details copied to clipboard. Paste in email or support ticket.",
+                                        });
+                                    });
                                 }}
                                 className="shrink-0 rounded-md border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-slate-700 hover:border-slate-500"
                             >
