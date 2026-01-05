@@ -11,6 +11,23 @@ All notable changes to StepLeague v3.
 
 ### Added
 
+- **Global Step Submissions (League-Agnostic)** - Submit steps once, applies to all leagues
+  - **Refactored `SubmitPage`** (`/submit-steps`) - Removed league selector, submissions are now global
+  - **Backend Updates** (`/api/submissions`, `/api/leaderboard`) - Handles `league_id: null` and aggregates steps across user membership
+  - **Database Migration** - `20260105175600_make_submission_league_nullable.sql` to relax `league_id` constraint
+  - **Offline Support** - Detected offline status and warns user (submissions queued in future update)
+  - **Error Handling** - Standardized `AppError` and `toast` usage in submission flow
+
+### Changed
+
+- Renamed `/submit` page to `/submit-steps` for clearer URL
+- Updated `menuConfig.ts` to point to new URL
+- Fixed build error by adding `API_FETCH_FAILED` to `ErrorCode` enum
+
+## [2026-01-05]
+
+### Added
+
 - **PRD 21: shadcn/ui Integration & Toast System** - Modern notification and dialog system
   - **Toast Notifications** - Replaced all browser `alert()` calls with shadcn toasts
     - Added `<Toaster />` to root layout

@@ -111,6 +111,7 @@
 - [x] Batch step submission with AI extraction
 - [x] Leaderboard filters (period, verified, custom dates)
 - [x] User nicknames
+- [x] **Global Step Submissions** (League-agnostic steps)
 - [x] Onboarding flow for new users
 
 ---

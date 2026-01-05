@@ -302,6 +302,19 @@ async function fetchPeriodStats(
   range: { start: string; end: string } | null,
   verified: "all" | "verified" | "unverified"
 ): Promise<Map<string, UserStats>> {
+  // 1. Get all members of this league
+  const { data: members } = await client
+    .from("memberships")
+    .select("user_id")
+    .eq("league_id", leagueId);
+
+  const memberIds = members?.map(m => m.user_id) || [];
+
+  if (memberIds.length === 0) {
+    return new Map();
+  }
+
+  // 2. Query submissions for these users (AGNOSTIC of league_id)
   let query = client
     .from("submissions")
     .select(`
@@ -311,7 +324,7 @@ async function fetchPeriodStats(
       for_date,
       users:user_id (display_name, nickname)
     `)
-    .eq("league_id", leagueId);
+    .in("user_id", memberIds); // Filter by USER, not by league specific rows
 
   if (range) {
     query = query.gte("for_date", range.start).lte("for_date", range.end);
@@ -323,6 +336,9 @@ async function fetchPeriodStats(
     query = query.eq("verified", false);
   }
 
+  // Note: We intentionally DO NOT filter by submission.league_id.
+  // This implements the "Global Steps" logic where steps count for all leagues.
+
   const { data: submissions, error } = await query;
 
   if (error) {
@@ -332,7 +348,32 @@ async function fetchPeriodStats(
 
   const userMap = new Map<string, UserStats>();
 
+  // Use a composite key for deduplication if needed?
+  // Current logic sums all rows.
+  // PROBLEM: If we have multiple rows for same date (e.g. from legacy multiple-league submissions),
+  // we will Double Count.
+  // FIX: Group by user+date and take MAX or distinct?
+  // User said "submit once". Existing data might have duplicates.
+  // We should probably deduplicate by (user_id, for_date).
+
+  const uniqueSubmissionsMap = new Map<string, typeof submissions[0]>();
+
   for (const sub of submissions || []) {
+    const key = `${sub.user_id}_${sub.for_date}`;
+    const existing = uniqueSubmissionsMap.get(key);
+
+    // If duplicate, prefer verified, then higher steps?
+    // Or just take the one created last?
+    // Let's take the one with higher steps to be safe/generous.
+    if (!existing || (sub.steps > existing.steps)) {
+      uniqueSubmissionsMap.set(key, sub);
+    }
+    else if (existing.steps === sub.steps && sub.verified && !existing.verified) {
+      uniqueSubmissionsMap.set(key, sub);
+    }
+  }
+
+  for (const sub of Array.from(uniqueSubmissionsMap.values())) {
     const uid = sub.user_id;
     const profile = sub.users as unknown as { display_name: string | null; nickname: string | null } | null;
 
@@ -397,7 +438,7 @@ async function fetchProxyMemberStats(
   let query = client
     .from("submissions")
     .select("proxy_member_id, steps, verified, for_date")
-    .eq("league_id", leagueId)
+    //.eq("league_id", leagueId) // Removed for Global/Agnostic approach
     .in("proxy_member_id", proxyIds);
 
   if (range) {
@@ -419,7 +460,20 @@ async function fetchProxyMemberStats(
 
   const proxyMap = new Map<string, UserStats>();
 
+  // Deduplicate proxy submissions? Proxies are usually league-bound anyway in schema (proxy_members has league_id).
+  // But submissions for proxies theoretically could be global if proxies were global users.
+  // For now, proxy_members table ties them to league, so only that league's proxy IDs will match.
+  // We can safely process them. But let's dedup just in case.
+  const uniqueProxySubs = new Map<string, typeof submissions[0]>();
   for (const sub of submissions || []) {
+    const key = `${sub.proxy_member_id}_${sub.for_date}`;
+    const existing = uniqueProxySubs.get(key);
+    if (!existing || (sub.steps > existing.steps)) {
+      uniqueProxySubs.set(key, sub);
+    }
+  }
+
+  for (const sub of Array.from(uniqueProxySubs.values())) {
     const proxyId = sub.proxy_member_id;
     if (!proxyId) continue;
 

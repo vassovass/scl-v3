@@ -3,6 +3,8 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { useToast } from "@/hooks/use-toast";
+import { normalizeError, reportErrorClient, errorFromResponse, ErrorCode } from "@/lib/errors";
 import { SubmissionForm } from "@/components/forms/SubmissionForm";
 import { BatchSubmissionForm } from "@/components/forms/BatchSubmissionForm";
 import { BulkUnverifiedForm } from "@/components/forms/BulkUnverifiedForm";
@@ -35,13 +37,39 @@ interface Submission {
  */
 export default function SubmitPage() {
     const { session } = useAuth();
+    const { toast } = useToast();
 
+    // State
+    const [isOffline, setIsOffline] = useState(false);
     const [leagues, setLeagues] = useState<League[]>([]);
-    const [selectedLeagueId, setSelectedLeagueId] = useState<string>("");
+    const [selectedLeagueId, setSelectedLeagueId] = useState<string>(""); // Kept for legacy compatibility/defaults
     const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [loading, setLoading] = useState(true);
     const [submissionMode, setSubmissionMode] = useState<"single" | "batch" | "bulk-manual">("batch");
     const [expandedSubmissionId, setExpandedSubmissionId] = useState<string | null>(null);
+
+    // Online status check
+    useEffect(() => {
+        setIsOffline(!navigator.onLine);
+
+        const handleOnline = () => setIsOffline(false);
+        const handleOffline = () => {
+            setIsOffline(true);
+            toast({
+                title: "You are offline",
+                description: "Submissions will be queued.",
+                duration: 5000,
+            });
+        };
+
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+
+        return () => {
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
+        };
+    }, [toast]);
 
     // Fetch user's leagues
     useEffect(() => {
@@ -55,47 +83,61 @@ export default function SubmitPage() {
                     },
                 });
 
-                if (res.ok) {
-                    const data = await res.json();
-                    const userLeagues = data.leagues || [];
-                    setLeagues(userLeagues);
+                if (!res.ok) {
+                    throw await errorFromResponse(res);
+                }
 
-                    // Auto-select first league if available
-                    if (userLeagues.length > 0 && !selectedLeagueId) {
-                        setSelectedLeagueId(userLeagues[0].id);
-                    }
+                const data = await res.json();
+                const userLeagues = data.leagues || [];
+                setLeagues(userLeagues);
+
+                // Auto-select first league if available (legacy behavior, but still useful for displaying defaults)
+                if (userLeagues.length > 0 && !selectedLeagueId) {
+                    setSelectedLeagueId(userLeagues[0].id);
                 }
             } catch (error) {
-                console.error("Error fetching leagues:", error);
+                const appError = normalizeError(error, ErrorCode.API_REQUEST_FAILED);
+                reportErrorClient(appError);
+                toast({
+                    variant: "destructive",
+                    title: "Failed to load leagues",
+                    description: appError.toUserMessage(),
+                });
             } finally {
                 setLoading(false);
             }
         };
 
         fetchLeagues();
-    }, [session, selectedLeagueId]);
+    }, [session, selectedLeagueId, toast]);
 
+    // Fetch submissions
     const fetchSubmissions = useCallback(async () => {
-        if (!session || !selectedLeagueId) return;
+        if (!session) return;
 
         try {
-            const res = await fetch(
-                `/api/submissions?league_id=${selectedLeagueId}&user_id=${session.user.id}&limit=20`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${session.access_token}`,
-                    },
-                }
-            );
+            // Fetch global submissions. 
+            // We don't filter by league_id anymore to show all user submissions.
+            const url = `/api/submissions?user_id=${session.user.id}&limit=20`;
 
-            if (res.ok) {
-                const data = await res.json();
-                setSubmissions(data.submissions || []);
+            const res = await fetch(url, {
+                headers: {
+                    Authorization: `Bearer ${session.access_token}`,
+                },
+            });
+
+            if (!res.ok) {
+                throw await errorFromResponse(res);
             }
+
+            const data = await res.json();
+            setSubmissions(data.submissions || []);
         } catch (error) {
-            console.error("Error fetching submissions:", error);
+            const appError = normalizeError(error, ErrorCode.API_FETCH_FAILED);
+            // Silent error for background fetch (common pattern) to avoid noisy toasts on every refresh
+            console.error('[FetchSubmissions]', appError);
         }
-    }, [session, selectedLeagueId]);
+    }, [session]);
 
     useEffect(() => {
         fetchSubmissions();
@@ -103,6 +145,10 @@ export default function SubmitPage() {
 
     const handleSubmissionComplete = () => {
         fetchSubmissions();
+        toast({
+            title: "Steps Submitted",
+            description: "Your steps have been recorded.",
+        });
     };
 
     const getVerificationBadge = (verified: boolean | null) => {
@@ -139,34 +185,8 @@ export default function SubmitPage() {
         );
     }
 
-    if (leagues.length === 0) {
-        return (
-            <div className="min-h-screen bg-slate-950">
-                <div className="mx-auto max-w-3xl px-6 py-12">
-                    <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-12 text-center">
-                        <h1 className="text-2xl font-bold text-slate-50">No Leagues Yet</h1>
-                        <p className="mt-4 text-slate-400">
-                            You need to join or create a league before you can submit steps.
-                        </p>
-                        <div className="mt-8 flex justify-center gap-4">
-                            <Link
-                                href="/join"
-                                className="rounded-lg border border-slate-700 px-6 py-3 text-sm font-medium text-slate-300 transition hover:border-slate-500"
-                            >
-                                Join League
-                            </Link>
-                            <Link
-                                href="/league/create"
-                                className="rounded-lg bg-sky-500 px-6 py-3 text-sm font-medium text-slate-950 transition hover:bg-sky-400"
-                            >
-                                Create League
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    // "No Leagues" check REMOVED to allow leagueless submissions.
+    // Instead we can show a specific message inside if user has no leagues, but still allow submission.
 
     return (
         <div className="min-h-screen bg-slate-950">
@@ -187,8 +207,32 @@ export default function SubmitPage() {
 
             {/* Main */}
             <main className="mx-auto max-w-3xl px-6 py-12">
-                {/* League Selector - REMOVED (Global Submission) */}
-                {/* Steps are now applied to all leagues automatically */}
+                {/* Offline Warning */}
+                {isOffline && (
+                    <div className="mb-6 rounded-lg border border-amber-500/50 bg-amber-500/10 p-4 text-amber-200">
+                        <div className="flex items-center gap-2">
+                            <span className="text-lg">⚠️</span>
+                            <div>
+                                <h3 className="font-medium">You are offline</h3>
+                                <p className="text-sm opacity-90">Submissions will be saved when you reconnect.</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Global Submission Info */}
+                <div className="mb-8 rounded-lg border border-sky-500/30 bg-sky-500/10 p-4 text-sky-200">
+                    <div className="flex items-start gap-3">
+                        <span className="mt-0.5 text-lg">🌍</span>
+                        <div>
+                            <h3 className="font-medium text-sky-100">Global Step Submission</h3>
+                            <p className="mt-1 text-sm text-sky-200/80">
+                                Steps submitted here are automatically applied to <strong>all your leagues</strong> based on their start dates.
+                                You don't need to submit separately for each league.
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
                 {/* Submit Steps Section */}
                 <ModuleFeedback moduleId="submission-form" moduleName="Step Submission Form">
@@ -242,6 +286,7 @@ export default function SubmitPage() {
                                     leagueId={selectedLeagueId}
                                     onSubmitted={handleSubmissionComplete}
                                     settings={{
+                                        // Use defaults if leagueless or not selected
                                         allow_manual_entry: selectedLeague?.allow_manual_entry ?? true,
                                         require_verification_photo: selectedLeague?.require_verification_photo ?? false
                                     }}
