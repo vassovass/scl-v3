@@ -6,6 +6,7 @@ import { FeedbackFilterState, DEFAULT_FILTER_STATE, BOARD_STATUS_OPTIONS } from 
 import { useFetch } from "@/hooks/useFetch";
 import { Badge } from "@/components/ui/Badge";
 import BulkActionsBar from "./BulkActionsBar";
+import ExpandableCardModal from "./ExpandableCardModal";
 
 interface FeedbackItem {
     id: string;
@@ -79,6 +80,24 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
     const [filters, setFilters] = useState<FeedbackFilterState>(DEFAULT_FILTER_STATE);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+    // Expandable card modal state
+    const [selectedItem, setSelectedItem] = useState<FeedbackItem | null>(null);
+    const [showDetailModal, setShowDetailModal] = useState(false);
+
+    // Handle opening detail modal
+    const handleOpenDetail = useCallback((item: FeedbackItem) => {
+        // Convert to modal-compatible format
+        setSelectedItem({
+            ...item,
+            subject: item.subject || '',
+            target_release: 'later',
+            priority_order: 0,
+            completed_at: null,
+            users: item.users ? { nickname: item.users.nickname || item.users.display_name || 'User' } : null,
+        } as unknown as FeedbackItem);
+        setShowDetailModal(true);
+    }, []);
 
     // Toggle selection for a single item
     const toggleSelection = useCallback((id: string) => {
@@ -299,7 +318,8 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                                     : isSelected
                                         ? "border-sky-500 ring-1 ring-sky-500/30 bg-sky-500/5"
                                         : "border-slate-800"
-                                    } ${isUpdating ? "opacity-60" : ""}`}
+                                    } ${isUpdating ? "opacity-60" : ""} cursor-pointer`}
+                                onClick={() => handleOpenDetail(item)}
                             >
                                 <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
                                     <div className="flex flex-wrap items-center gap-2 md:gap-3">
@@ -458,6 +478,19 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                 onBulkStatusChange={handleBulkStatusChange}
                 onBulkArchive={handleBulkArchive}
                 onBulkTogglePublic={handleBulkTogglePublic}
+            />
+
+            {/* Expandable Card Modal */}
+            <ExpandableCardModal
+                item={selectedItem as unknown as import("./ExpandableCardModal").FeedbackItem | null}
+                isOpen={showDetailModal}
+                onClose={() => {
+                    setShowDetailModal(false);
+                    setSelectedItem(null);
+                }}
+                onUpdate={() => refetch()}
+                canEdit={true}
+                canManageAttachments={true}
             />
         </div>
     );

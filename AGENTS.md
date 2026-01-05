@@ -48,7 +48,7 @@
 >   body: JSON.stringify({
 >     id: "<existing-id>",
 >     board_status: "done",
->     completed_at: "2025-12-24"  // Current date YYYY-MM-DD
+>     completed_at: "2026-01-05"  // Current date YYYY-MM-DD
 >   })
 > });
 > ```

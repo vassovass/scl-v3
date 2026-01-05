@@ -16,6 +16,7 @@ interface FeedbackItem {
     user_id: string | null;
     users?: { nickname: string } | null;
     screenshot_url: string | null;
+    attachment_count?: number;
 }
 
 interface KanbanCardProps {
@@ -25,6 +26,7 @@ interface KanbanCardProps {
     onToggleSelection: (id: string, e: React.MouseEvent) => void;
     onTogglePublic: (id: string, current: boolean) => void;
     onCycleRelease: (id: string, current: string) => void;
+    onOpenDetail?: (item: FeedbackItem) => void;
 }
 
 const KanbanCard = memo(function KanbanCard({
@@ -34,8 +36,15 @@ const KanbanCard = memo(function KanbanCard({
     onToggleSelection,
     onTogglePublic,
     onCycleRelease,
+    onOpenDetail,
 }: KanbanCardProps) {
     const [isExpanded, setIsExpanded] = useState(false);
+
+    // Handle double-click to open detail modal
+    const handleDoubleClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onOpenDetail?.(item);
+    };
 
     return (
         <Draggable draggableId={item.id} index={index}>
@@ -44,12 +53,14 @@ const KanbanCard = memo(function KanbanCard({
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
-                    className={`p-3 mb-2 bg-slate-800/80 rounded-lg border transition-all ${snapshot.isDragging
+                    onDoubleClick={handleDoubleClick}
+                    className={`p-3 mb-2 bg-slate-800/80 rounded-lg border transition-all cursor-pointer ${snapshot.isDragging
                         ? "border-sky-500 shadow-lg shadow-sky-500/20"
                         : isSelected
                             ? "border-sky-500 ring-1 ring-sky-500/30 bg-sky-500/10"
                             : "border-slate-700 hover:border-slate-600"
                         }`}
+                    title="Double-click to open details"
                 >
                     <div className="flex items-start justify-between gap-2 mb-2">
                         <div className="flex items-center gap-1">
@@ -134,6 +145,15 @@ const KanbanCard = memo(function KanbanCard({
                     <div className="mt-2 text-[10px] text-slate-500 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <span>{new Date(item.created_at).toLocaleDateString()}</span>
+                            {/* Attachment count badge */}
+                            {(item.attachment_count || 0) > 0 && (
+                                <span
+                                    className="px-1.5 py-0.5 bg-sky-500/20 text-sky-400 rounded text-[9px]"
+                                    title={`${item.attachment_count} attachment${item.attachment_count === 1 ? '' : 's'}`}
+                                >
+                                    🖼️ {item.attachment_count}
+                                </span>
+                            )}
                             {item.screenshot_url && (
                                 <a
                                     href={item.screenshot_url}

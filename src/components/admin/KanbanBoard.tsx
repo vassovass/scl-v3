@@ -9,6 +9,7 @@ import BulkActionsBar from "./BulkActionsBar";
 import MergeModal from "./MergeModal";
 import KanbanCard from "./KanbanCard";
 import ImportModal from "./ImportModal";
+import ExpandableCardModal from "./ExpandableCardModal";
 import { useExport } from "@/hooks/useExport";
 import { KANBAN_COLUMNS as EXPORT_COLUMNS } from "@/lib/export/presets";
 import { useRouter } from "next/navigation";
@@ -27,6 +28,7 @@ interface FeedbackItem {
     user_id: string | null;
     users?: { nickname: string } | null;
     screenshot_url: string | null;
+    attachment_count?: number;
 }
 
 interface KanbanColumn {
@@ -55,6 +57,29 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [showMergeModal, setShowMergeModal] = useState(false);
     const [showImportModal, setShowImportModal] = useState(false);
+
+    // Expandable card modal state
+    const [selectedItem, setSelectedItem] = useState<FeedbackItem | null>(null);
+    const [showDetailModal, setShowDetailModal] = useState(false);
+
+    // Handle opening detail modal
+    const handleOpenDetail = useCallback((item: FeedbackItem) => {
+        setSelectedItem(item);
+        setShowDetailModal(true);
+    }, []);
+
+    // Handle item update from modal
+    const handleItemUpdate = useCallback((updatedItem: FeedbackItem) => {
+        setColumns((prev) =>
+            prev.map((col) => ({
+                ...col,
+                items: col.items.map((item) =>
+                    item.id === updatedItem.id ? updatedItem : item
+                ),
+            }))
+        );
+        setSelectedItem(updatedItem);
+    }, []);
 
     // Toggle selection for a single item
     const toggleSelection = useCallback((id: string, e: React.MouseEvent) => {
@@ -398,6 +423,7 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                                                                 onToggleSelection={toggleSelection}
                                                                 onTogglePublic={togglePublic}
                                                                 onCycleRelease={cycleRelease}
+                                                                onOpenDetail={handleOpenDetail}
                                                             />
                                                         ))}
                                                         {provided.placeholder}
@@ -446,6 +472,19 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                 endpoint="/api/admin/feedback/import"
                 columns={EXPORT_COLUMNS}
                 title="Import Kanban Items"
+            />
+
+            {/* Expandable Card Modal */}
+            <ExpandableCardModal
+                item={selectedItem}
+                isOpen={showDetailModal}
+                onClose={() => {
+                    setShowDetailModal(false);
+                    setSelectedItem(null);
+                }}
+                onUpdate={handleItemUpdate}
+                canEdit={true}
+                canManageAttachments={true}
             />
         </div>
     );

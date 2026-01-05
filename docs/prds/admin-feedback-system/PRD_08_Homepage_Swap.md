@@ -17,7 +17,7 @@ Before starting work on this PRD, the implementing agent MUST:
 
 2. **Follow documentation rules:**
    - Update `CHANGELOG.md` with all changes
-   - Use date format `YYYY-MM-DD` (current year is 2025)
+   - Use date format `YYYY-MM-DD` (current year is 2026)
    - Store artifacts in `docs/artifacts/`
    - Update roadmap when complete
 

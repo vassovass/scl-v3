@@ -7,6 +7,35 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-01-05]
+
+### Added
+
+- **PRD 20: Expandable Cards with Image Paste** - Click-to-expand cards with attachment support
+  - **ExpandableCardModal** (`src/components/admin/ExpandableCardModal.tsx`) - Full detail view modal using shadcn Dialog
+    - Editable title, description, status, priority, release target
+    - Integrated attachment gallery with upload capability
+    - Image paste zone for Ctrl+V / Cmd+V uploads
+  - **Modular Attachments System** - Generic, reusable across all entity types
+    - **Database**: New `attachments` table with polymorphic `entity_type` + `entity_id` pattern
+    - **Types** (`src/types/attachments.ts`) - EntityType, Attachment, upload config/validation
+    - **API** (`/api/attachments`) - GET/POST/DELETE endpoints with structured error responses
+    - **Hook** (`useAttachments`) - Optimistic UI, file validation, error handling
+  - **Reusable UI Components**:
+    - `ImagePasteZone` - Clipboard paste, drag-drop, file picker with preview
+    - `AttachmentGallery` - Thumbnail grid, lightbox view, delete buttons
+  - **Error Handling System** (`src/lib/errors.ts`) - Future-proof error infrastructure
+    - `AppError` class with typed `ErrorCode` enum
+    - `reportError()` / `reportErrorClient()` for centralized logging
+    - `normalizeError()` for converting any thrown value
+    - Integrates with existing `logger.ts`
+  - **Integration**:
+    - KanbanBoard: Double-click card opens modal, attachment count badge
+    - FeedbackList: Click row opens modal with full details
+    - PRD Index updated (18, 19 marked complete; 20 in progress)
+
+---
+
 ## [2026-01-04]
 
 ### Added

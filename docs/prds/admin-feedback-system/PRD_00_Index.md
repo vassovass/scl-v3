@@ -75,23 +75,23 @@
 |---|-----|--------|
 | 16 | [Import/Export System](./PRD_16_Export_Utility.md) | ✅ Complete |
 | 17 | [Public Roadmap Polish](./PRD_17_Public_Roadmap_Polish.md) | ✅ Complete |
-| 18 | [Documentation](./PRD_18_Documentation.md) | 📋 Planned |
+| 18 | [Documentation](./PRD_18_Documentation.md) | ✅ Complete |
 
 ---
 
 ### Phase 6: Core League Features
 
-| # | PRD | Outcome |
-|---|-----|---------|
-| 19 | [League Start Date](./PRD_19_League_Start_Date.md) | League owners set when step counting begins |
+| # | PRD | Status |
+|---|-----|--------|
+| 19 | [League Start Date](./PRD_19_League_Start_Date.md) | ✅ Complete |
 
 ---
 
 ### Phase 7: Enhanced Card Experience
 
-| # | PRD | Outcome |
-|---|-----|---------|
-| 20 | [Expandable Cards with Image Paste](./PRD_20_Expandable_Cards_Image_Paste.md) | Click to expand cards, paste screenshots |
+| # | PRD | Status |
+|---|-----|--------|
+| 20 | [Expandable Cards with Image Paste](./PRD_20_Expandable_Cards_Image_Paste.md) | 🔄 In Progress |
 
 ---
 
