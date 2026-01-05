@@ -13,7 +13,7 @@ export function GlobalFooter() {
     const legalItems = MENUS.footerLegal.items;
 
     return (
-        <footer className="border-t border-slate-800 bg-slate-950 mt-auto">
+        <footer className="border-t border-border bg-background mt-auto">
             <div className="mx-auto max-w-6xl px-4 py-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                     {/* Brand */}
@@ -21,7 +21,7 @@ export function GlobalFooter() {
                         <Link href="/dashboard" className="group flex items-center gap-2">
                             <span className="text-xl">👟</span>
                             <span className="font-bold">
-                                <span className="text-slate-200 transition-colors group-hover:text-sky-400">Step</span>
+                                <span className="text-foreground transition-colors group-hover:text-primary">Step</span>
                                 <span className="text-sky-500 transition-colors group-hover:text-slate-200">League</span>
                             </span>
                         </Link>
@@ -32,7 +32,7 @@ export function GlobalFooter() {
 
                     {/* Navigation Column */}
                     <div>
-                        <h4 className="text-sm font-medium text-slate-300 mb-3">
+                        <h4 className="text-sm font-medium text-foreground mb-3">
                             {MENUS.footerNavigation.label}
                         </h4>
                         <ul className="space-y-2">
@@ -40,7 +40,7 @@ export function GlobalFooter() {
                                 <li key={item.id}>
                                     <Link
                                         href={item.href || '#'}
-                                        className="text-sm text-slate-500 hover:text-slate-300 transition"
+                                        className="text-sm text-muted-foreground hover:text-primary transition"
                                         data-module-id={`footer-${item.id}`}
                                         data-module-name={item.label}
                                     >
@@ -95,8 +95,8 @@ export function GlobalFooter() {
                 </div>
 
                 {/* Bottom bar */}
-                <div className="mt-8 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <p className="text-xs text-slate-600">
+                <div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <p className="text-xs text-muted-foreground">
                         © {currentYear} {APP_CONFIG.name}. All rights reserved.
                     </p>
                     <div className="flex items-center gap-4 text-xs text-slate-600">

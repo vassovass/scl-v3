@@ -147,7 +147,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
     // Dynamic header classes based on variant
     const headerClasses = isTransparent
         ? "absolute top-0 left-0 right-0 z-40 bg-transparent transition-all duration-300"
-        : "sticky top-0 z-40 border-b border-slate-800 bg-slate-950/95 backdrop-blur-md transition-all duration-300";
+        : "sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-md transition-all duration-300";
 
     return (
         <header className={headerClasses}>

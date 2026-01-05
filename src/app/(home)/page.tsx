@@ -33,28 +33,28 @@ export default function HomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[rgb(var(--bg-base))] text-white overflow-hidden">
+    <main className="min-h-screen bg-background text-foreground overflow-hidden">
       {/* === HERO SECTION === */}
       <section className="relative min-h-screen flex items-center overflow-hidden">
         {/* Background gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-sky-900/20 via-transparent to-purple-900/20" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20" />
 
         {/* Hero content - asymmetric layout: contained text, edge-to-edge image */}
         <div className="relative z-10 w-full grid lg:grid-cols-2 items-center">
           {/* Left: Text content - contained with padding */}
           <div className="text-center lg:text-left order-2 lg:order-1 px-6 lg:pl-12 xl:pl-24 py-20 lg:py-0">
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] pb-2 animate-fade-slide">
-              <span className="block text-white">Step</span>
+              <span className="block text-foreground">Step</span>
               <span className="block bg-gradient-to-r from-sky-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent pb-1">
                 League
               </span>
             </h1>
 
-            <p className="mt-6 text-xl sm:text-2xl font-light text-slate-300 animate-fade-slide animate-delay-100">
+            <p className="mt-6 text-xl sm:text-2xl font-light text-muted-foreground animate-fade-slide animate-delay-100">
               Compete. Track. Win.
             </p>
 
-            <p className="mt-4 text-lg text-slate-400 max-w-lg mx-auto lg:mx-0 animate-fade-slide animate-delay-200">
+            <p className="mt-4 text-lg text-muted-foreground max-w-lg mx-auto lg:mx-0 animate-fade-slide animate-delay-200">
               {APP_CONFIG.tagline}. Upload step screenshots, get AI-verified,
               and climb the leaderboard against friends.
             </p>
@@ -69,7 +69,7 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/sign-in"
-                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white border-2 border-slate-600 rounded-full transition-all duration-300 hover:border-sky-400 hover:text-sky-400"
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-foreground border-2 border-input rounded-full transition-all duration-300 hover:border-primary hover:text-primary"
               >
                 Sign In
               </Link>
@@ -100,13 +100,13 @@ export default function HomePage() {
       </section>
 
       {/* === HOW IT WORKS === */}
-      <section className="py-24 bg-gradient-to-b from-[#0a0a0a] to-slate-900/50">
+      <section className="py-24 bg-gradient-to-b from-background to-muted/50">
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
               How It Works
             </h2>
-            <p className="mt-4 text-lg text-slate-400">
+            <p className="mt-4 text-lg text-muted-foreground">
               Three simple steps to start competing
             </p>
           </div>
@@ -115,12 +115,12 @@ export default function HomePage() {
             {/* Step 1 */}
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-sky-500/20 to-cyan-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition duration-500" />
-              <div className="relative bg-slate-800/50 border border-slate-700/50 rounded-2xl p-8 h-full">
+              <div className="relative bg-card border border-border rounded-2xl p-8 h-full">
                 <div className="w-14 h-14 bg-gradient-to-br from-sky-400 to-cyan-500 rounded-xl flex items-center justify-center text-2xl font-bold text-black mb-6">
                   1
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-3">Upload Screenshot</h3>
-                <p className="text-slate-400">
+                <h3 className="text-xl font-semibold text-foreground mb-3">Upload Screenshot</h3>
+                <p className="text-muted-foreground">
                   Take a screenshot of your daily steps from any fitness app - Apple Health, Google Fit, Samsung Health, and more.
                 </p>
               </div>
@@ -158,12 +158,12 @@ export default function HomePage() {
       </section>
 
       {/* === FEATURES SECTION === */}
-      <section className="py-24 bg-slate-900/50">
+      <section className="py-24 bg-muted/20">
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left: Features list */}
             <div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-8">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-8">
                 Everything you need to <br />
                 <span className="bg-gradient-to-r from-sky-400 to-cyan-400 bg-clip-text text-transparent">
                   compete with friends
@@ -178,8 +178,8 @@ export default function HomePage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white">AI-Powered Verification</h3>
-                    <p className="text-slate-400 mt-1">Screenshots are verified by AI to prevent cheating and ensure fair competition.</p>
+                    <h3 className="text-lg font-semibold text-foreground">AI-Powered Verification</h3>
+                    <p className="text-muted-foreground mt-1">Screenshots are verified by AI to prevent cheating and ensure fair competition.</p>>
                   </div>
                 </div>
 
@@ -260,14 +260,14 @@ export default function HomePage() {
       {/* === FINAL CTA === */}
       <section className="py-24 relative overflow-hidden">
         {/* Background effects */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-[#0a0a0a]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-card to-background" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-sky-500/10 rounded-full blur-3xl" />
 
         <div className="relative z-10 max-w-3xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-5xl font-bold text-white">
+          <h2 className="text-3xl sm:text-5xl font-bold text-foreground">
             Ready to start competing?
           </h2>
-          <p className="mt-6 text-xl text-slate-400">
+          <p className="mt-6 text-xl text-muted-foreground">
             Join StepLeague for free and challenge your friends to move more.
           </p>
           <Link
@@ -280,7 +280,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer spacer */}
-      <div className="h-12 bg-[#0a0a0a]" />
+      <div className="h-12 bg-background" />
     </main>
   );
 }

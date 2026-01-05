@@ -62,7 +62,7 @@ export function MobileMenu({
     ];
 
     return (
-        <div className="md:hidden border-t border-slate-800 bg-slate-950 px-4 py-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
+        <div className="md:hidden border-t border-border bg-background px-4 py-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
             {/* Dashboard Link */}
             <Link
                 href="/dashboard"
@@ -136,8 +136,8 @@ export function MobileMenu({
                         {displayName[0]?.toUpperCase()}
                     </div>
                     <div>
-                        <div className="text-sm font-medium text-slate-200">{displayName}</div>
-                        <div className="text-xs text-slate-500 truncate max-w-[200px]">{user?.email}</div>
+                        <div className="text-sm font-medium text-foreground">{displayName}</div>
+                        <div className="text-xs text-muted-foreground truncate max-w-[200px]">{user?.email}</div>
                     </div>
                 </div>
 
@@ -209,7 +209,7 @@ interface MobileSectionProps {
 
 function MobileSection({
     title,
-    titleClassName = "text-slate-500",
+    titleClassName = "text-muted-foreground",
     items,
     isExpanded,
     onToggle,
@@ -264,7 +264,7 @@ function MobileMenuItem({
 }: MobileMenuItemProps) {
     const [isExpanded, setIsExpanded] = useState(false);
 
-    const baseClass = `block px-4 py-3 rounded-lg text-sm transition-colors ${className || "text-slate-300 hover:bg-slate-800 hover:text-white"}`;
+    const baseClass = `block px-4 py-3 rounded-lg text-sm transition-colors ${className || "text-muted-foreground hover:bg-accent hover:text-accent-foreground"}`;
     const paddingLeft = depth > 0 ? `pl-${4 + depth * 4}` : '';
 
     // Has children - render as sub-accordion

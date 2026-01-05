@@ -5,44 +5,45 @@ import { format } from "date-fns";
 import { DayPicker, DateRange } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 
-// Custom style overrides for dark mode
+// Custom style overrides using our semantic variables
+// We map the react-day-picker Custom Properties to our global variables
 const css = `
   .rdp {
     --rdp-cell-size: 40px;
-    --rdp-accent-color: #0ea5e9;
-    --rdp-background-color: #0f172a;
-    --rdp-accent-color-dark: #0284c7;
-    --rdp-background-color-dark: #1e293b;
-    --rdp-outline: 2px solid #0ea5e9;
-    --rdp-outline-selected: 2px solid #e2e8f0;
+    --rdp-accent-color: rgb(var(--date-picker-accent));
+    --rdp-background-color: rgb(var(--date-picker-bg));
+    --rdp-accent-color-dark: rgb(var(--date-picker-accent));
+    --rdp-background-color-dark: rgb(var(--date-picker-bg));
+    --rdp-outline: 2px solid rgb(var(--date-picker-accent));
+    --rdp-outline-selected: 2px solid rgb(var(--date-picker-border));
     margin: 0;
   }
   .rdp-day {
-    color: #f1f5f9 !important;
+    color: rgb(var(--date-picker-text)) !important;
     font-weight: 500;
   }
   .rdp-day_outside {
-    color: #475569 !important;
+    color: rgb(var(--muted-foreground)) !important;
     opacity: 0.5;
   }
   .rdp-head_cell {
-    color: #94a3b8;
+    color: rgb(var(--muted-foreground));
     font-weight: 500;
     font-size: 0.75rem;
   }
   .rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
-    background-color: #334155;
+    background-color: rgb(var(--accent));
     border-radius: 6px;
-    color: #ffffff;
+    color: rgb(var(--accent-foreground));
   }
   .rdp-day_selected {
     background-color: var(--rdp-accent-color) !important;
-    color: white !important;
+    color: rgb(var(--primary-foreground)) !important;
     font-weight: 600;
   }
   .rdp-range_middle {
-    background-color: rgba(14, 165, 233, 0.35) !important;
-    color: #ffffff !important;
+    background-color: rgba(var(--date-picker-accent), 0.2) !important;
+    color: rgb(var(--date-picker-text)) !important;
     border-radius: 0;
   }
   .rdp-day_range_start {
@@ -54,17 +55,17 @@ const css = `
   .rdp-caption_label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #f1f5f9;
+    color: rgb(var(--date-picker-text));
   }
   .rdp-nav_button {
-    color: #94a3b8;
+    color: rgb(var(--muted-foreground));
   }
   .rdp-nav_button:hover {
-    color: #f1f5f9;
-    background-color: #334155;
+    color: rgb(var(--date-picker-text));
+    background-color: rgb(var(--accent));
   }
   .rdp-day_today:not(.rdp-day_selected) {
-    border: 1px solid #0ea5e9;
+    border: 1px solid rgb(var(--date-picker-accent));
     border-radius: 6px;
   }
 `;
@@ -156,8 +157,8 @@ export function DateRangePicker({ date, onSelect, className = "" }: DateRangePic
           type="button"
           onClick={handleOpen}
           className={`flex items-center gap-2 px-3 py-2 text-sm rounded-md border transition-colors ${isOpen
-            ? "border-sky-500 bg-slate-900 text-sky-400"
-            : "border-slate-700 bg-slate-900 text-slate-300 hover:border-slate-600 hover:bg-slate-800"
+            ? "border-primary bg-popover text-primary"
+            : "border-border bg-popover text-muted-foreground hover:border-foreground/20 hover:bg-accent hover:text-accent-foreground"
             }`}
         >
           <span className="opacity-70">📅</span>
@@ -177,7 +178,7 @@ export function DateRangePicker({ date, onSelect, className = "" }: DateRangePic
       </div>
 
       {isOpen && (
-        <div className="absolute top-full left-0 z-50 mt-2 rounded-lg border border-slate-700 bg-slate-900 shadow-xl">
+        <div className="absolute top-full left-0 z-50 mt-2 rounded-lg border border-border bg-popover shadow-xl">
           {/* Selection indicator */}
           <div className="px-3 py-2 border-b border-slate-700 text-sm">
             <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${selectingEnd
@@ -199,7 +200,7 @@ export function DateRangePicker({ date, onSelect, className = "" }: DateRangePic
           </div>
 
           {/* Helper text */}
-          <div className="px-3 pb-2 text-xs text-slate-500">
+          <div className="px-3 pb-2 text-xs text-muted-foreground">
             {selectingEnd
               ? "Click a date to set end • Click before start to reset"
               : "Click a date to set start"}

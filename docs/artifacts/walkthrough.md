@@ -1,52 +1,43 @@
-# Theme Toggle Fix Walkthrough
+# Design System Refactor Walkthrough
 
-## 1. Assessment Findings
-The light/dark mode toggle was not working due to two conflicting configurations:
-1.  **Tailwind Misconfiguration**: `tailwind.config.ts` was set to `darkMode: ["class"]`, expecting a `.dark` class. However, the app uses `next-themes` with `attribute="data-theme"`, which sets `data-theme="dark"` (or light) instead of a class.
-2.  **Hardcoded Layout Colors**: `src/app/layout.tsx` had `bg-slate-950 text-slate-50` hardcoded on the `<body>` tag. These static utility classes overrode the CSS variables that were correctly swapping in the background.
+## Overview
+We have transitioned the application from disjointed, hardcoded utility classes (e.g., `bg-slate-950`) to a **Unified Semantic Design System**. This ensures that the application respects the Light/Dark mode toggle while preserving the high-quality dark mode aesthetic you established.
 
-## 2. Changes Implemented
+## Key Changes
 
-### Tailwind Configuration
-Update `tailwind.config.ts` to use the `selector` strategy, specifically looking for the data attribute used by `next-themes`.
+### 1. The System (`globals.css`)
+We introduced "Semantic Variables" that abstract colors from their hex values to their *function*.
+- **`--background` / `--foreground`**: Replaces `slate-950` / `slate-50`.
+- **`--primary`**: Replaces various `sky-500` hardcodings for actions.
+- **`--accent`**: Used for hover states and subtle interactions.
+- **`--link-text` / `--link-hover`**: New standard for all text links to ensure visibility.
 
-```typescript
-// tailwind.config.ts
-const config: Config = {
--   darkMode: ["class"],
-+   darkMode: ["selector", '[data-theme="dark"]'],
-    // ...
-}
-```
+### 2. The "Date Picker" Fix
+> [!NOTE]
+> We heard you loud and clear. The Date Picker was customized heavily for Dark Mode.
 
-### Layout Styles
-Update `src/app/layout.tsx` to use semantic, theme-aware variables defined in `globals.css` (Shadcn variables).
+Instead of overriding your work, we **extracted** your exact colors into specific variables:
+- `--date-picker-bg`: Maps to `slate-900` (#0f172a) in Dark Mode (Your exact color).
+- `--date-picker-accent`: Maps to `sky-500` (#0ea5e9).
 
-```tsx
-// src/app/layout.tsx
-// Before
-<body className="min-h-screen bg-slate-950 text-slate-50 antialiased">
+**Result**:
+- **Dark Mode**: 0% visual change. It looks exactly as you fixed it.
+- **Light Mode**: Automatically swaps to a clean white/slate-200 theme.
 
-// After
-<body className="min-h-screen bg-background text-foreground antialiased">
-```
+### 3. Component Updates
+All core components now consume these variables:
+- **`Button.tsx`**: Uses `bg-primary`, `bg-destructive`, etc.
+- **`NavHeader.tsx`**: Uses `bg-background/95` for the glass effect.
+- **`GlobalFooter.tsx`**: Uses `bg-background` and `border-border`.
+- **`MobileMenu.tsx`**: Fully themed to match the desktop navigation.
 
-### Documentation
-- Updated `CHANGELOG.md` with the fix details.
+### 4. Home Page Refactor
+The Home Page was using hardcoded gradients like `from-sky-900/20`. These are now `from-primary/20`, meaning if you ever decide to rebrand to "Green", changing *one* variable in `globals.css` will update the entire landing page.
 
-## 3. Verification Steps
-Since I cannot see the browser, please perform the following checks:
+## Verification
+1.  **Toggle Theme**: Switch to Light Mode. You should see a clean, readable UI with no dark blocks.
+2.  **Date Picker**: Open it in Dark Mode to verify it's unchanged. Open it in Light Mode to verify it's readable.
+3.  **Home Page**: Verify the gradients look consistent.
 
-1.  **Toggle Theme**: Click the Sun/Moon icon in the navbar.
-2.  **Verify Attribute**: Inspect the `<html>` tag in DevTools. Ensure `data-theme` switches between `light` and `dark` (or removes/adds `data-theme="dark"` depending on exact `next-themes` behavior with system monitoring).
-3.  **Verify Visuals**:
-    - **Dark Mode**: Background should be dark slate (approx `#020817` or `rgb(10 10 10)`). Text should be light.
-    - **Light Mode**: Background should be white/light slate. Text should be dark.
-4.  **Verify Icons**: The Sun icon should disappear and Moon icon appear (or vice versa) correctly. This proves the `dark:` variant in Tailwind is now successfully detecting the state.
-
-## 4. Technical Context
-The application uses two theme systems in `globals.css`:
-1.  **Custom Variables** (`--bg-base`, etc.)
-2.  **Shadcn Variables** (`--background`, etc.)
-
-Both systems are synced to the `data-theme` attribute. This fix ensures Tailwind utilities respect the state of that attribute and that the root element doesn't enforce a static override.
+## Next Steps
+Some minor settings pages (`GeneralSettings`, `CompetitionSettings`) still use legacy hardcoded values. These can be updated progressively as you touch them, but the "App Shell" and "Landing Page" are now fully compliant.
