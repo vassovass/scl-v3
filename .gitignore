@@ -37,3 +37,13 @@ next-env.d.ts
 # IDE
 .idea/
 .vscode/
+
+# Windows reserved names (can't be real files)
+nul
+NUL
+con
+CON
+aux
+AUX
+prn
+PRN
