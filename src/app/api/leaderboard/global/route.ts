@@ -53,15 +53,23 @@ export const GET = withApiHandler({
         limit, offset
     } = parsed.data;
 
-    // Check site settings for global leaderboard visibility
-    const { data: visibilitySetting } = await adminClient
-        .from("site_settings")
-        .select("value")
-        .eq("key", "global_leaderboard_enabled")
-        .single();
+    // Check site settings for global leaderboard visibility (optional - defaults to enabled)
+    let isEnabled = true;
+    try {
+        const { data: visibilitySetting, error } = await adminClient
+            .from("site_settings")
+            .select("value")
+            .eq("key", "global_leaderboard_enabled")
+            .maybeSingle(); // Use maybeSingle to avoid error when no row exists
 
-    // Default to enabled if setting doesn't exist
-    const isEnabled = visibilitySetting?.value !== "false";
+        // Only disable if we have a setting explicitly set to "false"
+        if (!error && visibilitySetting?.value === "false") {
+            isEnabled = false;
+        }
+    } catch {
+        // If site_settings table doesn't exist or any error, default to enabled
+        console.log("site_settings table not available, defaulting leaderboard to enabled");
+    }
 
     if (!isEnabled) {
         return {
