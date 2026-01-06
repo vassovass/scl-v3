@@ -6,6 +6,7 @@ import { MenuList } from "@/components/admin/menus/MenuList";
 import { MenuItemForm } from "@/components/admin/menus/MenuItemForm";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { menuCache } from "@/lib/cache/menuCache";
 
 interface MenuItemData {
   id: string;
@@ -137,6 +138,10 @@ export default function MenuEditorPage() {
         });
       }
 
+      // Invalidate menu cache for all users
+      await menuCache.invalidate();
+      console.log('[Menu Editor] Cache invalidated after menu item mutation');
+
       // Reload menus
       await loadMenus();
     } catch (error) {
@@ -156,6 +161,10 @@ export default function MenuEditorPage() {
       });
 
       if (!res.ok) throw new Error('Failed to delete item');
+
+      // Invalidate menu cache for all users
+      await menuCache.invalidate();
+      console.log('[Menu Editor] Cache invalidated after menu item deletion');
 
       toast({
         title: 'Menu item deleted',

@@ -190,8 +190,17 @@ export const GET = withApiHandler({
 
   console.log(`[Menu API /api/menus] Returning ${Object.keys(menusObj).length} menus and ${Object.keys(locationsObj).length} locations`);
 
-  return {
+  // Return with cache headers
+  // Cache for 60 seconds, but allow stale content for 5 minutes while revalidating
+  const response = Response.json({
     menus: menusObj,
     locations: locationsObj,
-  };
+    _timestamp: Date.now(), // Cache-busting timestamp
+  });
+
+  response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+  response.headers.set('CDN-Cache-Control', 'public, s-maxage=60');
+  response.headers.set('Vercel-CDN-Cache-Control', 'public, s-maxage=60');
+
+  return response;
 });
