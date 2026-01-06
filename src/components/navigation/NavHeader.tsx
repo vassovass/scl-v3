@@ -199,17 +199,6 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                             Dashboard
                         </Link>
 
-                        {/* World Leaderboard Link */}
-                        <Link
-                            href="/leaderboard"
-                            className={`px-3 py-2 text-sm rounded-lg transition-colors duration-200 ${pathname === "/leaderboard"
-                                ? "bg-primary/20 text-primary font-medium"
-                                : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                                }`}
-                        >
-                            🌍 World
-                        </Link>
-
                         {/* Roadmap Link - visible to all users */}
                         <Link
                             href="/roadmap"

@@ -75,18 +75,6 @@ export function MobileMenu({
                 📊 Dashboard
             </Link>
 
-            {/* World Leaderboard Link */}
-            <Link
-                href="/leaderboard"
-                onClick={onClose}
-                className={`block px-4 py-3 rounded-xl text-sm font-medium transition-colors ${isActive("/leaderboard")
-                    ? "bg-primary/10 text-primary border border-primary/20"
-                    : "text-muted-foreground hover:bg-accent"
-                    }`}
-            >
-                🌍 World Leaderboard
-            </Link>
-
             {/* League Section */}
             {currentLeagueId && leagueItems.length > 0 && (
                 <MobileSection

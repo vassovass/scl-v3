@@ -190,12 +190,6 @@ export const MAIN_MENU: MenuDefinition = {
             icon: '📊',
         },
         {
-            id: 'world-leaderboard',
-            label: 'World Leaderboard',
-            href: '/leaderboard',
-            icon: '🌍',
-        },
-        {
             id: 'league',
             label: 'League',
             icon: '🏆',
@@ -307,7 +301,6 @@ export const FOOTER_NAVIGATION: MenuDefinition = {
     label: 'Navigation',
     items: [
         { id: 'footer-dashboard', label: 'Dashboard', href: '/dashboard' },
-        { id: 'footer-leaderboard', label: 'World Leaderboard', href: '/leaderboard' },
         { id: 'footer-create', label: 'Create League', href: '/league/create' },
         { id: 'footer-join', label: 'Join League', href: '/join' },
     ]
