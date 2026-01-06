@@ -7,6 +7,27 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-01-06]
+
+### Added
+
+- **PRD 23: World Leaderboard** - Platform-wide rankings across all leagues
+  - **API** (`/api/leaderboard/global`)
+    - Period filters: All Time, This Year, This Month, Last 30 Days, Last 7 Days, Custom
+    - Comparison mode: Previous period, Same period last year, Custom range
+    - SuperAdmin visibility toggle via `site_settings.global_leaderboard_enabled`
+    - Modular badge calculation system for future extensibility
+  - **Page** (`/leaderboard`) - World rankings with full filtering
+    - Custom date range picker using `DateRangePicker` component
+    - Period comparison with improvement percentages
+    - Current user highlighted with world rank badge
+    - Achievement badges displayed (Million Club, 500K, 100K, streaks)
+    - Proper shadcn/theme-aware styling
+  - **Navigation** - Added "🌍 World Leaderboard" to main menu
+  - **New Badges** - `centurion` (100+ day streak), `legend_365` (365 day streak)
+  
+---
+
 ## [2026-01-05]
 
 ### Fixed

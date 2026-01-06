@@ -114,6 +114,7 @@
 - [x] **Global Step Submissions** (League-agnostic steps)
 - [x] Onboarding flow for new users
 - [x] **PWA & Offline Support** (Offline submission queue, auto-sync, installable)
+- [x] **World Leaderboard** (Platform-wide rankings, meta-achievements)
 
 ---
 

@@ -165,6 +165,16 @@ export const BADGE_CONFIG: Record<string, Record<string, BadgeConfig>> = {
             icon: '👟',
             className: 'text-sky-400',
         },
+        centurion: {
+            label: '100+ Day Streak',
+            icon: '💯',
+            className: 'text-amber-400',
+        },
+        legend_365: {
+            label: '365 Day Streak',
+            icon: '🌟',
+            className: 'text-yellow-400',
+        },
     },
 };
 

@@ -190,6 +190,12 @@ export const MAIN_MENU: MenuDefinition = {
             icon: '📊',
         },
         {
+            id: 'world-leaderboard',
+            label: 'World Leaderboard',
+            href: '/leaderboard',
+            icon: '🌍',
+        },
+        {
             id: 'league',
             label: 'League',
             icon: '🏆',

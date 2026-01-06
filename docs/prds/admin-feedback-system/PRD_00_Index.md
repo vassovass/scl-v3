@@ -109,8 +109,8 @@
 
 | # | PRD | Outcome |
 |---|-----|---------|
-| 22 | [PWA & Offline Support](./PRD_22_PWA_Offline.md) | Offline submission queuing, Service Worker |
-| 23 | [Global Leaderboard](./PRD_23_Global_Leaderboard.md) | Platform-wide rankings, Lifetime stats |
+| 22 | [PWA & Offline Support](./PRD_22_PWA_Offline.md) | ✅ Offline submission queuing, Service Worker |
+| 23 | [Global Leaderboard](./PRD_23_Global_Leaderboard.md) | ✅ Platform-wide rankings, Lifetime stats |
 | 24 | [Smart Engagement](./PRD_24_Smart_Engagement.md) | Missed day prompt, Streak warnings |
 
 ---
