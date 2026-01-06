@@ -1,9 +1,9 @@
-# PRD 29: B2B Landing Pages
+# PRD 34: B2B Landing Pages
 
-> **Order:** 29 of 30  
-> **Previous:** [PRD 28: Admin Analytics](./PRD_28_Admin_Analytics.md)  
-> **Next:** [PRD 30: SEO Comparison](./PRD_30_SEO_Comparison.md)  
-> **Status:** 📋 Proposed  
+> **Order:** 34 of 36
+> **Previous:** [PRD 33: Pricing & How It Works](./PRD_33_Pricing_HowItWorks.md)
+> **Next:** [PRD 35: SEO Comparison Pages](./PRD_35_SEO_Comparison.md)
+> **Status:** 📋 Proposed
 > **Phase:** Marketing & Growth
 
 ---
@@ -22,7 +22,7 @@ Before starting work on this PRD, the implementing agent MUST:
    - Use date format `YYYY-MM-DD` (current year is 2026)
 
 3. **After completion:**
-   - Commit with message format: `feat(PRD-29): Brief description`
+   - Commit with message format: `feat(PRD-34): Brief description`
    - Mark this PRD as done on the Kanban board
 
 ---
@@ -30,9 +30,7 @@ Before starting work on this PRD, the implementing agent MUST:
 ## Problem Statement
 
 **Market Opportunity:** Corporate wellness market projected at $93+ billion by 2027.
-
 **Current:** StepLeague has no B2B presence or landing pages.
-
 **Gap:** HR managers searching for "corporate wellness programs" or "employee step challenges" won't find StepLeague.
 
 ---
@@ -77,29 +75,11 @@ A "StepLeague for Teams" B2B section:
 
 ### 2. Waitlist Page (Initial Launch)
 
-Simple email capture before full B2B launch:
-
-```tsx
-<main>
-  <h1>Team Wellness Challenges Are Coming</h1>
-  <p>Be the first to bring healthy competition to your workplace.</p>
-  
-  <WaitlistForm />
-  
-  <p>Join 200+ companies on the waitlist</p>
-</main>
-```
+Simple email capture before full B2B launch.
 
 ### 3. Features Directory (`/teams/features`)
 
-Organized by use case:
-
-| Category | Features |
-|----------|----------|
-| Team Building | Team challenges, leaderboards |
-| Health & Wellness | Step tracking, streaks, reminders |
-| Remote Teams | Cross-location, async participation |
-| HR Admin | Reports, analytics, CSV export |
+Organized by use case: Team Building, Health, Remote Teams, HR Admin.
 
 ---
 
@@ -119,99 +99,36 @@ CREATE TABLE b2b_waitlist (
 
 -- RLS: SuperAdmin only
 ALTER TABLE b2b_waitlist ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "SuperAdmin access" ON b2b_waitlist
-FOR ALL TO authenticated
-USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND is_superadmin = true));
 ```
 
 ---
 
-## SEO Configuration
+## Verification Checklist
 
-```tsx
-// /teams/page.tsx
-export const metadata: Metadata = {
-  title: "Corporate Wellness Step Challenges | StepLeague for Teams",
-  description: "Drive employee engagement with fun, competitive step challenges. Easy setup, works with any fitness tracker. Request a demo today.",
-  keywords: ["corporate wellness", "employee step challenge", "team fitness", "workplace wellness"],
-};
-```
+> **IMPORTANT:** After implementation, verify at these specific locations.
 
----
+### Frontend Checks
 
-## Files to Create
+| Check | URL/Location | Expected Result |
+|-------|--------------|-----------------|
+| Page loads | `/teams` | Landing page content visible |
+| Waitlist form | `/teams` | Accepts email/company info |
+| Submission | Submit form | Redirects to /teams/waitlist |
+| Features subpage | `/teams/features` | Loads feature grid |
+| SEO title | View Source | "Corporate Wellness..." title present |
 
-| File | Description |
-|------|-------------|
-| `src/app/(marketing)/teams/page.tsx` | Main B2B landing |
-| `src/app/(marketing)/teams/features/page.tsx` | Features directory |
-| `src/app/(marketing)/teams/waitlist/page.tsx` | Thank you page |
-| `src/components/marketing/WaitlistForm.tsx` | Email capture |
-| `src/components/marketing/TrustBar.tsx` | Logo bar |
-| `src/components/marketing/ValuePropCard.tsx` | Benefit cards |
-| `src/app/api/waitlist/route.ts` | Waitlist API |
-| `supabase/migrations/YYYYMMDD_b2b_waitlist.sql` | Table |
+### Backend Checks
 
----
+| Check | Method | Expected Result |
+|-------|--------|-----------------|
+| Table exists | Query `b2b_waitlist` | Table found |
+| Data saved | Submit form | New row in `b2b_waitlist` |
+| RLS check | Query as public | No access to waitlist data |
 
-## Success Criteria
+### Documentation Checks
 
-- [ ] `/teams` page live with all sections
-- [ ] Waitlist form captures email, company, role
-- [ ] Features page showcases capabilities
-- [ ] Mobile-responsive
-- [ ] SEO meta tags configured
-- [ ] Build passes (`npm run build`)
-
----
-
-## Proactive Enhancements
-
-### 1. Live Social Proof Counter
-
-Real-time engagement ticker:
-- "🚶 12,456 steps walked by teams today"
-- Updates every 30 seconds (via SWR polling)
-- Builds urgency and credibility
-
-### 2. Interactive Mini-Demo
-
-Embedded demo without signup:
-- Fake leaderboard users can interact with
-- "Try giving a high-five" sample
-- Reduces friction to understanding product
-
----
-
-## Theme Awareness
-
-Landing pages should:
-- Support both light and dark modes (PRD 21 Part G)
-- Default to user's system preference
-- Use CSS variables for all colors
-- Ensure hero images work in both themes
-
----
-
-## shadcn Components to Use
-
-| Component | Usage |
-|-----------|-------|
-| `Button` | CTAs, form submit |
-| `Input` | Email capture |
-| `Select` | Company size dropdown |
-| `Card` | Value prop cards |
-| `Toast` | Form submission feedback |
-
----
-
-## Out of Scope
-
-- Full demo booking system (use Calendly)
-- Pricing page (premature)
-- Case studies (need customers first)
-- Comparison pages (PRD 30)
+- [ ] CHANGELOG.md updated
+- [ ] AGENTS.md updated
 
 ---
 

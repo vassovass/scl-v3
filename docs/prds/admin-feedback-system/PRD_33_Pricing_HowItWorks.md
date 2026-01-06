@@ -1,10 +1,10 @@
-# PRD 25: Pricing & How It Works Pages
+# PRD 33: Pricing & How It Works Pages
 
-> **Order:** 25 of 34
-> **Previous:** [PRD 24: Smart Engagement](./PRD_24_Smart_Engagement.md)
-> **Next:** [PRD 26: User Preferences System](./PRD_26_User_Preferences.md)
-> **Prioritized By:** User Request (2026-01-05) - "Fairly high priority"
+> **Order:** 33 of 36
+> **Previous:** [PRD 32: Admin Analytics](./PRD_32_Admin_Analytics.md)
+> **Next:** [PRD 34: B2B Landing Pages](./PRD_34_B2B_Landing.md)
 > **Status:** 📋 Proposed
+> **Phase:** Product Hunt Stage
 
 ---
 
@@ -74,12 +74,31 @@
 
 ---
 
-## Implementation Steps
+## Verification Checklist
 
-1.  **Create Pages**: `/pricing` and `/how-it-works` in `(public)` group.
-2.  **Design**: Use new Shadcn cards and typography.
-3.  **Content**: Draft copy based on "Freemium Privacy" model.
-4.  **Waitlist**: Implement simple email capture for Premium interest (store in `feedback` or new table?). *Decision*: Use `feedback` table with type `waitlist_premium`.
+> **IMPORTANT:** After implementation, verify at these specific locations.
+
+### Frontend Checks
+
+| Check | URL/Location | Expected Result |
+|-------|--------------|-----------------|
+| Pricing page loads | `/pricing` | Pricing table visible |
+| Pricing responsiveness | Mobile | Table stacks or scrolls |
+| Waitlist button | `/pricing` -> "Notify Me" | Opens waitlist modal/page |
+| How it works loads | `/how-it-works` | Visual steps visible |
+| Nav links | Header/Footer | Links present and working |
+
+### Code Checks
+
+| Check | Command | Expected Result |
+|-------|---------|-----------------|
+| Metadata present | View Source | Title/Description tags correct |
+| Build passes | `npm run build` | No errors |
+
+### Documentation Checks
+
+- [ ] CHANGELOG.md updated
+- [ ] AGENTS.md updated
 
 ---
 
