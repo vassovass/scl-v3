@@ -5,7 +5,13 @@
       "Bash(npm run build:*)",
       "Bash(find:*)",
       "Bash(git log:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(Get-ChildItem -Path srccomponents -Recurse -Filter *.tsx)",
+      "Bash(Select-Object -First 50 FullName)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfix(theme): comprehensive light/dark mode refactor with semantic CSS variables\n\n- Fix globals.css: convert light mode variables from RGB to HSL format\n- Add missing design tokens (radius, transitions, z-index)\n- Update 15 components to use semantic color classes instead of hardcoded slate colors\n- Add logo hover animation (color swap + shoe glow effect)\n- Components updated: NavHeader, MobileMenu, ShadcnMenuRenderer, PageHeader,\n  EmptyState, LoadingSkeleton, FeedbackWidget, Badge, mode-toggle,\n  confirm-dialog, UniversalFilters, RoadmapView, SubmissionForm, SettingsSection\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push)",
+      "Bash(git commit:*)"
     ]
   }
 }

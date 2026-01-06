@@ -19,3 +19,5 @@ Replaced legacy invalid `bg-[rgb(var(--...))]` wrappers with standard Tailwind s
 ## Verification
 - **Visuals**: Light mode no longer "yellow" or "stark white". Text is readable.
 - **Build**: Production build verified (in progress).
+- **DateRangePicker Fix**: Resolved `css` variable name mismatch that caused Vercel build failure.
+
