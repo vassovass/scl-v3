@@ -220,6 +220,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                                 <ShadcnMenuRenderer
                                     menuId="main"
                                     items={menus.main?.items.find(i => i.id === 'league')?.children}
+                                    menus={menus}
                                     variant="dropdown"
                                     userRole={userRole}
                                     leagueId={currentLeagueId}
@@ -237,6 +238,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                         <div data-tour="nav-actions-menu">
                             <ShadcnMenuRenderer
                                 items={menus.main?.items.find(i => i.id === 'actions')?.children}
+                                menus={menus}
                                 variant="dropdown"
                                 userRole={userRole}
                                 leagueId={currentLeagueId}
@@ -252,6 +254,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                         {/* Help Menu (with onboarding tours) */}
                         <ShadcnMenuRenderer
                             menuId="help"
+                            menus={menus}
                             variant="dropdown"
                             userRole={userRole}
                             leagueId={currentLeagueId}
@@ -267,6 +270,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                         {isSuperadmin && (
                             <ShadcnMenuRenderer
                                 menuId="admin"
+                                menus={menus}
                                 variant="dropdown"
                                 userRole={userRole}
                                 trigger={
@@ -288,6 +292,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                         <div className="ml-2" data-tour="nav-user-menu">
                             <ShadcnMenuRenderer
                                 menuId="user"
+                                menus={menus}
                                 variant="dropdown"
                                 userRole={userRole}
                                 trigger={

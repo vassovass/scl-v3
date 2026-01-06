@@ -32,6 +32,8 @@ interface ShadcnMenuRendererProps {
     menuId?: keyof typeof MENUS;
     /** Direct items (overrides menuId) */
     items?: MenuItem[];
+    /** Menus object from useMenuConfig (database-backed with fallback) */
+    menus?: Record<string, MenuDefinition>;
     /** Rendering variant */
     variant?: MenuVariant;
     /** Current user role for filtering */
@@ -67,6 +69,7 @@ interface ShadcnMenuRendererProps {
 export function ShadcnMenuRenderer({
     menuId,
     items: directItems,
+    menus: customMenus,
     variant = "dropdown",
     userRole,
     leagueId,
@@ -81,7 +84,9 @@ export function ShadcnMenuRenderer({
     label,
 }: ShadcnMenuRendererProps) {
     // Get items from menuId or direct items
-    const menuDef: MenuDefinition | undefined = menuId ? MENUS[menuId] : undefined;
+    // Use provided menus (database-backed) or fall back to static MENUS
+    const menusSource = customMenus || MENUS;
+    const menuDef: MenuDefinition | undefined = menuId ? menusSource[menuId] : undefined;
     const rawItems = directItems || menuDef?.items || [];
 
     // Apply role-based filtering and resolve hrefs

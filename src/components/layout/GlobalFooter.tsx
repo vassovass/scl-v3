@@ -2,15 +2,17 @@
 
 import Link from "next/link";
 import { APP_CONFIG } from "@/lib/config";
-import { MENUS } from "@/lib/menuConfig";
+import { useMenuConfig } from "@/hooks/useMenuConfig";
 
 export function GlobalFooter() {
     const currentYear = new Date().getFullYear();
 
-    // Get menu items from centralized config
-    const navigationItems = MENUS.footerNavigation.items;
-    const accountItems = MENUS.footerAccount.items;
-    const legalItems = MENUS.footerLegal.items;
+    // Get menu items from database (with static fallback)
+    const { menus } = useMenuConfig();
+
+    const navigationItems = menus.footerNavigation?.items || [];
+    const accountItems = menus.footerAccount?.items || [];
+    const legalItems = menus.footerLegal?.items || [];
 
     return (
         <footer className="border-t border-border bg-background mt-auto">
@@ -33,7 +35,7 @@ export function GlobalFooter() {
                     {/* Navigation Column */}
                     <div>
                         <h4 className="text-sm font-medium text-foreground mb-3">
-                            {MENUS.footerNavigation.label}
+                            {menus.footerNavigation?.label || "Navigation"}
                         </h4>
                         <ul className="space-y-2">
                             {navigationItems.map(item => (
@@ -54,7 +56,7 @@ export function GlobalFooter() {
                     {/* Account Column */}
                     <div>
                         <h4 className="text-sm font-medium text-foreground mb-3">
-                            {MENUS.footerAccount.label}
+                            {menus.footerAccount?.label || "Account"}
                         </h4>
                         <ul className="space-y-2">
                             {accountItems.map(item => (
@@ -75,7 +77,7 @@ export function GlobalFooter() {
                     {/* Legal Column */}
                     <div>
                         <h4 className="text-sm font-medium text-foreground mb-3">
-                            {MENUS.footerLegal.label}
+                            {menus.footerLegal?.label || "Legal"}
                         </h4>
                         <ul className="space-y-2">
                             {legalItems.map(item => (
