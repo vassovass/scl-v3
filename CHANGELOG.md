@@ -7,6 +7,48 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-01-07]
+
+### Added
+
+- **PRD 24: WordPress-Style Menu Backend System** - Database-backed menu management
+  - **Database Schema** - New tables for menu configuration
+    - `menu_definitions` - Menu metadata (id, label, description)
+    - `menu_items` - Individual menu items with full MenuItem interface support
+    - `menu_locations` - Location assignments (public_header, app_header, admin_header, footer)
+    - RLS policies for SuperAdmin management, public read access
+    - Automatic updated_at triggers
+  - **Data Migration** - Seeded all existing menuConfig.ts data to database
+    - Converted all 8 menus (main, help, user, admin, public, 3 footer menus)
+    - Preserved nested structure, visibility rules, and special flags
+    - Migrated all menu location configurations
+  - **API Routes** - Full CRUD for menu management
+    - `GET /api/menus` - Public endpoint with database fallback
+    - `GET /api/admin/menus` - List all menus (SuperAdmin)
+    - `POST /api/admin/menus` - Create menu (SuperAdmin)
+    - `GET/PATCH/DELETE /api/admin/menus/:menuId` - Manage single menu
+    - `POST/PUT /api/admin/menus/:menuId/items` - Add/reorder items
+    - `PATCH/DELETE /api/admin/menus/:menuId/items/:itemId` - Edit/delete items
+  - **Frontend Hook** - `useMenuConfig()` with static fallback
+    - Fetches from database via SWR caching
+    - Falls back to menuConfig.ts if database empty/error
+    - Provides `useMenu()` and `useMenuLocation()` helpers
+    - Re-exports all utility functions (filterMenuByRole, prepareMenuItems, etc.)
+  - **Admin UI** (`/admin/menus`) - Visual menu editor
+    - Left sidebar menu selector
+    - Drag-and-drop reordering with @dnd-kit
+    - Add/edit/delete items with modal form
+    - Support for nested submenu items
+    - Role visibility toggles
+    - Live preview (future enhancement placeholder)
+  - **Components** - Modular admin components
+    - `MenuList` - Sidebar menu selector
+    - `MenuItemRow` - Draggable item with actions dropdown
+    - `MenuItemForm` - Add/edit modal with full field support
+  - **Configuration** - Added Menu Editor to SuperAdmin pages
+
+---
+
 ## [2026-01-06]
 
 ### Added

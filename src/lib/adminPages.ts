@@ -35,6 +35,11 @@ export const SUPERADMIN_PAGES: AdminPage[] = [
         label: "💬 Feedback",
         description: "View user feedback and bug reports",
     },
+    {
+        href: "/admin/menus",
+        label: "🍔 Menu Editor",
+        description: "Manage navigation menus with drag-and-drop",
+    },
     // Add more superadmin pages here:
     // {
     //     href: "/admin/users",

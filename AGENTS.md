@@ -293,6 +293,9 @@ scl-v3/
 | `feedback` | type, subject, description, screenshot_url |
 | `module_feedback` | module_id, feedback_type, comment, screenshot_url |
 | `user_records` | user_id, best_day_steps, best_day_date, current_streak, total_steps_lifetime |
+| `menu_definitions` | id, label, description (PRD 24) |
+| `menu_items` | id, menu_id, parent_id, item_key, label, href, icon, visible_to, requires_league, on_click, sort_order (PRD 24) |
+| `menu_locations` | location, menu_ids[], show_logo, show_sign_in, show_user_menu, show_admin_menu (PRD 24) |
 
 ---
 
@@ -782,18 +785,30 @@ When adding a new trackable feature:
 
 ---
 
-## Recent Features (2026-01-04)
+## Recent Features
+
+### 2026-01-07
+
+- ✅ **Menu Backend System** (PRD 24)
+  - Database-backed menu configuration
+  - Visual menu editor at `/admin/menus`
+  - Drag-and-drop reordering with @dnd-kit
+  - `useMenuConfig()` hook with static fallback
+  - Full CRUD API routes for menu management
+  - Pattern: Database-first with menuConfig.ts fallback
+
+### 2026-01-04
 
 - ✅ **League Settings System** (PRD 19)
   - League owners can set start date
   - Modular settings components pattern
   - Enforcement in submissions API
-  
+
 - ✅ **DateRangePicker Component**
   - Replaced dual date inputs
   - Standard pattern for all date selection
   - Location: `src/components/ui/DateRangePicker.tsx`
-  
+
 - ✅ **shadcn/ui Foundation**
   - Toast, Dialog, Dropdown components
   - Theme-aware CSS variables
@@ -818,4 +833,4 @@ When adding a new trackable feature:
 
 ---
 
-*Last updated: 2026-01-04. This file is the canonical source for AI agents.*
+*Last updated: 2026-01-07. This file is the canonical source for AI agents.*
