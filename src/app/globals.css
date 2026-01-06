@@ -116,78 +116,84 @@
 }
 
 /* === LIGHT THEME === */
+/* Palette generated with tonal surface approach for softer, professional look */
 [data-theme="light"] {
-  /* Core Brand Colors - Same brand, adjusted for light bg */
-  --brand-primary: 199 89% 48%;          /* sky-500 - same */
-  --brand-primary-dark: 204 80% 40%;     /* sky-600 */
-  --brand-primary-light: 199 92% 56%;    /* sky-400 */
-  --brand-accent: 271 91% 65%;           /* purple-500 */
-  --glow-primary: 199 89% 48%;
+  /* Core Brand Colors - Teal/Cyan primary from user's palette */
+  --brand-primary: 189 35% 43%;          /* #468594 - teal primary */
+  --brand-primary-dark: 189 35% 38%;     /* #3f7582 - darker */
+  --brand-primary-light: 189 35% 48%;    /* lighter teal */
+  --brand-accent: 271 91% 65%;           /* purple-500 - keep accent */
+  --glow-primary: 189 35% 43%;
   --glow-accent: 271 91% 65%;
 
-  /* Page Backgrounds - Clean off-white */
-  --background: 210 40% 98%;             /* slate-50 #f8fafc */
-  --foreground: 222.2 84% 4.9%;          /* slate-950 #020617 */
+  /* Page Backgrounds - Tonal surface (NOT pure white) */
+  --background: 192 15% 95%;             /* #ecf2f4 - tonal surface a0 */
+  --foreground: 189 30% 20%;             /* #2b4950 - primary a40 for text */
 
-  /* Surface / Cards - Pure white for lift */
-  --card: 0 0% 100%;                     /* white */
-  --card-foreground: 222.2 84% 4.9%;     /* slate-950 */
+  /* Surface / Cards - Slightly elevated tonal */
+  --card: 0 0% 100%;                     /* white for cards - lift effect */
+  --card-foreground: 189 30% 20%;        /* dark teal text */
 
   /* Popovers / Modals */
   --popover: 0 0% 100%;                  /* white */
-  --popover-foreground: 222.2 84% 4.9%;  /* slate-950 */
+  --popover-foreground: 189 30% 20%;     /* dark teal text */
 
-  /* Primary Actions */
-  --primary: 199 89% 48%;                /* sky-500 */
+  /* Primary Actions - Teal brand */
+  --primary: 189 35% 43%;                /* #468594 */
   --primary-foreground: 0 0% 100%;       /* white */
 
-  /* Secondary Actions */
-  --secondary: 210 40% 96.1%;            /* slate-100 */
-  --secondary-foreground: 222.2 47.4% 11.2%; /* slate-900 */
+  /* Secondary Actions - Tonal surface */
+  --secondary: 192 10% 90%;              /* #dfe5e6 - tonal a10 */
+  --secondary-foreground: 189 30% 20%;   /* dark teal */
 
-  /* Subtle / Muted */
-  --muted: 210 40% 96.1%;                /* slate-100 */
-  --muted-foreground: 215.4 16.3% 46.9%; /* slate-500 */
+  /* Subtle / Muted - Tonal grays */
+  --muted: 192 10% 90%;                  /* #dfe5e6 */
+  --muted-foreground: 189 20% 35%;       /* #57777e - medium teal-gray */
 
-  /* Accents */
-  --accent: 210 40% 96.1%;               /* slate-100 */
-  --accent-foreground: 222.2 47.4% 11.2%; /* slate-900 */
+  /* Accents - Tonal hover state */
+  --accent: 192 8% 85%;                  /* #d3d8d9 - tonal a20 */
+  --accent-foreground: 189 30% 20%;      /* dark teal */
 
-  /* Destructive */
-  --destructive: 0 84.2% 60.2%;          /* red-500 */
+  /* Destructive - Keep semantic reds */
+  --destructive: 0 58% 45%;              /* #b13535 - danger a0 */
   --destructive-foreground: 0 0% 100%;   /* white */
 
-  /* Borders */
-  --border: 214.3 31.8% 91.4%;           /* slate-200 */
-  --input: 214.3 31.8% 91.4%;            /* slate-200 */
-  --ring: 199 89% 48%;                   /* sky-500 */
+  /* Borders - Subtle tonal */
+  --border: 192 8% 85%;                  /* #d3d8d9 - tonal a20 */
+  --input: 192 8% 85%;                   /* same */
+  --ring: 189 35% 43%;                   /* teal primary */
 
   /* Link System */
-  --link-text: 204 80% 40%;              /* sky-600 */
-  --link-hover: 202 80% 24%;             /* sky-800 */
+  --link-text: 189 35% 38%;              /* #3f7582 - primary a10 */
+  --link-hover: 189 35% 30%;             /* #325760 - primary a30 */
 
-  /* Legacy alignment (HSL format - FIXED from RGB) */
-  --bg-base: 210 40% 98%;                /* slate-50 */
-  --bg-elevated: 210 40% 98%;            /* slate-50 */
+  /* Legacy alignment */
+  --bg-base: 192 15% 95%;                /* tonal surface */
+  --bg-elevated: 0 0% 100%;              /* white */
   --bg-card: 0 0% 100%;                  /* white */
-  --bg-card-hover: 210 40% 96.1%;        /* slate-100 */
-  --text-primary: 222.2 84% 4.9%;        /* slate-950 */
-  --text-secondary: 215.4 16.3% 46.9%;   /* slate-500 */
-  --border-subtle: 214.3 31.8% 91.4%;    /* slate-200 */
-  --border-default: 215.4 16.3% 46.9%;   /* slate-500 */
+  --bg-card-hover: 192 10% 90%;          /* tonal a10 */
+  --text-primary: 189 30% 20%;           /* dark teal */
+  --text-secondary: 189 20% 35%;         /* medium teal-gray */
+  --border-subtle: 192 8% 85%;           /* tonal a20 */
+  --border-default: 192 5% 75%;          /* tonal a40 */
 
   /* Menu System */
   --menu-bg: 0 0% 100%;                  /* white */
-  --menu-border: 214.3 31.8% 91.4%;      /* slate-200 */
-  --menu-item-text: 215.4 16.3% 46.9%;   /* slate-500 */
-  --menu-item-hover-bg: 210 40% 96.1%;   /* slate-100 */
-  --menu-item-hover-text: 222.2 84% 4.9%; /* slate-950 */
+  --menu-border: 192 8% 85%;             /* tonal border */
+  --menu-item-text: 189 20% 35%;         /* medium teal-gray */
+  --menu-item-hover-bg: 192 10% 90%;     /* tonal a10 */
+  --menu-item-hover-text: 189 30% 20%;   /* dark teal */
 
   /* Date Picker */
   --date-picker-bg: 0 0% 100%;
-  --date-picker-border: 214.3 31.8% 91.4%;
-  --date-picker-text: 222.2 84% 4.9%;
-  --date-picker-accent: 199 89% 48%;
+  --date-picker-border: 192 8% 85%;
+  --date-picker-text: 189 30% 20%;
+  --date-picker-accent: 189 35% 43%;
+
+  /* Semantic Status Colors from user's palette */
+  --success: 160 65% 30%;                /* #1b7f5c */
+  --warning: 38 70% 42%;                 /* #b8871f */
+  --info: 214 68% 38%;                   /* #1e56a3 */
 }
 
 /* ============================================
