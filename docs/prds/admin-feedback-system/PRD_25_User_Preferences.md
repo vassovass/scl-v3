@@ -1,12 +1,12 @@
-# PRD 22: User Preferences System
+# PRD 25: User Preferences System
 
-> **Order:** 22 of 30  
-> **Previous:** [PRD 21: shadcn Integration](./PRD_21_shadcn_Integration.md)  
-> **Next:** [PRD 23: SuperAdmin Settings](./PRD_23_SuperAdmin_Settings.md)  
+> **Order:** 25 of 36
+> **Previous:** [PRD 24: Menu Backend](./PRD_24_Menu_Backend.md)
+> **Next:** [PRD 26: SuperAdmin Settings](./PRD_26_SuperAdmin_Settings.md)
 > **Status:** 📋 Proposed
 
 > [!IMPORTANT]
-> **Dependency Note**: This PRD establishes the settings pattern used by PRD 23, 25, 26, 27, 28. Complete this before starting feature PRDs.
+> **Dependency Note**: This PRD establishes the settings pattern used by PRD 26, 27, 28. Complete this before starting feature PRDs.
 
 ---
 
@@ -36,7 +36,7 @@ Before starting work on this PRD, the implementing agent MUST:
 **Current:** Profile settings page is monolithic with hardcoded fields.
 
 **Issues:**
-1. PRDs 22-24 introduce new user preferences (reminder type, default landing, etc.)
+1. Future PRDs introduce new user preferences (reminder type, default landing, etc.)
 2. No pattern for adding new settings sections
 3. Current page doesn't scale for many preference types
 4. No separation between "Profile" and "Preferences"
@@ -336,7 +336,7 @@ Adding a new setting = add to registry + add column to database.
 │ │ Profile │ │                                 │ │
 │ │ ──────  │ │  Default Landing Page           │ │
 │ │ Prefer- │ │  ────────────────────           │ │
-│ │  ences  │ │  Where to go after login        │ │
+│ │ ences  │ │  Where to go after login        │ │
 │ │ ──────  │ │                                 │ │
 │ │ Notifi- │ │  ○ My Leagues (Dashboard)       │ │
 │ │ cations │ │  ● Submit Steps                 │ │
@@ -347,10 +347,11 @@ Adding a new setting = add to registry + add column to database.
 │ │         │ │                                 │ │
 │ │         │ │  Step Reminders                 │ │
 │ │         │ │  ────────────────────           │ │
-│ └─────────┘ │  ○ Floating button              │ │
-│             │  ● Badge only (subtle)          │ │
-│             │  ○ Card in league hub           │ │
-│             └─────────────────────────────────┘ │
+│ │         │ │  ○ Floating button              │ │
+│ │         │ │  ● Badge only (subtle)          │ │
+│ │         │ │  ○ Card in league hub           │ │
+│ │             └─────────────────────────────────┘ │
+│ └─────────┘ └─────────────────────────────────────────────────┘
 └─────────────────────────────────────────────────┘
 ```
 
@@ -374,7 +375,7 @@ Adding a new setting = add to registry + add column to database.
 │ ○ Floating button           │
 │ ● Badge only                │
 │ ○ Card in league hub        │
-└─────────────────────────────┘
+└────────────────────────────┘
 ```
 
 ---
@@ -456,6 +457,34 @@ All UI components must:
 - Password change (handled by Supabase Auth)
 - Export user data
 - Admin override of user preferences
+
+---
+
+## Verification Checklist
+
+> **IMPORTANT:** After implementation, verify at these specific locations.
+
+### Frontend Checks
+
+| Check | URL/Location | Expected Result |
+|-------|--------------|-----------------|
+| Settings page loads | `/settings/preferences` | Settings UI visible |
+| Tabs work | Click tabs | URL changes, content updates |
+| Default landing | Login flow | Redirects to chosen page |
+| Mobile responsive | Mobile viewport | Tabs scroll/stack correctly |
+
+### Backend Checks
+
+| Check | Method | Expected Result |
+|-------|--------|-----------------|
+| Table exists | Query `user_preferences` | Table found |
+| API updates | `PATCH /api/user/preferences` | Data persisted |
+
+### Documentation Checks
+
+- [ ] CHANGELOG.md updated
+- [ ] AGENTS.md updated (registry pattern)
+- [ ] Design system page updated
 
 ---
 

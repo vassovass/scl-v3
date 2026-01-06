@@ -1,12 +1,12 @@
-# PRD 23: SuperAdmin Settings & Feature Flags
+# PRD 26: SuperAdmin Settings & Feature Flags
 
-> **Order:** 23 of 30  
-> **Previous:** [PRD 22: User Preferences](./PRD_22_User_Preferences.md)  
-> **Next:** [PRD 24: League Hub](./PRD_24_League_Hub.md)  
+> **Order:** 26 of 36
+> **Previous:** [PRD 25: User Preferences](./PRD_25_User_Preferences.md)
+> **Next:** [PRD 27: League Hub](./PRD_27_League_Hub.md)
 > **Status:** 📋 Proposed
 
 > [!IMPORTANT]
-> **Feature Flag Dependency**: PRDs 25, 27, 28 are gated by feature flags defined here. If building features before this PRD, use fallback defaults: `getSetting('feature_xyz', true)`.
+> **Feature Flag Dependency**: PRDs 27, 28 are gated by feature flags defined here. If building features before this PRD, use fallback defaults: `getSetting('feature_xyz', true)`.
 
 ---
 
@@ -25,7 +25,7 @@ Before starting work on this PRD, the implementing agent MUST:
    - Use date format `YYYY-MM-DD` (current year is 2026)
 
 3. **After completion:**
-   - Commit with message format: `feat(PRD-28): Brief description`
+   - Commit with message format: `feat(PRD-26): Brief description`
    - Mark this PRD as done on the Kanban board
 
 ---
@@ -126,8 +126,8 @@ INSERT INTO app_settings (key, value, label, description, category, value_type, 
 ('max_league_members', '{"value": 50}', 'Default Max League Members', 'Default member limit for new leagues', 'defaults', 'number', '{"min": 5, "max": 1000}', '{superadmin}', false),
 
 -- Features
-('feature_high_fives', '{"enabled": true}', 'High-Fives Feature', 'Enable peer encouragement (PRD 26)', 'features', 'boolean', null, '{superadmin}', false),
-('feature_streak_freeze', '{"enabled": true}', 'Streak Freeze Feature', 'Allow users to freeze streaks (PRD 23)', 'features', 'boolean', null, '{superadmin}', false),
+('feature_high_fives', '{"enabled": true}', 'High-Fives Feature', 'Enable peer encouragement (PRD 31)', 'features', 'boolean', null, '{superadmin}', false),
+('feature_streak_freeze', '{"enabled": true}', 'Streak Freeze Feature', 'Allow users to freeze streaks (PRD 28)', 'features', 'boolean', null, '{superadmin}', false),
 ('feature_analytics_export', '{"enabled": true}', 'Analytics Export', 'Allow CSV/PDF export from analytics', 'features', 'boolean', null, '{superadmin}', false),
 
 -- Display
@@ -292,9 +292,9 @@ Update visibility settings (SuperAdmin only).
 |---------|-------------|-------|
 | Batch Upload | `max_batch_uploads` | Limit date picker in submission form |
 | Backfill | `max_backfill_days` | Limit how far back calendar allows |
-| High-Fives (PRD 26) | `feature_high_fives` | Gate entire feature |
-| Streak Freeze (PRD 23) | `feature_streak_freeze` | Gate freeze option |
-| Analytics Export (PRD 27) | `feature_analytics_export` | Gate export buttons |
+| High-Fives (PRD 31) | `feature_high_fives` | Gate entire feature |
+| Streak Freeze (PRD 28) | `feature_streak_freeze` | Gate freeze option |
+| Analytics Export (PRD 32) | `feature_analytics_export` | Gate export buttons |
 
 ---
 
@@ -346,6 +346,33 @@ All UI components must:
 - A/B testing framework (future)
 - Scheduled setting changes
 - Setting change notifications to users
+
+---
+
+## Verification Checklist
+
+> **IMPORTANT:** After implementation, verify at these specific locations.
+
+### Frontend Checks
+
+| Check | URL/Location | Expected Result |
+|-------|--------------|-----------------|
+| Admin settings | `/admin/settings` | Settings UI loads |
+| Visibility update | Toggle checkbox | Persists after reload |
+| League cascade | `/league/[id]/settings` | Shows inherited checks |
+| Feature flags | Disable feature | Feature disappears from UI |
+
+### Backend Checks
+
+| Check | Method | Expected Result |
+|-------|--------|-----------------|
+| Table exists | Query `app_settings` | Table found |
+| RLS enforcement | Query as member | Restricts unseen settings |
+
+### Documentation Checks
+
+- [ ] CHANGELOG.md updated
+- [ ] AGENTS.md updated
 
 ---
 

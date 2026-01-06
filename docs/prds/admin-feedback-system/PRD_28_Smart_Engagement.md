@@ -1,11 +1,12 @@
-# PRD 24: Smart Engagement & Notifications
+# PRD 28: Smart Engagement & Notifications
 
-> **Order:** 24 of 33
-> **Previous:** [PRD 23: Global Leaderboard & Metagame](./PRD_23_Global_Leaderboard.md)
-> **Next:** [PRD 25: User Preferences System](./PRD_25_User_Preferences.md)
+> **Order:** 28 of 36
+> **Previous:** [PRD 27: League Hub](./PRD_27_League_Hub.md)
+> **Next:** [PRD 29: Unified Progress](./PRD_29_Unified_Progress.md)
 > **Prioritized By:** User Request (2026-01-05) - "Smart Missed Day Prompt"
 > **Status:** 📋 Proposed
 > **Includes:** Formerly "PRD 25 Smart Step Reminder"
+> **Depends on:** PRD 25 (User Prefs for notification settings)
 
 ---
 
@@ -89,6 +90,32 @@ const { misseddays, riskLevel } = useEngagement(userSubmissions);
 - [ ] Submit page enables pre-filling date via URL.
 - [ ] "Streak at Risk" warning in evening.
 - [ ] Mobile-responsive and dismissible.
+
+---
+
+## Verification Checklist
+
+> **IMPORTANT:** After implementation, verify at these specific locations.
+
+### Frontend Checks
+
+| Check | URL/Location | Expected Result |
+|-------|--------------|-----------------|
+| Missed day prompt | `/dashboard` | Shows card if yesterday missing |
+| Pre-fill date | `/submit?date=2026-01-05` | Form shows 2026-01-05 |
+| Streak warning | `/dashboard` | Shows if >6pm & no submit |
+| Dismiss works | Click dismiss | Card disappears |
+
+### Code Checks
+
+| Check | Command | Expected Result |
+|-------|---------|-----------------|
+| Timezone logic | Manual test | Uses local time not UTC |
+| Hook performance | `useEngagement` | Only runs on mount/data change |
+
+### Documentation Checks
+
+- [ ] CHANGELOG.md updated
 
 ---
 

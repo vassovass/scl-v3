@@ -17,162 +17,70 @@
 
 ---
 
-## Implementation Order
+## Completed Phases (Foundation)
 
-### Phase 0: Foundation (Complete ✅)
-
+### Phase 0-8: Legacy Complete ✅
 | # | PRD | Status |
 |---|-----|--------|
-| 1 | [Database Schema](./PRD_01_Database_Schema.md) | ✅ Complete |
-| 2 | [Admin Feedback APIs](./PRD_02_Admin_APIs.md) | ✅ Complete |
-| 3 | [Filter & Search](./PRD_03_Filter_Search.md) | ✅ Complete |
+| 1-3 | Database, APIs, Search | ✅ Complete |
+| 4-6 | API Handler, Data Fetching, Badges | ✅ Complete |
+| 7-9 | Navigation, Homepage, Feedback Page | ✅ Complete |
+| 10-13 | Bulk Actions, Saved Views | ✅ Complete |
+| 14-15 | Analytics, Page Layout | ✅ Complete |
+| 16-18 | Import/Export, Roadmap, Docs | ✅ Complete |
+| 19-20 | League Start, Cards | ✅ Complete |
+| 21 | shadcn/ui Integration | ✅ Complete |
+| 22 | PWA & Offline Support | ✅ Complete |
+| 23 | Global Leaderboard | ✅ Complete |
 
 ---
 
-### Phase 1: Unification (Complete ✅)
+## Active Roadmap: Alpha Stage (Core UX)
 
-| # | PRD | Status |
-|---|-----|--------|
-| 4 | [Unified API Handler](./PRD_04_Unified_API_Handler.md) | ✅ Complete |
-| 5 | [Universal Data Fetching](./PRD_05_Universal_Data_Fetching.md) | ✅ Complete |
-| 6 | [Badge & Color System](./PRD_06_Badge_Color_System.md) | ✅ Complete |
+> **Focus:** Robust application logic, improved navigation, and core retention loops.
 
----
-
-### Phase 2: Site-Wide Polish (Complete ✅)
-
-| # | PRD | Status |
-|---|-----|--------|
-| 7 | [Navigation All Pages](./PRD_07_Navigation_All_Pages.md) | ✅ Complete |
-| 8 | [Homepage Swap](./PRD_08_Homepage_Swap.md) | ✅ Complete |
-| 9 | [Admin Feedback Page](./PRD_09_Admin_Feedback_Page.md) | ✅ Complete |
+| Priority | # | PRD Title | Outcome | Status |
+|----------|---|-----------|---------|--------|
+| **A-0** | 24 | [Menu Backend System](./PRD_24_Menu_Backend.md) | Database-backed menu management | 📋 Proposed |
+| **A-1** | 25 | [User Preferences](./PRD_25_User_Preferences.md) | Modular settings architecture | 📋 Proposed |
+| **A-2** | 26 | [SuperAdmin Settings](./PRD_26_SuperAdmin_Settings.md) | App-wide config & feature flags | 📋 Proposed |
+| **A-3** | 27 | [League Hub Redesign](./PRD_27_League_Hub.md) | New league landing experience | 📋 Proposed |
+| **A-4** | 28 | [Smart Engagement](./PRD_28_Smart_Engagement.md) | Missed day prompt & streak warnings | 📋 Proposed |
+| **A-5** | 29 | [Unified Progress](./PRD_29_Unified_Progress.md) | Merged analytics/leaderboard view | 📋 Proposed |
+| **A-6** | 30 | [Duplicate Resolution](./PRD_30_Duplicate_Resolution.md) | Smart conflict handling UI | 📋 Proposed |
 
 ---
 
-### Phase 3: Bulk Operations (Complete ✅)
+## Active Roadmap: Product Hunt Stage (Growth)
 
-| # | PRD | Status |
-|---|-----|--------|
-| 10 | [Bulk Actions API](./PRD_10_Bulk_Actions_API.md) | ✅ Complete |
-| 11 | [Multi-Select UI](./PRD_11_MultiSelect_UI.md) | ✅ Complete |
-| 12 | [Merge Items (AI)](./PRD_12_Merge_Items.md) | ✅ Complete |
-| 13 | [Saved Views](./PRD_13_Saved_Views.md) | ✅ Complete |
+> **Focus:** Viral features, monetization foundations, and marketing assets.
 
----
-
-### Phase 4: Alpha Testing Infrastructure (Complete ✅)
-
-| # | PRD | Status |
-|---|-----|--------|
-| 14 | [Analytics GTM & GA4](./PRD_14_Analytics_GTM_GA4.md) | ✅ Complete |
-| 15 | [Page Layout System](./PRD_15_Page_Layout_System.md) | ✅ Complete |
+| Priority | # | PRD Title | Outcome | Status |
+|----------|---|-----------|---------|--------|
+| **P-1** | 31 | [Social Encouragement](./PRD_31_Social_Encouragement.md) | High-fives & cheer prompts | 📋 Proposed |
+| **P-2** | 32 | [Admin Analytics](./PRD_32_Admin_Analytics.md) | Business KPI dashboard | 📋 Proposed |
+| **P-3** | 33 | [Pricing & How It Works](./PRD_33_Pricing_HowItWorks.md) | Freemium model explanation | 📋 Proposed |
+| **P-4** | 34 | [B2B Landing Pages](./PRD_34_B2B_Landing.md) | Corporate team sales funnel | 📋 Proposed |
+| **P-5** | 35 | [SEO Comparison Pages](./PRD_35_SEO_Comparison.md) | "StepLeague vs X" pages | 📋 Proposed |
 
 ---
 
-### Phase 5: Advanced Features
+## Ongoing Maintenance
 
-| # | PRD | Status |
-|---|-----|--------|
-| 16 | [Import/Export System](./PRD_16_Export_Utility.md) | ✅ Complete |
-| 17 | [Public Roadmap Polish](./PRD_17_Public_Roadmap_Polish.md) | ✅ Complete |
-| 18 | [Documentation](./PRD_18_Documentation.md) | ✅ Complete |
+| # | PRD | Outcome | Status |
+|---|-----|---------|--------|
+| 36 | [Technical Debt](./PRD_36_Technical_Debt.md) | Cleanup, Refactoring & Optimization | 🔄 Ongoing |
 
 ---
 
-### Phase 6: Core League Features
+## Dependency Graph
 
-| # | PRD | Status |
-|---|-----|--------|
-| 19 | [League Start Date](./PRD_19_League_Start_Date.md) | ✅ Complete |
-
----
-
-### Phase 7: Enhanced Card Experience
-
-| # | PRD | Status |
-|---|-----|--------|
-| 20 | [Expandable Cards with Image Paste](./PRD_20_Expandable_Cards_Image_Paste.md) | ✅ Complete |
-
----
-
-### Phase 8: UI Component Library
-
-| # | PRD | Outcome |
-|---|-----|---------|
-| 21 | [shadcn/ui Integration](./PRD_21_shadcn_Integration.md) | Toast notifications, dialogs, theme toggle, accessible dropdowns |
-
----
-
-### Phase 9: PWA & Global Features
-
-> **Priority:** "Unfinished Items" (User Request)
-
-| # | PRD | Outcome |
-|---|-----|---------|
-| 22 | [PWA & Offline Support](./PRD_22_PWA_Offline.md) | ✅ Offline submission queuing, Service Worker |
-| 23 | [Global Leaderboard](./PRD_23_Global_Leaderboard.md) | ✅ Platform-wide rankings, Lifetime stats |
-| 24 | [Smart Engagement](./PRD_24_Smart_Engagement.md) | Missed day prompt, Streak warnings |
-
----
-
-### Phase 10: Business & Education (High Priority)
-
-| # | PRD | Outcome |
-|---|-----|---------|
-| 25 | [Pricing & How It Works](./PRD_25_Pricing_HowItWorks.md) | Freemium model explanation, Privacy differentiation |
-
----
-
-### Phase 11: Settings & Configuration
-
-| # | PRD | Outcome |
-|---|-----|---------|
-| 26 | [User Preferences System](./PRD_26_User_Preferences.md) | Modular settings architecture |
-| 27 | [SuperAdmin Settings](./PRD_27_SuperAdmin_Settings.md) | App-wide config, feature flags |
-
----
-
-### Phase 12: UX Flow Improvements
-
-| # | PRD | Outcome |
-|---|-----|---------|
-| 28 | [League Hub Redesign](./PRD_28_League_Hub.md) | Click league → Hub overview |
-| 29 | [Unified Progress View](./PRD_29_Unified_Progress.md) | My Progress / League Progress toggle |
-
----
-
-### Phase 13: Social & Analytics
-
-| # | PRD | Outcome |
-|---|-----|---------|
-| 30 | [Social Encouragement](./PRD_30_Social_Encouragement.md) | High-fives, cheer prompts |
-| 31 | [Admin Analytics](./PRD_31_Admin_Analytics.md) | KPI dashboard, export |
-
----
-
-### Phase 14: Marketing & Growth
-
-| # | PRD | Outcome |
-|---|-----|---------|
-| 32 | [B2B Landing Pages](./PRD_32_B2B_Landing.md) | /teams landing, waitlist |
-| 33 | [SEO Comparison Pages](./PRD_33_SEO_Comparison.md) | /compare hub |
-
----
-
-### Phase 15: Maintenance
-
-| # | PRD | Outcome |
-|---|-----|---------|
-| 34 | [Technical Debt](./PRD_34_Technical_Debt.md) | Cleanup & Refactoring |
-
----
-
-### Phase 16: Data Integrity
-
-| # | PRD | Outcome |
-|---|-----|---------|
-| 35 | [Duplicate Submission Resolution](./PRD_35_Duplicate_Resolution.md) | Conflict detection, smart resolution UI |
-
----
-
-
+```mermaid
+graph TD
+    PRD24[24. Menu System] --> PRD25[25. User Prefs]
+    PRD25 --> PRD26[26. SuperAdmin Settings]
+    PRD26 --> PRD27[27. League Hub]
+    PRD26 --> PRD31[31. Social Encouragement]
+    PRD27 --> PRD28[28. Smart Engagement]
+    PRD27 --> PRD29[29. Unified Progress]
+```

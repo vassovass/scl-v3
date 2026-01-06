@@ -1,8 +1,9 @@
-# PRD 24: League Hub & Navigation Redesign
+# PRD 27: League Hub & Navigation Redesign
 
-> **Order:** 24 of 30  
-> **Previous:** [PRD 23: SuperAdmin Settings](./PRD_23_SuperAdmin_Settings.md)  
-> **Next:** [PRD 25: Smart Step Reminder](./PRD_25_Step_Reminder.md)  
+> **Order:** 27 of 36
+> **Previous:** [PRD 26: SuperAdmin Settings](./PRD_26_SuperAdmin_Settings.md)
+> **Next:** [PRD 28: Smart Engagement](./PRD_28_Smart_Engagement.md)
+> **Depends on:** PRD 26 (feature flags), PRD 25 (user prefs)
 > **Status:** 📋 Proposed
 
 ---
@@ -23,7 +24,7 @@ Before starting work on this PRD, the implementing agent MUST:
    - Update ROADMAP.md when complete
 
 3. **After completion:**
-   - Commit with message format: `feat(PRD-22): Brief description`
+   - Commit with message format: `feat(PRD-27): Brief description`
    - Mark this PRD as done on the Kanban board
 
 ---
@@ -51,6 +52,27 @@ When users click a league, they arrive at a **League Hub** showing:
 
 ---
 
+## Research Reference
+
+> This design draws from common patterns in competitive gaming and health tracking applications.
+
+### Design Patterns Applied
+
+| Pattern | Source | Application in SCL |
+|---------|--------|-------------------|
+| **Hub Overview** | Industry standard | Dedicated landing page with quick stats before deep actions |
+| **Tabbed Navigation** | Competitive Gaming | Clear separation of "Rankings", "Matches" (Submit), and "Stats" |
+| **Status Indicators** | Health Apps | "Today's Status" card prominent on landing |
+
+### Screenshots
+
+See [research_navigation_patterns.md](../../artifacts/research_navigation_patterns.md) for patterns:
+- League overview structure
+- Tab navigation styles
+- Quick stat summaries
+
+---
+
 ## Proposed Architecture
 
 ### URL Structure
@@ -59,7 +81,7 @@ When users click a league, they arrive at a **League Hub** showing:
 |---------|----------|
 | `/league/[id]` → Submit form | `/league/[id]` → **Hub overview** |
 | `/league/[id]/leaderboard` → Rankings | Keep as-is |
-| `/league/[id]/analytics` → Personal stats | Rename to `/league/[id]/progress` (optional) |
+| `/league/[id]/analytics` → Personal stats | Rename to `/league/[id]/progress` (PRD 29) |
 | _(none)_ | `/league/[id]/submit` → **New submit page** |
 | `/league/[id]/settings` → Settings | Keep as-is |
 
@@ -107,6 +129,7 @@ Create `LeagueNav.tsx` - horizontal tabs:
 - Active tab highlighted
 - Mobile-responsive (horizontal scroll or stack)
 - Visible on all league sub-pages
+- **shadcn**: Use `Tabs` component or styled links
 
 ### 4. Quick Stats Component
 
@@ -187,60 +210,25 @@ Per AGENTS.md, design mobile-first:
 
 ## Proactive Enhancements
 
-> These enhancements go beyond the basic requirements to deliver exceptional UX.
-
 ### 1. Quick Submit Widget
 
 Add a floating "➕ Submit" FAB (Floating Action Button) visible on all league sub-pages:
-
-```
-┌─────────────────────────────┐
-│                             │
-│      [Any league page]      │
-│                             │
-│                       [➕]  │  ← FAB bottom-right
-└─────────────────────────────┘
-```
-
 - Tapping opens quick submit modal (no page navigation)
 - Reduces friction for primary action
-- Badge shows if today not yet submitted
 
 ### 2. League Card Badges on Hub
 
 Show visual badges on the Hub header:
+- 🏆 User is currently #1
+- 📈 User moved up in rank
+- 🔥 5 Current streak count
+- ⚠️ Steps missing today
 
-| Badge | Meaning |
-|-------|---------|
-| 🏆 | User is currently #1 |
-| 📈 | User moved up in rank |
-| 🔥 5 | Current streak count |
-| ⚠️ | Steps missing today |
-
-### 3. Keyboard Shortcuts
-
-| Shortcut | Action |
-|----------|--------|
-| `S` | Go to Submit |
-| `R` | Go to Rankings |
-| `P` | Go to Progress |
-| `?` | Show shortcuts help |
-
-Implement via `useHotkeys` hook (already pattern in admin area).
-
-### 4. Deep-Link Sharing
+### 3. Deep-Link Sharing
 
 Enable sharing links to specific tabs:
 - URLs like `/league/x?tab=rankings` work
 - Share button copies deep link
-- Social previews show tab context
-
-### 5. Last Visited Tab Memory
-
-Remember user's last active tab per league:
-- Store in `localStorage` per league ID
-- Return to same tab on next visit
-- Graceful fallback to Hub if tab invalid
 
 ---
 
@@ -254,11 +242,33 @@ All UI components must:
 
 ---
 
-## Out of Scope
+## Verification Checklist
 
-- League activity feed (Phase 2)
-- Member list with profiles
-- Chat/comments
+> **IMPORTANT:** After implementation, verify at these specific locations.
+
+### Frontend Checks
+
+| Check | URL/Location | Expected Result |
+|-------|--------------|-----------------|
+| Hub accessible | `/league/[id]` | Shows hub, not submit form |
+| Tab navigation | `/league/[id]` | 4 tabs visible: Submit, Rankings, Progress, Settings |
+| Quick stats | `/league/[id]` | Rank, streak, today status visible |
+| Mobile tabs | Mobile viewport | Tabs horizontally scrollable |
+| Submit moved | `/league/[id]/submit` | Submit form loads |
+| Analytics | Click tabs | `analytics.leagueNav.tabClicked` fires |
+
+### Code Checks
+
+| Check | Command | Expected Result |
+|-------|---------|-----------------|
+| Build passes | `npm run build` | No errors |
+| No new lint errors | `npx tsc --noEmit` | No errors |
+| No hardcoded colors | `grep -r "bg-slate" src/components/league` | No results |
+
+### Documentation Checks
+
+- [ ] CHANGELOG.md updated
+- [ ] AGENTS.md updated
 
 ---
 
