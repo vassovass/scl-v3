@@ -19,6 +19,15 @@ const createItemSchema = z.object({
   external: z.boolean().optional(),
   divider_before: z.boolean().optional(),
   sort_order: z.number().int().optional(),
+  // SEO fields
+  seo_title: z.string().max(60).optional().nullable(),
+  seo_description: z.string().max(160).optional().nullable(),
+  seo_keywords: z.array(z.string()).optional().nullable(),
+  // Open Graph fields
+  og_title: z.string().max(60).optional().nullable(),
+  og_description: z.string().max(160).optional().nullable(),
+  og_image: z.string().url().optional().nullable(),
+  og_type: z.string().optional().nullable(),
 });
 
 export const POST = withApiHandler({
@@ -58,6 +67,15 @@ export const POST = withApiHandler({
       visible_to: body.visible_to || [],
       hidden_from: body.hidden_from || [],
       requires_league: body.requires_league || false,
+      // SEO fields
+      seo_title: body.seo_title || null,
+      seo_description: body.seo_description || null,
+      seo_keywords: body.seo_keywords || [],
+      // Open Graph fields
+      og_title: body.og_title || null,
+      og_description: body.og_description || null,
+      og_image: body.og_image || null,
+      og_type: body.og_type || 'website',
       on_click: body.on_click || null,
       external: body.external || false,
       divider_before: body.divider_before || false,
@@ -136,6 +154,15 @@ const updateItemSchema = z.object({
   external: z.boolean().optional(),
   divider_before: z.boolean().optional(),
   sort_order: z.number().int().optional(),
+  // SEO fields
+  seo_title: z.string().max(60).optional().nullable(),
+  seo_description: z.string().max(160).optional().nullable(),
+  seo_keywords: z.array(z.string()).optional().nullable(),
+  // Open Graph fields
+  og_title: z.string().max(60).optional().nullable(),
+  og_description: z.string().max(160).optional().nullable(),
+  og_image: z.string().url().optional().nullable(),
+  og_type: z.string().optional().nullable(),
 });
 
 export const PATCH = withApiHandler({

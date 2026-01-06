@@ -8,7 +8,8 @@ import { createClient } from "@/lib/supabase/client";
 import { ShadcnMenuRenderer } from "./ShadcnMenuRenderer";
 import { MobileMenu } from "./MobileMenu";
 import { ModeToggle } from "@/components/mode-toggle";
-import { MenuItem, UserRole, MENUS, MenuLocation, detectMenuLocation, MENU_LOCATIONS } from "@/lib/menuConfig";
+import { MenuItem, UserRole, MenuLocation, detectMenuLocation } from "@/lib/menuConfig";
+import { useMenuConfig } from "@/hooks/useMenuConfig";
 import { APP_CONFIG } from "@/lib/config";
 import { OfflineIndicator } from "@/components/ui/OfflineIndicator";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
@@ -31,6 +32,9 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const navRef = useRef<HTMLDivElement>(null);
 
+    // Get menu configuration (database-backed with static fallback)
+    const { menus, locations } = useMenuConfig();
+
     // Extract league ID from path if on a league page
     const leagueMatch = pathname.match(/\/league\/([^/]+)/);
     const currentLeagueId = leagueMatch?.[1];
@@ -43,7 +47,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
         locationOverride ?? detectMenuLocation(pathname),
         [locationOverride, pathname]
     );
-    const locationConfig = MENU_LOCATIONS[menuLocation];
+    const locationConfig = locations[menuLocation];
     const isPublicLocation = menuLocation === 'public_header';
 
     useEffect(() => {
@@ -215,7 +219,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                             <div data-tour="nav-league-menu">
                                 <ShadcnMenuRenderer
                                     menuId="main"
-                                    items={MENUS.main.items.find(i => i.id === 'league')?.children}
+                                    items={menus.main?.items.find(i => i.id === 'league')?.children}
                                     variant="dropdown"
                                     userRole={userRole}
                                     leagueId={currentLeagueId}
@@ -232,7 +236,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                         {/* Actions Menu */}
                         <div data-tour="nav-actions-menu">
                             <ShadcnMenuRenderer
-                                items={MENUS.main.items.find(i => i.id === 'actions')?.children}
+                                items={menus.main?.items.find(i => i.id === 'actions')?.children}
                                 variant="dropdown"
                                 userRole={userRole}
                                 leagueId={currentLeagueId}
@@ -311,7 +315,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                 {/* Public menu for non-authenticated users on public pages - sleek text links */}
                 {!session && isPublicLocation && (
                     <div className="hidden md:flex items-center gap-6">
-                        {MENUS.public.items.map((item) => (
+                        {menus.public?.items.map((item) => (
                             <Link
                                 key={item.id}
                                 href={item.href || '#'}
@@ -353,7 +357,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
             {!session && isPublicLocation && mobileMenuOpen && (
                 <div className="md:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-md border-b border-border animate-fade-in">
                     <nav className="px-4 py-4 space-y-1">
-                        {MENUS.public.items.map((item) => (
+                        {menus.public?.items.map((item) => (
                             <Link
                                 key={item.id}
                                 href={item.href || '#'}
