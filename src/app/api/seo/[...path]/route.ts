@@ -12,7 +12,7 @@ import { withApiHandler } from "@/lib/api/handler";
 export const GET = withApiHandler({
   auth: 'none', // Public endpoint - needed for SSR metadata
 }, async ({ adminClient, params }) => {
-  const pathSegments = params?.path as string[];
+  const pathSegments = Array.isArray(params?.path) ? params.path : [params?.path as string];
 
   if (!pathSegments || pathSegments.length === 0) {
     throw new Error('Path is required');
@@ -62,7 +62,7 @@ export const GET = withApiHandler({
 export const PUT = withApiHandler({
   auth: 'superadmin', // Only superadmins can update SEO
 }, async ({ body, adminClient, params }) => {
-  const pathSegments = params?.path as string[];
+  const pathSegments = Array.isArray(params?.path) ? params.path : [params?.path as string];
 
   if (!pathSegments || pathSegments.length === 0) {
     throw new Error('Path is required');

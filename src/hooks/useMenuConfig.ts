@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   MENUS,
   MENU_LOCATIONS,
@@ -14,43 +14,80 @@ import {
   resolveMenuHrefs,
   filterByLeagueContext,
 } from '@/lib/menuConfig';
+import { menuCache, getCacheAge } from '@/lib/cache/menuCache';
 
 /**
- * Hook to fetch menu configuration from database with fallback to static config
+ * Hook to fetch menu configuration from database with multi-layer caching
  *
  * Features:
- * - Fetches menus from /api/menus
+ * - Multi-layer caching (Memory → SessionStorage → IndexedDB → API)
+ * - Stale-while-revalidate pattern for instant renders
+ * - Cross-tab sync via BroadcastChannel
+ * - Offline PWA support with IndexedDB
  * - Falls back to static MENUS if database is empty or errors
- * - Provides helper functions for role filtering and href resolution
- * - Client-side caching
  *
  * @example
- * const { menus, locations, isLoading } = useMenuConfig();
+ * const { menus, locations, isLoading, isStale } = useMenuConfig();
  * const mainMenu = menus.main;
  */
 export function useMenuConfig() {
   const [data, setData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<any>(null);
+  const [isStale, setIsStale] = useState(false);
+  const [cacheAge, setCacheAge] = useState<string | null>(null);
 
-  const loadMenus = async () => {
+  const loadMenus = useCallback(async (skipCache = false) => {
     try {
+      // Layer 1-3: Try cache first (unless explicitly skipping)
+      if (!skipCache) {
+        const cached = await menuCache.get();
+        if (cached) {
+          setData(cached);
+          setIsStale(menuCache.isStale(cached));
+          setCacheAge(getCacheAge(cached.timestamp));
+
+          // If cache is not expired, use it and optionally revalidate in background
+          if (!menuCache.isExpired(cached)) {
+            setIsLoading(false);
+            setError(null);
+            return; // Use fresh cache, don't fetch from API
+          }
+          // Cache is expired, show stale data but fetch fresh in foreground
+        }
+      }
+
+      // Layer 4: Fetch from API
       setIsLoading(true);
       const res = await fetch('/api/menus');
       const json = await res.json();
+
+      // Update cache with fresh data
+      if (json.menus && json.locations) {
+        await menuCache.set({
+          menus: json.menus,
+          locations: json.locations,
+        });
+      }
+
       setData(json);
+      setIsStale(false);
+      setCacheAge(null);
       setError(null);
     } catch (err) {
       setError(err);
-      setData(null);
+      // Keep showing stale cache data if available
+      if (!data) {
+        setData(null);
+      }
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [data]);
 
   useEffect(() => {
     loadMenus();
-  }, []);
+  }, [loadMenus]);
 
   // Use database menus if available, otherwise fall back to static
   const menus: Record<string, MenuDefinition> = data?.menus || MENUS;
@@ -65,8 +102,17 @@ export function useMenuConfig() {
     isLoading,
     /** Error if any */
     error,
-    /** Manually refresh menus from database */
-    refresh: loadMenus,
+    /** Whether cache is stale (> 1 minute old) */
+    isStale,
+    /** Human-readable cache age (e.g., "2m ago") */
+    cacheAge,
+    /** Manually refresh menus from database, bypassing cache */
+    refresh: () => loadMenus(true),
+    /** Clear all cache layers and reload */
+    invalidate: async () => {
+      await menuCache.invalidate();
+      loadMenus(true);
+    },
     /** Whether using static fallback */
     isUsingFallback: !data?.menus,
 
