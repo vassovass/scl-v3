@@ -1,5 +1,6 @@
 import { withApiHandler } from "@/lib/api/handler";
 import { z } from "zod";
+import { AppError, ErrorCode } from "@/lib/errors";
 
 /**
  * GET /api/admin/menus
@@ -15,7 +16,12 @@ export const GET = withApiHandler({
     .order('id');
 
   if (defError) {
-    throw new Error(`Failed to fetch menu definitions: ${defError.message}`);
+    throw new AppError({
+      code: ErrorCode.DB_QUERY_FAILED,
+      message: 'Failed to fetch menu definitions',
+      context: { error: defError.message, hint: defError.hint },
+      recoverable: true,
+    });
   }
 
   // Fetch all menu items
@@ -25,12 +31,20 @@ export const GET = withApiHandler({
     .order('sort_order');
 
   if (itemsError) {
-    throw new Error(`Failed to fetch menu items: ${itemsError.message}`);
+    throw new AppError({
+      code: ErrorCode.DB_QUERY_FAILED,
+      message: 'Failed to fetch menu items',
+      context: { error: itemsError.message, hint: itemsError.hint },
+      recoverable: true,
+    });
   }
 
   // Build nested structure
   const menus = definitions.map((def: any) => {
-    const menuItems = items.filter((item: any) => item.menu_id === def.id);
+    const menuItems = items?.filter((item: any) => item.menu_id === def.id) || [];
+
+    // Debug logging
+    console.log(`[Menu API] Building menu "${def.id}" with ${menuItems.length} items`);
 
     // Build tree structure
     const itemsMap = new Map();
@@ -41,15 +55,22 @@ export const GET = withApiHandler({
     // Nest children under parents
     const rootItems: any[] = [];
     itemsMap.forEach((item) => {
-      if (item.parent_id) {
+      // Check for both null and undefined parent_id
+      if (item.parent_id !== null && item.parent_id !== undefined) {
         const parent = itemsMap.get(item.parent_id);
         if (parent) {
           parent.children.push(item);
+        } else {
+          // Orphaned item - log warning but add to root
+          console.warn(`[Menu API] Orphaned item: ${item.label} (parent_id: ${item.parent_id} not found)`);
+          rootItems.push(item);
         }
       } else {
         rootItems.push(item);
       }
     });
+
+    console.log(`[Menu API] Menu "${def.id}" has ${rootItems.length} root items`);
 
     return {
       id: def.id,
@@ -60,6 +81,9 @@ export const GET = withApiHandler({
       updated_at: def.updated_at,
     };
   });
+
+  console.log(`[Menu API] Returning ${menus.length} menus total`);
+  console.log(`[Menu API] Sample menu structure:`, JSON.stringify(menus[0], null, 2));
 
   return { menus };
 });
@@ -89,7 +113,12 @@ export const POST = withApiHandler({
     .single();
 
   if (error) {
-    throw new Error(`Failed to create menu: ${error.message}`);
+    throw new AppError({
+      code: ErrorCode.MENU_CREATE_FAILED,
+      message: 'Failed to create menu',
+      context: { menuId: body.id, error: error.message, hint: error.hint },
+      recoverable: true,
+    });
   }
 
   return { menu: data };

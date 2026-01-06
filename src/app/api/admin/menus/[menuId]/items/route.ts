@@ -1,5 +1,6 @@
 import { withApiHandler } from "@/lib/api/handler";
 import { z } from "zod";
+import { AppError, ErrorCode } from "@/lib/errors";
 
 /**
  * POST /api/admin/menus/:menuId/items
@@ -37,7 +38,11 @@ export const POST = withApiHandler({
   const menuId = params?.menuId as string;
 
   if (!menuId) {
-    throw new Error('Menu ID is required');
+    throw new AppError({
+      code: ErrorCode.REQUIRED_FIELD_MISSING,
+      message: 'Menu ID is required',
+      recoverable: false,
+    });
   }
 
   // If no sort_order provided, get max + 1
@@ -85,8 +90,15 @@ export const POST = withApiHandler({
     .single();
 
   if (error) {
-    throw new Error(`Failed to create menu item: ${error.message}`);
+    throw new AppError({
+      code: ErrorCode.MENU_ITEM_CREATE_FAILED,
+      message: 'Failed to create menu item',
+      context: { menuId, itemKey: body.item_key, error: error.message, hint: error.hint },
+      recoverable: true,
+    });
   }
+
+  console.log(`[Menu API] Created item "${body.label}" in menu "${menuId}"`);
 
   return { item: data };
 });
@@ -110,28 +122,52 @@ export const PUT = withApiHandler({
   const menuId = params?.menuId as string;
 
   if (!menuId) {
-    throw new Error('Menu ID is required');
+    throw new AppError({
+      code: ErrorCode.REQUIRED_FIELD_MISSING,
+      message: 'Menu ID is required',
+      recoverable: false,
+    });
   }
 
   // Update each item in a transaction-like manner
   // Note: Supabase doesn't support true transactions via REST API
   // So we do sequential updates
-  const updates = body.items.map(async (item) => {
-    const { error } = await adminClient
-      .from('menu_items')
-      .update({
-        parent_id: item.parent_id || null,
-        sort_order: item.sort_order,
-      })
-      .eq('id', item.id)
-      .eq('menu_id', menuId); // Ensure item belongs to this menu
+  try {
+    const updates = body.items.map(async (item) => {
+      const { error } = await adminClient
+        .from('menu_items')
+        .update({
+          parent_id: item.parent_id || null,
+          sort_order: item.sort_order,
+        })
+        .eq('id', item.id)
+        .eq('menu_id', menuId); // Ensure item belongs to this menu
 
-    if (error) {
-      throw new Error(`Failed to update item ${item.id}: ${error.message}`);
+      if (error) {
+        throw new AppError({
+          code: ErrorCode.MENU_ITEM_UPDATE_FAILED,
+          message: `Failed to update item ${item.id}`,
+          context: { itemId: item.id, menuId, error: error.message, hint: error.hint },
+          recoverable: true,
+        });
+      }
+    });
+
+    await Promise.all(updates);
+
+    console.log(`[Menu API] Batch updated ${body.items.length} items in menu "${menuId}"`);
+
+    return { success: true, updated: body.items.length };
+  } catch (error) {
+    if (error instanceof AppError) {
+      throw error;
     }
-  });
-
-  await Promise.all(updates);
-
-  return { success: true, updated: body.items.length };
+    throw new AppError({
+      code: ErrorCode.MENU_BATCH_UPDATE_FAILED,
+      message: 'Failed to update menu items',
+      context: { menuId, itemCount: body.items.length },
+      cause: error instanceof Error ? error : undefined,
+      recoverable: true,
+    });
+  }
 });

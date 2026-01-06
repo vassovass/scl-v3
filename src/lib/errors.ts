@@ -54,6 +54,16 @@ export enum ErrorCode {
     DB_DELETE_FAILED = 'DB_DELETE_FAILED',
     DB_QUERY_FAILED = 'DB_QUERY_FAILED',
 
+    // Menu errors
+    MENU_NOT_FOUND = 'MENU_NOT_FOUND',
+    MENU_CREATE_FAILED = 'MENU_CREATE_FAILED',
+    MENU_ITEM_NOT_FOUND = 'MENU_ITEM_NOT_FOUND',
+    MENU_ITEM_CREATE_FAILED = 'MENU_ITEM_CREATE_FAILED',
+    MENU_ITEM_UPDATE_FAILED = 'MENU_ITEM_UPDATE_FAILED',
+    MENU_ITEM_DELETE_FAILED = 'MENU_ITEM_DELETE_FAILED',
+    MENU_BATCH_UPDATE_FAILED = 'MENU_BATCH_UPDATE_FAILED',
+    MENU_INVALID_HIERARCHY = 'MENU_INVALID_HIERARCHY',
+
     // Form/Validation errors
     VALIDATION_FAILED = 'VALIDATION_FAILED',
     REQUIRED_FIELD_MISSING = 'REQUIRED_FIELD_MISSING',
@@ -128,6 +138,14 @@ export class AppError extends Error {
             [ErrorCode.NETWORK_ERROR]: 'Connection lost. Please check your internet and try again.',
             [ErrorCode.API_UNAUTHORIZED]: 'Please sign in to continue.',
             [ErrorCode.API_FORBIDDEN]: "You don't have permission to do this.",
+            [ErrorCode.MENU_NOT_FOUND]: 'Menu not found.',
+            [ErrorCode.MENU_CREATE_FAILED]: 'Failed to create menu. Please try again.',
+            [ErrorCode.MENU_ITEM_NOT_FOUND]: 'Menu item not found.',
+            [ErrorCode.MENU_ITEM_CREATE_FAILED]: 'Failed to create menu item. Please try again.',
+            [ErrorCode.MENU_ITEM_UPDATE_FAILED]: 'Failed to update menu item. Please try again.',
+            [ErrorCode.MENU_ITEM_DELETE_FAILED]: 'Failed to delete menu item. Please try again.',
+            [ErrorCode.MENU_BATCH_UPDATE_FAILED]: 'Failed to reorder menu items. Please try again.',
+            [ErrorCode.MENU_INVALID_HIERARCHY]: 'Invalid menu structure. Check parent items.',
         };
 
         return friendlyMessages[this.code] || this.message;

@@ -1,5 +1,6 @@
 import { withApiHandler } from "@/lib/api/handler";
 import { z } from "zod";
+import { AppError, ErrorCode } from "@/lib/errors";
 
 /**
  * PATCH /api/admin/menus/:menuId/items/:itemId
@@ -38,7 +39,11 @@ export const PATCH = withApiHandler({
   const itemId = params?.itemId as string;
 
   if (!menuId || !itemId) {
-    throw new Error('Menu ID and Item ID are required');
+    throw new AppError({
+      code: ErrorCode.REQUIRED_FIELD_MISSING,
+      message: 'Menu ID and Item ID are required',
+      recoverable: false,
+    });
   }
 
   const { data, error } = await adminClient
@@ -50,8 +55,15 @@ export const PATCH = withApiHandler({
     .single();
 
   if (error) {
-    throw new Error(`Failed to update menu item: ${error.message}`);
+    throw new AppError({
+      code: ErrorCode.MENU_ITEM_UPDATE_FAILED,
+      message: 'Failed to update menu item',
+      context: { menuId, itemId, error: error.message, hint: error.hint },
+      recoverable: true,
+    });
   }
+
+  console.log(`[Menu API] Updated item "${itemId}" in menu "${menuId}"`);
 
   return { item: data };
 });
@@ -67,7 +79,11 @@ export const DELETE = withApiHandler({
   const itemId = params?.itemId as string;
 
   if (!menuId || !itemId) {
-    throw new Error('Menu ID and Item ID are required');
+    throw new AppError({
+      code: ErrorCode.REQUIRED_FIELD_MISSING,
+      message: 'Menu ID and Item ID are required',
+      recoverable: false,
+    });
   }
 
   const { error } = await adminClient
@@ -77,8 +93,15 @@ export const DELETE = withApiHandler({
     .eq('menu_id', menuId);
 
   if (error) {
-    throw new Error(`Failed to delete menu item: ${error.message}`);
+    throw new AppError({
+      code: ErrorCode.MENU_ITEM_DELETE_FAILED,
+      message: 'Failed to delete menu item',
+      context: { menuId, itemId, error: error.message, hint: error.hint },
+      recoverable: true,
+    });
   }
+
+  console.log(`[Menu API] Deleted item "${itemId}" from menu "${menuId}"`);
 
   return { success: true };
 });
