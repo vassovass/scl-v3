@@ -1,13 +1,15 @@
 import { withApiHandler } from "@/lib/api/handler";
+import { AppError, ErrorCode } from "@/lib/errors";
 
 /**
  * GET /api/menus
  * Public endpoint - returns all menus with items for frontend consumption
+ * Filters items based on user's role (visible_to/hidden_from)
  * Used by useMenuConfig hook with fallback to static config
  */
 export const GET = withApiHandler({
   auth: 'none',
-}, async ({ adminClient }) => {
+}, async ({ adminClient, user }) => {
   // Fetch all menu definitions
   const { data: definitions, error: defError } = await adminClient
     .from('menu_definitions')
@@ -15,20 +17,55 @@ export const GET = withApiHandler({
     .order('id');
 
   if (defError) {
-    // Return empty to trigger fallback to static config
-    return { menus: null, error: defError.message };
+    console.error('[Menu API] Error fetching definitions:', defError);
+    throw new AppError({
+      code: ErrorCode.DB_QUERY_FAILED,
+      message: 'Failed to fetch menu definitions',
+      context: { error: defError.message },
+      recoverable: true,
+    });
   }
 
   // Fetch all menu items
   const { data: items, error: itemsError } = await adminClient
     .from('menu_items')
     .select('*')
-    .order('sort_order');
+    .order('menu_id, sort_order');
 
   if (itemsError) {
-    // Return empty to trigger fallback to static config
-    return { menus: null, error: itemsError.message };
+    console.error('[Menu API] Error fetching items:', itemsError);
+    throw new AppError({
+      code: ErrorCode.DB_QUERY_FAILED,
+      message: 'Failed to fetch menu items',
+      context: { error: itemsError.message },
+      recoverable: true,
+    });
   }
+
+  // Determine user's role for filtering
+  let isSuperadmin = false;
+  if (user) {
+    const { data: userData } = await adminClient
+      .from('users')
+      .select('is_superadmin')
+      .eq('id', user.id)
+      .single();
+
+    isSuperadmin = userData?.is_superadmin ?? false;
+  }
+
+  // Build role array for filtering
+  const userRoles: string[] = [];
+  if (!user) {
+    userRoles.push('guest');
+  } else {
+    userRoles.push('member'); // All authenticated users are members
+    if (isSuperadmin) {
+      userRoles.push('superadmin');
+    }
+  }
+
+  console.log('[Menu API /api/menus] User roles for filtering:', userRoles);
 
   // Build nested structure matching MENUS format from menuConfig.ts
   const menusObj: Record<string, any> = {};
@@ -36,9 +73,34 @@ export const GET = withApiHandler({
   definitions.forEach((def: any) => {
     const menuItems = items.filter((item: any) => item.menu_id === def.id);
 
-    // Build tree structure
+    // Filter items based on visibility rules
+    const visibleItems = menuItems.filter((item: any) => {
+      // Check visible_to (if specified, user must have one of these roles)
+      if (item.visible_to && Array.isArray(item.visible_to) && item.visible_to.length > 0) {
+        const hasVisibleRole = item.visible_to.some((role: string) => userRoles.includes(role));
+        if (!hasVisibleRole) {
+          console.log(`[Menu API] Filtering out item "${item.label}" - user lacks visible_to role. Required: ${item.visible_to.join(', ')} User has: ${userRoles.join(', ')}`);
+          return false; // User doesn't have required role
+        }
+      }
+
+      // Check hidden_from (if specified, user must NOT have any of these roles)
+      if (item.hidden_from && Array.isArray(item.hidden_from) && item.hidden_from.length > 0) {
+        const hasHiddenRole = item.hidden_from.some((role: string) => userRoles.includes(role));
+        if (hasHiddenRole) {
+          console.log(`[Menu API] Filtering out item "${item.label}" - user has hidden_from role: ${item.hidden_from.join(', ')}`);
+          return false; // User has a role that hides this item
+        }
+      }
+
+      return true; // Item is visible
+    });
+
+    console.log(`[Menu API] Menu "${def.id}": ${menuItems.length} total items, ${visibleItems.length} visible to user`);
+
+    // Build tree structure from visible items
     const itemsMap = new Map();
-    menuItems.forEach((item: any) => {
+    visibleItems.forEach((item: any) => {
       // Convert database format to MenuItem interface format
       itemsMap.set(item.id, {
         id: item.item_key,
@@ -56,14 +118,18 @@ export const GET = withApiHandler({
       });
     });
 
-    // Nest children under parents
+    // Nest children under parents (only visible items)
     const rootItems: any[] = [];
-    menuItems.forEach((item: any) => {
+    visibleItems.forEach((item: any) => {
       const menuItem = itemsMap.get(item.id);
-      if (item.parent_id) {
+      if (item.parent_id !== null && item.parent_id !== undefined) {
         const parent = itemsMap.get(item.parent_id);
         if (parent) {
           parent.children.push(menuItem);
+        } else {
+          // Parent was filtered out or doesn't exist, add as root
+          console.warn(`[Menu API] Orphaned item: ${item.label} (parent_id: ${item.parent_id} not found in visible items)`);
+          rootItems.push(menuItem);
         }
       } else {
         rootItems.push(menuItem);
@@ -96,22 +162,33 @@ export const GET = withApiHandler({
     .select('*');
 
   if (locError) {
-    // Return menus without locations
+    console.warn('[Menu API] Error fetching locations, using defaults:', locError);
+    // Return menus without locations - frontend will fall back to static config
     return { menus: menusObj, locations: null };
   }
 
-  // Convert locations to MENU_LOCATIONS format
+  // Convert locations to MENU_LOCATIONS format and filter based on user role
   const locationsObj: Record<string, any> = {};
-  locations.forEach((loc: any) => {
+  locations?.forEach((loc: any) => {
+    // Filter menu_ids based on whether user should see admin menu
+    let menuIds = loc.menu_ids || [];
+
+    // Remove 'admin' menu if user is not superadmin
+    if (!isSuperadmin) {
+      menuIds = menuIds.filter((id: string) => id !== 'admin');
+    }
+
     locationsObj[loc.location] = {
-      menus: loc.menu_ids,
+      menus: menuIds,
       showLogo: loc.show_logo,
       showSignIn: loc.show_sign_in,
       showUserMenu: loc.show_user_menu,
-      showAdminMenu: loc.show_admin_menu,
+      showAdminMenu: loc.show_admin_menu && isSuperadmin, // Only show if user is superadmin
       className: loc.class_name || undefined,
     };
   });
+
+  console.log(`[Menu API /api/menus] Returning ${Object.keys(menusObj).length} menus and ${Object.keys(locationsObj).length} locations`);
 
   return {
     menus: menusObj,

@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { User } from "@supabase/supabase-js";
-// import { MenuRenderer } from "./MenuRenderer"; // Removed legacy renderer import
-import { MenuItem, UserRole, MENUS, prepareMenuItems } from "@/lib/menuConfig";
+import { MenuItem, UserRole, prepareMenuItems } from "@/lib/menuConfig";
+import { useMenuConfig } from "@/hooks/useMenuConfig";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 
 interface MobileMenuProps {
@@ -37,6 +37,9 @@ export function MobileMenu({
     const displayName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "User";
     const userRole: UserRole = isSuperadmin ? 'superadmin' : 'member';
 
+    // Get menu configuration from database (with static fallback)
+    const { menus } = useMenuConfig();
+
     // Handle menu action - close menu after action
     const handleAction = (actionName: string, item: MenuItem) => {
         if (actionName === 'signOut') {
@@ -47,19 +50,26 @@ export function MobileMenu({
         onClose();
     };
 
-    // Get prepared menu items
-    const leagueItems = currentLeagueId
-        ? prepareMenuItems(MENUS.main.items.find(i => i.id === 'league')?.children || [], userRole, currentLeagueId)
+    // Get prepared menu items from database
+    const leagueItems = currentLeagueId && menus.main
+        ? prepareMenuItems(menus.main.items.find((i: MenuItem) => i.id === 'league')?.children || [], userRole, currentLeagueId)
         : [];
-    const actionsItems = prepareMenuItems(MENUS.main.items.find(i => i.id === 'actions')?.children || [], userRole, currentLeagueId);
-    const helpItems = prepareMenuItems(MENUS.help.items, userRole, currentLeagueId);
-    const adminItems = isSuperadmin ? prepareMenuItems(MENUS.admin.items, userRole, currentLeagueId) : [];
-    const userItems = prepareMenuItems(MENUS.user.items.filter(i => i.id !== 'sign-out'), userRole, currentLeagueId);
-    const footerItems = [
-        ...MENUS.footerLegal.items.slice(0, 2), // Terms, Privacy
-        { id: 'roadmap', label: 'Roadmap', href: '/roadmap' },
-        { id: 'beta', label: 'Beta Info', href: '/beta' },
-    ];
+    const actionsItems = menus.main
+        ? prepareMenuItems(menus.main.items.find((i: MenuItem) => i.id === 'actions')?.children || [], userRole, currentLeagueId)
+        : [];
+    const helpItems = menus.help ? prepareMenuItems(menus.help.items, userRole, currentLeagueId) : [];
+    const adminItems = isSuperadmin && menus.admin ? prepareMenuItems(menus.admin.items, userRole, currentLeagueId) : [];
+    const userItems = menus.user ? prepareMenuItems(menus.user.items.filter((i: MenuItem) => i.id !== 'sign-out'), userRole, currentLeagueId) : [];
+    const footerItems = menus.footerLegal
+        ? [
+            ...menus.footerLegal.items.slice(0, 2), // Terms, Privacy
+            { id: 'roadmap', label: 'Roadmap', href: '/roadmap' },
+            { id: 'beta', label: 'Beta Info', href: '/beta' },
+          ]
+        : [
+            { id: 'roadmap', label: 'Roadmap', href: '/roadmap' },
+            { id: 'beta', label: 'Beta Info', href: '/beta' },
+          ];
 
     return (
         <div className="md:hidden border-t border-border bg-background px-4 py-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
