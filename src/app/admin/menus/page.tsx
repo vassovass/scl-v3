@@ -1,13 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
+import { DragDropContext } from "@hello-pangea/dnd";
 import { toast } from "@/hooks/use-toast";
 import { MenuList } from "@/components/admin/menus/MenuList";
 import { MenuItemForm } from "@/components/admin/menus/MenuItemForm";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { menuCache } from "@/lib/cache/menuCache";
+import {
+  DroppableContainer,
+  DraggableWrapper,
+  DragHandle,
+  DepthIndicator,
+  LevelBadge,
+  flattenTree,
+} from "@/lib/dnd";
 
 interface MenuItemData {
   id: string;
@@ -182,34 +190,18 @@ export default function MenuEditorPage() {
     }
   };
 
-  // Flatten tree to array for reordering
-  const flattenItems = (items: MenuItemData[], parentId: string | null = null): Array<MenuItemData & { parent_id: string | null }> => {
-    let flat: Array<MenuItemData & { parent_id: string | null }> = [];
-    items.forEach(item => {
-      flat.push({ ...item, parent_id: parentId });
-      if (item.children && item.children.length > 0) {
-        flat = flat.concat(flattenItems(item.children, item.id));
-      }
-    });
-    return flat;
-  };
-
-  // Handle drag end - reorder items
-  const handleDragEnd = async (result: DropResult) => {
+  // Handle drag end - reorder items using shared utility
+  const handleDragEnd = async (result: any) => {
     if (!result.destination || !selectedMenu) return;
+    if (result.source.index === result.destination.index) return;
 
-    const sourceIndex = result.source.index;
-    const destIndex = result.destination.index;
-
-    if (sourceIndex === destIndex) return;
-
-    // Get flat list of all items with their parent_id
-    const allItems = flattenItems(selectedMenu.items);
+    // Get flat list of all items with their parent_id using shared utility
+    const allItems = flattenTree(selectedMenu.items);
 
     // Reorder the items array
     const reordered = Array.from(allItems);
-    const [movedItem] = reordered.splice(sourceIndex, 1);
-    reordered.splice(destIndex, 0, movedItem);
+    const [movedItem] = reordered.splice(result.source.index, 1);
+    reordered.splice(result.destination.index, 0, movedItem);
 
     // Update sort_order for all items
     const updates = reordered.map((item, index) => ({
@@ -253,7 +245,7 @@ export default function MenuEditorPage() {
       item.requires_league;
 
     return (
-      <Draggable key={item.id} draggableId={item.id} index={index}>
+      <DraggableWrapper key={item.id} draggableId={item.id} index={index}>
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
@@ -267,29 +259,11 @@ export default function MenuEditorPage() {
                   : 'border-border bg-card hover:bg-accent/50'
               }`}
             >
-              {/* Drag handle */}
-              <div
-                {...provided.dragHandleProps}
-                className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground p-1"
-              >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                  <circle cx="4" cy="4" r="1.5"/>
-                  <circle cx="4" cy="8" r="1.5"/>
-                  <circle cx="4" cy="12" r="1.5"/>
-                  <circle cx="12" cy="4" r="1.5"/>
-                  <circle cx="12" cy="8" r="1.5"/>
-                  <circle cx="12" cy="12" r="1.5"/>
-                </svg>
-              </div>
+              {/* Drag handle - using shared component */}
+              <DragHandle provided={provided} variant="dots" />
 
-              {/* Depth indicator */}
-              {depth > 0 && (
-                <div className="flex items-center gap-1 text-muted-foreground">
-                  {Array.from({ length: depth }).map((_, i) => (
-                    <span key={i} className="text-xs">└</span>
-                  ))}
-                </div>
-              )}
+              {/* Depth indicator - using shared component */}
+              <DepthIndicator depth={depth} />
 
               {/* Item info */}
               <div className="flex-1 min-w-0">
@@ -301,11 +275,11 @@ export default function MenuEditorPage() {
                       Restricted
                     </span>
                   )}
-                  {depth > 0 && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-600 dark:text-blue-400">
-                      Level {depth}
-                    </span>
-                  )}
+                  {/* Level badge - using shared component */}
+                  <LevelBadge
+                    level={depth}
+                    className="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-600 dark:text-blue-400"
+                  />
                 </div>
                 {(item.href || item.on_click) && (
                   <div className="text-xs text-muted-foreground truncate mt-0.5">
@@ -345,7 +319,7 @@ export default function MenuEditorPage() {
             )}
           </div>
         )}
-      </Draggable>
+      </DraggableWrapper>
     );
   };
 
@@ -409,14 +383,14 @@ export default function MenuEditorPage() {
                 </div>
               ) : (
                 <DragDropContext onDragEnd={handleDragEnd}>
-                  <Droppable droppableId="menu-items">
+                  <DroppableContainer droppableId="menu-items">
                     {(provided) => (
-                      <div ref={provided.innerRef} {...provided.droppableProps}>
+                      <>
                         {rootItems.map((item, index) => renderItem(item, index, 0))}
                         {provided.placeholder}
-                      </div>
+                      </>
                     )}
-                  </Droppable>
+                  </DroppableContainer>
                 </DragDropContext>
               )}
             </div>

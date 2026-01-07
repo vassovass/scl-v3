@@ -13,6 +13,7 @@ import ExpandableCardModal from "./ExpandableCardModal";
 import { useExport } from "@/hooks/useExport";
 import { KANBAN_COLUMNS as EXPORT_COLUMNS } from "@/lib/export/presets";
 import { useRouter } from "next/navigation";
+import { reorderArray, moveItemBetweenArrays, shouldIgnoreDrag } from "@/lib/dnd";
 
 interface FeedbackItem {
     id: string;
@@ -204,44 +205,62 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
     }, [filteredItems]);
 
     const handleDragEnd = async (result: DropResult) => {
-        const { source, destination, draggableId, type } = result;
+        // Use shared utility to check if drag should be ignored
+        if (shouldIgnoreDrag(result)) return;
 
+        const { source, destination, draggableId, type } = result;
         if (!destination) return;
-        if (source.droppableId === destination.droppableId && source.index === destination.index) return;
 
         // Handle Column Reordering
         if (type === "COLUMN") {
-            const newColumns = [...columns];
-            const [movedColumn] = newColumns.splice(source.index, 1);
-            newColumns.splice(destination.index, 0, movedColumn);
-            setColumns(newColumns);
+            // Use shared reorderArray utility
+            const { reorderedItems: reorderedColumns } = reorderArray(
+                columns,
+                source.index,
+                destination.index
+            );
+            setColumns(reorderedColumns);
 
             // Save new order to local storage
-            const orderIds = newColumns.map(c => c.id);
+            const orderIds = reorderedColumns.map(c => c.id);
             localStorage.setItem("admin-kanban-order", JSON.stringify(orderIds));
             return;
         }
 
-        // Handle Item Reordering (existing logic)
+        // Handle Item Reordering within/between columns
         const newColumns = [...columns];
         const sourceCol = newColumns.find((c) => c.id === source.droppableId);
         const destCol = newColumns.find((c) => c.id === destination.droppableId);
 
         if (!sourceCol || !destCol) return;
 
-        const [movedItem] = sourceCol.items.splice(source.index, 1);
-        movedItem.board_status = destination.droppableId;
-        destCol.items.splice(destination.index, 0, movedItem);
+        if (sourceCol.id === destCol.id) {
+            // Reorder within same column using shared utility
+            const { reorderedItems } = reorderArray(
+                sourceCol.items,
+                source.index,
+                destination.index
+            );
+            sourceCol.items = reorderedItems;
+        } else {
+            // Move between columns using shared utility
+            const { source: updatedSource, destination: updatedDest } = moveItemBetweenArrays(
+                sourceCol.items,
+                destCol.items,
+                source.index,
+                destination.index
+            );
+            sourceCol.items = updatedSource;
+            destCol.items = updatedDest;
 
-        // Update priority order for all items in destination column
-        destCol.items.forEach((item, index) => {
-            item.priority_order = index;
-        });
+            // Update board_status for moved item
+            const movedItem = destCol.items[destination.index];
+            movedItem.board_status = destination.droppableId;
 
-        // If moved to "done", set completed_at
-        const completedAt = destination.droppableId === "done" ? new Date().toISOString() : null;
-        if (completedAt) {
-            movedItem.completed_at = completedAt;
+            // If moved to "done", set completed_at
+            if (destination.droppableId === "done") {
+                movedItem.completed_at = new Date().toISOString();
+            }
         }
 
         setColumns(newColumns);
@@ -249,6 +268,7 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
         // Persist to database
         setIsUpdating(true);
         try {
+            const movedItem = destCol.items[destination.index];
             await fetch("/api/admin/kanban", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
@@ -256,7 +276,7 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                     id: draggableId,
                     board_status: destination.droppableId,
                     priority_order: destination.index,
-                    completed_at: completedAt,
+                    completed_at: movedItem.completed_at,
                 }),
             });
         } catch (error) {
