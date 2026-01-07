@@ -1,8 +1,10 @@
 -- PRD 26 (Partial): Add development stage setting to app_settings
 -- This migration adds a simple development stage tracking system
 
--- Create app_settings table if it doesn't exist
-CREATE TABLE IF NOT EXISTS app_settings (
+-- Drop and recreate app_settings table to ensure proper constraints
+DROP TABLE IF EXISTS app_settings CASCADE;
+
+CREATE TABLE app_settings (
   key TEXT PRIMARY KEY,
   value JSONB NOT NULL,
 
