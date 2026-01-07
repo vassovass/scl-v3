@@ -241,7 +241,7 @@ export const HELP_MENU: MenuDefinition = {
         },
         { id: 'feedback', label: 'Send Feedback', href: '/feedback', icon: '💬' },
         { id: 'roadmap', label: 'Roadmap', href: '/roadmap', icon: '🗺️' },
-        { id: 'beta-info', label: 'Beta Info', href: '/beta', icon: '📋' },
+        { id: 'beta-info', label: 'Stage Info', href: '/stage-info', icon: '📊' },
     ]
 };
 
@@ -328,20 +328,20 @@ export const FOOTER_LEGAL: MenuDefinition = {
         { id: 'footer-terms', label: 'Terms of Service', href: '/terms' },
         { id: 'footer-privacy', label: 'Privacy Policy', href: '/privacy' },
         { id: 'footer-security', label: 'Security', href: '/security' },
-        { id: 'footer-beta', label: 'Beta Info', href: '/beta' },
+        { id: 'footer-beta', label: 'Stage Info', href: '/stage-info' },
     ]
 };
 
 /**
  * Public/Marketing header menu (for non-authenticated pages)
- * Shown on: /, /privacy, /terms, /security, /beta
+ * Shown on: /, /privacy, /terms, /security, /stage-info
  */
 export const PUBLIC_MENU: MenuDefinition = {
     id: 'public',
     items: [
         { id: 'public-features', label: 'Features', href: '/#features', icon: '✨', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
         { id: 'public-roadmap', label: 'Roadmap', href: '/roadmap', icon: '🗺️', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
-        { id: 'public-beta', label: 'Beta Info', href: '/beta', icon: '🚧', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
+        { id: 'public-beta', label: 'Stage Info', href: '/stage-info', icon: '📊', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
     ]
 };
 
@@ -420,7 +420,7 @@ export function detectMenuLocation(pathname: string): MenuLocation {
     }
 
     // Public/marketing pages
-    const publicPages = ['/', '/privacy', '/terms', '/security', '/beta', '/roadmap', '/feedback'];
+    const publicPages = ['/', '/privacy', '/terms', '/security', '/stage-info', '/beta', '/roadmap', '/feedback'];
     if (publicPages.includes(pathname) || publicPages.some(p => pathname === p)) {
         return 'public_header';
     }
