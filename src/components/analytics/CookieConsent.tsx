@@ -133,10 +133,4 @@ function updateGoogleConsent(categories: string[]) {
     });
 }
 
-// Add gtag type declaration
-declare global {
-    interface Window {
-        gtag: (...args: unknown[]) => void;
-        dataLayer: Record<string, unknown>[];
-    }
-}
+// gtag type declaration is in src/lib/analytics.ts

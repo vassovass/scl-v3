@@ -816,6 +816,14 @@ When adding a new trackable feature:
 
 ### 2026-01-07
 
+- ✅ **User Preferences System** (PRD 25)
+  - Modular settings architecture for user/league/admin contexts
+  - Type-safe registry pattern following Slash Engineering best practices
+  - Reusable settings components (SettingsLayout, SettingsSection, etc.)
+  - `usePreferences()` hook with optimistic updates
+  - User settings at `/settings/profile` and `/settings/preferences`
+  - Default/override pattern for efficient storage
+
 - ✅ **Menu Backend System** (PRD 24)
   - Database-backed menu configuration
   - Visual menu editor at `/admin/menus`

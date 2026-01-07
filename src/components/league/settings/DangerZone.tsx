@@ -1,7 +1,7 @@
 "use client";
 
 import { League } from "@/types/database";
-import { SettingsSection } from "./SettingsSection";
+import { SettingsSection } from "@/components/settings";
 import { toast } from "@/hooks/use-toast";
 
 interface DangerZoneProps {

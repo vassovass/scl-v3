@@ -17,7 +17,13 @@
       "Bash(powershell -Command:*)",
       "Bash(npm run dev:*)",
       "Bash(node:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(grep:*)",
+      "Bash(for file in CompetitionSettings.tsx DangerZone.tsx RulesSettings.tsx)",
+      "Bash(do sed -i 's|from \"\"./SettingsSection\"\"|from \"\"@/components/settings\"\"|' \"$file\")",
+      "Bash(done)",
+      "Bash(cat:*)"
     ]
   }
 }

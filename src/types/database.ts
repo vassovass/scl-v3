@@ -355,6 +355,63 @@ export type Database = {
           }
         ];
       };
+      user_preferences: {
+        Row: {
+          user_id: string;
+          default_landing: "dashboard" | "submit" | "progress" | "rankings";
+          primary_league_id: string | null;
+          reminder_style: "floating" | "badge" | "card";
+          reminder_dismissed_until: string | null;
+          theme: "dark" | "light" | "system";
+          email_daily_reminder: boolean;
+          email_weekly_digest: boolean;
+          push_enabled: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          default_landing?: "dashboard" | "submit" | "progress" | "rankings";
+          primary_league_id?: string | null;
+          reminder_style?: "floating" | "badge" | "card";
+          reminder_dismissed_until?: string | null;
+          theme?: "dark" | "light" | "system";
+          email_daily_reminder?: boolean;
+          email_weekly_digest?: boolean;
+          push_enabled?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          default_landing?: "dashboard" | "submit" | "progress" | "rankings";
+          primary_league_id?: string | null;
+          reminder_style?: "floating" | "badge" | "card";
+          reminder_dismissed_until?: string | null;
+          theme?: "dark" | "light" | "system";
+          email_daily_reminder?: boolean;
+          email_weekly_digest?: boolean;
+          push_enabled?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_preferences_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_preferences_primary_league_id_fkey";
+            columns: ["primary_league_id"];
+            isOneToOne: false;
+            referencedRelation: "leagues";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -426,3 +483,4 @@ export type Submission = Tables<"submissions">;
 export type SiteSetting = Tables<"site_settings">;
 export type AuditLog = Tables<"audit_log">;
 export type ProxyMember = Tables<"proxy_members">;
+export type UserPreferences = Tables<"user_preferences">;

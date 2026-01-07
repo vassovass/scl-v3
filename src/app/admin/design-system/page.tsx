@@ -956,6 +956,91 @@ toast({ title: "Warning", description: "Check input", variant: "destructive" });
                     </div>
                 </section>
 
+                {/* Settings Components Section */}
+                <section className="mb-16">
+                    <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-sky-500"></span>
+                        Settings Components (PRD 25)
+                    </h2>
+
+                    <div className="space-y-6">
+                        <div className="glass-card p-6">
+                            <h3 className="text-sm font-medium text-slate-300 mb-4">Unified Settings Architecture</h3>
+                            <p className="text-sm text-slate-400 mb-6">
+                                Reusable settings components for User Preferences, League Settings, and Admin Settings.
+                                All components use shadcn/ui primitives with consistent styling.
+                            </p>
+
+                            <div className="space-y-4">
+                                <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                                    <code className="text-sky-400 text-sm">SettingsLayout</code>
+                                    <p className="text-xs text-slate-500 mt-2">
+                                        Main layout wrapper with header, back link, and optional tabbed navigation.
+                                    </p>
+                                    <pre className="text-xs text-slate-400 mt-3 bg-slate-950 p-3 rounded overflow-x-auto">
+{`<SettingsLayout
+  title="Settings"
+  navItems={[
+    { label: "Profile", href: "/settings/profile" },
+    { label: "Preferences", href: "/settings/preferences" }
+  ]}
+>
+  ...
+</SettingsLayout>`}
+                                    </pre>
+                                </div>
+
+                                <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                                    <code className="text-sky-400 text-sm">SettingsSection</code>
+                                    <p className="text-xs text-slate-500 mt-2">
+                                        Groups related settings with title and description. Supports danger mode.
+                                    </p>
+                                </div>
+
+                                <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                                    <code className="text-sky-400 text-sm">SettingsField</code>
+                                    <p className="text-xs text-slate-500 mt-2">
+                                        Text/textarea input with label, description, and character count.
+                                    </p>
+                                </div>
+
+                                <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                                    <code className="text-sky-400 text-sm">SettingsToggle</code>
+                                    <p className="text-xs text-slate-500 mt-2">
+                                        Boolean switch field (wraps shadcn Switch).
+                                    </p>
+                                </div>
+
+                                <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                                    <code className="text-sky-400 text-sm">SettingsSelect</code>
+                                    <p className="text-xs text-slate-500 mt-2">
+                                        Dropdown selector (wraps shadcn Select).
+                                    </p>
+                                </div>
+
+                                <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                                    <code className="text-sky-400 text-sm">SettingsRadioGroup</code>
+                                    <p className="text-xs text-slate-500 mt-2">
+                                        Radio button group with optional descriptions per option.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="mt-6 pt-6 border-t border-slate-700">
+                                <h4 className="text-xs font-medium text-slate-300 mb-3">Registry Pattern</h4>
+                                <p className="text-xs text-slate-400 mb-3">
+                                    Settings are defined in type-safe registries following industry best practices:
+                                </p>
+                                <ul className="text-xs text-slate-500 space-y-2 list-disc list-inside">
+                                    <li><code className="text-sky-400">src/lib/settings/userPreferences.ts</code> - User settings registry</li>
+                                    <li><code className="text-sky-400">src/lib/settings/types.ts</code> - Type-safe setting definitions</li>
+                                    <li><code className="text-sky-400">src/hooks/usePreferences.ts</code> - Hook with optimistic updates</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 {/* Theme Support Note */}
                 <section className="glass-card p-6 border-l-4 border-sky-500 mb-16">
                     <h3 className="text-lg font-semibold text-sky-400 mb-2">🌓 Theme Support</h3>

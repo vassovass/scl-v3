@@ -11,6 +11,41 @@ All notable changes to StepLeague v3.
 
 ### Added
 
+- **PRD 25: User Preferences System** - Modular, extensible settings architecture
+  - **Database Schema** - `user_preferences` table with default/override pattern
+    - Navigation preferences (default_landing, primary_league_id)
+    - Reminder preferences (reminder_style, dismissed_until)
+    - Theme preferences (dark/light/system) - future-ready
+    - Notification preferences (email/push settings) - future-ready
+    - RLS policies for user-only access
+    - Automatic updated_at trigger
+  - **Type-Safe Registry Pattern** - Follows Slash Engineering best practices
+    - `src/lib/settings/types.ts` - Base types and interfaces
+    - `src/lib/settings/userPreferences.ts` - User settings registry
+    - Compile-time + runtime type safety with Zod validation
+    - Extensible: Add new settings with just registry + DB column
+  - **Reusable Settings Components** - Unified across all settings contexts
+    - `SettingsLayout` - Page wrapper with header, back link, tabbed nav
+    - `SettingsNav` - Tabbed navigation component
+    - `SettingsSection` - Groups related settings
+    - `SettingsField` - Text/textarea inputs (wraps shadcn Input/Textarea)
+    - `SettingsToggle` - Boolean switches (wraps shadcn Switch)
+    - `SettingsSelect` - Dropdowns (wraps shadcn Select)
+    - `SettingsRadioGroup` - Radio options with descriptions
+    - All components use theme-aware CSS variables
+  - **API Endpoints** - RESTful preferences management
+    - `GET /api/user/preferences` - Fetch with defaults if not exists
+    - `PATCH /api/user/preferences` - Update with validation
+  - **React Hook** - `usePreferences()` with optimistic updates
+    - Automatic fetching and caching
+    - Single field or bulk updates
+    - Rollback on error with toast notifications
+  - **Settings Pages**
+    - `/settings/profile` - Name, nickname, email (refactored)
+    - `/settings/preferences` - Navigation, reminders, appearance
+    - Tabbed navigation between sections
+    - Mobile-responsive layout
+  - **shadcn Components** - Added Switch, RadioGroup
 - **PRD 24: WordPress-Style Menu Backend System** - Database-backed menu management
   - **Database Schema** - New tables for menu configuration
     - `menu_definitions` - Menu metadata (id, label, description)

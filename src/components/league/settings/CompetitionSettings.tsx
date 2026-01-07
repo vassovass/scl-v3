@@ -1,7 +1,7 @@
 "use client";
 
 import { League } from "@/types/database";
-import { SettingsSection } from "./SettingsSection";
+import { SettingsSection } from "@/components/settings";
 import { DatePicker } from "@/components/ui/DatePicker";
 
 interface CompetitionSettingsProps {

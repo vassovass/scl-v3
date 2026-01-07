@@ -9,6 +9,11 @@ interface SettingsSectionProps {
     danger?: boolean;
 }
 
+/**
+ * Reusable settings section wrapper component
+ * Used across user settings, league settings, and admin settings
+ * Provides consistent styling and structure
+ */
 export function SettingsSection({ title, description, children, danger = false }: SettingsSectionProps) {
     return (
         <div className={`rounded-xl border p-6 transition-all duration-300 ${danger
