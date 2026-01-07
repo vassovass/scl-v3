@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import { toast } from "@/hooks/use-toast";
 import { MenuList } from "@/components/admin/menus/MenuList";
 import { MenuItemForm } from "@/components/admin/menus/MenuItemForm";
@@ -181,62 +182,170 @@ export default function MenuEditorPage() {
     }
   };
 
-  const renderItem = (item: MenuItemData, depth: number = 0) => {
+  // Flatten tree to array for reordering
+  const flattenItems = (items: MenuItemData[], parentId: string | null = null): Array<MenuItemData & { parent_id: string | null }> => {
+    let flat: Array<MenuItemData & { parent_id: string | null }> = [];
+    items.forEach(item => {
+      flat.push({ ...item, parent_id: parentId });
+      if (item.children && item.children.length > 0) {
+        flat = flat.concat(flattenItems(item.children, item.id));
+      }
+    });
+    return flat;
+  };
+
+  // Handle drag end - reorder items
+  const handleDragEnd = async (result: DropResult) => {
+    if (!result.destination || !selectedMenu) return;
+
+    const sourceIndex = result.source.index;
+    const destIndex = result.destination.index;
+
+    if (sourceIndex === destIndex) return;
+
+    // Get flat list of all items with their parent_id
+    const allItems = flattenItems(selectedMenu.items);
+
+    // Reorder the items array
+    const reordered = Array.from(allItems);
+    const [movedItem] = reordered.splice(sourceIndex, 1);
+    reordered.splice(destIndex, 0, movedItem);
+
+    // Update sort_order for all items
+    const updates = reordered.map((item, index) => ({
+      id: item.id,
+      parent_id: item.parent_id,
+      sort_order: index,
+    }));
+
+    try {
+      // Send batch update to API
+      const res = await fetch(`/api/admin/menus/${selectedMenuId}/items`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: updates }),
+      });
+
+      if (!res.ok) throw new Error('Failed to reorder items');
+
+      // Invalidate cache
+      await menuCache.invalidate();
+
+      toast({
+        title: 'Items reordered',
+        description: 'Menu order has been updated.',
+      });
+
+      // Reload menus
+      await loadMenus();
+    } catch (error) {
+      toast({
+        title: 'Error reordering items',
+        description: String(error),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const renderItem = (item: MenuItemData, index: number, depth: number = 0) => {
     const hasVisibilityRestrictions =
       (item.visible_to && item.visible_to.length > 0) ||
       item.requires_league;
 
     return (
-      <div key={item.id} className={depth > 0 ? "ml-8" : ""}>
-        <div className="group flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors mb-2">
-          {/* Item info */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              {item.icon && <span className="text-base">{item.icon}</span>}
-              <span className="font-medium text-sm truncate text-foreground">{item.label}</span>
-              {hasVisibilityRestrictions && (
-                <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-400">
-                  Restricted
-                </span>
+      <Draggable key={item.id} draggableId={item.id} index={index}>
+        {(provided, snapshot) => (
+          <div
+            ref={provided.innerRef}
+            {...provided.draggableProps}
+            className={depth > 0 ? "ml-8" : ""}
+          >
+            <div
+              className={`group flex items-center gap-2 px-3 py-2 rounded-lg border transition-all mb-2 ${
+                snapshot.isDragging
+                  ? 'border-primary bg-primary/10 shadow-lg scale-105'
+                  : 'border-border bg-card hover:bg-accent/50'
+              }`}
+            >
+              {/* Drag handle */}
+              <div
+                {...provided.dragHandleProps}
+                className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground p-1"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <circle cx="4" cy="4" r="1.5"/>
+                  <circle cx="4" cy="8" r="1.5"/>
+                  <circle cx="4" cy="12" r="1.5"/>
+                  <circle cx="12" cy="4" r="1.5"/>
+                  <circle cx="12" cy="8" r="1.5"/>
+                  <circle cx="12" cy="12" r="1.5"/>
+                </svg>
+              </div>
+
+              {/* Depth indicator */}
+              {depth > 0 && (
+                <div className="flex items-center gap-1 text-muted-foreground">
+                  {Array.from({ length: depth }).map((_, i) => (
+                    <span key={i} className="text-xs">└</span>
+                  ))}
+                </div>
               )}
+
+              {/* Item info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  {item.icon && <span className="text-base">{item.icon}</span>}
+                  <span className="font-medium text-sm truncate text-foreground">{item.label}</span>
+                  {hasVisibilityRestrictions && (
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-400">
+                      Restricted
+                    </span>
+                  )}
+                  {depth > 0 && (
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-600 dark:text-blue-400">
+                      Level {depth}
+                    </span>
+                  )}
+                </div>
+                {(item.href || item.on_click) && (
+                  <div className="text-xs text-muted-foreground truncate mt-0.5">
+                    {item.href || `onClick: ${item.on_click}`}
+                  </div>
+                )}
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  onClick={() => handleEditItem(item)}
+                  className="px-2 py-1 text-xs rounded bg-background border border-border hover:bg-accent text-foreground"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleAddChildItem(item)}
+                  className="px-2 py-1 text-xs rounded bg-background border border-border hover:bg-accent text-foreground"
+                >
+                  Add Child
+                </button>
+                <button
+                  onClick={() => setDeleteConfirm(item.id)}
+                  className="px-2 py-1 text-xs rounded bg-destructive/10 border border-destructive/20 hover:bg-destructive/20 text-destructive"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
-            {(item.href || item.on_click) && (
-              <div className="text-xs text-muted-foreground truncate mt-0.5">
-                {item.href || `onClick: ${item.on_click}`}
+
+            {/* Render children recursively */}
+            {item.children && item.children.length > 0 && (
+              <div className="mt-1">
+                {item.children.map((child, childIndex) => renderItem(child, index + childIndex + 1, depth + 1))}
               </div>
             )}
           </div>
-
-          {/* Action buttons */}
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
-              onClick={() => handleEditItem(item)}
-              className="px-2 py-1 text-xs rounded bg-background border border-border hover:bg-accent text-foreground"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => handleAddChildItem(item)}
-              className="px-2 py-1 text-xs rounded bg-background border border-border hover:bg-accent text-foreground"
-            >
-              Add Child
-            </button>
-            <button
-              onClick={() => setDeleteConfirm(item.id)}
-              className="px-2 py-1 text-xs rounded bg-destructive/10 border border-destructive/20 hover:bg-destructive/20 text-destructive"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-
-        {/* Render children */}
-        {item.children && item.children.length > 0 && (
-          <div className="mt-1">
-            {item.children.map((child) => renderItem(child, depth + 1))}
-          </div>
         )}
-      </div>
+      </Draggable>
     );
   };
 
@@ -256,7 +365,7 @@ export default function MenuEditorPage() {
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-foreground mb-2">Menu Editor</h1>
           <p className="text-muted-foreground">
-            Manage navigation menus • Drag-and-drop coming soon
+            Manage navigation menus • Drag to reorder items
           </p>
         </div>
 
@@ -299,9 +408,16 @@ export default function MenuEditorPage() {
                   </Button>
                 </div>
               ) : (
-                <div>
-                  {rootItems.map((item) => renderItem(item))}
-                </div>
+                <DragDropContext onDragEnd={handleDragEnd}>
+                  <Droppable droppableId="menu-items">
+                    {(provided) => (
+                      <div ref={provided.innerRef} {...provided.droppableProps}>
+                        {rootItems.map((item, index) => renderItem(item, index, 0))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
               )}
             </div>
           </div>

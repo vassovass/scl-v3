@@ -16,7 +16,8 @@
       "Bash(curl:*)",
       "Bash(powershell -Command:*)",
       "Bash(npm run dev:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(npm install:*)"
     ]
   }
 }
