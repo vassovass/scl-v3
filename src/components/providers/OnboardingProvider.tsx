@@ -496,75 +496,78 @@ export function OnboardingProvider({ children, isAdmin = false, hasLeagues = fal
     return (
         <OnboardingContext.Provider value={contextValue}>
             {children}
-            <Joyride
-                steps={steps}
-                stepIndex={stepIndex}
-                run={run}
-                continuous
-                showProgress
-                showSkipButton
-                scrollToFirstStep
-                spotlightClicks
-                callback={handleJoyrideCallback}
-                styles={{
-                    options: {
-                        arrowColor: "#1e293b",
-                        backgroundColor: "#1e293b",
-                        overlayColor: "rgba(0, 0, 0, 0.75)",
-                        primaryColor: "#0ea5e9",
-                        textColor: "#f1f5f9",
-                        zIndex: 10000,
-                    },
-                    tooltip: {
-                        borderRadius: 12,
-                        padding: 20,
-                    },
-                    tooltipTitle: {
-                        fontSize: 18,
-                        fontWeight: 600,
-                    },
-                    tooltipContent: {
-                        fontSize: 14,
-                        lineHeight: 1.6,
-                    },
-                    buttonNext: {
-                        backgroundColor: "#0ea5e9",
-                        borderRadius: 8,
-                        color: "#0f172a",
-                        fontSize: 14,
-                        fontWeight: 600,
-                        padding: "8px 16px",
-                    },
-                    buttonBack: {
-                        color: "#94a3b8",
-                        fontSize: 14,
-                    },
-                    buttonSkip: {
-                        color: "#64748b",
-                        fontSize: 13,
-                    },
-                    spotlight: {
-                        borderRadius: 8,
-                    },
-                    beaconInner: {
-                        backgroundColor: "#0ea5e9",
-                    },
-                    beaconOuter: {
-                        backgroundColor: "rgba(14, 165, 233, 0.3)",
-                        border: "2px solid #0ea5e9",
-                    },
-                }}
-                locale={{
-                    back: "Back",
-                    close: "Close",
-                    last: "Done!",
-                    next: "Next",
-                    skip: "Skip tour",
-                }}
-            />
+            {/* Only render Joyride after hydration to prevent server/client mismatch */}
+            {isHydrated && (
+                <Joyride
+                    steps={steps}
+                    stepIndex={stepIndex}
+                    run={run}
+                    continuous
+                    showProgress
+                    showSkipButton
+                    scrollToFirstStep
+                    spotlightClicks
+                    callback={handleJoyrideCallback}
+                    styles={{
+                        options: {
+                            arrowColor: "#1e293b",
+                            backgroundColor: "#1e293b",
+                            overlayColor: "rgba(0, 0, 0, 0.75)",
+                            primaryColor: "#0ea5e9",
+                            textColor: "#f1f5f9",
+                            zIndex: 10000,
+                        },
+                        tooltip: {
+                            borderRadius: 12,
+                            padding: 20,
+                        },
+                        tooltipTitle: {
+                            fontSize: 18,
+                            fontWeight: 600,
+                        },
+                        tooltipContent: {
+                            fontSize: 14,
+                            lineHeight: 1.6,
+                        },
+                        buttonNext: {
+                            backgroundColor: "#0ea5e9",
+                            borderRadius: 8,
+                            color: "#0f172a",
+                            fontSize: 14,
+                            fontWeight: 600,
+                            padding: "8px 16px",
+                        },
+                        buttonBack: {
+                            color: "#94a3b8",
+                            fontSize: 14,
+                        },
+                        buttonSkip: {
+                            color: "#64748b",
+                            fontSize: 13,
+                        },
+                        spotlight: {
+                            borderRadius: 8,
+                        },
+                        beaconInner: {
+                            backgroundColor: "#0ea5e9",
+                        },
+                        beaconOuter: {
+                            backgroundColor: "rgba(14, 165, 233, 0.3)",
+                            border: "2px solid #0ea5e9",
+                        },
+                    }}
+                    locale={{
+                        back: "Back",
+                        close: "Close",
+                        last: "Done!",
+                        next: "Next",
+                        skip: "Skip tour",
+                    }}
+                />
+            )}
 
             {/* Feedback Modal */}
-            {showFeedback && (
+            {showFeedback && isHydrated && (
                 <div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/60 backdrop-blur-sm">
                     <div className="w-80 rounded-xl bg-slate-900 border border-slate-700 shadow-2xl p-5 space-y-4">
                         {feedbackSubmitted ? (
