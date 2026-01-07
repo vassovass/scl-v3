@@ -376,8 +376,63 @@ All UI components must:
 
 ---
 
+## Partial Implementation: Development Stage System
+
+**Status:** ✅ Partially Complete (2026-01-07)
+
+The following subset has been implemented:
+
+### Completed Features
+
+1. **Database Schema** (`20260107000100_add_app_stage_settings.sql`)
+   - Created `app_settings` table with all fields from PRD spec
+   - Added RLS policies for SuperAdmin access and public read for display settings
+   - Seeded initial `development_stage` setting with 5 stages:
+     - Pre-Alpha (purple)
+     - Alpha (blue)
+     - Beta (amber)
+     - Product Hunt (orange)
+     - Production (green)
+   - Seeded `stage_descriptions` with full metadata for info page
+
+2. **API & Hook**
+   - `GET /api/admin/settings` - Returns all settings visible to user
+   - `PATCH /api/admin/settings/:key` - Updates setting (SuperAdmin only)
+   - `useAppSettings()` hook with `getSetting()` and `updateSetting()`
+
+3. **SuperAdmin Settings Page** (`/admin/settings`)
+   - Stage selection UI with color-coded cards
+   - Badge visibility toggle
+   - Mobile-responsive layout
+   - Placeholder for future settings categories
+
+4. **Public Stage Info Page** (`/stage-info`)
+   - Dynamic stage banner with emoji, title, tagline
+   - "What This Means" section from database
+   - "Known Limitations" section (stage-specific)
+   - Feedback and Roadmap links
+   - `/beta` redirects to `/stage-info` for backwards compatibility
+
+5. **Footer Badge** (`GlobalFooter.tsx`)
+   - Reads stage from database via `useAppSettings()`
+   - Shows color-coded badge with pulse animation
+   - Links to `/stage-info`
+   - Respects `badge_visible` flag (can be hidden)
+
+### Still To Do (Full PRD 26)
+
+- Additional setting categories (Limits, Features, Defaults)
+- Visibility controls UI for settings
+- Cascade logic to League/User settings
+- Feature flag integration for PRDs 27-31
+- Setting change history/audit log
+- Environment presets
+
+---
+
 ## Changelog
 
 | Date | Section | Change |
 |------|---------|--------|
+| 2026-01-07 | Partial Implementation | Added development stage system implementation details |
 | 2026-01-05 | Initial | Created PRD for SuperAdmin Settings & Feature Flags |

@@ -40,6 +40,11 @@ export const SUPERADMIN_PAGES: AdminPage[] = [
         label: "🍔 Menu Editor",
         description: "Manage navigation menus with drag-and-drop",
     },
+    {
+        href: "/admin/settings",
+        label: "⚙️ App Settings",
+        description: "Configure app-wide settings and development stage",
+    },
     // Add more superadmin pages here:
     // {
     //     href: "/admin/users",

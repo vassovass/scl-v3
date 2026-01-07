@@ -11,6 +11,32 @@ All notable changes to StepLeague v3.
 
 ### Added
 
+- **PRD 26 (Partial): Development Stage Management System** - Dynamic stage tracking and display
+  - **Database Schema** (`app_settings` table)
+    - Created `app_settings` table with full PRD 26 spec (key, value, metadata, visibility controls)
+    - Added `development_stage` setting with 5 stages: Pre-Alpha, Alpha, Beta, Product Hunt, Production
+    - Added `stage_descriptions` with full metadata (title, emoji, tagline, what_it_means, known_limitations)
+    - RLS policies: SuperAdmin full access, public read for display/general categories
+  - **API & Hook**
+    - `GET /api/admin/settings` - Returns settings visible to current user
+    - `PATCH /api/admin/settings/:key` - Update setting (SuperAdmin only)
+    - `useAppSettings()` hook with `getSetting()` and `updateSetting()` methods
+  - **SuperAdmin Settings Page** (`/admin/settings`)
+    - Visual stage selector with color-coded cards (purple/blue/amber/orange/green)
+    - Badge visibility toggle switch
+    - Mobile-responsive layout
+    - Placeholder for future settings categories per PRD 26
+    - Added to SuperAdmin menu via `adminPages.ts`
+  - **Public Stage Info Page** (`/stage-info`)
+    - Dynamic content from database (stage-specific descriptions)
+    - Color-coded stage banner with emoji
+    - "What This Means", "Known Limitations", "Roadmap" sections
+    - Backwards-compatible: `/beta` redirects to `/stage-info`
+  - **Footer Badge** (GlobalFooter.tsx)
+    - Reads stage from database via `useAppSettings()`
+    - Color-coded badge with pulse animation (matches stage)
+    - Links to `/stage-info` for details
+    - Respects `badge_visible` toggle (can be hidden by SuperAdmin)
 - **PRD 25: User Preferences System** - Modular, extensible settings architecture
   - **Database Schema** - `user_preferences` table with default/override pattern
     - Navigation preferences (default_landing, primary_league_id)

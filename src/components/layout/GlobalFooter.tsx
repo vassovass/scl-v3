@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { APP_CONFIG } from "@/lib/config";
 import { useMenuConfig } from "@/hooks/useMenuConfig";
+import { useAppSettings } from "@/hooks/useAppSettings";
 
 export function GlobalFooter() {
     const currentYear = new Date().getFullYear();
@@ -97,18 +98,47 @@ export function GlobalFooter() {
                 </div>
 
                 {/* Bottom bar */}
-                <div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <p className="text-xs text-muted-foreground">
-                        © {currentYear} {APP_CONFIG.name}. All rights reserved.
-                    </p>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                            Beta
-                        </span>
-                    </div>
-                </div>
+                <FooterBottomBar currentYear={currentYear} />
             </div>
         </footer>
+    );
+}
+
+function FooterBottomBar({ currentYear }: { currentYear: number }) {
+    const { getSetting, isLoading } = useAppSettings();
+
+    // Get development stage from settings
+    const stageData = getSetting('development_stage', { stage: 'pre-alpha', badge_visible: true });
+
+    // Stage display configuration
+    const stageConfig: Record<string, { label: string; color: string; glowColor: string }> = {
+        'pre-alpha': { label: 'Pre-Alpha', color: 'text-purple-400', glowColor: 'bg-purple-500' },
+        'alpha': { label: 'Alpha', color: 'text-blue-400', glowColor: 'bg-blue-500' },
+        'beta': { label: 'Beta', color: 'text-amber-400', glowColor: 'bg-amber-500' },
+        'product-hunt': { label: 'Product Hunt', color: 'text-orange-400', glowColor: 'bg-orange-500' },
+        'production': { label: 'Production', color: 'text-emerald-400', glowColor: 'bg-emerald-500' },
+    };
+
+    const currentStage = stageConfig[stageData.stage] || stageConfig['beta'];
+
+    return (
+        <div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-muted-foreground">
+                © {currentYear} {APP_CONFIG.name}. All rights reserved.
+            </p>
+            {!isLoading && stageData.badge_visible && (
+                <Link
+                    href="/stage-info"
+                    className="flex items-center gap-4 text-xs text-muted-foreground hover:text-foreground transition group"
+                >
+                    <span className="flex items-center gap-1.5">
+                        <span className={`w-2 h-2 rounded-full ${currentStage.glowColor} animate-pulse`} />
+                        <span className={`${currentStage.color} group-hover:underline`}>
+                            {currentStage.label}
+                        </span>
+                    </span>
+                </Link>
+            )}
+        </div>
     );
 }

@@ -816,6 +816,14 @@ When adding a new trackable feature:
 
 ### 2026-01-07
 
+- ✅ **Development Stage System** (PRD 26 - Partial)
+  - SuperAdmin-configurable development stage (Pre-Alpha, Alpha, Beta, Product Hunt, Production)
+  - Dynamic stage badge in footer with color-coding and pulse animation
+  - Public stage info page at `/stage-info` with database-driven content
+  - `useAppSettings()` hook for reading/updating app-wide settings
+  - SuperAdmin settings page at `/admin/settings`
+  - Foundation for full PRD 26 (feature flags, limits, visibility controls)
+
 - ✅ **User Preferences System** (PRD 25)
   - Modular settings architecture for user/league/admin contexts
   - Type-safe registry pattern following Slash Engineering best practices
