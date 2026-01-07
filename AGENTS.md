@@ -461,28 +461,55 @@ Both dark and light theme values are defined in `globals.css`.
 ## Commands
 
 ```bash
+npm run dev      # Local development server (http://localhost:3000)
 npm run build    # Production build
 npx tsc --noEmit # Type check
 ```
 
 ---
 
-## Deployment (Vercel Only)
+## Development & Deployment
 
-**IMPORTANT**: This project has NO local development. All testing happens on Vercel.
+### Local Development
+
+Local development is fully supported. To run locally:
+
+1. **Create `.env.local`** from `.env.example`:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. **Fill in your credentials** in `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL` - From Supabase Dashboard → Settings → API
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - From Supabase Dashboard → Settings → API
+   - `SUPABASE_SERVICE_ROLE_KEY` - From Supabase Dashboard → Settings → API
+   - `GEMINI_API_KEY` - From [AI Studio](https://aistudio.google.com/app/apikey)
+
+3. **Configure Supabase Auth** for localhost:
+   - Go to Supabase Dashboard → Authentication → URL Configuration
+   - Add `http://localhost:3000` to **Site URL** or Redirect URLs
+   - Add `http://localhost:3000/**` to **Redirect URLs**
+   - For Google OAuth: Add `http://localhost:3000/api/auth/callback` in Google Cloud Console
+
+4. **Start the dev server**:
+   ```bash
+   npm run dev
+   ```
+
+5. **Open** http://localhost:3000
+
+### Production Deployment (Vercel)
 
 - **Live URL**: https://scl-v3.vercel.app/
 - **Deployment**: Auto-deploy from `main` branch
-- **Testing**: Always test on deployed URL, NOT localhost
 - **Environment**: All env vars configured in Vercel dashboard
-- **Build errors**: Expected locally without .env.local (ignored)
 
 ### Making Changes
 
-1. Push to main: `git push origin main`
-2. Vercel auto-builds and deploys (2-3 minutes)
-3. Test at https://scl-v3.vercel.app/
-4. Check Vercel dashboard for build logs if issues
+1. **Local testing**: Run `npm run dev` and test at http://localhost:3000
+2. **Production**: Push to main: `git push origin main`
+3. Vercel auto-builds and deploys (2-3 minutes)
+4. Verify at https://scl-v3.vercel.app/
 
 ---
 

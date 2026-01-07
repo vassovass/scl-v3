@@ -48,11 +48,21 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 GEMINI_API_KEY=your-gemini-key
 ```
 
-### 3. Live Application
+### 3. Run Locally
+
+```bash
+npm run dev
+```
+
+Open http://localhost:3000
+
+> **Note**: For OAuth login to work locally, configure Supabase Auth redirect URLs (see [AGENTS.md](./AGENTS.md#local-development)).
+
+### 4. Production
 
 **Production URL**: [https://scl-v3.vercel.app/](https://scl-v3.vercel.app/)
 
-The app is deployed on Vercel with auto-deploy from main branch. Local development is not required - all changes pushed to main are automatically deployed.
+The app is deployed on Vercel with auto-deploy from main branch.
 
 ---
 
@@ -154,7 +164,8 @@ See **[ROADMAP.md](./ROADMAP.md)** for upcoming features.
 
 | Issue | Solution |
 |-------|----------|
-| Auth redirects incorrectly | Update Site URL in Supabase Auth settings to `https://scl-v3.vercel.app` |
+| Auth redirects to production (localhost) | Add `http://localhost:3000` to Supabase Auth → URL Configuration |
+| Auth redirects incorrectly (production) | Update Site URL in Supabase Auth settings to `https://scl-v3.vercel.app` |
 | `useSearchParams` error | Wrap component in `<Suspense>` |
 | Type errors with Supabase | Use untyped client (see AGENTS.md) |
 | Build fails | Run `npx tsc --noEmit` locally first |
