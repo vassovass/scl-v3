@@ -25,7 +25,7 @@ export default function PreferencesPage() {
                 if (res.ok) {
                     const { leagues } = await res.json();
                     setUserLeagues([
-                        { value: "", label: "None" },
+                        { value: "none", label: "None" },
                         ...leagues.map((l: any) => ({
                             value: l.id,
                             label: l.name,
@@ -90,8 +90,8 @@ export default function PreferencesPage() {
                     <SettingsSelect
                         label="Primary League"
                         description="Used for quick links and default actions"
-                        value={preferences.primary_league_id || ""}
-                        onChange={(value) => updatePreference("primary_league_id", value || null)}
+                        value={preferences.primary_league_id || "none"}
+                        onChange={(value) => updatePreference("primary_league_id", value === "none" ? null : value)}
                         options={userLeagues}
                     />
                 )}
