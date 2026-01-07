@@ -24,18 +24,29 @@ SET
 WHERE item_key = 'public-beta';
 
 -- Add Stage Info to Admin menu for SuperAdmin quick access
-INSERT INTO menu_items (menu_id, item_key, label, href, description, visible_to, sort_order)
-VALUES (
-    'admin',
-    'admin-stage-info',
-    '📊 Stage Info',
-    '/stage-info',
-    'View current stage details',
-    ARRAY['superadmin']::TEXT[],
-    4
-)
-ON CONFLICT (menu_id, item_key) DO UPDATE SET
-    label = EXCLUDED.label,
-    href = EXCLUDED.href,
-    description = EXCLUDED.description,
-    updated_at = NOW();
+-- Check if the item already exists first
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM menu_items
+        WHERE menu_id = 'admin' AND item_key = 'admin-stage-info'
+    ) THEN
+        INSERT INTO menu_items (menu_id, item_key, label, href, description, visible_to, sort_order)
+        VALUES (
+            'admin',
+            'admin-stage-info',
+            '📊 Stage Info',
+            '/stage-info',
+            'View current stage details',
+            ARRAY['superadmin']::TEXT[],
+            4
+        );
+    ELSE
+        UPDATE menu_items SET
+            label = '📊 Stage Info',
+            href = '/stage-info',
+            description = 'View current stage details',
+            updated_at = NOW()
+        WHERE menu_id = 'admin' AND item_key = 'admin-stage-info';
+    END IF;
+END $$;
