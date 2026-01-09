@@ -2,7 +2,7 @@
 
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { SettingsSection } from "@/components/settings";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/Badge";
 import { Lock } from "lucide-react";
 
 /**
