@@ -1,62 +1,36 @@
-/**
- * Reusable Badge Component
- * 
- * Renders badges using the central BADGE_CONFIG.
- * Supports type, status, release, and achievement categories.
- * 
- * @example
- * <Badge category="type" value="bug" />
- * <Badge category="status" value="in_progress" />
- * <Badge category="release" value="now" size="sm" />
- */
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
 
-import { BADGE_CONFIG, BadgeConfig } from '@/lib/badges';
+import { cn } from "@/lib/utils"
 
-interface BadgeProps {
-    /** Badge category: type, status, release, or achievement */
-    category: 'type' | 'status' | 'release' | 'achievement';
-    /** Value within the category (e.g., 'bug', 'in_progress', 'now') */
-    value: string;
-    /** Size variant */
-    size?: 'sm' | 'md' | 'lg';
-    /** Show full label (true) or just icon (false) */
-    showLabel?: boolean;
-    /** Additional className */
-    className?: string;
-}
-
-const SIZE_CLASSES = {
-    sm: 'text-[9px] px-1.5 py-0.5',
-    md: 'text-xs px-2 py-1',
-    lg: 'text-sm px-3 py-1.5',
-};
-
-export function Badge({
-    category,
-    value,
-    size = 'md',
-    showLabel = true,
-    className = '',
-}: BadgeProps) {
-    const config: BadgeConfig | undefined = BADGE_CONFIG[category]?.[value];
-
-    if (!config) {
-        // Fallback for unknown values
-        return (
-            <span className={`inline-flex items-center rounded font-medium uppercase bg-muted text-muted-foreground ${SIZE_CLASSES[size]} ${className}`}>
-                {value}
-            </span>
-        );
+const badgeVariants = cva(
+    "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+    {
+        variants: {
+            variant: {
+                default:
+                    "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
+                secondary:
+                    "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+                destructive:
+                    "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
+                outline: "text-foreground",
+            },
+        },
+        defaultVariants: {
+            variant: "default",
+        },
     }
+)
 
+export interface BadgeProps
+    extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> { }
+
+function Badge({ className, variant, ...props }: BadgeProps) {
     return (
-        <span
-            className={`inline-flex items-center gap-1 rounded font-medium uppercase ${config.className} ${SIZE_CLASSES[size]} ${className}`}
-        >
-            {config.pulse && <span className="animate-pulse">●</span>}
-            {showLabel ? config.label : config.icon}
-        </span>
-    );
+        <div className={cn(badgeVariants({ variant }), className)} {...props} />
+    )
 }
 
-export default Badge;
+export { Badge, badgeVariants }
