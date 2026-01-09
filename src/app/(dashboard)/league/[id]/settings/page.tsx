@@ -10,6 +10,7 @@ import { GeneralSettings } from "@/components/league/settings/GeneralSettings";
 import { CompetitionSettings } from "@/components/league/settings/CompetitionSettings";
 import { RulesSettings } from "@/components/league/settings/RulesSettings";
 import { DangerZone } from "@/components/league/settings/DangerZone";
+import { InheritedAppSettings } from "@/components/league/settings/InheritedAppSettings";
 import Link from "next/link";
 import { analytics, trackEvent } from "@/lib/analytics";
 
@@ -174,6 +175,9 @@ export default function LeagueSettingsPage() {
                 )}
 
                 <div className="grid gap-8">
+                    {/* Inherited App Settings (read-only) - PRD-26 */}
+                    <InheritedAppSettings />
+
                     <GeneralSettings league={league} onChange={handleUpdate} disabled={saving} />
                     <CompetitionSettings league={league} onChange={handleUpdate} disabled={saving} />
                     <RulesSettings league={league} onChange={handleUpdate} disabled={saving} />
