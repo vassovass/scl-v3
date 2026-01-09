@@ -346,6 +346,27 @@ export const PUBLIC_MENU: MenuDefinition = {
 };
 
 /**
+ * League sub-navigation (tabs within league pages)
+ * Used by LeagueNav component for dynamic tab navigation
+ */
+export const LEAGUE_NAV_MENU: MenuDefinition = {
+    id: 'league_nav',
+    items: [
+        { id: 'league-overview', label: 'Overview', href: '/league/[id]/overview', icon: '🏠' },
+        { id: 'league-submit', label: 'Submit Steps', href: '/submit-steps', icon: '📝' },
+        { id: 'league-leaderboard', label: 'Rankings', href: '/league/[id]/leaderboard', icon: '🏆' },
+        { id: 'league-analytics', label: 'My Progress', href: '/league/[id]/analytics', icon: '📊' },
+        {
+            id: 'league-settings',
+            label: 'Settings',
+            href: '/league/[id]/settings',
+            icon: '⚙️',
+            visibleTo: ['admin', 'owner', 'superadmin']
+        },
+    ]
+};
+
+/**
  * All menus exported as a single object
  */
 export const MENUS = {
@@ -354,6 +375,7 @@ export const MENUS = {
     user: USER_MENU,
     admin: ADMIN_MENU,
     public: PUBLIC_MENU,
+    league_nav: LEAGUE_NAV_MENU,
     footerNavigation: FOOTER_NAVIGATION,
     footerAccount: FOOTER_ACCOUNT,
     footerLegal: FOOTER_LEGAL,

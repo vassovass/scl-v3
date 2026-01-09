@@ -323,6 +323,27 @@ export const analytics = {
         },
     },
 
+    /** League navigation interactions */
+    leagueNav: {
+        tabClicked: (leagueId: string, tabName: string) => {
+            trackEvent('league_nav_tab_clicked', {
+                league_id: leagueId,
+                tab_name: tabName,
+                component: 'LeagueNav',
+                category: 'navigation',
+                action: 'click',
+            });
+        },
+        hubViewed: (leagueId: string) => {
+            trackEvent('league_hub_viewed', {
+                league_id: leagueId,
+                component: 'LeagueHub',
+                category: 'league',
+                action: 'view',
+            });
+        },
+    },
+
     /** Kanban/Task board interactions */
     kanban: {
         cardMoved: (itemId: string, fromColumn: string, toColumn: string) => {

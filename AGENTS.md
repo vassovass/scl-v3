@@ -244,6 +244,69 @@ Users often track steps in gyms or areas with poor signal.
 
 ---
 
+### 7. Architecture Patterns (IMPORTANT)
+
+**Follow these established patterns to avoid tech debt:**
+
+#### 7.1 Step Submissions are League-Agnostic
+
+Steps are submitted ONCE and apply to ALL leagues. Do NOT create league-specific submit pages.
+
+```typescript
+// ✅ CORRECT: Link to global submit page
+<Link href="/submit-steps">Submit Steps</Link>
+
+// ❌ WRONG: League-specific submit page
+<Link href={`/league/${id}/submit`}>Submit Steps</Link>
+```
+
+**Why?** Steps are counted against the user, not the league. Same steps count in every league.
+
+#### 7.2 Badge Components
+
+Two distinct Badge components exist:
+
+| Component | Import | Use Case |
+|-----------|--------|----------|
+| `Badge` (shadcn) | `@/components/ui/badge` | General UI badges with `variant` prop (default, secondary, destructive, outline) |
+| `SystemBadge` | `@/components/ui/SystemBadge` | Category-based badges for Roadmap/Kanban (`category` + `value` props) |
+
+```typescript
+// General UI badge
+import { Badge } from "@/components/ui/badge";
+<Badge variant="outline">Label</Badge>
+
+// System category badge
+import { SystemBadge } from "@/components/ui/SystemBadge";
+<SystemBadge category="type" value="bug" size="sm" />
+```
+
+#### 7.3 menuConfig for Navigation
+
+All navigation should use the WordPress-style `menuConfig.ts`:
+
+```typescript
+import { MENUS, prepareMenuItems, UserRole } from "@/lib/menuConfig";
+
+// Get role-filtered items with [id] resolved
+const items = prepareMenuItems(MENUS.league_nav.items, userRole, leagueId);
+```
+
+**Available menus:** `main`, `help`, `user`, `admin`, `public`, `league_nav`, `footerNavigation`, `footerAccount`, `footerLegal`
+
+#### 7.4 Redirect Pattern for Flexible Defaults
+
+Use redirects for pages that may change their default over time:
+
+```typescript
+// /league/[id]/page.tsx
+import { redirect } from "next/navigation";
+
+export default function LeaguePage({ params }: { params: { id: string } }) {
+  redirect(`/league/${params.id}/overview`);  // Easy to change later
+}
+```
+
 ## Project Structure
 
 ```
@@ -814,15 +877,26 @@ When adding a new trackable feature:
 
 ## Recent Features
 
+### 2026-01-10
+
+- ✅ **SuperAdmin Settings & Feature Flags** (PRD 26 - Complete)
+  - TypeScript settings registry with type-safe keys and categories
+  - Full settings management: Limits, Features, Defaults, Display, General
+  - Feature flags: `useFeatureFlag()` hook for gating features
+  - Visibility controls: Configure who can see/edit each setting
+  - Cascade to League Settings: `InheritedAppSettings` component
+  - Environment presets: Development, Staging, Production profiles
+  - Audit logging for all settings changes
+  - Admin UI: Category tabs, setting editors, visibility controls, presets manager
+
 ### 2026-01-07
 
-- ✅ **Development Stage System** (PRD 26 - Partial)
+- ✅ **Development Stage System** (PRD 26 - Partial, now complete)
   - SuperAdmin-configurable development stage (Pre-Alpha, Alpha, Beta, Product Hunt, Production)
   - Dynamic stage badge in footer with color-coding and pulse animation
   - Public stage info page at `/stage-info` with database-driven content
   - `useAppSettings()` hook for reading/updating app-wide settings
   - SuperAdmin settings page at `/admin/settings`
-  - Foundation for full PRD 26 (feature flags, limits, visibility controls)
 
 - ✅ **User Preferences System** (PRD 25)
   - Modular settings architecture for user/league/admin contexts

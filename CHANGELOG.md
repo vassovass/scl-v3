@@ -7,6 +7,94 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-01-09]
+
+### Added
+
+- **PRD 27: League Hub & Navigation Redesign** - Transform league pages into a central hub
+  - **League Hub Overview** (`/league/[id]/overview`)
+    - Quick stats card: rank, steps this week, streak, today's status
+    - Submission status CTA linking to `/submit-steps`
+    - Quick action cards for Rankings, Progress, Submit
+  - **LeagueNav Component** (`src/components/league/LeagueNav.tsx`)
+    - Horizontal tab navigation using WordPress-style `menuConfig`
+    - Uses `LEAGUE_NAV_MENU` for dynamic, admin-configurable tabs
+    - Mobile-first with horizontal scroll
+    - Analytics tracking for tab clicks
+  - **New Components**
+    - `LeagueQuickStats.tsx` - Rank, streak, and today's status at a glance
+    - `SubmissionStatusCard.tsx` - CTA to submit steps (links to league-agnostic `/submit-steps`)
+  - **Redirect Pattern** (`/league/[id]/page.tsx`)
+    - Now redirects to `/league/[id]/overview` for flexibility
+    - Easy to change default page in future without refactoring
+  - **menuConfig Updates**
+    - Added `LEAGUE_NAV_MENU` with Overview, Submit Steps, Rankings, Progress, Settings tabs
+    - Settings tab role-restricted to admin/owner/superadmin
+  - **Analytics** - Added `leagueNav.tabClicked()` and `leagueNav.hubViewed()` tracking
+- **Badge Component Refactor** - Separated category-based and variant-based badges
+  - **shadcn badge** (`badge.tsx`) - Standard variants: default, secondary, destructive, outline
+  - **SystemBadge** (`SystemBadge.tsx`) - Category-based for roadmap/kanban (type, status, release, achievement)
+  - Updated imports across 4 files to use appropriate badge component
+
+## [2026-01-10]
+
+### Added
+
+- **PRD 26 (Complete): SuperAdmin Settings & Feature Flags System** - Full implementation
+  - **TypeScript Settings Registry** (`src/lib/settings/appSettings.ts`)
+    - Organized settings by category: limits, features, defaults, display, general
+    - Type-safe `AppSettingKey` union type for compile-time checking
+    - Helper functions: `getAppSettingDefaults()`, `getAppSettingDefinition()`, `getLeagueInheritedSettings()`
+    - Category metadata with icons for UI navigation
+  - **Database Migration** (`20260110000000_add_prd26_settings.sql`)
+    - Added all settings: max_batch_uploads, max_backfill_days, max_league_members
+    - Feature flags: feature_high_fives, feature_streak_freeze, feature_analytics_export
+    - Default values: default_daily_step_goal, default_stepweek_start
+    - Display settings: show_global_leaderboard, maintenance_mode
+    - Created `app_settings_audit` table for change tracking
+    - Created `app_settings_presets` table with Dev/Staging/Production presets
+    - Updated RLS policies for visibility controls
+  - **Enhanced useAppSettings Hook**
+    - Added `isFeatureEnabled()` - Type-safe feature flag check
+    - Added `getNumericSetting()` - Numeric setting with constraint validation
+    - Added `getLeagueInheritedSettings()` - Settings shown in league settings
+    - Added `updateVisibility()` - Update visibility controls
+    - Added `refresh()` - Manual settings reload
+  - **useFeatureFlag Hook** (`src/hooks/useFeatureFlag.ts`)
+    - Simple hook: `const enabled = useFeatureFlag('feature_high_fives')`
+    - With loading state: `useFeatureFlagWithLoading()`
+    - Multiple flags: `useFeatureFlags(['feature_a', 'feature_b'])`
+  - **API Endpoints**
+    - `PATCH /api/admin/settings/:key/visibility` - Update visibility controls
+    - `GET /api/admin/settings/audit` - Fetch audit log entries
+    - `GET/POST /api/admin/settings/presets` - List/create presets
+    - `GET/PATCH/DELETE /api/admin/settings/presets/:id` - Manage preset
+    - `POST /api/admin/settings/presets/:id/apply` - Apply preset to settings
+    - Added audit logging to existing `PATCH /api/admin/settings/:key`
+  - **Admin Settings UI Components** (`src/components/admin/settings/`)
+    - `NumberSetting` - Number input with min/max constraints
+    - `BooleanSetting` - Toggle switch for feature flags
+    - `SelectSetting` - Dropdown for predefined options
+    - `SettingRenderer` - Dynamic renderer based on setting type
+    - `VisibilityControls` - Role badges, show_in_league toggle
+    - `CategoryNav` - Mobile horizontal tabs, desktop vertical sidebar
+    - `SettingsAuditLog` - Expandable recent changes log
+    - `PresetsManager` - Preset selector with apply/save functionality
+  - **Enhanced Admin Settings Page** (`/admin/settings`)
+    - Category-based navigation (Limits, Features, Defaults, Display, General)
+    - Dynamic setting editors based on type
+    - Visibility controls per setting
+    - Preset manager at top for quick configuration
+    - Audit log at bottom showing recent changes
+    - Mobile-responsive design
+  - **League Settings Integration**
+    - `InheritedAppSettings` component shows app-level settings
+    - Read-only display with "App Setting" badge
+    - Automatically appears when settings have `show_in_league_settings = true`
+    - Added to `/league/[id]/settings` page
+
+---
+
 ## [2026-01-07]
 
 ### Added
