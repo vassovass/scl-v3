@@ -24,7 +24,7 @@ import {
     DialogTitle,
     DialogFooter,
 } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/Badge';
+import { SystemBadge as Badge } from '@/components/ui/SystemBadge';
 import { ImagePasteZone } from '@/components/ui/ImagePasteZone';
 import { AttachmentGallery } from '@/components/ui/AttachmentGallery';
 import { useAttachments } from '@/hooks/useAttachments';
@@ -224,8 +224,8 @@ export function ExpandableCardModal({
                             <button
                                 onClick={() => { setIsPublic(!isPublic); handleFieldChange(); }}
                                 className={`px-2 py-0.5 rounded text-xs transition-colors ${isPublic
-                                        ? 'bg-emerald-500/20 text-emerald-400'
-                                        : 'bg-slate-700 text-slate-400'
+                                    ? 'bg-emerald-500/20 text-emerald-400'
+                                    : 'bg-slate-700 text-slate-400'
                                     }`}
                             >
                                 {isPublic ? '🌐 Public' : '🔒 Private'}

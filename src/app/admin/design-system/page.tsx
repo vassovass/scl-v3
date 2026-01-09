@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import Link from "next/link";
 import { Spinner } from "@/components/ui/Spinner";
-import { Badge } from "@/components/ui/Badge";
+import { SystemBadge as Badge } from "@/components/ui/SystemBadge";
 
 /**
  * SUPERADMIN-ONLY: Design System & Brand Guidelines
@@ -978,7 +978,7 @@ toast({ title: "Warning", description: "Check input", variant: "destructive" });
                                         Main layout wrapper with header, back link, and optional tabbed navigation.
                                     </p>
                                     <pre className="text-xs text-slate-400 mt-3 bg-slate-950 p-3 rounded overflow-x-auto">
-{`<SettingsLayout
+                                        {`<SettingsLayout
   title="Settings"
   navItems={[
     { label: "Profile", href: "/settings/profile" },

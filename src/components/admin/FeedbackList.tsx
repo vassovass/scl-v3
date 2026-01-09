@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import UniversalFilters, { FILTER_PRESETS } from "@/components/shared/UniversalFilters";
 import { FeedbackFilterState, DEFAULT_FILTER_STATE, BOARD_STATUS_OPTIONS } from "@/lib/filters/feedbackFilters";
 import { useFetch } from "@/hooks/useFetch";
-import { Badge } from "@/components/ui/Badge";
+import { SystemBadge as Badge } from "@/components/ui/SystemBadge";
 import BulkActionsBar from "./BulkActionsBar";
 import ExpandableCardModal from "./ExpandableCardModal";
 

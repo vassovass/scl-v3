@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import PriorityVote from "./PriorityVote";
-import Badge from "@/components/ui/Badge";
+import { SystemBadge as Badge } from "@/components/ui/SystemBadge";
 import {
     Dialog,
     DialogContent,
