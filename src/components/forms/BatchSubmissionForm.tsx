@@ -6,6 +6,7 @@ import { apiRequest, ApiError } from "@/lib/api/client";
 
 interface BatchSubmissionFormProps {
     leagueId: string;
+    proxyMemberId?: string;
     onSubmitted?: () => void;
 }
 
@@ -66,7 +67,7 @@ const compressionOptions = {
     useWebWorker: true,
 };
 
-export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFormProps) {
+export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: BatchSubmissionFormProps) {
     const [images, setImages] = useState<ImageFile[]>([]);
     const [processing, setProcessing] = useState(false);
     const [overallStatus, setOverallStatus] = useState<string | null>(null);
@@ -238,6 +239,7 @@ export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFo
                         steps: image.editedSteps,
                         date: image.editedDate,
                         overwrite: true, // Allow overwriting if date already exists
+                        proxy_member_id: proxyMemberId || undefined,
                     }),
                 });
 

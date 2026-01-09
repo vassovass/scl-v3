@@ -73,6 +73,14 @@
 
 ---
 
+## Future Foundation (Schema Now, Features Later)
+
+| # | PRD | Outcome | Status |
+|---|-----|---------|--------|
+| 37 | [In-App Chat](./PRD_37_In_App_Chat.md) | Database schema for future chat/messaging | 📋 Proposed |
+
+---
+
 ## Dependency Graph
 
 ```mermaid

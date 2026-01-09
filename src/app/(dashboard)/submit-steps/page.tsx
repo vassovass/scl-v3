@@ -8,6 +8,7 @@ import { normalizeError, reportErrorClient, errorFromResponse, ErrorCode } from 
 import { SubmissionForm } from "@/components/forms/SubmissionForm";
 import { BatchSubmissionForm } from "@/components/forms/BatchSubmissionForm";
 import { BulkUnverifiedForm } from "@/components/forms/BulkUnverifiedForm";
+import { ProxySubmissionSection } from "@/components/forms/ProxySubmissionSection";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
 
 interface League {
@@ -47,6 +48,9 @@ export default function SubmitPage() {
     const [loading, setLoading] = useState(true);
     const [submissionMode, setSubmissionMode] = useState<"single" | "batch" | "bulk-manual">("batch");
     const [expandedSubmissionId, setExpandedSubmissionId] = useState<string | null>(null);
+
+    // Compute admin leagues for proxy submission
+    const adminLeagues = leagues.filter(l => l.role === "owner" || l.role === "admin");
 
     // Online status check
     useEffect(() => {
@@ -233,6 +237,13 @@ export default function SubmitPage() {
                         </div>
                     </div>
                 </div>
+
+                {/* Proxy Submission Section - For Admins/Owners */}
+                <ProxySubmissionSection
+                    adminLeagues={adminLeagues}
+                    submissionMode={submissionMode}
+                    onSubmitted={handleSubmissionComplete}
+                />
 
                 {/* Submit Steps Section */}
                 <ModuleFeedback moduleId="submission-form" moduleName="Step Submission Form">
