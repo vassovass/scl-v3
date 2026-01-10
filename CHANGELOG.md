@@ -40,6 +40,34 @@ All notable changes to StepLeague v3.
 
 ### Added
 
+- **User Theme Preference Persistence** (PRD-25 Integration)
+  - Created `useUserTheme` hook for database-synced theme management
+  - Integrates `next-themes` (client-side) with `user_preferences` table
+  - Loads user's saved theme on mount, syncs all changes to database automatically
+  - Falls back to localStorage for anonymous users
+  - Optimistic updates for instant UI feedback (no loading spinner)
+- **SuperAdmin Theme Variant Management Infrastructure**
+  - Added "appearance" category to app settings with Palette icon
+  - Created `ThemeVariant` interface for theme definitions (id, name, description, enabled)
+  - Added `theme_variants` setting (JSON type) for unlimited custom themes
+  - Default variants: dark and light (both enabled by default)
+  - SuperAdmins can add variants like "high-contrast", "colorblind-friendly" in future
+  - Updated all presets (Development, Staging, Production) to include theme_variants
+- **Comprehensive Theme System Documentation** (`docs/THEME_SYSTEM.md`)
+  - Complete architecture overview (next-themes + database persistence)
+  - All CSS variables documented with dark/light values
+  - Component patterns: badges, dropdowns, hover states, focus indicators
+  - Text overflow prevention pattern (critical `min-w-0` flexbox pattern)
+  - Accessibility requirements (WCAG 2.1 AA, 4.5:1 contrast ratios)
+  - Implementation history: PRD-21 Part E/F, user-reported issues, all 49 files changed
+  - Common pitfalls and solutions section
+  - Quick reference checklist for AI agents
+- **AGENTS.md Updates**
+  - Added prominent "MUST READ" warning for theme documentation
+  - Quick rules: semantic variables, light/dark testing, contrast requirements
+  - Updated theme system section with next-themes and database storage details
+  - Added THEME_SYSTEM.md and badges.ts to Related Files section
+
 - **PRD 26 (Complete): SuperAdmin Settings & Feature Flags System** - Full implementation
   - **TypeScript Settings Registry** (`src/lib/settings/appSettings.ts`)
     - Organized settings by category: limits, features, defaults, display, general
