@@ -27,12 +27,14 @@ export type AppSettingKey =
   | "default_stepweek_start"
   // Display
   | "show_global_leaderboard"
-  | "maintenance_mode";
+  | "maintenance_mode"
+  // Appearance
+  | "theme_variants";
 
 /**
  * Setting categories for organization
  */
-export type AppSettingCategory = "limits" | "features" | "defaults" | "display" | "general";
+export type AppSettingCategory = "limits" | "features" | "defaults" | "display" | "general" | "appearance";
 
 /**
  * Roles for visibility control

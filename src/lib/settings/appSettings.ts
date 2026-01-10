@@ -186,6 +186,47 @@ const generalSettings: AppSettingDefinition[] = [
 ];
 
 // ============================================================================
+// APPEARANCE SETTINGS
+// ============================================================================
+
+/**
+ * Theme variant definition for SuperAdmin-configurable themes
+ */
+export interface ThemeVariant {
+  id: string;
+  name: string;
+  description?: string;
+  enabled: boolean;
+}
+
+const appearanceSettings: AppSettingDefinition[] = [
+  {
+    key: "theme_variants",
+    type: "json",
+    label: "Theme Variants",
+    description: "Available theme variants for users to choose from. By default, only 'dark' and 'light' modes exist.",
+    default: [
+      {
+        id: "dark",
+        name: "Dark",
+        description: "Default dark theme",
+        enabled: true,
+      },
+      {
+        id: "light",
+        name: "Light",
+        description: "Light theme for better readability in bright environments",
+        enabled: true,
+      },
+    ] as ThemeVariant[],
+    category: "appearance",
+    visibleTo: ["superadmin"],
+    editableBy: ["superadmin"],
+    showInUserSettings: false,
+  },
+];
+
+// ============================================================================
 // REGISTRY EXPORT
 // ============================================================================
 
@@ -228,6 +269,13 @@ export const APP_SETTING_SECTIONS: AppSettingsSection[] = [
     description: "General application settings",
     icon: "Settings",
     settings: generalSettings,
+  },
+  {
+    id: "appearance",
+    title: "Appearance",
+    description: "Theme variants and visual customization",
+    icon: "Palette",
+    settings: appearanceSettings,
   },
 ];
 

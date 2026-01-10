@@ -9,15 +9,17 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useUserTheme } from "@/hooks/useUserTheme";
 
 /**
  * ModeToggle - Theme selector dropdown (Light/Dark/System)
- * 
+ *
  * Displays current theme icon and allows switching between modes.
- * Uses existing shadcn dropdown-menu component.
+ * Uses useUserTheme hook for database-synced theme persistence.
  */
 export function ModeToggle() {
-    const { theme, setTheme } = useTheme();
+    const { theme } = useTheme(); // For display only
+    const { updateTheme } = useUserTheme(); // For database sync
     const [mounted, setMounted] = React.useState(false);
 
     // Avoid hydration mismatch by only rendering after mount
@@ -52,21 +54,21 @@ export function ModeToggle() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuItem
-                    onClick={() => setTheme("light")}
+                    onClick={() => updateTheme("light")}
                     className={theme === "light" ? "bg-accent" : ""}
                 >
                     <Sun className="mr-2 h-4 w-4" />
                     Light
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                    onClick={() => setTheme("dark")}
+                    onClick={() => updateTheme("dark")}
                     className={theme === "dark" ? "bg-accent" : ""}
                 >
                     <Moon className="mr-2 h-4 w-4" />
                     Dark
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                    onClick={() => setTheme("system")}
+                    onClick={() => updateTheme("system")}
                     className={theme === "system" ? "bg-accent" : ""}
                 >
                     <Monitor className="mr-2 h-4 w-4" />

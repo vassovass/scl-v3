@@ -47,6 +47,28 @@ VALUES
 ON CONFLICT (key) DO NOTHING;
 
 -- ============================================================================
+-- APPEARANCE SETTINGS
+-- ============================================================================
+
+INSERT INTO app_settings (key, value, label, description, category, value_type, visible_to, editable_by, show_in_user_settings)
+VALUES
+  (
+    'theme_variants',
+    '[
+      {"id":"dark","name":"Dark","description":"Default dark theme","enabled":true},
+      {"id":"light","name":"Light","description":"Light theme for better readability in bright environments","enabled":true}
+    ]'::jsonb,
+    'Theme Variants',
+    'Available theme variants for users to choose from. By default, only dark and light modes exist.',
+    'appearance',
+    'json',
+    '{superadmin}',
+    '{superadmin}',
+    false
+  )
+ON CONFLICT (key) DO NOTHING;
+
+-- ============================================================================
 -- AUDIT LOG TABLE
 -- ============================================================================
 
@@ -122,7 +144,11 @@ VALUES
       "default_daily_step_goal": 10000,
       "default_stepweek_start": "monday",
       "show_global_leaderboard": true,
-      "maintenance_mode": false
+      "maintenance_mode": false,
+      "theme_variants": [
+        {"id":"dark","name":"Dark","description":"Default dark theme","enabled":true},
+        {"id":"light","name":"Light","description":"Light theme for better readability in bright environments","enabled":true}
+      ]
     }'::jsonb,
     false
   ),
@@ -139,7 +165,11 @@ VALUES
       "default_daily_step_goal": 10000,
       "default_stepweek_start": "monday",
       "show_global_leaderboard": false,
-      "maintenance_mode": false
+      "maintenance_mode": false,
+      "theme_variants": [
+        {"id":"dark","name":"Dark","description":"Default dark theme","enabled":true},
+        {"id":"light","name":"Light","description":"Light theme for better readability in bright environments","enabled":true}
+      ]
     }'::jsonb,
     false
   ),
@@ -156,7 +186,11 @@ VALUES
       "default_daily_step_goal": 10000,
       "default_stepweek_start": "monday",
       "show_global_leaderboard": false,
-      "maintenance_mode": false
+      "maintenance_mode": false,
+      "theme_variants": [
+        {"id":"dark","name":"Dark","description":"Default dark theme","enabled":true},
+        {"id":"light","name":"Light","description":"Light theme for better readability in bright environments","enabled":true}
+      ]
     }'::jsonb,
     true
   )
