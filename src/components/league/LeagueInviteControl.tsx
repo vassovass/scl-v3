@@ -50,39 +50,39 @@ export function LeagueInviteControl({ inviteCode, leagueName, className = "" }: 
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 onMouseEnter={() => setIsOpen(true)}
-                className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/50 px-6 py-3 text-sm font-medium text-slate-300 transition hover:border-slate-500 hover:bg-slate-800 hover:text-white"
+                className="flex items-center gap-2 rounded-lg border border-border bg-card px-6 py-3 text-sm font-medium text-foreground transition hover:border-primary/50 hover:bg-secondary"
                 data-tour="invite-button"
             >
                 <span>Invite Code:</span>
                 <span className="font-mono tracking-wider text-primary">{inviteCode}</span>
-                <span className="text-xs text-slate-500 ml-1">▼</span>
+                <span className="text-xs text-muted-foreground ml-1">▼</span>
             </button>
 
             {isOpen && (
                 <div
-                    className="absolute left-0 top-full z-20 mt-2 w-64 rounded-xl border border-slate-700 bg-slate-800 p-2 shadow-xl ring-1 ring-black/5"
+                    className="absolute left-0 top-full z-20 mt-2 w-64 rounded-xl border border-border bg-card p-2 shadow-xl"
                     onMouseLeave={() => setIsOpen(false)}
                 >
-                    <div className="mb-2 px-2 py-1.5 text-xs text-slate-500 font-semibold uppercase tracking-wider">
+                    <div className="mb-2 px-2 py-1.5 text-xs text-muted-foreground font-semibold uppercase tracking-wider">
                         Share Invite Link
                     </div>
 
                     <button
                         onClick={() => handleShare("copy")}
-                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-700 hover:text-white transition"
+                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-secondary transition"
                     >
                         <span className="text-lg">{copied ? "✓" : "📋"}</span>
                         <div className="flex-1">
                             <div>{copied ? "Copied!" : "Copy Link"}</div>
-                            {!copied && <div className="text-xs text-slate-500 truncate">{getInviteUrl()}</div>}
+                            {!copied && <div className="text-xs text-muted-foreground truncate">{getInviteUrl()}</div>}
                         </div>
                     </button>
 
-                    <div className="my-1 border-t border-slate-700/50" />
+                    <div className="my-1 border-t border-border" />
 
                     <button
                         onClick={() => handleShare("whatsapp")}
-                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-slate-200 hover:bg-emerald-900/30 hover:text-emerald-400 transition"
+                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-[hsl(var(--success)/0.1)] hover:text-[hsl(var(--success))] transition"
                     >
                         <span className="text-lg">💬</span>
                         WhatsApp
@@ -90,7 +90,7 @@ export function LeagueInviteControl({ inviteCode, leagueName, className = "" }: 
 
                     <button
                         onClick={() => handleShare("x")}
-                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-900/30 hover:text-white transition"
+                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-secondary transition"
                     >
                         <span className="text-lg font-bold">𝕏</span>
                         X
@@ -99,7 +99,7 @@ export function LeagueInviteControl({ inviteCode, leagueName, className = "" }: 
                     {supportsNativeShare && (
                         <button
                             onClick={() => handleShare("native")}
-                            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-700 hover:text-white transition"
+                            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-secondary transition"
                         >
                             <span className="text-lg">📤</span>
                             More Options...
