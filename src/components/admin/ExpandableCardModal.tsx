@@ -60,6 +60,8 @@ interface ExpandableCardModalProps {
     onClose: () => void;
     /** Called when item is updated */
     onUpdate?: (updatedItem: FeedbackItem) => void;
+    /** Called when item is deleted */
+    onDelete?: (id: string, hard: boolean) => void;
     /** Whether user can edit the item */
     canEdit?: boolean;
     /** Whether user can manage attachments */
@@ -75,6 +77,7 @@ export function ExpandableCardModal({
     isOpen,
     onClose,
     onUpdate,
+    onDelete,
     canEdit = false,
     canManageAttachments = false,
 }: ExpandableCardModalProps) {
@@ -86,6 +89,7 @@ export function ExpandableCardModal({
     const [isPublic, setIsPublic] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [hasChanges, setHasChanges] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     // Attachments
     const {
@@ -312,22 +316,63 @@ export function ExpandableCardModal({
                     )}
                 </div>
 
-                <DialogFooter>
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
-                    >
-                        {hasChanges ? 'Cancel' : 'Close'}
-                    </button>
-                    {canEdit && hasChanges && (
+                <DialogFooter className="flex items-center justify-between sm:justify-between">
+                    {/* Delete section (left) */}
+                    <div className="flex items-center gap-2">
+                        {canEdit && onDelete && (
+                            showDeleteConfirm ? (
+                                <div className="flex items-center gap-1 animate-fade-in">
+                                    <span className="text-xs text-slate-400 mr-1">Delete?</span>
+                                    <button
+                                        onClick={() => { onDelete(item.id, false); onClose(); }}
+                                        className="px-2 py-1 text-xs bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 rounded transition-colors"
+                                        title="Archive (can restore later)"
+                                    >
+                                        📦 Archive
+                                    </button>
+                                    <button
+                                        onClick={() => { onDelete(item.id, true); onClose(); }}
+                                        className="px-2 py-1 text-xs bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded transition-colors"
+                                        title="Delete forever"
+                                    >
+                                        🗑️ Forever
+                                    </button>
+                                    <button
+                                        onClick={() => setShowDeleteConfirm(false)}
+                                        className="px-2 py-1 text-xs text-slate-400 hover:text-slate-200 rounded transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => setShowDeleteConfirm(true)}
+                                    className="px-3 py-1.5 text-sm text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                >
+                                    🗑️ Delete
+                                </button>
+                            )
+                        )}
+                    </div>
+
+                    {/* Save/Close section (right) */}
+                    <div className="flex items-center gap-2">
                         <button
-                            onClick={handleSave}
-                            disabled={isSaving}
-                            className="px-4 py-2 rounded-lg bg-sky-600 text-white hover:bg-sky-500 disabled:opacity-50 transition-colors"
+                            onClick={onClose}
+                            className="px-4 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
                         >
-                            {isSaving ? 'Saving...' : 'Save Changes'}
+                            {hasChanges ? 'Cancel' : 'Close'}
                         </button>
-                    )}
+                        {canEdit && hasChanges && (
+                            <button
+                                onClick={handleSave}
+                                disabled={isSaving}
+                                className="px-4 py-2 rounded-lg bg-sky-600 text-white hover:bg-sky-500 disabled:opacity-50 transition-colors"
+                            >
+                                {isSaving ? 'Saving...' : 'Save Changes'}
+                            </button>
+                        )}
+                    </div>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

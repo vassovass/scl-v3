@@ -27,6 +27,7 @@ interface KanbanCardProps {
     onTogglePublic: (id: string, current: boolean) => void;
     onCycleRelease: (id: string, current: string) => void;
     onOpenDetail?: (item: FeedbackItem) => void;
+    onDelete?: (id: string, hard: boolean) => void;
 }
 
 const KanbanCard = memo(function KanbanCard({
@@ -37,8 +38,10 @@ const KanbanCard = memo(function KanbanCard({
     onTogglePublic,
     onCycleRelease,
     onOpenDetail,
+    onDelete,
 }: KanbanCardProps) {
     const [isExpanded, setIsExpanded] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     // Handle double-click to open detail modal
     const handleDoubleClick = (e: React.MouseEvent) => {
@@ -88,16 +91,54 @@ const KanbanCard = memo(function KanbanCard({
                                 {RELEASE_OPTIONS.find((r) => r.id === item.target_release)?.label || "📅 Later"}
                             </button>
                         </div>
-                        <button
-                            onClick={() => onTogglePublic(item.id, item.is_public)}
-                            className={`text-xs px-1.5 py-0.5 rounded transition-colors ${item.is_public
-                                ? "bg-emerald-500/20 text-emerald-400"
-                                : "bg-slate-700 text-slate-400 hover:text-slate-300"
-                                }`}
-                            title={item.is_public ? "Public on roadmap" : "Private"}
-                        >
-                            {item.is_public ? "🌐" : "🔒"}
-                        </button>
+                        <div className="flex items-center gap-1">
+                            <button
+                                onClick={() => onTogglePublic(item.id, item.is_public)}
+                                className={`text-xs px-1.5 py-0.5 rounded transition-colors ${item.is_public
+                                    ? "bg-emerald-500/20 text-emerald-400"
+                                    : "bg-slate-700 text-slate-400 hover:text-slate-300"
+                                    }`}
+                                title={item.is_public ? "Public on roadmap" : "Private"}
+                            >
+                                {item.is_public ? "🌐" : "🔒"}
+                            </button>
+                            {/* Delete button with confirmation */}
+                            {onDelete && (
+                                showDeleteConfirm ? (
+                                    <div className="flex items-center gap-0.5 animate-fade-in">
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); onDelete(item.id, false); setShowDeleteConfirm(false); }}
+                                            className="text-[9px] px-1 py-0.5 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 rounded transition-colors"
+                                            title="Archive (can restore later)"
+                                        >
+                                            📦
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); onDelete(item.id, true); setShowDeleteConfirm(false); }}
+                                            className="text-[9px] px-1 py-0.5 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded transition-colors"
+                                            title="Delete forever"
+                                        >
+                                            🗑️
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(false); }}
+                                            className="text-[9px] px-1 py-0.5 text-slate-400 hover:text-slate-200 rounded transition-colors"
+                                            title="Cancel"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(true); }}
+                                        className="text-xs px-1.5 py-0.5 rounded bg-slate-700/50 text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                                        title="Delete or archive"
+                                    >
+                                        🗑️
+                                    </button>
+                                )
+                            )}
+                        </div>
                     </div>
 
                     <div className="flex items-center justify-between mb-1">

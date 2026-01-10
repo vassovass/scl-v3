@@ -59,6 +59,7 @@ export const bulkArchiveSchema = z.object({
         .array(z.string().uuid())
         .min(1, "At least one ID required")
         .max(100, "Maximum 100 items per operation"),
+    hard: z.boolean().optional(), // If true, permanently delete. Default: false (soft delete)
 });
 
 // Type exports

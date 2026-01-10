@@ -14,6 +14,7 @@ import { useExport } from "@/hooks/useExport";
 import { KANBAN_COLUMNS as EXPORT_COLUMNS } from "@/lib/export/presets";
 import { useRouter } from "next/navigation";
 import { reorderArray, moveItemBetweenArrays, shouldIgnoreDrag } from "@/lib/dnd";
+import { toast } from "@/hooks/use-toast";
 
 interface FeedbackItem {
     id: string;
@@ -48,9 +49,10 @@ const COLUMNS: { id: string; title: string }[] = [
 
 interface KanbanBoardProps {
     initialItems: FeedbackItem[];
+    archivedItems?: FeedbackItem[];
 }
 
-export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
+export default function KanbanBoard({ initialItems, archivedItems = [] }: KanbanBoardProps) {
     const router = useRouter();
     const [columns, setColumns] = useState<KanbanColumn[]>([]);
     const [isUpdating, setIsUpdating] = useState(false);
@@ -58,6 +60,7 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [showMergeModal, setShowMergeModal] = useState(false);
     const [showImportModal, setShowImportModal] = useState(false);
+    const [showArchived, setShowArchived] = useState(false);
 
     // Expandable card modal state
     const [selectedItem, setSelectedItem] = useState<FeedbackItem | null>(null);
@@ -121,12 +124,12 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
         router.refresh();
     };
 
-    const handleBulkArchive = async () => {
+    const handleBulkArchive = async (hard: boolean = false) => {
         const ids = Array.from(selectedIds);
         await fetch("/api/admin/feedback/bulk/archive", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ids }),
+            body: JSON.stringify({ ids, hard }),
         });
         clearSelection();
         router.refresh();
@@ -337,6 +340,85 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
         setIsUpdating(false);
     }, []);
 
+    // Handle single item delete (soft or hard)
+    const handleDelete = useCallback(async (itemId: string, hard: boolean) => {
+        setIsUpdating(true);
+        try {
+            const response = await fetch("/api/admin/kanban", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: itemId, hard }),
+            });
+
+            if (response.ok) {
+                // Remove from local state immediately
+                setColumns((prev) =>
+                    prev.map((col) => ({
+                        ...col,
+                        items: col.items.filter((item) => item.id !== itemId),
+                    }))
+                );
+
+                // Show toast with undo for soft delete
+                if (!hard) {
+                    toast({
+                        title: "📦 Item archived",
+                        description: "Item moved to archive. Click Undo to restore.",
+                        action: (
+                            <button
+                                onClick={() => handleRestore(itemId)}
+                                className="px-3 py-1 text-sm bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors"
+                            >
+                                Undo
+                            </button>
+                        ),
+                    });
+                } else {
+                    toast({
+                        title: "🗑️ Item deleted",
+                        description: "Item permanently removed.",
+                    });
+                }
+            }
+        } catch (error) {
+            console.error("Failed to delete:", error);
+            toast({
+                title: "Error",
+                description: "Failed to delete item.",
+                variant: "destructive",
+            });
+        }
+        setIsUpdating(false);
+    }, []);
+
+    // Handle restore (unarchive) item
+    const handleRestore = useCallback(async (itemId: string) => {
+        setIsUpdating(true);
+        try {
+            const response = await fetch("/api/admin/kanban", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: itemId, archived_at: null }),
+            });
+
+            if (response.ok) {
+                toast({
+                    title: "✅ Item restored",
+                    description: "Item is back on the board.",
+                });
+                router.refresh();
+            }
+        } catch (error) {
+            console.error("Failed to restore:", error);
+            toast({
+                title: "Error",
+                description: "Failed to restore item.",
+                variant: "destructive",
+            });
+        }
+        setIsUpdating(false);
+    }, [router]);
+
     return (
         <div className="relative h-full flex flex-col">
             {/* Header with Filters and Export Button */}
@@ -347,6 +429,19 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                     compact
                 />
                 <div className="flex items-center gap-2">
+                    {/* Archived toggle */}
+                    {archivedItems.length > 0 && (
+                        <button
+                            onClick={() => setShowArchived(!showArchived)}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors ${showArchived
+                                ? "bg-amber-500/20 text-amber-400 border-amber-500/40"
+                                : "bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200"
+                                }`}
+                            title={showArchived ? "Hide archived items" : "Show archived items"}
+                        >
+                            📦 {archivedItems.length} archived
+                        </button>
+                    )}
                     {isUpdating && (
                         <span className="text-xs text-[hsl(var(--info))] animate-pulse">
                             Saving...
@@ -444,6 +539,7 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                                                                 onTogglePublic={togglePublic}
                                                                 onCycleRelease={cycleRelease}
                                                                 onOpenDetail={handleOpenDetail}
+                                                                onDelete={handleDelete}
                                                             />
                                                         ))}
                                                         {provided.placeholder}
@@ -503,9 +599,55 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                     setSelectedItem(null);
                 }}
                 onUpdate={handleItemUpdate}
+                onDelete={handleDelete}
                 canEdit={true}
                 canManageAttachments={true}
             />
+
+            {/* Archived Items Section */}
+            {showArchived && archivedItems.length > 0 && (
+                <div className="mt-6 p-4 bg-amber-500/5 border border-amber-500/20 rounded-lg animate-fade-in">
+                    <h3 className="text-sm font-semibold text-amber-400 mb-3 flex items-center gap-2">
+                        📦 Archived Items ({archivedItems.length})
+                        <span className="text-xs font-normal text-slate-500">
+                            Click restore to bring back to board
+                        </span>
+                    </h3>
+                    <div className="grid gap-2 max-h-64 overflow-y-auto">
+                        {archivedItems.map((item) => (
+                            <div
+                                key={item.id}
+                                className="flex items-center justify-between p-2 bg-slate-800/50 rounded-lg border border-slate-700"
+                            >
+                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                    <span className={`text-xs px-1.5 py-0.5 rounded ${TYPE_COLORS[item.type as keyof typeof TYPE_COLORS] || TYPE_COLORS.general}`}>
+                                        {item.type}
+                                    </span>
+                                    <span className="text-sm text-slate-300 truncate">
+                                        {item.subject}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-1 shrink-0">
+                                    <button
+                                        onClick={() => handleRestore(item.id)}
+                                        className="px-2 py-1 text-xs bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 rounded transition-colors"
+                                        title="Restore to board"
+                                    >
+                                        ↩️ Restore
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(item.id, true)}
+                                        className="px-2 py-1 text-xs bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded transition-colors"
+                                        title="Delete forever"
+                                    >
+                                        🗑️
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

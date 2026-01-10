@@ -15,6 +15,13 @@ const kanbanUpdateSchema = z.object({
     is_public: z.boolean().optional(),
     completed_at: z.string().nullable().optional(),
     target_release: z.enum(["now", "next", "later", "future"]).nullable().optional(),
+    archived_at: z.string().nullable().optional(),
+});
+
+// Schema for DELETE requests
+const kanbanDeleteSchema = z.object({
+    id: z.string().uuid(),
+    hard: z.boolean().optional(), // If true, permanently delete. If false/undefined, soft-delete (archive)
 });
 
 /**
@@ -129,4 +136,51 @@ export const GET = withApiHandler({
             totalPages: Math.ceil((count || 0) / limit)
         }
     };
+});
+
+/**
+ * DELETE /api/admin/kanban
+ * Delete a kanban item (superadmin only)
+ * 
+ * - hard=false (default): Soft delete (sets archived_at)
+ * - hard=true: Hard delete (permanently removes from database)
+ */
+export const DELETE = withApiHandler({
+    auth: 'superadmin',
+    schema: kanbanDeleteSchema,
+}, async ({ body, adminClient }) => {
+    const { id, hard } = body;
+
+    if (hard) {
+        // Hard delete - permanently remove from database
+        const { error } = await adminClient
+            .from("feedback")
+            .delete()
+            .eq("id", id);
+
+        if (error) {
+            console.error("Kanban hard delete error:", error);
+            return { success: false, error: error.message };
+        }
+
+        return { success: true, deleted: true, hard: true };
+    } else {
+        // Soft delete - set archived_at timestamp
+        const { data, error } = await adminClient
+            .from("feedback")
+            .update({
+                archived_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            })
+            .eq("id", id)
+            .select("id")
+            .single();
+
+        if (error) {
+            console.error("Kanban soft delete error:", error);
+            return { success: false, error: error.message };
+        }
+
+        return { success: true, archived: true, id: data?.id };
+    }
 });

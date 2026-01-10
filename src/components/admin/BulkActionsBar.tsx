@@ -7,7 +7,7 @@ interface BulkActionsBarProps {
     selectedCount: number;
     onClear: () => void;
     onBulkStatusChange: (status: string) => Promise<void>;
-    onBulkArchive: () => Promise<void>;
+    onBulkArchive: (hard?: boolean) => Promise<void>;
     onBulkTogglePublic: (isPublic: boolean) => Promise<void>;
     onMerge?: () => void;
 }
@@ -39,10 +39,10 @@ export default function BulkActionsBar({
         }
     };
 
-    const handleArchive = async () => {
+    const handleArchive = async (hard: boolean = false) => {
         setIsLoading(true);
         try {
-            await onBulkArchive();
+            await onBulkArchive(hard);
         } finally {
             setIsLoading(false);
         }
@@ -125,14 +125,24 @@ export default function BulkActionsBar({
                     🔒
                 </button>
 
-                {/* Archive button */}
+                {/* Archive button (soft delete) */}
                 <button
-                    onClick={handleArchive}
+                    onClick={() => handleArchive(false)}
                     disabled={isLoading}
                     className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-[hsl(var(--warning))] bg-amber-500/20 hover:bg-amber-500/30 rounded-lg transition disabled:opacity-50"
-                    title="Archive all selected (mark as done)"
+                    title="Archive selected (can restore later)"
                 >
                     📦 Archive
+                </button>
+
+                {/* Delete forever button (hard delete) */}
+                <button
+                    onClick={() => handleArchive(true)}
+                    disabled={isLoading}
+                    className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-red-400 bg-red-500/20 hover:bg-red-500/30 rounded-lg transition disabled:opacity-50"
+                    title="Delete forever (cannot undo)"
+                >
+                    🗑️
                 </button>
 
                 <div className="w-px h-5 bg-slate-700" />

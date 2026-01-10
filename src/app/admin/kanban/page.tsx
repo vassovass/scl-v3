@@ -27,15 +27,24 @@ export default async function AdminKanbanPage() {
     const { data: isAdmin } = await supabase.rpc("is_superadmin");
     if (!isAdmin) return redirect("/");
 
-    // Fetch all feedback items
     const adminClient = createAdminClient();
-    const { data: feedbackItems, error } = await adminClient
+
+    // Fetch active items (not archived)
+    const { data: activeItems, error: activeError } = await adminClient
         .from("feedback")
         .select("*, users(nickname)")
+        .is("archived_at", null)
         .order("priority_order", { ascending: true })
         .order("created_at", { ascending: false });
 
-    if (error) {
+    // Fetch archived items
+    const { data: archivedItems, error: archivedError } = await adminClient
+        .from("feedback")
+        .select("*, users(nickname)")
+        .not("archived_at", "is", null)
+        .order("archived_at", { ascending: false });
+
+    if (activeError || archivedError) {
         return (
             <PageLayout
                 title="Kanban Board"
@@ -45,14 +54,21 @@ export default async function AdminKanbanPage() {
                 empty={{
                     icon: "⚠️",
                     title: "Error loading items",
-                    description: error.message,
+                    description: activeError?.message || archivedError?.message || "Unknown error",
                 }}
             />
         );
     }
 
     // Add default board_status if missing
-    const items = (feedbackItems || []).map((item: any) => ({
+    const items = (activeItems || []).map((item: any) => ({
+        ...item,
+        board_status: item.board_status || "backlog",
+        is_public: item.is_public || false,
+        priority_order: item.priority_order || 0,
+    }));
+
+    const archived = (archivedItems || []).map((item: any) => ({
         ...item,
         board_status: item.board_status || "backlog",
         is_public: item.is_public || false,
@@ -89,7 +105,7 @@ export default async function AdminKanbanPage() {
                     variant: "ghost",
                 },
             ]}
-            isEmpty={items.length === 0}
+            isEmpty={items.length === 0 && archived.length === 0}
             empty={{
                 icon: "📋",
                 title: "No items yet",
@@ -103,9 +119,8 @@ export default async function AdminKanbanPage() {
             className="animate-fade-in"
         >
             <div className="animate-fade-slide animate-delay-100">
-                <KanbanBoard initialItems={items} />
+                <KanbanBoard initialItems={items} archivedItems={archived} />
             </div>
         </PageLayout>
     );
 }
-

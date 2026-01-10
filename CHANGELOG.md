@@ -38,6 +38,41 @@ All notable changes to StepLeague v3.
 
 ## [2026-01-10]
 
+### Added
+
+- **Kanban Delete/Archive System** - Full delete and archive functionality for Kanban items
+  - **Database Migration** (`20260110103000_add_feedback_archived_at.sql`)
+    - Added `archived_at` column to feedback table for soft-delete support
+    - Index on `archived_at` for efficient filtering of active items
+  - **DELETE API Endpoint** (`/api/admin/kanban`)
+    - `DELETE` method with `hard` parameter
+    - Soft delete (default): Sets `archived_at` timestamp, item can be restored
+    - Hard delete: Permanently removes from database
+  - **Bulk Archive API** (`/api/admin/feedback/bulk/archive`)
+    - Updated to set `archived_at` (previously just moved to "done" column)
+    - Added `hard` parameter for permanent bulk deletion
+  - **KanbanCard Delete Button**
+    - Inline delete with confirmation showing options: 📦 Archive or 🗑️ Delete Forever
+    - Compact UI that expands on click with cancel option
+  - **ExpandableCardModal Delete Button**
+    - Footer-positioned delete with same archive/forever options
+    - Confirmation step before action
+  - **BulkActionsBar Updates**
+    - Separate "Archive" and "Delete Forever" buttons
+    - Archive is soft-delete (restorable), Delete is permanent
+  - **Kanban Page Filter**
+    - Now excludes archived items by default (`archived_at IS NULL`)
+  - **Archived View Toggle** 📦
+    - Button in header showing count of archived items
+    - Toggle shows/hides expandable list of archived items
+    - Each archived item has "↩️ Restore" and "🗑️ Delete Forever" options
+    - Restore brings items back to the Kanban board
+  - **Toast Notifications**
+    - Archive action shows toast with "Undo" button to restore immediately
+    - Delete forever shows confirmation toast
+    - Restore shows success toast
+    - Error toasts for failed operations
+
 ### Fixed
 
 - **Admin Dropdown Menu** - Fixed Admin and User dropdown menus not opening reliably (required triple clicks)
