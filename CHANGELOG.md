@@ -40,11 +40,13 @@ All notable changes to StepLeague v3.
 
 ### Fixed
 
-- **Admin Dropdown Menu** - Fixed Admin and User dropdown menus not opening when clicked
-  - Root cause: Custom trigger elements (span/div) wrapped inside button broke Radix UI's `asChild` prop merging
-  - Solution: Changed custom triggers to use shadcn's `Button` component with proper `asChild` pattern
-  - Updated `NavHeader.tsx`: Admin menu and User menu now use `<Button variant="ghost" size="sm">`
-  - Follows Radix UI best practices where custom trigger IS the button element, not content inside a button
+- **Admin Dropdown Menu** - Fixed Admin and User dropdown menus not opening reliably (required triple clicks)
+  - Root cause: Nested button elements - `Button` component rendered inside `DropdownMenuTrigger` with `asChild`
+  - Investigation revealed actual DOM had `<button><button>content</button></button>` structure
+  - Clicks sometimes hit inner button (no handlers) vs outer button (with handlers) causing unreliable behavior
+  - Solution: Use `buttonVariants` function instead of `Button` component to avoid nested buttons
+  - Updated `NavHeader.tsx`: Changed from `<Button variant="ghost">` to `<button className={buttonVariants({variant: "ghost"})}>`
+  - Now renders single button element with correct event handlers attached
 
 ### Added
 
