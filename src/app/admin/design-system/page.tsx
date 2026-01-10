@@ -6,6 +6,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import Link from "next/link";
 import { Spinner } from "@/components/ui/Spinner";
 import { SystemBadge as Badge } from "@/components/ui/SystemBadge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 /**
  * SUPERADMIN-ONLY: Design System & Brand Guidelines
@@ -459,16 +460,31 @@ export default function DesignSystemPage() {
                             </div>
                         </div>
 
-                        {/* Status Badges */}
+                        {/* Status Badges (Workflow) */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-slate-300 mb-3">Status Badges</h3>
+                            <h3 className="text-sm font-medium text-slate-300 mb-3">Status Badges (Workflow)</h3>
                             <div className="flex flex-wrap gap-2">
                                 <Badge category="status" value="backlog" />
                                 <Badge category="status" value="todo" />
                                 <Badge category="status" value="in_progress" />
                                 <Badge category="status" value="review" />
                                 <Badge category="status" value="done" />
+                                <Badge category="status" value="needs_work" />
                             </div>
+                        </div>
+
+                        {/* Status Badges (Submission States) */}
+                        <div className="mb-6">
+                            <h3 className="text-sm font-medium text-slate-300 mb-3">Status Badges (Submission States)</h3>
+                            <div className="flex flex-wrap gap-2">
+                                <Badge category="status" value="verified" />
+                                <Badge category="status" value="pending" />
+                                <Badge category="status" value="failed" />
+                                <Badge category="status" value="pending_review" />
+                            </div>
+                            <p className="text-xs text-slate-500 mt-2">
+                                Uses semantic CSS variables: <code className="text-primary">--success</code>, <code className="text-primary">--warning</code>, <code className="text-primary">--destructive</code>
+                            </p>
                         </div>
 
                         {/* Release Badges */}
@@ -517,12 +533,16 @@ export default function DesignSystemPage() {
                         <div className="pt-6 border-t border-slate-700">
                             <p className="text-xs text-slate-500 mb-4">Usage:</p>
                             <pre className="text-xs text-slate-400 bg-slate-900 p-4 rounded-lg overflow-x-auto">
-                                {`import { Badge } from "@/components/ui/Badge";
+                                {`import { SystemBadge } from "@/components/ui/SystemBadge";
 
-<Badge category="type" value="bug" />
-<Badge category="status" value="in_progress" size="sm" />
-<Badge category="release" value="now" showLabel={false} />`}
+<SystemBadge category="type" value="bug" />
+<SystemBadge category="status" value="verified" size="sm" />
+<SystemBadge category="release" value="now" showLabel={false} />
+<SystemBadge category="achievement" value="leader" />`}
                             </pre>
+                            <p className="text-xs text-slate-500 mt-4">
+                                All badge colors defined in <code className="text-primary">src/lib/badges.ts</code> - Status badges (verified/pending/failed) use semantic CSS variables for theme adaptation.
+                            </p>
                         </div>
                     </div>
                 </section>
@@ -831,21 +851,40 @@ export default function DesignSystemPage() {
 
                         {/* Alerts/Messages */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-slate-300 mb-3">Alert Messages</h3>
+                            <h3 className="text-sm font-medium text-slate-300 mb-3">Alert Component</h3>
                             <div className="space-y-3">
-                                <div className="rounded-lg p-4 bg-emerald-900/20 border border-emerald-700 text-emerald-400 text-sm">
-                                    ✓ Success message example
-                                </div>
-                                <div className="rounded-lg p-4 bg-rose-900/20 border border-rose-700 text-rose-400 text-sm">
-                                    ✗ Error message example
-                                </div>
-                                <div className="rounded-lg p-4 bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.5)] text-[hsl(var(--warning))] text-sm">
-                                    ⚠ Warning message example
-                                </div>
-                                <div className="rounded-lg p-4 bg-[hsl(var(--info)/0.2)] border border-[hsl(var(--info)/0.5)] text-[hsl(var(--info))] text-sm">
-                                    ℹ Info message example
-                                </div>
+                                <Alert variant="success">
+                                    <AlertDescription>
+                                        ✓ Success: Your changes have been saved successfully.
+                                    </AlertDescription>
+                                </Alert>
+                                <Alert variant="destructive">
+                                    <AlertDescription>
+                                        ✗ Error: Unable to process your request. Please try again.
+                                    </AlertDescription>
+                                </Alert>
+                                <Alert variant="warning">
+                                    <AlertDescription>
+                                        ⚠ Warning: This action cannot be undone. Please confirm before proceeding.
+                                    </AlertDescription>
+                                </Alert>
+                                <Alert variant="info">
+                                    <AlertDescription>
+                                        ℹ Info: This feature uses semantic CSS variables for theme-aware colors.
+                                    </AlertDescription>
+                                </Alert>
+                                <Alert>
+                                    <AlertDescription>
+                                        Default: Standard informational message.
+                                    </AlertDescription>
+                                </Alert>
                             </div>
+                            <p className="text-xs text-slate-500 mt-4">
+                                Usage: <code className="text-primary">{'<Alert variant="success|destructive|warning|info">'}</code>
+                            </p>
+                            <p className="text-xs text-slate-500 mt-1">
+                                Uses semantic CSS variables for automatic light/dark mode adaptation
+                            </p>
                         </div>
 
                         {/* Usage Note */}

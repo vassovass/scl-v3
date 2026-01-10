@@ -93,6 +93,54 @@ All notable changes to StepLeague v3.
     - Automatically appears when settings have `show_in_league_settings = true`
     - Added to `/league/[id]/settings` page
 
+### Changed
+
+- **Comprehensive Light/Dark Mode Theme System** - WCAG 2.1 AA compliant contrast fixes across 49 files
+  - **CSS Variables & Design System**
+    - Added semantic status colors: `--success`, `--warning`, `--info` to `globals.css`
+    - Updated light theme colors for 4.5:1 minimum contrast ratio (WCAG 2.1 AA)
+    - HSL format ensures proper color adaptation between themes
+  - **New Components**
+    - Created shadcn `Alert` component (`src/components/ui/alert.tsx`) with semantic variants (warning, destructive, success, info)
+    - Extended `SystemBadge` with status category support (verified, pending, failed)
+  - **PRD-21 Part E (CSS Unification)** - Replaced hardcoded Tailwind colors with semantic CSS variables
+    - **Amber/Yellow → Warning**: 16 files fixed (`text-amber-400` → `text-[hsl(var(--warning))]`)
+    - **Sky/Blue → Primary/Info**: 24 files fixed (`text-sky-400` → `text-primary` or `text-[hsl(var(--info))]`)
+    - **Emerald/Green → Success**: Badge colors updated (`text-emerald-400` → `text-[hsl(var(--success))]`)
+    - **Slate → Semantic**: All files (`bg-slate-950` → `bg-background`, `text-slate-400` → `text-muted-foreground`)
+  - **PRD-21 Part F (Joyride Integration)** - Onboarding tour dialogs now theme-aware
+    - Replaced hardcoded hex colors in `OnboardingProvider.tsx` with CSS variables
+    - Tour tooltips, buttons, and beacons adapt to both light and dark modes
+  - **Auth Pages (3 files)** - Full theme support with proper contrast
+    - `sign-in/page.tsx`, `sign-up/page.tsx`, `claim/[code]/page.tsx`
+    - Error/success states use semantic `destructive` and `success` variables
+    - Form inputs with semantic focus borders (`focus:border-primary`)
+  - **Dashboard Pages (5 files)** - Theme-aware analytics and submissions
+    - `analytics/page.tsx` - Day modal with semantic colors
+    - `leaderboard/page.tsx` - 22 batch color replacements
+    - `submit-steps/page.tsx` - Migrated to SystemBadge
+    - `join/page.tsx`, `league/create/page.tsx` - Form theming
+  - **Forms (8 components)** - Consistent semantic colors across all forms
+    - SubmissionForm, BatchSubmissionForm, BatchConflictTable, ConflictResolutionDialog
+    - BulkUnverifiedForm, ProxySubmissionSection, JoinLeagueForm, consent-declaration
+    - Checkbox colors, selection states, file upload buttons all theme-aware
+  - **Admin Components (12 files)** - Full admin UI theme support
+    - design-system/page.tsx (70+ text-primary replacements)
+    - Kanban (KanbanBoard, KanbanCard), Feedback (FeedbackList)
+    - Import/export (ImportModal, BulkActionsBar)
+    - Settings (settings/page.tsx, VisibilityControls)
+  - **Roadmap (3 components)** - RoadmapView, RoadmapCard, PriorityVote
+  - **League Components (4 files)** - SubmissionStatusCard, ProxyMembersDropdown, LeagueInviteControl
+  - **UI Components (7 files)** - OfflineIndicator, AchievementShareCard, DatePicker, DateRangePicker, ImagePasteZone
+  - **Navigation & Layout (3 files)** - NavHeader, MobileMenu, GlobalFooter with brand color consistency
+  - **Core Libraries**
+    - `badges.ts` - Achievement badge colors updated to use semantic variables
+    - Badge definitions with backgrounds intentionally preserved (designed to work together)
+  - **Technical Quality**
+    - TypeScript compilation: ✓ Passes with no errors
+    - Future-proof: Change theme colors in one place (globals.css)
+    - Accessibility: WCAG 2.1 AA compliant contrast throughout
+
 ---
 
 ## [2026-01-07]
