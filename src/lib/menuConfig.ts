@@ -252,6 +252,7 @@ export const USER_MENU: MenuDefinition = {
     id: 'user',
     items: [
         { id: 'profile-settings', label: 'Profile Settings', href: '/settings/profile', icon: '⚙️' },
+        { id: 'user-preferences', label: 'Preferences', href: '/settings/preferences', icon: '🎨' },
         {
             id: 'sign-out',
             label: 'Sign Out',
@@ -269,6 +270,13 @@ export const ADMIN_MENU: MenuDefinition = {
     id: 'admin',
     label: 'Admin',
     items: [
+        {
+            id: 'admin-settings',
+            label: '⚙️ App Settings',
+            href: '/admin/settings',
+            description: 'Feature flags & system limits',
+            visibleTo: ['superadmin'],
+        },
         {
             id: 'admin-kanban',
             label: '📋 Kanban Board',
@@ -314,6 +322,7 @@ export const FOOTER_ACCOUNT: MenuDefinition = {
     label: 'Account',
     items: [
         { id: 'footer-profile', label: 'Profile Settings', href: '/settings/profile' },
+        { id: 'footer-preferences', label: 'Preferences', href: '/settings/preferences' },
         { id: 'footer-feedback', label: 'Send Feedback', href: '/feedback' },
     ]
 };
