@@ -4,6 +4,23 @@ import { useState, useRef, useEffect } from "react";
 import { APP_CONFIG } from "@/lib/config";
 import { useShare } from "@/hooks/useShare";
 
+/**
+ * LeagueInviteControl - Theme-aware invite code dropdown with share options
+ *
+ * IMPORTANT: Text Overflow Prevention Pattern
+ * All menu items use this flexbox pattern to prevent text overlap:
+ *
+ * <div className="flex items-center gap-3">
+ *   <Icon className="flex-shrink-0" />  // Icon won't shrink
+ *   <div className="flex-1 min-w-0">    // min-w-0 enables truncation
+ *     <div className="truncate">Text</div>  // Truncates with ellipsis
+ *   </div>
+ * </div>
+ *
+ * The `min-w-0` is CRITICAL - without it, flex items have an implicit
+ * `min-width: auto` which prevents truncation.
+ */
+
 interface LeagueInviteControlProps {
     inviteCode: string;
     leagueName: string;
