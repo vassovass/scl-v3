@@ -5,7 +5,7 @@ interface LeagueQuickStatsProps {
     totalMembers: number;
     stepsThisWeek: number;
     currentStreak: number;
-    hasSubmittedToday: boolean;
+    hasSubmittedYesterday: boolean;
 }
 
 /**
@@ -16,7 +16,7 @@ export function LeagueQuickStats({
     totalMembers,
     stepsThisWeek,
     currentStreak,
-    hasSubmittedToday,
+    hasSubmittedYesterday,
 }: LeagueQuickStatsProps) {
     const getRankBadgeColor = (rank: number | null) => {
         if (!rank) return "text-muted-foreground";
@@ -68,14 +68,14 @@ export function LeagueQuickStats({
                 {/* Today's Status */}
                 <div className="text-center">
                     <div className="text-2xl font-bold">
-                        {hasSubmittedToday ? (
+                        {hasSubmittedYesterday ? (
                             <span className="text-emerald-500">✅</span>
                         ) : (
                             <span className="text-amber-500">⚠️</span>
                         )}
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">
-                        {hasSubmittedToday ? "Submitted" : "Missing today"}
+                        {hasSubmittedYesterday ? "Submitted" : "Missing yesterday"}
                     </div>
                 </div>
             </div>

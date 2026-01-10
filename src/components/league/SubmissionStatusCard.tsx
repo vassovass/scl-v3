@@ -3,19 +3,19 @@
 import Link from "next/link";
 
 interface SubmissionStatusCardProps {
-    hasSubmittedToday: boolean;
-    todaySteps?: number;
+    hasSubmittedYesterday: boolean;
+    yesterdaySteps?: number;
 }
 
 /**
- * CTA card prompting users to submit steps if they haven't today
+ * CTA card prompting users to submit steps if they haven't for yesterday
  * Links to the league-agnostic /submit-steps page
  */
 export function SubmissionStatusCard({
-    hasSubmittedToday,
-    todaySteps,
+    hasSubmittedYesterday,
+    yesterdaySteps,
 }: SubmissionStatusCardProps) {
-    if (hasSubmittedToday && todaySteps) {
+    if (hasSubmittedYesterday && yesterdaySteps) {
         // Success state - already submitted
         return (
             <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-6">
@@ -24,9 +24,9 @@ export function SubmissionStatusCard({
                         <span className="text-2xl">✅</span>
                     </div>
                     <div>
-                        <h3 className="font-semibold text-emerald-100">Today's steps submitted!</h3>
+                        <h3 className="font-semibold text-emerald-100">Yesterday's steps submitted!</h3>
                         <p className="text-sm text-emerald-200/80">
-                            {todaySteps.toLocaleString()} steps recorded for today
+                            {yesterdaySteps.toLocaleString()} steps recorded for yesterday
                         </p>
                     </div>
                 </div>
@@ -43,9 +43,9 @@ export function SubmissionStatusCard({
                         <span className="text-2xl">⚠️</span>
                     </div>
                     <div>
-                        <h3 className="font-semibold text-foreground">You haven't submitted today</h3>
+                        <h3 className="font-semibold text-foreground">You haven't submitted yesterday</h3>
                         <p className="text-sm text-[hsl(var(--warning)/0.8)]">
-                            Don't break your streak – submit your steps now!
+                            Don't break your streak – submit yesterday's steps now!
                         </p>
                     </div>
                 </div>

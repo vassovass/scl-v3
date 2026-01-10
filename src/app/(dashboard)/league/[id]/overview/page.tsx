@@ -9,6 +9,7 @@ import { LeagueNav } from "@/components/league/LeagueNav";
 import { LeagueQuickStats } from "@/components/league/LeagueQuickStats";
 import { SubmissionStatusCard } from "@/components/league/SubmissionStatusCard";
 import { LeagueInviteControl } from "@/components/league/LeagueInviteControl";
+import { useSubmissionStatus } from "@/hooks/useSubmissionStatus";
 import { analytics } from "@/lib/analytics";
 
 interface League {
@@ -23,8 +24,6 @@ interface UserStats {
     rank: number | null;
     stepsThisWeek: number;
     currentStreak: number;
-    hasSubmittedToday: boolean;
-    todaySteps?: number;
 }
 
 /**
@@ -41,9 +40,20 @@ export default function LeagueOverviewPage() {
         rank: null,
         stepsThisWeek: 0,
         currentStreak: 0,
-        hasSubmittedToday: false,
     });
     const [loading, setLoading] = useState(true);
+
+    // Use the modular hook for checking yesterday's submission status
+    const {
+        hasSubmitted: hasSubmittedYesterday,
+        steps: yesterdaySteps,
+        isLoading: submissionLoading,
+    } = useSubmissionStatus({
+        userId: session?.user?.id,
+        leagueId,
+        targetDate: "yesterday", // Check for previous day's submission
+        skip: !session?.user?.id,
+    });
 
     const fetchLeagueData = useCallback(async () => {
         if (!session) return;
@@ -59,7 +69,7 @@ export default function LeagueOverviewPage() {
             const leagueData = await leagueRes.json();
             setLeague(leagueData.league);
 
-            // Fetch user stats for this league
+            // Fetch user stats for this league (rank, streak, etc.)
             const statsRes = await fetch(`/api/leagues/${leagueId}/stats?user_id=${session.user.id}`);
             if (statsRes.ok) {
                 const statsData = await statsRes.json();
@@ -67,8 +77,13 @@ export default function LeagueOverviewPage() {
                     rank: statsData.rank,
                     stepsThisWeek: statsData.steps_this_week || 0,
                     currentStreak: statsData.current_streak || 0,
-                    hasSubmittedToday: statsData.has_submitted_today || false,
-                    todaySteps: statsData.today_steps,
+                });
+            } else {
+                // Stats API may not exist yet, use defaults
+                setStats({
+                    rank: null,
+                    stepsThisWeek: 0,
+                    currentStreak: 0,
                 });
             }
 
@@ -144,13 +159,13 @@ export default function LeagueOverviewPage() {
                     totalMembers={totalMembers}
                     stepsThisWeek={stats.stepsThisWeek}
                     currentStreak={stats.currentStreak}
-                    hasSubmittedToday={stats.hasSubmittedToday}
+                    hasSubmittedYesterday={hasSubmittedYesterday}
                 />
 
                 {/* Submission Status CTA */}
                 <SubmissionStatusCard
-                    hasSubmittedToday={stats.hasSubmittedToday}
-                    todaySteps={stats.todaySteps}
+                    hasSubmittedYesterday={hasSubmittedYesterday}
+                    yesterdaySteps={yesterdaySteps}
                 />
 
                 {/* Quick Actions */}

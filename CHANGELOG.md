@@ -40,6 +40,36 @@ All notable changes to StepLeague v3.
 
 ### Added
 
+- **PRD 38: Notification Infrastructure** - Multi-layer notification system
+  - **Database Schema** (`migrations/20260110144500_notification_infrastructure.sql`)
+    - `notification_types` - Reference table for all notification types
+    - `notification_settings_global` - SuperAdmin platform defaults
+    - `notification_settings_league` - Per-league settings (Owner/Admin)
+    - `notification_preferences_user` - User preferences
+    - `notification_preferences_user_league` - Per-league user overrides
+    - `notifications` - Notification queue/history with league_name for display
+  - **Presets** - `yesterday_only`, `three_days`, `week`, `two_weeks` for submission reminders
+  - **Seed Data** - 8 notification types: submission_reminder, streak_milestone, streak_at_risk, ranking_change, league_activity, weekly_summary, high_five_received, badge_earned
+
+- **Modular Submission Status Hook** (`src/hooks/useSubmissionStatus.ts`)
+  - Reusable hook for checking step submission status
+  - Configurable: `targetDate` (yesterday/today/custom), `leagueId`, `userId`
+  - Used in league overview page
+
+- **Submission Gap Analysis API** (`/api/submissions/gaps`)
+  - Returns missing dates, gap count, coverage percentage
+  - Configurable date range via `days` parameter
+  - Research-backed notification wording
+
+### Fixed
+
+- **Submission Status Check** - Now checks for **yesterday's** submission instead of today's
+  - `LeagueQuickStats.tsx` - "Missing yesterday" instead of "Missing today"
+  - `SubmissionStatusCard.tsx` - Updated messaging and props
+  - `overview/page.tsx` - Uses `useSubmissionStatus` hook
+
+### Added
+
 - **Kanban Delete/Archive System** - Full delete and archive functionality for Kanban items
   - **Database Migration** (`20260110103000_add_feedback_archived_at.sql`)
     - Added `archived_at` column to feedback table for soft-delete support
