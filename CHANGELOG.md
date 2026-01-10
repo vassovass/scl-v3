@@ -38,6 +38,14 @@ All notable changes to StepLeague v3.
 
 ## [2026-01-10]
 
+### Fixed
+
+- **Admin Dropdown Menu** - Fixed Admin and User dropdown menus not opening when clicked
+  - Root cause: Custom trigger elements (span/div) wrapped inside button broke Radix UI's `asChild` prop merging
+  - Solution: Changed custom triggers to use shadcn's `Button` component with proper `asChild` pattern
+  - Updated `NavHeader.tsx`: Admin menu and User menu now use `<Button variant="ghost" size="sm">`
+  - Follows Radix UI best practices where custom trigger IS the button element, not content inside a button
+
 ### Added
 
 - **User Theme Preference Persistence** (PRD-25 Integration)

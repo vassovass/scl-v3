@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { ShadcnMenuRenderer } from "./ShadcnMenuRenderer";
 import { MobileMenu } from "./MobileMenu";
 import { ModeToggle } from "@/components/mode-toggle";
+import { Button } from "@/components/ui/button";
 import { MenuItem, UserRole, MenuLocation, detectMenuLocation } from "@/lib/menuConfig";
 import { useMenuConfig } from "@/hooks/useMenuConfig";
 import { APP_CONFIG } from "@/lib/config";
@@ -274,9 +275,9 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                                 variant="dropdown"
                                 userRole={userRole}
                                 trigger={
-                                    <span className="text-[hsl(var(--warning))] hover:text-[hsl(var(--warning)/0.9)] flex items-center gap-1">
+                                    <Button variant="ghost" size="sm" className="text-[hsl(var(--warning))] hover:text-[hsl(var(--warning)/0.9)] hover:bg-accent">
                                         ⚡ Admin <span className="text-[10px]">▼</span>
-                                    </span>
+                                    </Button>
                                 }
                                 isOpen={openDropdown === 'admin'}
                                 onToggle={() => toggleDropdown('admin')}
@@ -296,12 +297,12 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                                 variant="dropdown"
                                 userRole={userRole}
                                 trigger={
-                                    <div className="flex items-center gap-2">
-                                        <span className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-emerald-500 flex items-center justify-center text-white text-sm font-medium shadow-md ring-2 ring-background group-hover:ring-accent transition-all">
+                                    <Button variant="ghost" size="sm" className="gap-2 px-2">
+                                        <span className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-emerald-500 flex items-center justify-center text-white text-sm font-medium shadow-md ring-2 ring-background hover:ring-accent transition-all">
                                             {displayName[0]?.toUpperCase()}
                                         </span>
                                         <span className="text-[10px] text-muted-foreground">▼</span>
-                                    </div>
+                                    </Button>
                                 }
                                 isOpen={openDropdown === 'user'}
                                 onToggle={() => toggleDropdown('user')}
