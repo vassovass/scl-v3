@@ -73,6 +73,13 @@ All notable changes to StepLeague v3.
     - Restore shows success toast
     - Error toasts for failed operations
 
+- **Delete League Functionality** - Implemented the "Delete League" button in league settings
+  - Uses existing `/api/leagues/[id]` DELETE endpoint (already supported soft/hard delete)
+  - Added `ConfirmDialog` with destructive variant for confirmation
+  - Toast notification on success: "League moved to trash, permanent deletion in 7 days"
+  - Redirects to dashboard after deletion
+  - Reuses same patterns as Kanban delete (ConfirmDialog + toast)
+
 ### Fixed
 
 - **Admin Dropdown Menu** - Fixed Admin and User dropdown menus not opening reliably (required triple clicks)
