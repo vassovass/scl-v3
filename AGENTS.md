@@ -382,6 +382,23 @@ scl-v3/
 
 ## Theme, Styling & Branding
 
+> ⚠️ **MUST READ: [Theme System Documentation](./docs/THEME_SYSTEM.md)**
+>
+> **All AI agents working with colors, styling, or UI MUST read the theme documentation first.**
+> It contains comprehensive guidelines on:
+> - CSS variable usage and semantic color system
+> - Light/dark mode implementation patterns
+> - Badge configuration and component patterns
+> - Text overflow prevention patterns
+> - Accessibility requirements (WCAG 2.1 AA)
+> - Common pitfalls and solutions
+>
+> **Quick Rules:**
+> - ❌ NEVER use hardcoded Tailwind colors (`bg-slate-900`, `text-sky-400`)
+> - ✅ ALWAYS use semantic CSS variables (`bg-card`, `text-foreground`, `text-[hsl(var(--success))]`)
+> - ✅ Test in BOTH light and dark modes before considering work complete
+> - ✅ Ensure 4.5:1 minimum contrast ratio for all text
+
 ### Brand Logo Treatment
 
 The StepLeague logo uses two-tone text with a color-swap hover effect:
@@ -400,12 +417,13 @@ The StepLeague logo uses two-tone text with a color-swap hover effect:
 
 All defined in `src/app/globals.css` using CSS custom properties.
 
-| Category | Examples | CSS Variable |
-|----------|----------|-------------|
-| **Primary** | `sky-500/600` | `--brand-primary` |
-| **Backgrounds** | `bg-gradient-mesh`, `.glass-card` | `--bg-base`, `--bg-card` |
-| **Text** | `slate-50/400/500` | `--text-primary`, `--text-secondary` |
-| **Status** | `green-500`, `amber-400`, `red-500` | `--success`, `--warning`, `--error` |
+| Category | CSS Variables | Usage |
+|----------|---------------|-------|
+| **Primary** | `--primary`, `--primary-foreground` | Brand color (sky blue), buttons |
+| **Backgrounds** | `--background`, `--card`, `--muted` | Page/card backgrounds |
+| **Text** | `--foreground`, `--muted-foreground` | Primary/secondary text |
+| **Status** | `--success`, `--warning`, `--info`, `--destructive` | Success/error states |
+| **Interactive** | `--border`, `--input`, `--ring` | Borders, inputs, focus states |
 
 ### Utility Classes (from `globals.css`)
 
@@ -416,12 +434,19 @@ All defined in `src/app/globals.css` using CSS custom properties.
 - `.animate-float`, `.animate-pulse-glow` - Animations
 - `.section-container`, `.stat-badge`, `.feature-icon` - Layout helpers
 
-### Theme System (future-proofed for light/dark mode)
+### Theme System
 
+- **Framework**: `next-themes` for client-side management
+- **Storage**: localStorage + `user_preferences` table (database-backed)
+- **Attribute**: `data-theme="light"` (NOT class-based)
+- **Variants**: Dark (default), Light, System (follows OS preference)
+- **Future**: SuperAdmin-configurable custom theme variants
+
+**Implementation:**
 - Default: Dark theme (`:root` variables)
-- Light theme: Add `data-theme="light"` to `<html>` element
+- Light theme: `[data-theme="light"]` selector overrides
 - All theme-aware colors use CSS variables, no hardcoded values
-- When adding new colors, add both dark `:root` and `[data-theme="light"]` variants
+- When adding new colors, add BOTH `:root` and `[data-theme="light"]` variants
 
 > **Superadmins**: See `/admin/design-system` for live examples of all design tokens and branding.
 
@@ -942,8 +967,10 @@ When adding a new trackable feature:
 | [ROADMAP.md](./ROADMAP.md) | Upcoming features and planned work |
 | [CLAUDE.md](./CLAUDE.md) | Claude-specific notes (references this file) |
 | [.cursor/rules/](./cursor/rules/) | Cursor IDE rules |
+| [**THEME_SYSTEM.md**](./docs/THEME_SYSTEM.md) | **⚠️ MUST READ** - Theme, color, and styling guidelines for all UI work |
 | [docs/feedback-roadmap-system.md](./docs/feedback-roadmap-system.md) | **StepLeague System Docs** - Architecture & Component Reference |
 | [globals.css](./src/app/globals.css) | Design tokens, CSS variables, utility classes |
+| [badges.ts](./src/lib/badges.ts) | Central badge color configuration |
 | [analytics.ts](./src/lib/analytics.ts) | **Analytics tracking methods** - All event tracking lives here |
 | [/admin/design-system](./src/app/admin/design-system/page.tsx) | **Live component examples** (superadmin only) - UPDATE when adding/changing components |
 | **AI Artifacts Folder** | `docs/artifacts/` - All AI-generated planning docs, decisions, task lists (version controlled) |
