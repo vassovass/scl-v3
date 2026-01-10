@@ -10,6 +10,7 @@ import { BatchSubmissionForm } from "@/components/forms/BatchSubmissionForm";
 import { BulkUnverifiedForm } from "@/components/forms/BulkUnverifiedForm";
 import { ProxySubmissionSection } from "@/components/forms/ProxySubmissionSection";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
+import { SystemBadge } from "@/components/ui/SystemBadge";
 
 interface League {
     id: string;
@@ -157,12 +158,12 @@ export default function SubmitPage() {
 
     const getVerificationBadge = (verified: boolean | null) => {
         if (verified === true) {
-            return <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs text-emerald-400">✓ Verified</span>;
+            return <SystemBadge category="status" value="verified" size="sm" />;
         }
         if (verified === false) {
-            return <span className="rounded-full bg-rose-500/20 px-2 py-0.5 text-xs text-rose-400">✗ Failed</span>;
+            return <SystemBadge category="status" value="failed" size="sm" />;
         }
-        return <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs text-amber-400">⏳ Pending</span>;
+        return <SystemBadge category="status" value="pending" size="sm" />;
     };
 
     const formatDate = (dateStr: string) => {
@@ -183,7 +184,7 @@ export default function SubmitPage() {
 
     if (loading) {
         return (
-            <div className="flex min-h-screen items-center justify-center text-slate-400">
+            <div className="flex min-h-screen items-center justify-center text-muted-foreground">
                 Loading...
             </div>
         );
@@ -193,15 +194,15 @@ export default function SubmitPage() {
     // Instead we can show a specific message inside if user has no leagues, but still allow submission.
 
     return (
-        <div className="min-h-screen bg-slate-950">
+        <div className="min-h-screen bg-background">
             {/* Page Title */}
-            <div className="border-b border-slate-800 bg-slate-900/30">
+            <div className="border-b border-border bg-card/30">
                 <div className="mx-auto max-w-3xl px-6 py-4">
                     <div className="flex items-center justify-between">
-                        <h1 className="text-xl font-bold text-slate-50">Submit Steps</h1>
+                        <h1 className="text-xl font-bold text-foreground">Submit Steps</h1>
                         <Link
                             href="/dashboard"
-                            className="text-sm text-slate-400 hover:text-slate-200 transition-colors"
+                            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                         >
                             ← Back to Dashboard
                         </Link>
@@ -213,7 +214,7 @@ export default function SubmitPage() {
             <main className="mx-auto max-w-3xl px-6 py-12">
                 {/* Offline Warning */}
                 {isOffline && (
-                    <div className="mb-6 rounded-lg border border-amber-500/50 bg-amber-500/10 p-4 text-amber-200">
+                    <div className="mb-6 rounded-lg border border-[hsl(var(--warning)/.5)] bg-[hsl(var(--warning)/.1)] p-4 text-[hsl(var(--warning))]">
                         <div className="flex items-center gap-2">
                             <span className="text-lg">⚠️</span>
                             <div>
@@ -225,12 +226,12 @@ export default function SubmitPage() {
                 )}
 
                 {/* Global Submission Info */}
-                <div className="mb-8 rounded-lg border border-sky-500/30 bg-sky-500/10 p-4 text-sky-200">
+                <div className="mb-8 rounded-lg border border-[hsl(var(--info)/.3)] bg-[hsl(var(--info)/.1)] p-4 text-[hsl(var(--info))]">
                     <div className="flex items-start gap-3">
                         <span className="mt-0.5 text-lg">🌍</span>
                         <div>
-                            <h3 className="font-medium text-sky-100">Global Step Submission</h3>
-                            <p className="mt-1 text-sm text-sky-200/80">
+                            <h3 className="font-medium">Global Step Submission</h3>
+                            <p className="mt-1 text-sm opacity-80">
                                 Steps submitted here are automatically applied to <strong>all your leagues</strong> based on their start dates.
                                 You don't need to submit separately for each league.
                             </p>
@@ -250,8 +251,8 @@ export default function SubmitPage() {
                     <section data-tour="submission-form">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h2 className="text-xl font-semibold text-slate-100">Submit Today&apos;s Steps</h2>
-                                <p className="mt-2 text-sm text-slate-400">
+                                <h2 className="text-xl font-semibold text-foreground">Submit Today&apos;s Steps</h2>
+                                <p className="mt-2 text-sm text-muted-foreground">
                                     {submissionMode === "single"
                                         ? "Upload a screenshot to verify your step count."
                                         : submissionMode === "batch"
@@ -260,12 +261,12 @@ export default function SubmitPage() {
                                 </p>
                             </div>
 
-                            <div className="flex rounded-lg border border-slate-700 bg-slate-800 p-1" data-tour="batch-toggle">
+                            <div className="flex rounded-lg border border-border bg-secondary p-1" data-tour="batch-toggle">
                                 <button
                                     onClick={() => setSubmissionMode("single")}
                                     className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${submissionMode === "single"
-                                        ? "bg-sky-600 text-white shadow-sm"
-                                        : "text-slate-400 hover:text-slate-200"
+                                        ? "bg-primary text-primary-foreground shadow-sm"
+                                        : "text-muted-foreground hover:text-foreground"
                                         }`}
                                 >
                                     Single Entry
@@ -273,8 +274,8 @@ export default function SubmitPage() {
                                 <button
                                     onClick={() => setSubmissionMode("batch")}
                                     className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${submissionMode === "batch"
-                                        ? "bg-sky-600 text-white shadow-sm"
-                                        : "text-slate-400 hover:text-slate-200"
+                                        ? "bg-primary text-primary-foreground shadow-sm"
+                                        : "text-muted-foreground hover:text-foreground"
                                         }`}
                                 >
                                     Batch Upload
@@ -282,8 +283,8 @@ export default function SubmitPage() {
                                 <button
                                     onClick={() => setSubmissionMode("bulk-manual")}
                                     className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${submissionMode === "bulk-manual"
-                                        ? "bg-amber-600 text-white shadow-sm"
-                                        : "text-slate-400 hover:text-slate-200"
+                                        ? "bg-[hsl(var(--warning))] text-primary-foreground shadow-sm"
+                                        : "text-muted-foreground hover:text-foreground"
                                         }`}
                                 >
                                     Bulk Manual
@@ -314,27 +315,27 @@ export default function SubmitPage() {
                 {/* Your Recent Submissions */}
                 <ModuleFeedback moduleId="recent-submissions" moduleName="Recent Submissions">
                     <section className="mt-12">
-                        <h2 className="text-xl font-semibold text-slate-100">Your Recent Submissions</h2>
-                        <p className="mt-2 text-sm text-slate-400">
+                        <h2 className="text-xl font-semibold text-foreground">Your Recent Submissions</h2>
+                        <p className="mt-2 text-sm text-muted-foreground">
                             Your step submissions from the past week.
                         </p>
 
                         <div className="mt-6">
                             {submissions.length === 0 ? (
-                                <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-6 text-center">
-                                    <p className="text-slate-400">No submissions this week yet.</p>
+                                <div className="rounded-lg border border-border bg-card/50 p-6 text-center">
+                                    <p className="text-muted-foreground">No submissions this week yet.</p>
                                 </div>
                             ) : (
-                                <div className="overflow-hidden rounded-lg border border-slate-800">
+                                <div className="overflow-hidden rounded-lg border border-border">
                                     <table className="w-full">
-                                        <thead className="bg-slate-900">
+                                        <thead className="bg-card">
                                             <tr>
-                                                <th className="px-4 py-3 text-left text-sm font-medium text-slate-400">Date</th>
-                                                <th className="px-4 py-3 text-right text-sm font-medium text-slate-400">Steps</th>
-                                                <th className="px-4 py-3 text-right text-sm font-medium text-slate-400">Status</th>
+                                                <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Date</th>
+                                                <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Steps</th>
+                                                <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Status</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-slate-800">
+                                        <tbody className="divide-y divide-border">
                                             {submissions.map((sub) => {
                                                 const isExpanded = expandedSubmissionId === sub.id;
                                                 const canExpand = sub.verified === false && sub.verification_notes;
@@ -342,25 +343,25 @@ export default function SubmitPage() {
                                                 return (
                                                     <React.Fragment key={sub.id}>
                                                         <tr
-                                                            className={`hover:bg-slate-900/50 ${canExpand ? 'cursor-pointer' : ''}`}
+                                                            className={`hover:bg-muted/50 ${canExpand ? 'cursor-pointer' : ''}`}
                                                             onClick={() => {
                                                                 if (canExpand) {
                                                                     setExpandedSubmissionId(isExpanded ? null : sub.id);
                                                                 }
                                                             }}
                                                         >
-                                                            <td className="px-4 py-3 text-slate-100">
+                                                            <td className="px-4 py-3 text-foreground">
                                                                 {formatDate(sub.for_date)}
                                                                 {sub.partial && (
-                                                                    <span className="ml-2 text-xs text-slate-500">(partial)</span>
+                                                                    <span className="ml-2 text-xs text-muted-foreground">(partial)</span>
                                                                 )}
                                                                 {canExpand && (
-                                                                    <span className="ml-2 text-xs text-slate-500">
+                                                                    <span className="ml-2 text-xs text-muted-foreground">
                                                                         {isExpanded ? '▼' : '▶'}
                                                                     </span>
                                                                 )}
                                                             </td>
-                                                            <td className="px-4 py-3 text-right font-mono text-slate-100">
+                                                            <td className="px-4 py-3 text-right font-mono text-foreground">
                                                                 {sub.steps.toLocaleString()}
                                                             </td>
                                                             <td className="px-4 py-3 text-right">
@@ -370,10 +371,10 @@ export default function SubmitPage() {
                                                         {/* Expanded verification details */}
                                                         {isExpanded && sub.verification_notes && (
                                                             <tr>
-                                                                <td colSpan={3} className="bg-slate-900/80 px-4 py-3">
-                                                                    <div className="rounded-md border border-slate-700 bg-slate-800/50 p-3 space-y-2">
-                                                                        <p className="text-sm font-medium text-slate-300">Verification Details</p>
-                                                                        <p className="text-sm text-slate-400">{sub.verification_notes}</p>
+                                                                <td colSpan={3} className="bg-muted/50 px-4 py-3">
+                                                                    <div className="rounded-md border border-border bg-card/50 p-3 space-y-2">
+                                                                        <p className="text-sm font-medium text-foreground">Verification Details</p>
+                                                                        <p className="text-sm text-muted-foreground">{sub.verification_notes}</p>
                                                                     </div>
                                                                 </td>
                                                             </tr>

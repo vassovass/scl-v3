@@ -96,7 +96,7 @@ export default function RoadmapCard({ item, isLoggedIn, isCompleted }: RoadmapCa
                             )}
                             {/* Attachment indicator */}
                             {attachments.length > 0 && (
-                                <span className="text-xs text-sky-400" title={`${attachments.length} attachment(s)`}>
+                                <span className="text-xs text-[hsl(var(--info))]" title={`${attachments.length} attachment(s)`}>
                                     🖼️ {attachments.length}
                                 </span>
                             )}
@@ -149,7 +149,7 @@ export default function RoadmapCard({ item, isLoggedIn, isCompleted }: RoadmapCa
                                     ✅ Completed
                                 </span>
                             ) : (
-                                <span className="px-2 py-0.5 rounded bg-sky-500/20 text-sky-400 text-xs">
+                                <span className="px-2 py-0.5 rounded bg-[hsl(var(--info)/0.2)] text-[hsl(var(--info))] text-xs">
                                     In Progress
                                 </span>
                             )}

@@ -113,6 +113,11 @@
   --date-picker-border: 217.2 32.6% 17.5%;
   --date-picker-text: 210 40% 98%;
   --date-picker-accent: 199 89% 48%;
+
+  /* Semantic Status Colors */
+  --success: 160 65% 45%;      /* #1abc7b - Emerald-ish for dark mode */
+  --warning: 45 93% 60%;       /* #fbbf24 - Amber/yellow for dark mode, readable on dark */
+  --info: 199 89% 48%;         /* #0ea5e9 - Sky-500 (matches primary) */
 }
 
 /* === LIGHT THEME === */
@@ -190,10 +195,10 @@
   --date-picker-text: 189 30% 20%;
   --date-picker-accent: 189 35% 43%;
 
-  /* Semantic Status Colors from user's palette */
-  --success: 160 65% 30%;                /* #1b7f5c */
-  --warning: 38 70% 42%;                 /* #b8871f */
-  --info: 214 68% 38%;                   /* #1e56a3 */
+  /* Semantic Status Colors - Darker for proper contrast */
+  --success: 160 65% 30%;                /* #1b7f5c - Dark green (good) */
+  --warning: 25 85% 40%;                 /* #c2610b - Dark orange (better than amber) */
+  --info: 214 68% 35%;                   /* #1a4d8f - Dark blue (darker for better contrast) */
 }
 
 /* ============================================

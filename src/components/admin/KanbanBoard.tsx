@@ -348,7 +348,7 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                 />
                 <div className="flex items-center gap-2">
                     {isUpdating && (
-                        <span className="text-xs text-sky-400 animate-pulse">
+                        <span className="text-xs text-[hsl(var(--info))] animate-pulse">
                             Saving...
                         </span>
                     )}
@@ -365,10 +365,10 @@ export default function KanbanBoard({ initialItems }: KanbanBoardProps) {
                         <div className="absolute right-0 top-full mt-2 w-72 p-3 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
                             <h4 className="text-sm font-semibold text-slate-200 mb-2">📋 Kanban → 🗺️ Roadmap</h4>
                             <div className="text-xs text-slate-400 space-y-1.5">
-                                <p><span className="text-sky-400">🌐 Public items</span> appear on /roadmap</p>
+                                <p><span className="text-primary">🌐 Public items</span> appear on /roadmap</p>
                                 <div className="border-t border-slate-700 pt-1.5 mt-1.5">
                                     <p className="font-medium text-slate-300 mb-1">Column Mapping:</p>
-                                    <p>• <span className="text-amber-400">In Progress</span> → <span className="text-orange-400">🔥 Now</span></p>
+                                    <p>• <span className="text-[hsl(var(--warning))]">In Progress</span> → <span className="text-orange-400">🔥 Now</span></p>
                                     <p>• <span className="text-slate-300">Release tag</span> → Roadmap column</p>
                                     <p>• <span className="text-emerald-400">Done</span> → <span className="text-emerald-400">✅ Done</span></p>
                                 </div>

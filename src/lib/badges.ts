@@ -85,7 +85,17 @@ export const BADGE_CONFIG: Record<string, Record<string, BadgeConfig>> = {
         verified: {
             label: '✓ Verified',
             icon: '✓',
-            className: 'bg-emerald-500/20 text-emerald-400',
+            className: 'bg-[hsl(var(--success)/0.2)] text-[hsl(var(--success))]',
+        },
+        pending: {
+            label: '⏳ Pending',
+            icon: '⏳',
+            className: 'bg-[hsl(var(--warning)/0.2)] text-[hsl(var(--warning))]',
+        },
+        failed: {
+            label: '✗ Failed',
+            icon: '✗',
+            className: 'bg-destructive/20 text-destructive',
         },
         needs_work: {
             label: '⚠ Needs Work',
@@ -128,12 +138,12 @@ export const BADGE_CONFIG: Record<string, Record<string, BadgeConfig>> = {
         leader: {
             label: 'Leader',
             icon: '👑',
-            className: 'text-yellow-400',
+            className: 'text-[hsl(var(--warning))]',
         },
         most_improved: {
             label: 'Most Improved',
             icon: '🚀',
-            className: 'text-emerald-400',
+            className: 'text-[hsl(var(--success))]',
         },
         streak_30: {
             label: '30+ Day Streak',
@@ -163,17 +173,17 @@ export const BADGE_CONFIG: Record<string, Record<string, BadgeConfig>> = {
         '100k_club': {
             label: '100k Steps Club',
             icon: '👟',
-            className: 'text-sky-400',
+            className: 'text-[hsl(var(--info))]',
         },
         centurion: {
             label: '100+ Day Streak',
             icon: '💯',
-            className: 'text-amber-400',
+            className: 'text-[hsl(var(--warning))]',
         },
         legend_365: {
             label: '365 Day Streak',
             icon: '🌟',
-            className: 'text-yellow-400',
+            className: 'text-[hsl(var(--warning))]',
         },
     },
 };

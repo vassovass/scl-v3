@@ -128,14 +128,14 @@ export function MobileMenu({
             {adminItems.length > 0 && (
                 <MobileSection
                     title="⚡ SuperAdmin"
-                    titleClassName="text-amber-500"
+                    titleClassName="text-[hsl(var(--warning))]"
                     items={adminItems}
                     isExpanded={expandedSection === 'admin'}
                     onToggle={() => setExpandedSection(expandedSection === 'admin' ? null : 'admin')}
                     onClose={onClose}
                     onAction={handleAction}
                     isActive={isActive}
-                    itemClassName="text-amber-500/80 hover:bg-amber-900/10 hover:text-amber-400"
+                    itemClassName="text-[hsl(var(--warning)/0.8)] hover:bg-amber-900/10 hover:text-[hsl(var(--warning))]"
                 />
             )}
 

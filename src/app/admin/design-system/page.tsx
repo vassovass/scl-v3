@@ -109,7 +109,7 @@ export default function DesignSystemPage() {
                                 <div className="flex items-center gap-2 p-4 rounded-lg bg-slate-900 border border-slate-700">
                                     <span className="text-xl">👟</span>
                                     <span className="text-lg font-bold">
-                                        <span className="text-sky-400">Step</span>
+                                        <span className="text-primary">Step</span>
                                         <span className="text-slate-50">League</span>
                                     </span>
                                 </div>
@@ -124,8 +124,8 @@ export default function DesignSystemPage() {
                             <div className="inline-flex items-center gap-2 p-4 rounded-lg bg-slate-900 border border-slate-700 cursor-pointer group">
                                 <span className="text-xl">👟</span>
                                 <span className="text-lg font-bold">
-                                    <span className="text-slate-50 transition-colors group-hover:text-sky-400">Step</span>
-                                    <span className="text-sky-500 transition-colors group-hover:text-slate-50">League</span>
+                                    <span className="text-slate-50 transition-colors group-hover:text-primary">Step</span>
+                                    <span className="text-primary transition-colors group-hover:text-slate-50">League</span>
                                 </span>
                             </div>
                         </div>
@@ -136,8 +136,8 @@ export default function DesignSystemPage() {
                                 {`<Link className="group flex items-center gap-2">
   <span className="text-xl">👟</span>
   <span className="text-lg font-bold">
-    <span className="text-slate-50 transition-colors group-hover:text-sky-400">Step</span>
-    <span className="text-sky-500 transition-colors group-hover:text-slate-50">League</span>
+    <span className="text-slate-50 transition-colors group-hover:text-primary">Step</span>
+    <span className="text-primary transition-colors group-hover:text-slate-50">League</span>
   </span>
 </Link>`}
                             </pre>
@@ -156,22 +156,22 @@ export default function DesignSystemPage() {
                             <div className="space-y-2">
                                 <div className="h-16 rounded-lg bg-sky-500"></div>
                                 <p className="text-xs text-slate-400">Primary (sky-500)</p>
-                                <code className="text-xs text-sky-400">--brand-primary</code>
+                                <code className="text-xs text-primary">--brand-primary</code>
                             </div>
                             <div className="space-y-2">
                                 <div className="h-16 rounded-lg bg-sky-400"></div>
                                 <p className="text-xs text-slate-400">Primary Light</p>
-                                <code className="text-xs text-sky-400">--brand-primary-light</code>
+                                <code className="text-xs text-primary">--brand-primary-light</code>
                             </div>
                             <div className="space-y-2">
                                 <div className="h-16 rounded-lg bg-purple-500"></div>
                                 <p className="text-xs text-slate-400">Accent (purple-500)</p>
-                                <code className="text-xs text-sky-400">--brand-accent</code>
+                                <code className="text-xs text-primary">--brand-accent</code>
                             </div>
                             <div className="space-y-2">
                                 <div className="h-16 rounded-lg bg-blue-500"></div>
                                 <p className="text-xs text-slate-400">Accent Alt (blue-500)</p>
-                                <code className="text-xs text-sky-400">--brand-accent-alt</code>
+                                <code className="text-xs text-primary">--brand-accent-alt</code>
                             </div>
                         </div>
 
@@ -180,22 +180,22 @@ export default function DesignSystemPage() {
                             <div className="space-y-2">
                                 <div className="h-16 rounded-lg bg-[rgb(10,10,10)] border border-slate-700"></div>
                                 <p className="text-xs text-slate-400">Base</p>
-                                <code className="text-xs text-sky-400">--bg-base</code>
+                                <code className="text-xs text-primary">--bg-base</code>
                             </div>
                             <div className="space-y-2">
                                 <div className="h-16 rounded-lg bg-slate-900"></div>
                                 <p className="text-xs text-slate-400">Elevated</p>
-                                <code className="text-xs text-sky-400">--bg-elevated</code>
+                                <code className="text-xs text-primary">--bg-elevated</code>
                             </div>
                             <div className="space-y-2">
                                 <div className="h-16 rounded-lg bg-slate-800"></div>
                                 <p className="text-xs text-slate-400">Card</p>
-                                <code className="text-xs text-sky-400">--bg-card</code>
+                                <code className="text-xs text-primary">--bg-card</code>
                             </div>
                             <div className="space-y-2">
                                 <div className="h-16 rounded-lg bg-slate-700"></div>
                                 <p className="text-xs text-slate-400">Card Hover</p>
-                                <code className="text-xs text-sky-400">--bg-card-hover</code>
+                                <code className="text-xs text-primary">--bg-card-hover</code>
                             </div>
                         </div>
 
@@ -206,7 +206,7 @@ export default function DesignSystemPage() {
                                 <p className="text-xs text-slate-400">Success</p>
                             </div>
                             <div className="space-y-2">
-                                <div className="h-12 rounded-lg bg-amber-400"></div>
+                                <div className="h-12 rounded-lg bg-[hsl(var(--warning))]"></div>
                                 <p className="text-xs text-slate-400">Warning</p>
                             </div>
                             <div className="space-y-2">
@@ -296,7 +296,7 @@ export default function DesignSystemPage() {
                             <p className="text-sm text-slate-400">
                                 Uses backdrop-blur for frosted glass effect. Perfect for content sections.
                             </p>
-                            <code className="text-xs text-sky-400 mt-4 block">.glass-card</code>
+                            <code className="text-xs text-primary mt-4 block">.glass-card</code>
                         </div>
 
                         <div className="glass-card card-glow p-6">
@@ -304,7 +304,7 @@ export default function DesignSystemPage() {
                             <p className="text-sm text-slate-400">
                                 Glass card with gradient glow on hover. Good for interactive elements.
                             </p>
-                            <code className="text-xs text-sky-400 mt-4 block">.glass-card .card-glow</code>
+                            <code className="text-xs text-primary mt-4 block">.glass-card .card-glow</code>
                         </div>
 
                         <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 hover:border-slate-700 transition">
@@ -312,7 +312,7 @@ export default function DesignSystemPage() {
                             <p className="text-sm text-slate-400">
                                 Basic bordered card without blur. Use for simpler UIs.
                             </p>
-                            <code className="text-xs text-sky-400 mt-4 block">border + bg-slate-900/50</code>
+                            <code className="text-xs text-primary mt-4 block">border + bg-slate-900/50</code>
                         </div>
                     </div>
                 </section>
@@ -329,25 +329,25 @@ export default function DesignSystemPage() {
                             <div className="text-center">
                                 <div className="w-16 h-16 mx-auto bg-gradient-primary rounded-lg animate-float"></div>
                                 <p className="text-xs text-slate-400 mt-2">Float</p>
-                                <code className="text-xs text-sky-400">.animate-float</code>
+                                <code className="text-xs text-primary">.animate-float</code>
                             </div>
 
                             <div className="text-center">
                                 <div className="w-16 h-16 mx-auto bg-gradient-primary rounded-lg animate-pulse"></div>
                                 <p className="text-xs text-slate-400 mt-2">Pulse</p>
-                                <code className="text-xs text-sky-400">.animate-pulse</code>
+                                <code className="text-xs text-primary">.animate-pulse</code>
                             </div>
 
                             <div className="text-center">
                                 <div className="w-16 h-16 mx-auto bg-gradient-primary rounded-lg animate-pulse-glow"></div>
                                 <p className="text-xs text-slate-400 mt-2">Pulse Glow</p>
-                                <code className="text-xs text-sky-400">.animate-pulse-glow</code>
+                                <code className="text-xs text-primary">.animate-pulse-glow</code>
                             </div>
 
                             <div className="text-center">
                                 <div className="w-16 h-16 mx-auto bg-gradient-primary rounded-lg animate-fade-in"></div>
                                 <p className="text-xs text-slate-400 mt-2">Fade In</p>
-                                <code className="text-xs text-sky-400">.animate-fade-in</code>
+                                <code className="text-xs text-primary">.animate-fade-in</code>
                             </div>
                         </div>
                     </div>
@@ -364,7 +364,7 @@ export default function DesignSystemPage() {
                         <div className="h-48 rounded-xl bg-gradient-mesh flex items-center justify-center border border-slate-700">
                             <div className="text-center">
                                 <p className="text-sm font-medium text-white">Gradient Mesh</p>
-                                <code className="text-xs text-sky-400">.bg-gradient-mesh</code>
+                                <code className="text-xs text-primary">.bg-gradient-mesh</code>
                             </div>
                         </div>
 
@@ -405,7 +405,7 @@ export default function DesignSystemPage() {
                                 </svg>
                             </div>
                         </div>
-                        <code className="text-xs text-sky-400 mt-4 block">.feature-icon</code>
+                        <code className="text-xs text-primary mt-4 block">.feature-icon</code>
                     </div>
                 </section>
 
@@ -443,7 +443,7 @@ export default function DesignSystemPage() {
 
                     <div className="glass-card p-6">
                         <p className="text-sm text-slate-400 mb-6">
-                            Centralized badge system used across Kanban, Roadmap, and Leaderboard. All badges are defined in <code className="text-sky-400">src/lib/badges.ts</code>.
+                            Centralized badge system used across Kanban, Roadmap, and Leaderboard. All badges are defined in <code className="text-primary">src/lib/badges.ts</code>.
                         </p>
 
                         {/* Type Badges */}
@@ -546,27 +546,27 @@ export default function DesignSystemPage() {
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">DatePicker</code>
+                                    <code className="text-primary">DatePicker</code>
                                     <p className="text-xs text-slate-500 mt-1">Calendar date selection with range support</p>
                                     <p className="text-xs text-slate-600 mt-1">ui/DatePicker.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">DateRangePicker</code>
+                                    <code className="text-primary">DateRangePicker</code>
                                     <p className="text-xs text-slate-500 mt-1">Calendar date range selection with custom styles</p>
                                     <p className="text-xs text-slate-600 mt-1">ui/DateRangePicker.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">ShareButton</code>
+                                    <code className="text-primary">ShareButton</code>
                                     <p className="text-xs text-slate-500 mt-1">Social sharing with Web Share API fallback</p>
                                     <p className="text-xs text-slate-600 mt-1">ui/ShareButton.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">ModuleFeedback</code>
+                                    <code className="text-primary">ModuleFeedback</code>
                                     <p className="text-xs text-slate-500 mt-1">Floating feedback button for any page section</p>
                                     <p className="text-xs text-slate-600 mt-1">ui/ModuleFeedback.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">Spinner</code>
+                                    <code className="text-primary">Spinner</code>
                                     <p className="text-xs text-slate-500 mt-1">Loading indicator with sizes</p>
                                     <div className="flex items-center gap-4 mt-2 text-sky-400">
                                         <Spinner size="sm" />
@@ -576,7 +576,7 @@ export default function DesignSystemPage() {
                                     <p className="text-xs text-slate-600 mt-1">ui/Spinner.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">AchievementShareCard</code>
+                                    <code className="text-primary">AchievementShareCard</code>
                                     <p className="text-xs text-slate-500 mt-1">Shareable achievement/stats card with download</p>
                                     <p className="text-xs text-slate-600 mt-1">ui/AchievementShareCard.tsx</p>
                                 </div>
@@ -590,22 +590,22 @@ export default function DesignSystemPage() {
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">SubmissionForm</code>
+                                    <code className="text-primary">SubmissionForm</code>
                                     <p className="text-xs text-slate-500 mt-1">Single step entry with AI verification</p>
                                     <p className="text-xs text-slate-600 mt-1">forms/SubmissionForm.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">BatchSubmissionForm</code>
+                                    <code className="text-primary">BatchSubmissionForm</code>
                                     <p className="text-xs text-slate-500 mt-1">Multi-image upload with bulk processing</p>
                                     <p className="text-xs text-slate-600 mt-1">forms/BatchSubmissionForm.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">BulkUnverifiedForm</code>
+                                    <code className="text-primary">BulkUnverifiedForm</code>
                                     <p className="text-xs text-slate-500 mt-1">Quick manual entry for multiple dates</p>
                                     <p className="text-xs text-slate-600 mt-1">forms/BulkUnverifiedForm.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">JoinLeagueForm</code>
+                                    <code className="text-primary">JoinLeagueForm</code>
                                     <p className="text-xs text-slate-500 mt-1">Invite code entry form</p>
                                     <p className="text-xs text-slate-600 mt-1">forms/JoinLeagueForm.tsx</p>
                                 </div>
@@ -615,21 +615,21 @@ export default function DesignSystemPage() {
                         {/* Analytics Components */}
                         <div className="mb-6">
                             <h3 className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
-                                <span className="text-amber-400">📊</span> Analytics Components
+                                <span className="text-[hsl(var(--warning))]">📊</span> Analytics Components
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">CalendarHeatmap</code>
+                                    <code className="text-primary">CalendarHeatmap</code>
                                     <p className="text-xs text-slate-500 mt-1">GitHub-style activity heatmap</p>
                                     <p className="text-xs text-slate-600 mt-1">analytics/CalendarHeatmap.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">DailyBreakdownTable</code>
+                                    <code className="text-primary">DailyBreakdownTable</code>
                                     <p className="text-xs text-slate-500 mt-1">Tabular view with period grouping</p>
                                     <p className="text-xs text-slate-600 mt-1">analytics/DailyBreakdownTable.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">PersonalStatsCard</code>
+                                    <code className="text-primary">PersonalStatsCard</code>
                                     <p className="text-xs text-slate-500 mt-1">User achievements and records</p>
                                     <p className="text-xs text-slate-600 mt-1">analytics/PersonalStatsCard.tsx</p>
                                 </div>
@@ -643,17 +643,17 @@ export default function DesignSystemPage() {
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">LeagueInviteControl</code>
+                                    <code className="text-primary">LeagueInviteControl</code>
                                     <p className="text-xs text-slate-500 mt-1">Invite code display and sharing</p>
                                     <p className="text-xs text-slate-600 mt-1">league/LeagueInviteControl.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">ProxyMembersDropdown</code>
+                                    <code className="text-primary">ProxyMembersDropdown</code>
                                     <p className="text-xs text-slate-500 mt-1">Select user for proxy submissions</p>
                                     <p className="text-xs text-slate-600 mt-1">league/ProxyMembersDropdown.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">ProxyMemberManagement</code>
+                                    <code className="text-primary">ProxyMemberManagement</code>
                                     <p className="text-xs text-slate-500 mt-1">Admin panel for proxy users</p>
                                     <p className="text-xs text-slate-600 mt-1">league/ProxyMemberManagement.tsx</p>
                                 </div>
@@ -667,27 +667,27 @@ export default function DesignSystemPage() {
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">PageLayout</code>
+                                    <code className="text-primary">PageLayout</code>
                                     <p className="text-xs text-slate-500 mt-1">Orchestrator for header, loading, empty, and content states</p>
                                     <p className="text-xs text-slate-600 mt-1">layout/PageLayout.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">PageHeader</code>
+                                    <code className="text-primary">PageHeader</code>
                                     <p className="text-xs text-slate-500 mt-1">Title, subtitle, actions, breadcrumbs with analytics</p>
                                     <p className="text-xs text-slate-600 mt-1">layout/PageHeader.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">EmptyState</code>
+                                    <code className="text-primary">EmptyState</code>
                                     <p className="text-xs text-slate-500 mt-1">Configurable empty state with icons, descriptions, CTAs</p>
                                     <p className="text-xs text-slate-600 mt-1">layout/EmptyState.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">LoadingSkeleton</code>
+                                    <code className="text-primary">LoadingSkeleton</code>
                                     <p className="text-xs text-slate-500 mt-1">Multiple variants: list, cards, table, content</p>
                                     <p className="text-xs text-slate-600 mt-1">layout/LoadingSkeleton.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">GlobalFooter</code>
+                                    <code className="text-primary">GlobalFooter</code>
                                     <p className="text-xs text-slate-500 mt-1">Site-wide footer with navigation links</p>
                                     <p className="text-xs text-slate-600 mt-1">layout/GlobalFooter.tsx</p>
                                 </div>
@@ -701,17 +701,17 @@ export default function DesignSystemPage() {
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">NavHeader</code>
+                                    <code className="text-primary">NavHeader</code>
                                     <p className="text-xs text-slate-500 mt-1">Main navigation with dropdowns and mobile menu</p>
                                     <p className="text-xs text-slate-600 mt-1">navigation/NavHeader.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">NavDropdown</code>
+                                    <code className="text-primary">NavDropdown</code>
                                     <p className="text-xs text-slate-500 mt-1">Reusable animated dropdown menu</p>
                                     <p className="text-xs text-slate-600 mt-1">navigation/NavDropdown.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">MobileMenu</code>
+                                    <code className="text-primary">MobileMenu</code>
                                     <p className="text-xs text-slate-500 mt-1">Responsive drawer for small screens</p>
                                     <p className="text-xs text-slate-600 mt-1">navigation/MobileMenu.tsx</p>
                                 </div>
@@ -725,12 +725,12 @@ export default function DesignSystemPage() {
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">AuthProvider</code>
+                                    <code className="text-primary">AuthProvider</code>
                                     <p className="text-xs text-slate-500 mt-1">Supabase auth context and session management</p>
                                     <p className="text-xs text-slate-600 mt-1">providers/AuthProvider.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">OnboardingProvider</code>
+                                    <code className="text-primary">OnboardingProvider</code>
                                     <p className="text-xs text-slate-500 mt-1">Guided tour system with role-based steps</p>
                                     <p className="text-xs text-slate-600 mt-1">providers/OnboardingProvider.tsx</p>
                                 </div>
@@ -753,32 +753,32 @@ export default function DesignSystemPage() {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                             <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                <code className="text-sky-400">Dashboard Layout</code>
+                                <code className="text-primary">Dashboard Layout</code>
                                 <p className="text-xs text-slate-500 mt-1">NavHeader + content + GlobalFooter wrapper</p>
                                 <p className="text-xs text-slate-600 mt-1">(dashboard)/layout.tsx</p>
                             </div>
                             <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                <code className="text-sky-400">Auth Layout</code>
+                                <code className="text-primary">Auth Layout</code>
                                 <p className="text-xs text-slate-500 mt-1">Centered card for sign-in/sign-up</p>
                                 <p className="text-xs text-slate-600 mt-1">(auth)/sign-in, sign-up</p>
                             </div>
                             <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                <code className="text-sky-400">League Detail</code>
+                                <code className="text-primary">League Detail</code>
                                 <p className="text-xs text-slate-500 mt-1">Submission form + leaderboard + analytics tabs</p>
                                 <p className="text-xs text-slate-600 mt-1">league/[id]/*</p>
                             </div>
                             <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                <code className="text-sky-400">Static Page</code>
+                                <code className="text-primary">Static Page</code>
                                 <p className="text-xs text-slate-500 mt-1">section-container with prose content</p>
                                 <p className="text-xs text-slate-600 mt-1">privacy, terms, security, beta</p>
                             </div>
                             <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                <code className="text-sky-400">Settings Page</code>
+                                <code className="text-primary">Settings Page</code>
                                 <p className="text-xs text-slate-500 mt-1">Form sections with glass-card containers</p>
                                 <p className="text-xs text-slate-600 mt-1">settings/profile</p>
                             </div>
                             <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                <code className="text-sky-400">Share Page</code>
+                                <code className="text-primary">Share Page</code>
                                 <p className="text-xs text-slate-500 mt-1">Public shareable content with OG images</p>
                                 <p className="text-xs text-slate-600 mt-1">share/[id], invite/[code]</p>
                             </div>
@@ -807,7 +807,7 @@ export default function DesignSystemPage() {
                                     <input
                                         type="text"
                                         placeholder="Example input..."
-                                        className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 focus:border-sky-500 focus:outline-none"
+                                        className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 focus:border-primary focus:outline-none"
                                     />
                                 </div>
                                 <div>
@@ -821,7 +821,7 @@ export default function DesignSystemPage() {
                                 </div>
                                 <div>
                                     <label className="block text-xs text-slate-500 mb-1">Select</label>
-                                    <select className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 focus:border-sky-500 focus:outline-none">
+                                    <select className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 focus:border-primary focus:outline-none">
                                         <option>Option 1</option>
                                         <option>Option 2</option>
                                     </select>
@@ -839,10 +839,10 @@ export default function DesignSystemPage() {
                                 <div className="rounded-lg p-4 bg-rose-900/20 border border-rose-700 text-rose-400 text-sm">
                                     ✗ Error message example
                                 </div>
-                                <div className="rounded-lg p-4 bg-amber-900/20 border border-amber-700 text-amber-400 text-sm">
+                                <div className="rounded-lg p-4 bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.5)] text-[hsl(var(--warning))] text-sm">
                                     ⚠ Warning message example
                                 </div>
-                                <div className="rounded-lg p-4 bg-sky-900/20 border border-sky-700 text-sky-400 text-sm">
+                                <div className="rounded-lg p-4 bg-[hsl(var(--info)/0.2)] border border-[hsl(var(--info)/0.5)] text-[hsl(var(--info))] text-sm">
                                     ℹ Info message example
                                 </div>
                             </div>
@@ -867,14 +867,14 @@ export default function DesignSystemPage() {
 
                     <div className="glass-card p-6">
                         <p className="text-sm text-slate-400 mb-6">
-                            Production-ready, accessible components from shadcn/ui. All components in <code className="text-sky-400">src/components/ui/</code>.
+                            Production-ready, accessible components from shadcn/ui. All components in <code className="text-primary">src/components/ui/</code>.
                         </p>
 
                         {/* Toast Notifications */}
                         <div className="mb-6">
                             <h3 className="text-sm font-medium text-slate-300 mb-3">Toast Notifications</h3>
                             <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700">
-                                <p className="text-xs text-slate-400 mb-3">Replace all <code className="text-rose-400">alert()</code> calls with <code className="text-sky-400">toast()</code>:</p>
+                                <p className="text-xs text-slate-400 mb-3">Replace all <code className="text-rose-400">alert()</code> calls with <code className="text-primary">toast()</code>:</p>
                                 <pre className="text-xs text-slate-400 bg-slate-900 p-3 rounded-lg overflow-x-auto">
                                     {`import { toast } from "@/hooks/use-toast";
 
@@ -891,7 +891,7 @@ toast({ title: "Warning", description: "Check input", variant: "destructive" });
                         <div className="mb-6">
                             <h3 className="text-sm font-medium text-slate-300 mb-3">Confirmation Dialogs</h3>
                             <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700">
-                                <p className="text-xs text-slate-400 mb-3">Replace <code className="text-rose-400">confirm()</code> with <code className="text-sky-400">ConfirmDialog</code>:</p>
+                                <p className="text-xs text-slate-400 mb-3">Replace <code className="text-rose-400">confirm()</code> with <code className="text-primary">ConfirmDialog</code>:</p>
                                 <pre className="text-xs text-slate-400 bg-slate-900 p-3 rounded-lg overflow-x-auto">
                                     {`import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
@@ -913,27 +913,27 @@ toast({ title: "Warning", description: "Check input", variant: "destructive" });
                             <h3 className="text-sm font-medium text-slate-300 mb-3">Form Components</h3>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">input.tsx</code>
+                                    <code className="text-primary">input.tsx</code>
                                     <p className="text-xs text-slate-500 mt-1">Text input field</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">select.tsx</code>
+                                    <code className="text-primary">select.tsx</code>
                                     <p className="text-xs text-slate-500 mt-1">Dropdown select</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">checkbox.tsx</code>
+                                    <code className="text-primary">checkbox.tsx</code>
                                     <p className="text-xs text-slate-500 mt-1">Checkbox input</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">label.tsx</code>
+                                    <code className="text-primary">label.tsx</code>
                                     <p className="text-xs text-slate-500 mt-1">Form labels</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">textarea.tsx</code>
+                                    <code className="text-primary">textarea.tsx</code>
                                     <p className="text-xs text-slate-500 mt-1">Multi-line text</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">tooltip.tsx</code>
+                                    <code className="text-primary">tooltip.tsx</code>
                                     <p className="text-xs text-slate-500 mt-1">Hover tooltips</p>
                                 </div>
                             </div>
@@ -944,11 +944,11 @@ toast({ title: "Warning", description: "Check input", variant: "destructive" });
                             <h3 className="text-sm font-medium text-slate-300 mb-3">Other Components</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">dialog.tsx</code>
+                                    <code className="text-primary">dialog.tsx</code>
                                     <p className="text-xs text-slate-500 mt-1">Modal dialogs (used by ExpandableCardModal)</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-sky-400">dropdown-menu.tsx</code>
+                                    <code className="text-primary">dropdown-menu.tsx</code>
                                     <p className="text-xs text-slate-500 mt-1">Dropdown menus (used by ModeToggle)</p>
                                 </div>
                             </div>
@@ -973,7 +973,7 @@ toast({ title: "Warning", description: "Check input", variant: "destructive" });
 
                             <div className="space-y-4">
                                 <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
-                                    <code className="text-sky-400 text-sm">SettingsLayout</code>
+                                    <code className="text-primary text-sm">SettingsLayout</code>
                                     <p className="text-xs text-slate-500 mt-2">
                                         Main layout wrapper with header, back link, and optional tabbed navigation.
                                     </p>
@@ -991,35 +991,35 @@ toast({ title: "Warning", description: "Check input", variant: "destructive" });
                                 </div>
 
                                 <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
-                                    <code className="text-sky-400 text-sm">SettingsSection</code>
+                                    <code className="text-primary text-sm">SettingsSection</code>
                                     <p className="text-xs text-slate-500 mt-2">
                                         Groups related settings with title and description. Supports danger mode.
                                     </p>
                                 </div>
 
                                 <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
-                                    <code className="text-sky-400 text-sm">SettingsField</code>
+                                    <code className="text-primary text-sm">SettingsField</code>
                                     <p className="text-xs text-slate-500 mt-2">
                                         Text/textarea input with label, description, and character count.
                                     </p>
                                 </div>
 
                                 <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
-                                    <code className="text-sky-400 text-sm">SettingsToggle</code>
+                                    <code className="text-primary text-sm">SettingsToggle</code>
                                     <p className="text-xs text-slate-500 mt-2">
                                         Boolean switch field (wraps shadcn Switch).
                                     </p>
                                 </div>
 
                                 <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
-                                    <code className="text-sky-400 text-sm">SettingsSelect</code>
+                                    <code className="text-primary text-sm">SettingsSelect</code>
                                     <p className="text-xs text-slate-500 mt-2">
                                         Dropdown selector (wraps shadcn Select).
                                     </p>
                                 </div>
 
                                 <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
-                                    <code className="text-sky-400 text-sm">SettingsRadioGroup</code>
+                                    <code className="text-primary text-sm">SettingsRadioGroup</code>
                                     <p className="text-xs text-slate-500 mt-2">
                                         Radio button group with optional descriptions per option.
                                     </p>
@@ -1032,9 +1032,9 @@ toast({ title: "Warning", description: "Check input", variant: "destructive" });
                                     Settings are defined in type-safe registries following industry best practices:
                                 </p>
                                 <ul className="text-xs text-slate-500 space-y-2 list-disc list-inside">
-                                    <li><code className="text-sky-400">src/lib/settings/userPreferences.ts</code> - User settings registry</li>
-                                    <li><code className="text-sky-400">src/lib/settings/types.ts</code> - Type-safe setting definitions</li>
-                                    <li><code className="text-sky-400">src/hooks/usePreferences.ts</code> - Hook with optimistic updates</li>
+                                    <li><code className="text-primary">src/lib/settings/userPreferences.ts</code> - User settings registry</li>
+                                    <li><code className="text-primary">src/lib/settings/types.ts</code> - Type-safe setting definitions</li>
+                                    <li><code className="text-primary">src/hooks/usePreferences.ts</code> - Hook with optimistic updates</li>
                                 </ul>
                             </div>
                         </div>
@@ -1042,22 +1042,22 @@ toast({ title: "Warning", description: "Check input", variant: "destructive" });
                 </section>
 
                 {/* Theme Support Note */}
-                <section className="glass-card p-6 border-l-4 border-sky-500 mb-16">
-                    <h3 className="text-lg font-semibold text-sky-400 mb-2">🌓 Theme Support</h3>
+                <section className="glass-card p-6 border-l-4 border-primary mb-16">
+                    <h3 className="text-lg font-semibold text-primary mb-2">🌓 Theme Support</h3>
                     <p className="text-sm text-slate-400 mb-3">
                         All components use CSS variables for light/dark mode. Use the <strong>theme toggle</strong> in the navigation header to switch between Light, Dark, and System modes.
                     </p>
                     <div className="text-xs text-slate-500">
-                        <strong>When adding new components:</strong> Always use CSS variables from <code className="text-sky-400">globals.css</code> instead of hardcoded Tailwind colors.
+                        <strong>When adding new components:</strong> Always use CSS variables from <code className="text-primary">globals.css</code> instead of hardcoded Tailwind colors.
                     </div>
                 </section>
 
                 {/* Documentation Note */}
                 <section className="glass-card p-6 border-l-4 border-amber-500">
-                    <h3 className="text-lg font-semibold text-amber-400 mb-2">⚠️ Maintenance Note</h3>
+                    <h3 className="text-lg font-semibold text-[hsl(var(--warning))] mb-2">⚠️ Maintenance Note</h3>
                     <p className="text-sm text-slate-400">
                         This design system page must be updated whenever new design tokens, utility classes,
-                        or reusable components are added. See <code className="text-sky-400">AGENTS.md</code> for documentation rules.
+                        or reusable components are added. See <code className="text-primary">AGENTS.md</code> for documentation rules.
                     </p>
                 </section>
             </div >

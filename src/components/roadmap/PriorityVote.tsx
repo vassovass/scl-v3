@@ -51,7 +51,7 @@ export default function PriorityVote({
     // Determine color based on average priority
     const getPriorityColor = (priority: number) => {
         if (priority >= 7) return "text-emerald-400";
-        if (priority >= 4) return "text-amber-400";
+        if (priority >= 4) return "text-[hsl(var(--warning))]";
         return "text-slate-400";
     };
 
@@ -64,7 +64,7 @@ export default function PriorityVote({
                 className={`w-12 h-12 rounded-lg flex flex-col items-center justify-center transition-all ${isLoggedIn
                         ? "hover:bg-slate-800 cursor-pointer"
                         : "cursor-not-allowed opacity-60"
-                    } ${currentVote ? "bg-sky-500/20 border border-sky-500/30" : "bg-slate-800/50"}`}
+                    } ${currentVote ? "bg-primary/20 border border-primary/30" : "bg-slate-800/50"}`}
                 title={isLoggedIn ? "Click to vote" : "Sign in to vote"}
             >
                 <span className={`text-lg font-bold ${getPriorityColor(avgPriority)}`}>
@@ -88,9 +88,9 @@ export default function PriorityVote({
                             max="10"
                             value={sliderValue}
                             onChange={(e) => setSliderValue(parseInt(e.target.value))}
-                            className="w-24 accent-sky-500"
+                            className="w-24 accent-primary"
                         />
-                        <span className="text-lg font-bold text-sky-400 w-6 text-center">
+                        <span className="text-lg font-bold text-primary w-6 text-center">
                             {sliderValue}
                         </span>
                     </div>
@@ -98,7 +98,7 @@ export default function PriorityVote({
                         <button
                             onClick={handleVote}
                             disabled={isVoting}
-                            className="px-3 py-1 text-xs bg-sky-500 text-white rounded hover:bg-sky-600 disabled:opacity-50"
+                            className="px-3 py-1 text-xs bg-primary text-primary-foreground rounded hover:bg-primary/90 disabled:opacity-50"
                         >
                             {isVoting ? "..." : "Vote"}
                         </button>

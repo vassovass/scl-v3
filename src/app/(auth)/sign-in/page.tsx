@@ -94,23 +94,23 @@ function SignInForm() {
 
   return (
     <div className="w-full max-w-sm">
-      <h1 className="text-center text-2xl font-bold text-slate-50">
-        Sign in to Step<span className="text-sky-500">League</span>
+      <h1 className="text-center text-2xl font-bold text-foreground">
+        Sign in to Step<span className="text-primary">League</span>
       </h1>
-      <p className="mt-2 text-center text-sm text-slate-400">
+      <p className="mt-2 text-center text-sm text-muted-foreground">
         Welcome back! Enter your credentials.
       </p>
 
       {/* Success message after sign out */}
       {signedOut && (
-        <div className="mt-6 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+        <div className="mt-6 rounded-lg border border-[hsl(var(--success)/0.2)] bg-[hsl(var(--success)/0.1)] px-4 py-3 text-sm text-[hsl(var(--success))]">
           ✓ You&apos;ve been signed out successfully
         </div>
       )}
 
       {/* Resend success message */}
       {resendSuccess && (
-        <div className="mt-6 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+        <div className="mt-6 rounded-lg border border-[hsl(var(--success)/0.2)] bg-[hsl(var(--success)/0.1)] px-4 py-3 text-sm text-[hsl(var(--success))]">
           ✓ Confirmation email sent! Check your inbox.
         </div>
       )}
@@ -120,7 +120,7 @@ function SignInForm() {
         type="button"
         onClick={handleGoogleSignIn}
         disabled={loading}
-        className="mt-8 flex w-full items-center justify-center gap-3 rounded-lg border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-medium text-slate-50 transition hover:bg-slate-800 disabled:opacity-50"
+        className="mt-8 flex w-full items-center justify-center gap-3 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-secondary disabled:opacity-50"
       >
         <svg className="h-5 w-5" viewBox="0 0 24 24">
           <path
@@ -145,16 +145,16 @@ function SignInForm() {
 
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-slate-700" />
+          <div className="w-full border-t border-border" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="bg-slate-950 px-4 text-slate-500">or</span>
+          <span className="bg-background px-4 text-muted-foreground">or</span>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="rounded-lg border border-red-500/50 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          <div className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {error}
           </div>
         )}
@@ -165,14 +165,14 @@ function SignInForm() {
             type="button"
             onClick={handleResendConfirmation}
             disabled={resendLoading || !email}
-            className="w-full rounded-lg border border-amber-500/50 bg-amber-500/10 px-4 py-3 text-sm text-amber-400 hover:bg-amber-500/20 disabled:opacity-50 transition"
+            className="w-full rounded-lg border border-[hsl(var(--warning)/0.5)] bg-[hsl(var(--warning)/0.1)] px-4 py-3 text-sm text-[hsl(var(--warning))] hover:bg-[hsl(var(--warning)/0.2)] disabled:opacity-50 transition"
           >
             {resendLoading ? "Sending..." : "📧 Resend confirmation email"}
           </button>
         )}
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-slate-300">
+          <label htmlFor="email" className="block text-sm font-medium text-foreground">
             Email
           </label>
           <input
@@ -181,13 +181,13 @@ function SignInForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="mt-1 block w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2.5 text-slate-50 placeholder:text-slate-500 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="mt-1 block w-full rounded-lg border border-border bg-card px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             placeholder="you@example.com"
           />
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-slate-300">
+          <label htmlFor="password" className="block text-sm font-medium text-foreground">
             Password
           </label>
           <input
@@ -196,7 +196,7 @@ function SignInForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="mt-1 block w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2.5 text-slate-50 placeholder:text-slate-500 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="mt-1 block w-full rounded-lg border border-border bg-card px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             placeholder="••••••••"
           />
         </div>
@@ -204,15 +204,15 @@ function SignInForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-sky-500 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:opacity-50"
+          className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50"
         >
           {loading ? "Signing in..." : "Sign In"}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-slate-400">
+      <p className="mt-6 text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{" "}
-        <Link href="/sign-up" className="text-sky-400 hover:text-sky-300">
+        <Link href="/sign-up" className="text-primary hover:text-primary/80">
           Sign up
         </Link>
       </p>
@@ -222,8 +222,8 @@ function SignInForm() {
 
 export default function SignInPage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-6">
-      <Suspense fallback={<div className="text-slate-400">Loading...</div>}>
+    <main className="flex min-h-screen flex-col items-center justify-center bg-background px-6">
+      <Suspense fallback={<div className="text-muted-foreground">Loading...</div>}>
         <SignInForm />
       </Suspense>
     </main>

@@ -26,9 +26,9 @@ export default function LeagueAnalyticsPage() {
     } | null>(null);
 
     return (
-        <div className="min-h-screen bg-slate-950">
+        <div className="min-h-screen bg-background">
             {/* Header */}
-            <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-sm sticky top-0 z-20">
+            <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-20">
                 <ModuleFeedback moduleId="analytics-header" moduleName="Page Filters">
                     <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6 sm:py-4">
                         {/* Mobile: Stack vertically, Desktop: Single row */}
@@ -37,24 +37,24 @@ export default function LeagueAnalyticsPage() {
                             <div className="flex items-center gap-3">
                                 <Link
                                     href={`/league/${leagueId}`}
-                                    className="text-sm text-sky-400 hover:text-sky-300"
+                                    className="text-sm text-primary hover:text-primary/80"
                                 >
                                     ←
                                 </Link>
-                                <h1 className="text-lg font-bold text-slate-100 sm:text-xl">Analytics</h1>
+                                <h1 className="text-lg font-bold text-foreground sm:text-xl">Analytics</h1>
                             </div>
 
                             {/* Controls row - always visible */}
                             <div className="flex items-center justify-between gap-2 sm:gap-3">
                                 {/* View Mode Toggle */}
-                                <div className="flex rounded-lg border border-slate-700 p-0.5">
+                                <div className="flex rounded-lg border border-border p-0.5">
                                     {(["both", "calendar", "table"] as const).map((mode) => (
                                         <button
                                             key={mode}
                                             onClick={() => setViewMode(mode)}
                                             className={`px-2 py-1 text-xs rounded transition sm:px-3 ${viewMode === mode
-                                                ? "bg-sky-600 text-white"
-                                                : "text-slate-400 hover:text-slate-200"
+                                                ? "bg-primary text-primary-foreground"
+                                                : "text-muted-foreground hover:text-foreground"
                                                 }`}
                                         >
                                             {mode === "both" ? "📅📋" : mode === "calendar" ? "📅" : "📋"}
@@ -83,7 +83,7 @@ export default function LeagueAnalyticsPage() {
                 {/* Personal Stats */}
                 <ModuleFeedback moduleId="personal-stats" moduleName="Personal Records">
                     <section className="mb-8">
-                        <h2 className="text-sm font-medium text-slate-400 mb-3">🏆 Your Records</h2>
+                        <h2 className="text-sm font-medium text-muted-foreground mb-3">🏆 Your Records</h2>
                         <PersonalStatsCard />
                     </section>
                 </ModuleFeedback>
@@ -91,7 +91,7 @@ export default function LeagueAnalyticsPage() {
                 {(viewMode === "both" || viewMode === "calendar") && (
                     <ModuleFeedback moduleId="analytics-calendar" moduleName="Calendar Heatmap">
                         <section className="mb-6">
-                            <h2 className="text-sm font-medium text-slate-400 mb-3">📅 Submission Calendar</h2>
+                            <h2 className="text-sm font-medium text-muted-foreground mb-3">📅 Submission Calendar</h2>
                             <CalendarHeatmap
                                 leagueId={leagueId}
                                 onDayClick={(day) => setSelectedDay(day)}
@@ -103,9 +103,9 @@ export default function LeagueAnalyticsPage() {
                 {/* Day Detail Modal */}
                 {selectedDay && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-                        <div className="w-full max-w-md rounded-xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
+                        <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-2xl">
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-semibold text-slate-100">
+                                <h3 className="text-lg font-semibold text-foreground">
                                     {new Date(selectedDay.date + "T00:00:00").toLocaleDateString("en-US", {
                                         weekday: "long",
                                         month: "long",
@@ -114,41 +114,41 @@ export default function LeagueAnalyticsPage() {
                                 </h3>
                                 <button
                                     onClick={() => setSelectedDay(null)}
-                                    className="text-slate-400 hover:text-slate-200"
+                                    className="text-muted-foreground hover:text-foreground"
                                 >
                                     ✕
                                 </button>
                             </div>
 
                             <div className="grid grid-cols-3 gap-4 text-center">
-                                <div className="rounded-lg bg-slate-800 p-3">
-                                    <div className="text-2xl font-bold text-sky-400">
+                                <div className="rounded-lg bg-secondary p-3">
+                                    <div className="text-2xl font-bold text-primary">
                                         {selectedDay.submitted_count}
                                     </div>
-                                    <div className="text-xs text-slate-500">Submitted</div>
+                                    <div className="text-xs text-muted-foreground">Submitted</div>
                                 </div>
-                                <div className="rounded-lg bg-slate-800 p-3">
-                                    <div className="text-2xl font-bold text-slate-300">
+                                <div className="rounded-lg bg-secondary p-3">
+                                    <div className="text-2xl font-bold text-foreground">
                                         {selectedDay.total_members}
                                     </div>
-                                    <div className="text-xs text-slate-500">Members</div>
+                                    <div className="text-xs text-muted-foreground">Members</div>
                                 </div>
-                                <div className="rounded-lg bg-slate-800 p-3">
-                                    <div className="text-2xl font-bold text-emerald-400">
+                                <div className="rounded-lg bg-secondary p-3">
+                                    <div className="text-2xl font-bold text-[hsl(var(--success))]">
                                         {selectedDay.total_steps.toLocaleString()}
                                     </div>
-                                    <div className="text-xs text-slate-500">Total Steps</div>
+                                    <div className="text-xs text-muted-foreground">Total Steps</div>
                                 </div>
                             </div>
 
                             <div className="mt-4 text-center">
-                                <div className="inline-flex items-center gap-2 rounded-full bg-slate-800 px-4 py-2">
-                                    <span className="text-sm text-slate-400">Coverage:</span>
+                                <div className="inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-2">
+                                    <span className="text-sm text-muted-foreground">Coverage:</span>
                                     <span className={`text-sm font-semibold ${selectedDay.submitted_count === selectedDay.total_members
-                                        ? "text-emerald-400"
+                                        ? "text-[hsl(var(--success))]"
                                         : selectedDay.submitted_count >= selectedDay.total_members * 0.5
-                                            ? "text-sky-400"
-                                            : "text-amber-400"
+                                            ? "text-[hsl(var(--info))]"
+                                            : "text-[hsl(var(--warning))]"
                                         }`}>
                                         {Math.round((selectedDay.submitted_count / selectedDay.total_members) * 100)}%
                                     </span>
@@ -162,7 +162,7 @@ export default function LeagueAnalyticsPage() {
                 {(viewMode === "both" || viewMode === "table") && (
                     <ModuleFeedback moduleId="analytics-breakdown" moduleName="Daily Breakdown Table">
                         <section>
-                            <h2 className="text-sm font-medium text-slate-400 mb-3">📋 Daily Breakdown</h2>
+                            <h2 className="text-sm font-medium text-muted-foreground mb-3">📋 Daily Breakdown</h2>
                             <DailyBreakdownTable leagueId={leagueId} />
                         </section>
                     </ModuleFeedback>

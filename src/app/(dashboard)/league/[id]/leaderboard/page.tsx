@@ -79,17 +79,17 @@ function formatDate(dateStr: string) {
 // Loading skeleton component
 function LeaderboardSkeleton() {
   return (
-    <div className="min-h-screen bg-slate-950">
-      <div className="border-b border-slate-800 bg-slate-900/30">
+    <div className="min-h-screen bg-background">
+      <div className="border-b border-border bg-card/30">
         <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
-          <div className="h-7 w-32 bg-slate-800 rounded animate-pulse" />
-          <div className="h-5 w-24 bg-slate-800 rounded animate-pulse" />
+          <div className="h-7 w-32 bg-muted rounded animate-pulse" />
+          <div className="h-5 w-24 bg-muted rounded animate-pulse" />
         </div>
       </div>
       <div className="mx-auto max-w-3xl px-6 py-8">
         <div className="space-y-4">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-16 bg-slate-800/50 rounded-lg animate-pulse" />
+            <div key={i} className="h-16 bg-muted/50 rounded-lg animate-pulse" />
           ))}
         </div>
       </div>
@@ -258,12 +258,12 @@ function LeaderboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="border-b border-slate-800 bg-slate-900/30">
+      <div className="border-b border-border bg-card/30">
         <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-slate-50">Leaderboard</h1>
-          <Link href={`/league/${leagueId}`} className="text-sm text-slate-400 hover:text-slate-300">
+          <h1 className="text-xl font-bold text-foreground">Leaderboard</h1>
+          <Link href={`/league/${leagueId}`} className="text-sm text-muted-foreground hover:text-foreground">
             ← Back to League
           </Link>
         </div>
@@ -271,14 +271,14 @@ function LeaderboardContent() {
 
       {/* Period Selection */}
       <ModuleFeedback moduleId="leaderboard-period" moduleName="Period Selector" className="w-full">
-        <div className="border-b border-slate-800 bg-slate-900/20">
+        <div className="border-b border-border bg-card/20">
           <div className="mx-auto max-w-3xl px-6 py-4">
             <div className="flex flex-wrap items-center gap-3">
-              <label className="text-sm text-slate-400">Period:</label>
+              <label className="text-sm text-muted-foreground">Period:</label>
               <select
                 value={period}
                 onChange={(e) => handlePeriodChange(e.target.value as PeriodPreset)}
-                className="rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100"
+                className="rounded-md border border-input bg-card px-3 py-1.5 text-sm text-foreground"
                 style={{ colorScheme: "dark" }}
               >
                 {PERIOD_OPTIONS.map(opt => (
@@ -290,7 +290,7 @@ function LeaderboardContent() {
                 onClick={toggleComparison}
                 className={`ml-auto px-3 py-1.5 text-sm rounded-md transition ${comparisonMode
                   ? "bg-sky-600 text-white"
-                  : "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"
+                  : "bg-secondary text-foreground border border-input hover:bg-secondary/80"
                   }`}
               >
                 {comparisonMode ? "✓ Compare" : "Compare Periods"}
@@ -312,13 +312,13 @@ function LeaderboardContent() {
 
             {/* Comparison Period B */}
             {comparisonMode && (
-              <div className="mt-4 pt-4 border-t border-slate-800">
+              <div className="mt-4 pt-4 border-t border-border">
                 <div className="flex flex-wrap items-center gap-3">
-                  <label className="text-sm text-slate-400">Compare to:</label>
+                  <label className="text-sm text-muted-foreground">Compare to:</label>
                   <select
                     value={periodB}
                     onChange={(e) => handlePeriodBChange(e.target.value as PeriodPreset)}
-                    className="rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100"
+                    className="rounded-md border border-input bg-card px-3 py-1.5 text-sm text-foreground"
                     style={{ colorScheme: "dark" }}
                   >
                     {PERIOD_OPTIONS.map(opt => (
@@ -348,14 +348,14 @@ function LeaderboardContent() {
         <div className="mx-auto max-w-3xl px-6 py-4 flex flex-wrap items-center gap-4" data-tour="leaderboard-filters">
           {/* Sort By */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500">Sort:</span>
+            <span className="text-xs text-foreground0">Sort:</span>
             {(["steps", "improvement", "average", "streak"] as SortBy[]).map(s => (
               <button
                 key={s}
                 onClick={() => handleSortChange(s)}
                 className={`px-2 py-1 text-xs rounded-md transition ${sortBy === s
-                  ? "bg-sky-600/20 text-sky-400 border border-sky-600"
-                  : "bg-slate-800 text-slate-400 border border-slate-700"
+                  ? "bg-sky-600/20 text-primary border border-sky-600"
+                  : "bg-secondary text-muted-foreground border border-input"
                   }`}
               >
                 {s === "steps" ? "Steps" : s === "improvement" ? "Improvement %" : s === "average" ? "Daily Avg" : "Streak"}
@@ -365,14 +365,14 @@ function LeaderboardContent() {
 
           {/* Verified Filter */}
           <div className="flex items-center gap-2 ml-auto" data-tour="verified-filter">
-            <span className="text-xs text-slate-500">Show:</span>
+            <span className="text-xs text-foreground0">Show:</span>
             {(["all", "verified", "unverified"] as VerifiedFilter[]).map(f => (
               <button
                 key={f}
                 onClick={() => handleVerifiedChange(f)}
                 className={`px-2 py-1 text-xs rounded-md transition ${verifiedFilter === f
-                  ? "bg-emerald-600/20 text-emerald-400 border border-emerald-600"
-                  : "bg-slate-800 text-slate-400 border border-slate-700"
+                  ? "bg-[hsl(var(--success)/0.2)] text-[hsl(var(--success))] border border-[hsl(var(--success))]"
+                  : "bg-secondary text-muted-foreground border border-input"
                   }`}
               >
                 {f === "all" ? "All" : f === "verified" ? "Verified" : "Unverified"}
@@ -387,18 +387,18 @@ function LeaderboardContent() {
         <ModuleFeedback moduleId="leaderboard-stats" moduleName="Stats Summary">
           <div className="mx-auto max-w-3xl px-6 pb-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-3 text-center">
-                <p className="text-xl font-bold text-slate-100">{meta.team_total_steps.toLocaleString()}</p>
-                <p className="text-xs text-slate-500">Team Total</p>
+              <div className="rounded-lg border border-border bg-card/50 p-3 text-center">
+                <p className="text-xl font-bold text-foreground">{meta.team_total_steps.toLocaleString()}</p>
+                <p className="text-xs text-foreground0">Team Total</p>
               </div>
-              <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-3 text-center">
-                <p className="text-xl font-bold text-slate-100">{meta.total_members}</p>
-                <p className="text-xs text-slate-500">Members</p>
+              <div className="rounded-lg border border-border bg-card/50 p-3 text-center">
+                <p className="text-xl font-bold text-foreground">{meta.total_members}</p>
+                <p className="text-xs text-foreground0">Members</p>
               </div>
               {meta.period_a && (
-                <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-3 text-center col-span-2">
-                  <p className="text-sm text-slate-300">{meta.period_a.start} → {meta.period_a.end}</p>
-                  <p className="text-xs text-slate-500">Period</p>
+                <div className="rounded-lg border border-border bg-card/50 p-3 text-center col-span-2">
+                  <p className="text-sm text-foreground">{meta.period_a.start} → {meta.period_a.end}</p>
+                  <p className="text-xs text-foreground0">Period</p>
                 </div>
               )}
             </div>
@@ -409,55 +409,55 @@ function LeaderboardContent() {
       {/* Main Table */}
       <div className="mx-auto max-w-3xl px-6 py-4">
         {loading ? (
-          <div className="text-center text-slate-400 py-12">Loading...</div>
+          <div className="text-center text-muted-foreground py-12">Loading...</div>
         ) : error ? (
           <div className="rounded-xl border border-rose-800 bg-rose-900/20 p-6 text-center">
             <p className="text-rose-400">{error}</p>
-            <button onClick={fetchLeaderboard} className="mt-4 text-sm text-slate-400 hover:text-slate-300">Try again</button>
+            <button onClick={fetchLeaderboard} className="mt-4 text-sm text-muted-foreground hover:text-foreground">Try again</button>
           </div>
         ) : entries.length === 0 ? (
-          <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-12 text-center">
-            <p className="text-slate-400">No submissions for this period.</p>
+          <div className="rounded-xl border border-border bg-card/50 p-12 text-center">
+            <p className="text-muted-foreground">No submissions for this period.</p>
           </div>
         ) : (
           <ModuleFeedback moduleId="leaderboard-table" moduleName="Leaderboard Table">
-            <div className="overflow-x-auto rounded-xl border border-slate-800" data-tour="leaderboard-table">
+            <div className="overflow-x-auto rounded-xl border border-border" data-tour="leaderboard-table">
               <table className="w-full text-sm">
-                <thead className="bg-slate-900">
+                <thead className="bg-card">
                   <tr>
-                    <th className="px-3 py-3 text-left text-slate-400 font-medium">#</th>
-                    <th className="px-3 py-3 text-left text-slate-400 font-medium">Name</th>
-                    <th className="px-3 py-3 text-right text-slate-400 font-medium">Steps</th>
-                    <th className="px-3 py-3 text-center text-slate-400 font-medium">Days</th>
+                    <th className="px-3 py-3 text-left text-muted-foreground font-medium">#</th>
+                    <th className="px-3 py-3 text-left text-muted-foreground font-medium">Name</th>
+                    <th className="px-3 py-3 text-right text-muted-foreground font-medium">Steps</th>
+                    <th className="px-3 py-3 text-center text-muted-foreground font-medium">Days</th>
                     {comparisonMode && (
                       <>
-                        <th className="px-3 py-3 text-right text-slate-400 font-medium">Prev</th>
-                        <th className="px-3 py-3 text-right text-slate-400 font-medium">Δ%</th>
+                        <th className="px-3 py-3 text-right text-muted-foreground font-medium">Prev</th>
+                        <th className="px-3 py-3 text-right text-muted-foreground font-medium">Δ%</th>
                       </>
                     )}
-                    <th className="px-3 py-3 text-right text-slate-400 font-medium">Avg/Day</th>
-                    <th className="px-3 py-3 text-center text-slate-400 font-medium">🔥</th>
-                    <th className="px-3 py-3 text-center text-slate-400 font-medium">Badges</th>
+                    <th className="px-3 py-3 text-right text-muted-foreground font-medium">Avg/Day</th>
+                    <th className="px-3 py-3 text-center text-muted-foreground font-medium">🔥</th>
+                    <th className="px-3 py-3 text-center text-muted-foreground font-medium">Badges</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
                   {entries.map((entry) => (
                     <tr
                       key={entry.user_id}
-                      className={`hover:bg-slate-900/50 ${entry.user_id === session?.user?.id ? "bg-sky-950/20" : ""}`}
+                      className={`hover:bg-card/50 ${entry.user_id === session?.user?.id ? "bg-primary/10" : ""}`}
                     >
                       <td className="px-3 py-3">
-                        <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${entry.rank === 1 ? "bg-yellow-500/20 text-yellow-400" :
-                          entry.rank === 2 ? "bg-slate-400/20 text-slate-300" :
-                            entry.rank === 3 ? "bg-amber-600/20 text-amber-500" :
-                              "bg-slate-800 text-slate-400"
+                        <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${entry.rank === 1 ? "bg-[hsl(var(--warning)/0.2)] text-[hsl(var(--warning))]" :
+                          entry.rank === 2 ? "bg-muted/50 text-foreground" :
+                            entry.rank === 3 ? "bg-[hsl(var(--warning)/0.15)] text-[hsl(var(--warning))]" :
+                              "bg-secondary text-muted-foreground"
                           }`}>
                           {entry.rank}
                         </span>
                       </td>
                       <td className="px-3 py-3">
-                        <span className="text-slate-100">{entry.display_name || "Anonymous"}</span>
-                        {entry.user_id === session?.user?.id && <span className="ml-1 text-xs text-sky-400">(You)</span>}
+                        <span className="text-foreground">{entry.display_name || "Anonymous"}</span>
+                        {entry.user_id === session?.user?.id && <span className="ml-1 text-xs text-primary">(You)</span>}
                         {entry.user_id === session?.user?.id && (
                           <ShareAchievementButton
                             achievement={{
@@ -484,33 +484,33 @@ function LeaderboardContent() {
                           </ShareAchievementButton>
                         )}
                       </td>
-                      <td className="px-3 py-3 text-right font-mono text-slate-100">
+                      <td className="px-3 py-3 text-right font-mono text-foreground">
                         {entry.total_steps.toLocaleString()}
                       </td>
                       <td className="px-3 py-3 text-center text-sm">
-                        <span className="text-sky-400">{entry.days_submitted}</span>
+                        <span className="text-primary">{entry.days_submitted}</span>
                         {entry.total_days_in_period && (
                           <>
-                            <span className="text-slate-600">/</span>
-                            <span className="text-slate-400">{entry.total_days_in_period}</span>
+                            <span className="text-muted-foreground">/</span>
+                            <span className="text-muted-foreground">{entry.total_days_in_period}</span>
                           </>
                         )}
                       </td>
                       {comparisonMode && (
                         <>
-                          <td className="px-3 py-3 text-right font-mono text-slate-400">
+                          <td className="px-3 py-3 text-right font-mono text-muted-foreground">
                             {entry.period_b_steps?.toLocaleString() ?? "—"}
                           </td>
                           <td className="px-3 py-3 text-right">
                             {entry.improvement_pct !== null ? (
-                              <span className={entry.improvement_pct >= 0 ? "text-emerald-400" : "text-slate-500"}>
+                              <span className={entry.improvement_pct >= 0 ? "text-[hsl(var(--success))]" : "text-foreground0"}>
                                 {entry.improvement_pct >= 0 ? "+" : ""}{entry.improvement_pct}%
                               </span>
                             ) : "—"}
                           </td>
                         </>
                       )}
-                      <td className="px-3 py-3 text-right text-slate-400">
+                      <td className="px-3 py-3 text-right text-muted-foreground">
                         {entry.average_per_day.toLocaleString()}
                       </td>
                       <td className="px-3 py-3 text-center">

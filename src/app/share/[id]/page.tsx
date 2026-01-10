@@ -84,11 +84,11 @@ export default function SharePage({ searchParams }: SharePageProps) {
     const type = searchParams.type || "rank";
 
     const getRankDisplay = () => {
-        if (type === "personal_best") return { emoji: "💪", text: "New Personal Best!", color: "text-sky-400" };
-        if (rank === 1) return { emoji: "👑", text: "1st Place!", color: "text-yellow-400" };
+        if (type === "personal_best") return { emoji: "💪", text: "New Personal Best!", color: "text-primary" };
+        if (rank === 1) return { emoji: "👑", text: "1st Place!", color: "text-[hsl(var(--warning))]" };
         if (rank === 2) return { emoji: "🥈", text: "2nd Place!", color: "text-slate-300" };
-        if (rank === 3) return { emoji: "🥉", text: "3rd Place!", color: "text-amber-600" };
-        return { emoji: "🏆", text: `#${rank}`, color: "text-sky-400" };
+        if (rank === 3) return { emoji: "🥉", text: "3rd Place!", color: "text-[hsl(var(--warning))]" };
+        return { emoji: "🏆", text: `#${rank}`, color: "text-primary" };
     };
 
     const rankDisplay = getRankDisplay();
@@ -104,7 +104,7 @@ export default function SharePage({ searchParams }: SharePageProps) {
                     </h1>
                     <p className="text-lg text-slate-300 mt-2">{name}</p>
 
-                    <div className="mt-6 py-6 rounded-xl bg-gradient-to-r from-sky-600/20 to-emerald-600/20 border border-sky-500/30">
+                    <div className="mt-6 py-6 rounded-xl bg-gradient-to-r from-primary/20 to-emerald-600/20 border border-primary/30">
                         <div className="text-4xl font-bold text-white">
                             {steps.toLocaleString()}
                         </div>
@@ -123,7 +123,7 @@ export default function SharePage({ searchParams }: SharePageProps) {
 
                     <div className="mt-8 pt-4 border-t border-slate-700">
                         <div className="text-sm font-semibold text-slate-300">
-                            Step<span className="text-sky-500">League</span>
+                            Step<span className="text-primary">League</span>
                         </div>
                     </div>
                 </div>
@@ -132,7 +132,7 @@ export default function SharePage({ searchParams }: SharePageProps) {
                 <div className="mt-6">
                     <a
                         href="/dashboard"
-                        className="inline-block rounded-xl bg-sky-600 px-6 py-3 text-sm font-semibold text-white hover:bg-sky-500 transition"
+                        className="inline-block rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition"
                     >
                         Join the Challenge!
                     </a>

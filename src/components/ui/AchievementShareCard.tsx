@@ -158,7 +158,7 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
                         <p className="text-sm text-slate-400 mt-1">{achievement.userName || "You"}</p>
                     </div>
 
-                    <div className="text-center py-6 rounded-xl bg-gradient-to-r from-sky-600/20 to-emerald-600/20 border border-sky-500/30">
+                    <div className="text-center py-6 rounded-xl bg-gradient-to-r from-primary/20 to-emerald-600/20 border border-primary/30">
                         <div className="text-4xl font-bold text-white">
                             {achievement.value.toLocaleString()}
                         </div>
@@ -184,7 +184,7 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
                         <button
                             onClick={handleShare}
                             disabled={isSharing}
-                            className="w-full flex items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-3 text-sm font-semibold text-white hover:bg-sky-500 disabled:opacity-50 transition"
+                            className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition"
                         >
                             📤 {isSharing ? "Sharing..." : "Share"}
                         </button>
@@ -242,7 +242,7 @@ export function ShareAchievementButton({ achievement, children, className = "" }
         <>
             <button
                 onClick={() => setShowCard(true)}
-                className={`inline-flex items-center gap-1 text-sky-400 hover:text-sky-300 transition ${className}`}
+                className={`inline-flex items-center gap-1 text-primary hover:text-primary/80 transition ${className}`}
             >
                 {children || "🎉 Share"}
             </button>

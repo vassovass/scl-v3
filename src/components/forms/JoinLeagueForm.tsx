@@ -74,7 +74,7 @@ export function JoinLeagueForm({ prefilledCode = "" }: JoinLeagueFormProps) {
                     onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
                     required
                     placeholder="ABC123"
-                    className="mt-1 block w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-center text-2xl font-mono tracking-widest text-slate-50 uppercase placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+                    className="mt-1 block w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-center text-2xl font-mono tracking-widest text-slate-50 uppercase placeholder:text-slate-600 focus:border-primary focus:outline-none"
                     maxLength={10}
                 />
             </div>
@@ -82,7 +82,7 @@ export function JoinLeagueForm({ prefilledCode = "" }: JoinLeagueFormProps) {
             <button
                 type="submit"
                 disabled={loading || inviteCode.length < 4}
-                className="w-full rounded-lg bg-sky-500 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:opacity-50"
+                className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50"
             >
                 {loading ? "Joining..." : prefilledCode ? "Join League" : "Join League"}
             </button>

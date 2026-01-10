@@ -106,7 +106,7 @@ export function ConflictResolutionDialog({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-lg">
                 <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2 text-amber-400">
+                    <DialogTitle className="flex items-center gap-2 text-[hsl(var(--warning))]">
                         <span>⚠️</span>
                         Submission Already Exists for {formatDate(conflict.date)}
                     </DialogTitle>
@@ -144,12 +144,12 @@ export function ConflictResolutionDialog({
                                     ✗ Failed
                                 </span>
                             ) : (
-                                <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs text-amber-400">
+                                <span className="rounded-full bg-[hsl(var(--warning)/0.2)] px-2 py-0.5 text-xs text-[hsl(var(--warning))]">
                                     ⏳ Unverified
                                 </span>
                             )}
                             {existingHasProof ? (
-                                <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-xs text-sky-400">
+                                <span className="rounded-full bg-[hsl(var(--info)/0.2)] px-2 py-0.5 text-xs text-[hsl(var(--info))]">
                                     📷 Screenshot
                                 </span>
                             ) : (
@@ -179,11 +179,11 @@ export function ConflictResolutionDialog({
                             {conflict.incoming.steps.toLocaleString()}
                         </div>
                         <div className="mt-2 flex flex-wrap gap-2">
-                            <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs text-amber-400">
+                            <span className="rounded-full bg-[hsl(var(--warning)/0.2)] px-2 py-0.5 text-xs text-[hsl(var(--warning))]">
                                 ⏳ Pending
                             </span>
                             {incomingHasProof ? (
-                                <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-xs text-sky-400">
+                                <span className="rounded-full bg-[hsl(var(--info)/0.2)] px-2 py-0.5 text-xs text-[hsl(var(--info))]">
                                     📷 Screenshot
                                 </span>
                             ) : (
@@ -196,10 +196,10 @@ export function ConflictResolutionDialog({
                 </div>
 
                 {/* Recommendation */}
-                <div className="mt-4 rounded-lg border border-sky-500/30 bg-sky-500/10 p-3">
+                <div className="mt-4 rounded-lg border border-[hsl(var(--info)/0.3)] bg-[hsl(var(--info)/0.1)] p-3">
                     <div className="flex items-start gap-2">
-                        <span className="text-sky-400">💡</span>
-                        <p className="text-sm text-sky-200">{recommendation.reason}</p>
+                        <span className="text-[hsl(var(--info))]">💡</span>
+                        <p className="text-sm text-[hsl(var(--info))]">{recommendation.reason}</p>
                     </div>
                 </div>
 

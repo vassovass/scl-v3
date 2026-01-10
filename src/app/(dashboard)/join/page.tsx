@@ -9,18 +9,18 @@ export default function JoinLeaguePage() {
 
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-background">
       {/* Page Title */}
-      <div className="border-b border-slate-800 bg-slate-900/30">
+      <div className="border-b border-border bg-card/30">
         <div className="mx-auto max-w-5xl px-6 py-4">
-          <h1 className="text-xl font-bold text-slate-50">Join a League</h1>
+          <h1 className="text-xl font-bold text-foreground">Join a League</h1>
         </div>
       </div>
 
       {/* Main */}
       <ModuleFeedback moduleId="join-league-form" moduleName="Join League Form">
         <div className="mx-auto max-w-md px-6 py-12">
-          <p className="text-center text-slate-400">
+          <p className="text-center text-muted-foreground">
             Enter the invite code shared by your league admin.
           </p>
 

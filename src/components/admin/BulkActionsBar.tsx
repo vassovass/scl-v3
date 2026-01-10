@@ -61,7 +61,7 @@ export default function BulkActionsBar({
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
             <div className="flex items-center gap-2 rounded-xl bg-slate-900/95 backdrop-blur-sm border border-slate-700 shadow-xl shadow-black/20 px-4 py-2">
                 {/* Selected count */}
-                <span className="text-sm font-medium text-sky-400">
+                <span className="text-sm font-medium text-[hsl(var(--info))]">
                     {selectedCount} selected
                 </span>
 
@@ -129,7 +129,7 @@ export default function BulkActionsBar({
                 <button
                     onClick={handleArchive}
                     disabled={isLoading}
-                    className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-amber-400 bg-amber-500/20 hover:bg-amber-500/30 rounded-lg transition disabled:opacity-50"
+                    className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-[hsl(var(--warning))] bg-amber-500/20 hover:bg-amber-500/30 rounded-lg transition disabled:opacity-50"
                     title="Archive all selected (mark as done)"
                 >
                     📦 Archive
@@ -149,7 +149,7 @@ export default function BulkActionsBar({
                 {/* Loading indicator */}
                 {isLoading && (
                     <div className="ml-2">
-                        <div className="w-4 h-4 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                     </div>
                 )}
             </div>

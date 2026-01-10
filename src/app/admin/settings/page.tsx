@@ -107,8 +107,8 @@ export default function AdminSettingsPage() {
   const getColorClasses = (color: string) => {
     const colorMap: Record<string, { bg: string; border: string; text: string }> = {
       purple: { bg: "bg-purple-900/20", border: "border-purple-600/30", text: "text-purple-400" },
-      blue: { bg: "bg-blue-900/20", border: "border-blue-600/30", text: "text-blue-400" },
-      amber: { bg: "bg-amber-900/20", border: "border-amber-600/30", text: "text-amber-400" },
+      blue: { bg: "bg-[hsl(var(--info)/0.2)]", border: "border-[hsl(var(--info)/0.3)]", text: "text-[hsl(var(--info))]" },
+      amber: { bg: "bg-amber-900/20", border: "border-amber-600/30", text: "text-[hsl(var(--warning))]" },
       orange: { bg: "bg-orange-900/20", border: "border-orange-600/30", text: "text-orange-400" },
       green: { bg: "bg-emerald-900/20", border: "border-emerald-600/30", text: "text-emerald-400" },
     };

@@ -603,9 +603,9 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                                     type="checkbox"
                                     checked={overwrite}
                                     onChange={(e) => setOverwrite(e.target.checked)}
-                                    className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-sky-500 focus:ring-sky-500"
+                                    className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-primary focus:ring-primary"
                                 />
-                                <label htmlFor="submission-overwrite" className="text-sm text-sky-300 font-medium cursor-pointer">
+                                <label htmlFor="submission-overwrite" className="text-sm text-primary font-medium cursor-pointer">
                                     Overwrite existing submission
                                 </label>
                             </div>
@@ -642,7 +642,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                                             </span>
                                         </p>
                                     ) : (
-                                        <p className="text-amber-400">
+                                        <p className="text-[hsl(var(--warning))]">
                                             ⚠ Could not detect step count from screenshot
                                         </p>
                                     )}
@@ -666,11 +666,11 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                                 {verificationDetails.extractedDate &&
                                     verificationDetails.extractedDate !== verificationDetails.claimedDate && (
                                         <div className="text-sm mt-2 pt-2 border-t border-border">
-                                            <p className="text-amber-400">
+                                            <p className="text-[hsl(var(--warning))]">
                                                 ⚠ Date mismatch detected
                                             </p>
                                             <p className="text-muted-foreground mt-1">
-                                                Screenshot date: <span className="text-amber-300 font-medium">{verificationDetails.extractedDate}</span>
+                                                Screenshot date: <span className="text-[hsl(var(--warning))] font-medium">{verificationDetails.extractedDate}</span>
                                                 {" "}• Submitted: <span className="text-foreground">{verificationDetails.claimedDate}</span>
                                             </p>
                                         </div>
@@ -727,8 +727,8 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
 
                 {/* Pending verification status */}
                 {pendingVerification && !showWaitConfirm && (
-                    <div className="rounded-md border border-amber-700 bg-amber-900/30 p-3">
-                        <p className="text-sm text-amber-300">
+                    <div className="rounded-md border border-[hsl(var(--warning)/0.5)] bg-[hsl(var(--warning)/0.1)] p-3">
+                        <p className="text-sm text-[hsl(var(--warning))]">
                             Verification in progress...
                             {estimatedWaitSeconds > 0 && (
                                 <span className="ml-1">
@@ -736,7 +736,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                                 </span>
                             )}
                         </p>
-                        <p className="mt-1 text-xs text-amber-400/70">
+                        <p className="mt-1 text-xs text-[hsl(var(--warning)/0.7)]">
                             Keep this tab open to complete verification.
                         </p>
                     </div>
@@ -744,11 +744,11 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
 
                 {/* Wait confirmation dialog */}
                 {showWaitConfirm && (
-                    <div className="rounded-md border border-amber-700 bg-amber-900/30 p-4">
-                        <p className="text-sm font-medium text-amber-300">
+                    <div className="rounded-md border border-[hsl(var(--warning)/0.5)] bg-[hsl(var(--warning)/0.1)] p-4">
+                        <p className="text-sm font-medium text-[hsl(var(--warning))]">
                             High traffic detected
                         </p>
-                        <p className="mt-1 text-sm text-amber-400/80">
+                        <p className="mt-1 text-sm text-[hsl(var(--warning)/0.8)]">
                             Verification is estimated to take {formatWaitTime(estimatedWaitSeconds)}.
                             Would you like to wait? You must keep this tab open.
                         </p>
@@ -756,7 +756,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                             <button
                                 type="button"
                                 onClick={handleConfirmWait}
-                                className="rounded-md bg-amber-600 px-3 py-1.5 text-sm font-medium text-slate-950 transition hover:bg-amber-500"
+                                className="rounded-md bg-[hsl(var(--warning))] px-3 py-1.5 text-sm font-medium text-primary-foreground transition hover:bg-[hsl(var(--warning)/0.9)]"
                             >
                                 Yes, wait
                             </button>
@@ -775,7 +775,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                     type="submit"
                     disabled={submitting || !!pendingVerification}
                     className={`w-full rounded-md px-4 py-2 text-sm font-semibold text-primary-foreground transition disabled:cursor-not-allowed disabled:opacity-60 ${isOffline
-                        ? "bg-amber-500 hover:bg-amber-400"
+                        ? "bg-[hsl(var(--warning))] hover:bg-[hsl(var(--warning)/0.9)]"
                         : "bg-primary hover:bg-primary/90"
                         }`}
                     data-tour="submit-button"

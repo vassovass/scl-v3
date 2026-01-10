@@ -44,12 +44,12 @@ const GROUP_OPTIONS = [
 ];
 
 function getStepsColor(steps: number | null): string {
-    if (steps === null) return "bg-slate-800 text-slate-600";
-    if (steps < 3000) return "bg-slate-700 text-slate-400";
-    if (steps < 6000) return "bg-sky-900/50 text-sky-300";
-    if (steps < 10000) return "bg-sky-700/50 text-sky-200";
-    if (steps < 15000) return "bg-emerald-700/50 text-emerald-200";
-    return "bg-emerald-500/30 text-emerald-300";
+    if (steps === null) return "bg-muted text-muted-foreground";
+    if (steps < 3000) return "bg-muted text-muted-foreground";
+    if (steps < 6000) return "bg-[hsl(var(--info)/0.2)] text-[hsl(var(--info))]";
+    if (steps < 10000) return "bg-[hsl(var(--info)/0.3)] text-[hsl(var(--info))]";
+    if (steps < 15000) return "bg-[hsl(var(--success)/0.2)] text-[hsl(var(--success))]";
+    return "bg-[hsl(var(--success)/0.3)] text-[hsl(var(--success))]";
 }
 
 function formatSteps(steps: number | null): string {
@@ -117,7 +117,7 @@ export function DailyBreakdownTable({
 
     if (loading) {
         return (
-            <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 text-center text-slate-400">
+            <div className="rounded-xl border border-border bg-card/50 p-6 text-center text-muted-foreground">
                 Loading breakdown...
             </div>
         );
@@ -125,7 +125,7 @@ export function DailyBreakdownTable({
 
     if (error) {
         return (
-            <div className="rounded-xl border border-rose-800 bg-rose-900/20 p-6 text-center text-rose-400">
+            <div className="rounded-xl border border-destructive/50 bg-destructive/10 p-6 text-center text-destructive">
                 {error}
             </div>
         );
@@ -133,27 +133,27 @@ export function DailyBreakdownTable({
 
     if (!data || data.members.length === 0) {
         return (
-            <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 text-center text-slate-400">
+            <div className="rounded-xl border border-border bg-card/50 p-6 text-center text-muted-foreground">
                 No data for this period.
             </div>
         );
     }
 
     return (
-        <div className="rounded-xl border border-slate-800 bg-slate-900/50">
+        <div className="rounded-xl border border-border bg-card/50">
             {/* Controls */}
-            <div className="flex flex-wrap items-center gap-4 p-4 border-b border-slate-800">
+            <div className="flex flex-wrap items-center gap-4 p-4 border-b border-border">
                 {/* Group By */}
                 <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-500">Group:</span>
+                    <span className="text-xs text-muted-foreground">Group:</span>
                     <div className="flex gap-1">
                         {GROUP_OPTIONS.map((opt) => (
                             <button
                                 key={opt.value}
                                 onClick={() => setGroupBy(opt.value as typeof groupBy)}
                                 className={`px-2 py-1 text-xs rounded transition ${groupBy === opt.value
-                                        ? "bg-sky-600 text-white"
-                                        : "bg-slate-800 text-slate-400 hover:text-slate-200"
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-secondary text-muted-foreground hover:text-foreground"
                                     }`}
                             >
                                 {opt.label}
@@ -164,11 +164,11 @@ export function DailyBreakdownTable({
 
                 {/* Sort By */}
                 <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-500">Sort:</span>
+                    <span className="text-xs text-muted-foreground">Sort:</span>
                     <select
                         value={sortBy}
                         onChange={(e) => setSortBy(e.target.value as SortBy)}
-                        className="rounded bg-slate-800 border border-slate-700 px-2 py-1 text-xs text-slate-200"
+                        className="rounded bg-secondary border border-input px-2 py-1 text-xs text-foreground"
                     >
                         <option value="total">Total Steps</option>
                         <option value="average">Average</option>
@@ -181,35 +181,35 @@ export function DailyBreakdownTable({
             {/* Table with horizontal scroll */}
             <div ref={tableRef} className="overflow-x-auto">
                 <table className="w-full text-xs">
-                    <thead className="bg-slate-900 sticky top-0">
+                    <thead className="bg-card sticky top-0">
                         <tr>
-                            <th className="sticky left-0 z-10 bg-slate-900 px-3 py-2 text-left text-slate-400 font-medium min-w-[120px]">
+                            <th className="sticky left-0 z-10 bg-card px-3 py-2 text-left text-muted-foreground font-medium min-w-[120px]">
                                 Member
                             </th>
                             {data.dates.map((dateStr) => (
-                                <th key={dateStr} className="px-1 py-2 text-center text-slate-500 font-medium min-w-[40px]">
+                                <th key={dateStr} className="px-1 py-2 text-center text-muted-foreground font-medium min-w-[40px]">
                                     {formatDateLabel(dateStr)}
                                 </th>
                             ))}
-                            <th className="px-3 py-2 text-right text-slate-400 font-medium min-w-[70px]">
+                            <th className="px-3 py-2 text-right text-muted-foreground font-medium min-w-[70px]">
                                 Total
                             </th>
-                            <th className="px-3 py-2 text-right text-slate-400 font-medium min-w-[50px]">
+                            <th className="px-3 py-2 text-right text-muted-foreground font-medium min-w-[50px]">
                                 Avg
                             </th>
-                            <th className="px-3 py-2 text-center text-slate-400 font-medium min-w-[40px]">
+                            <th className="px-3 py-2 text-center text-muted-foreground font-medium min-w-[40px]">
                                 %
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800">
+                    <tbody className="divide-y divide-border">
                         {data.members.map((member, idx) => (
-                            <tr key={member.user_id} className="hover:bg-slate-900/50">
+                            <tr key={member.user_id} className="hover:bg-muted/50">
                                 {/* Member name - sticky */}
-                                <td className="sticky left-0 z-10 bg-slate-950 px-3 py-2">
+                                <td className="sticky left-0 z-10 bg-background px-3 py-2">
                                     <div className="flex items-center gap-2">
-                                        <span className="text-slate-500 w-4">{idx + 1}.</span>
-                                        <span className="text-slate-200 truncate max-w-[100px]">
+                                        <span className="text-muted-foreground w-4">{idx + 1}.</span>
+                                        <span className="text-foreground truncate max-w-[100px]">
                                             {member.nickname || member.display_name || "Anonymous"}
                                         </span>
                                     </div>
@@ -225,20 +225,20 @@ export function DailyBreakdownTable({
                                             title={dayData ? `${dayData.steps.toLocaleString()} steps${dayData.verified ? " ✓" : ""}` : "No data"}
                                         >
                                             {formatSteps(dayData?.steps ?? null)}
-                                            {dayData?.verified && <span className="text-emerald-400 ml-0.5">✓</span>}
+                                            {dayData?.verified && <span className="text-[hsl(var(--success))] ml-0.5">✓</span>}
                                         </td>
                                     );
                                 })}
 
                                 {/* Totals */}
-                                <td className="px-3 py-2 text-right font-mono text-slate-200">
+                                <td className="px-3 py-2 text-right font-mono text-foreground">
                                     {member.total_steps.toLocaleString()}
                                 </td>
-                                <td className="px-3 py-2 text-right font-mono text-slate-400">
+                                <td className="px-3 py-2 text-right font-mono text-muted-foreground">
                                     {member.avg_per_day.toLocaleString()}
                                 </td>
                                 <td className="px-3 py-2 text-center">
-                                    <span className={`${member.consistency_pct >= 80 ? "text-emerald-400" : member.consistency_pct >= 50 ? "text-sky-400" : "text-slate-500"}`}>
+                                    <span className={`${member.consistency_pct >= 80 ? "text-[hsl(var(--success))]" : member.consistency_pct >= 50 ? "text-[hsl(var(--info))]" : "text-muted-foreground"}`}>
                                         {member.consistency_pct}%
                                     </span>
                                 </td>

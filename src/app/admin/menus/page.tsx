@@ -271,14 +271,14 @@ export default function MenuEditorPage() {
                   {item.icon && <span className="text-base">{item.icon}</span>}
                   <span className="font-medium text-sm truncate text-foreground">{item.label}</span>
                   {hasVisibilityRestrictions && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-400">
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/20 text-[hsl(var(--warning))]">
                       Restricted
                     </span>
                   )}
                   {/* Level badge - using shared component */}
                   <LevelBadge
                     level={depth}
-                    className="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-600 dark:text-blue-400"
+                    className="text-xs px-1.5 py-0.5 rounded bg-[hsl(var(--info)/0.2)] text-[hsl(var(--info))]"
                   />
                 </div>
                 {(item.href || item.on_click) && (

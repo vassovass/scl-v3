@@ -38,7 +38,7 @@ const COLUMNS = [
 const COLUMN_STYLES: Record<string, string> = {
     now: 'border-t-2 border-rose-500',
     next: 'border-t-2 border-amber-500',
-    later: 'border-t-2 border-sky-500',
+    later: 'border-t-2 border-primary',
     done: 'border-t-2 border-emerald-500',
 };
 
@@ -327,7 +327,7 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                                     {column.id === "later" && getTotalCount("later") > 6 && (
                                         <button
                                             onClick={() => setShowAllLater(!showAllLater)}
-                                            className="w-full text-center py-2 text-xs text-sky-400 hover:text-sky-300 transition-colors"
+                                            className="w-full text-center py-2 text-xs text-primary hover:text-primary/80 transition-colors"
                                         >
                                             {showAllLater
                                                 ? "Show less ↑"

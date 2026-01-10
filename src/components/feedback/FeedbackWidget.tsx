@@ -133,7 +133,7 @@ export function FeedbackWidget() {
                                             ? t === "bug"
                                                 ? "bg-rose-500/20 text-rose-400"
                                                 : t === "feature"
-                                                    ? "bg-amber-500/20 text-amber-400"
+                                                    ? "bg-amber-500/20 text-[hsl(var(--warning))]"
                                                     : "bg-primary/20 text-primary"
                                             : "text-muted-foreground hover:text-foreground"
                                             }`}

@@ -158,8 +158,8 @@ export function BulkUnverifiedForm({ leagueId, onSubmitted }: BulkUnverifiedForm
 
                     {/* Conflicts with verified submissions */}
                     {result.conflicts.length > 0 && (
-                        <div className="mt-4 rounded-md border border-amber-500/30 bg-amber-500/10 p-4">
-                            <h4 className="flex items-center gap-2 font-medium text-amber-400">
+                        <div className="mt-4 rounded-md border border-[hsl(var(--warning)/0.3)] bg-[hsl(var(--warning)/0.1)] p-4">
+                            <h4 className="flex items-center gap-2 font-medium text-[hsl(var(--warning))]">
                                 <span>⚠️</span>
                                 Conflicts with Verified Submissions
                             </h4>
@@ -282,7 +282,7 @@ export function BulkUnverifiedForm({ leagueId, onSubmitted }: BulkUnverifiedForm
             )}
 
             {/* Info banner */}
-            <div className="mb-4 rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-200">
+            <div className="mb-4 rounded-md border border-[hsl(var(--warning)/0.3)] bg-[hsl(var(--warning)/0.1)] p-3 text-sm text-[hsl(var(--warning))]">
                 <strong>Note:</strong> These entries will be marked as unverified since no proof image is provided.
             </div>
 

@@ -221,7 +221,7 @@ export function ImagePasteZone({
           relative flex flex-col items-center justify-center gap-2
           p-6 rounded-xl border-2 border-dashed transition-all cursor-pointer
           ${isDragOver
-                        ? 'border-sky-500 bg-sky-500/10'
+                        ? 'border-primary bg-primary/10'
                         : 'border-slate-600 hover:border-slate-500 bg-slate-800/30 hover:bg-slate-800/50'
                     }
           ${disabled || isUploading ? 'opacity-50 cursor-not-allowed' : ''}
@@ -230,7 +230,7 @@ export function ImagePasteZone({
                 {/* Icons and text */}
                 {isUploading ? (
                     <>
-                        <div className="w-8 h-8 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
+                        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                         <span className="text-sm text-slate-400">Uploading...</span>
                     </>
                 ) : (
@@ -242,8 +242,8 @@ export function ImagePasteZone({
                         </div>
                         <div className="text-center">
                             <p className="text-sm text-slate-300">
-                                <span className="font-medium text-sky-400">Paste</span> an image or{' '}
-                                <span className="font-medium text-sky-400">drag & drop</span>
+                                <span className="font-medium text-primary">Paste</span> an image or{' '}
+                                <span className="font-medium text-primary">drag & drop</span>
                             </p>
                             <p className="text-xs text-slate-500 mt-1">
                                 Ctrl+V / Cmd+V • Max {MAX_FILE_SIZE_DISPLAY}

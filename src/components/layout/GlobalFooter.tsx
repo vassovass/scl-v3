@@ -25,7 +25,7 @@ export function GlobalFooter() {
                             <span className="text-xl">👟</span>
                             <span className="font-bold">
                                 <span className="text-foreground transition-colors group-hover:text-primary">Step</span>
-                                <span className="text-sky-500 transition-colors group-hover:text-foreground">League</span>
+                                <span className="text-primary transition-colors group-hover:text-foreground">League</span>
                             </span>
                         </Link>
                         <p className="mt-2 text-xs text-muted-foreground">
@@ -113,8 +113,8 @@ function FooterBottomBar({ currentYear }: { currentYear: number }) {
     // Stage display configuration
     const stageConfig: Record<string, { label: string; color: string; glowColor: string }> = {
         'pre-alpha': { label: 'Pre-Alpha', color: 'text-purple-400', glowColor: 'bg-purple-500' },
-        'alpha': { label: 'Alpha', color: 'text-blue-400', glowColor: 'bg-blue-500' },
-        'beta': { label: 'Beta', color: 'text-amber-400', glowColor: 'bg-amber-500' },
+        'alpha': { label: 'Alpha', color: 'text-[hsl(var(--info))]', glowColor: 'bg-[hsl(var(--info))]' },
+        'beta': { label: 'Beta', color: 'text-[hsl(var(--warning))]', glowColor: 'bg-amber-500' },
         'product-hunt': { label: 'Product Hunt', color: 'text-orange-400', glowColor: 'bg-orange-500' },
         'production': { label: 'Production', color: 'text-emerald-400', glowColor: 'bg-emerald-500' },
     };

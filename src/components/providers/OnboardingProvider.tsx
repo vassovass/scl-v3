@@ -510,11 +510,11 @@ export function OnboardingProvider({ children, isAdmin = false, hasLeagues = fal
                     callback={handleJoyrideCallback}
                     styles={{
                         options: {
-                            arrowColor: "#1e293b",
-                            backgroundColor: "#1e293b",
+                            arrowColor: "hsl(var(--card))",
+                            backgroundColor: "hsl(var(--card))",
                             overlayColor: "rgba(0, 0, 0, 0.75)",
-                            primaryColor: "#0ea5e9",
-                            textColor: "#f1f5f9",
+                            primaryColor: "hsl(var(--primary))",
+                            textColor: "hsl(var(--foreground))",
                             zIndex: 10000,
                         },
                         tooltip: {
@@ -530,30 +530,30 @@ export function OnboardingProvider({ children, isAdmin = false, hasLeagues = fal
                             lineHeight: 1.6,
                         },
                         buttonNext: {
-                            backgroundColor: "#0ea5e9",
+                            backgroundColor: "hsl(var(--primary))",
                             borderRadius: 8,
-                            color: "#0f172a",
+                            color: "hsl(var(--primary-foreground))",
                             fontSize: 14,
                             fontWeight: 600,
                             padding: "8px 16px",
                         },
                         buttonBack: {
-                            color: "#94a3b8",
+                            color: "hsl(var(--muted-foreground))",
                             fontSize: 14,
                         },
                         buttonSkip: {
-                            color: "#64748b",
+                            color: "hsl(var(--muted-foreground))",
                             fontSize: 13,
                         },
                         spotlight: {
                             borderRadius: 8,
                         },
                         beaconInner: {
-                            backgroundColor: "#0ea5e9",
+                            backgroundColor: "hsl(var(--primary))",
                         },
                         beaconOuter: {
-                            backgroundColor: "rgba(14, 165, 233, 0.3)",
-                            border: "2px solid #0ea5e9",
+                            backgroundColor: "hsl(var(--primary) / 0.3)",
+                            border: "2px solid hsl(var(--primary))",
                         },
                     }}
                     locale={{
@@ -569,11 +569,11 @@ export function OnboardingProvider({ children, isAdmin = false, hasLeagues = fal
             {/* Feedback Modal */}
             {showFeedback && isHydrated && (
                 <div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-                    <div className="w-80 rounded-xl bg-slate-900 border border-slate-700 shadow-2xl p-5 space-y-4">
+                    <div className="w-80 rounded-xl bg-card border border-border shadow-2xl p-5 space-y-4">
                         {feedbackSubmitted ? (
                             <div className="text-center py-6">
                                 <span className="text-3xl">✓</span>
-                                <p className="mt-2 text-sm text-emerald-400">Thanks for your feedback!</p>
+                                <p className="mt-2 text-sm text-[hsl(var(--success))]">Thanks for your feedback!</p>
                             </div>
                         ) : (
                             <>

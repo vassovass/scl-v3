@@ -132,11 +132,11 @@ export function BatchConflictTable({
     }, [selections]);
 
     return (
-        <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
+        <div className="rounded-lg border border-[hsl(var(--warning)/0.3)] bg-[hsl(var(--warning)/0.05)] p-4">
             {/* Header */}
             <div className="mb-4 flex items-center gap-2">
                 <span className="text-lg">⚠️</span>
-                <h3 className="font-semibold text-amber-400">
+                <h3 className="font-semibold text-[hsl(var(--warning))]">
                     {conflicts.length} {conflicts.length === 1 ? "Conflict" : "Conflicts"} Found
                 </h3>
             </div>
@@ -181,7 +181,7 @@ export function BatchConflictTable({
                                     type="checkbox"
                                     checked={allSelected}
                                     onChange={toggleAll}
-                                    className="rounded border-slate-600 bg-slate-700 text-sky-500 focus:ring-sky-500"
+                                    className="rounded border-slate-600 bg-slate-700 text-primary focus:ring-primary"
                                 />
                             </th>
                             <th className="px-3 py-2 text-left font-medium text-slate-400">Date</th>
@@ -201,7 +201,7 @@ export function BatchConflictTable({
                                 <tr
                                     key={conflict.date}
                                     className={`transition ${selectedRows.has(conflict.date)
-                                            ? "bg-sky-500/10"
+                                            ? "bg-primary/10"
                                             : "hover:bg-slate-800/50"
                                         }`}
                                 >
@@ -210,7 +210,7 @@ export function BatchConflictTable({
                                             type="checkbox"
                                             checked={selectedRows.has(conflict.date)}
                                             onChange={() => toggleRow(conflict.date)}
-                                            className="rounded border-slate-600 bg-slate-700 text-sky-500 focus:ring-sky-500"
+                                            className="rounded border-slate-600 bg-slate-700 text-primary focus:ring-primary"
                                         />
                                     </td>
                                     <td className="px-3 py-2 font-medium text-slate-200">
@@ -228,7 +228,7 @@ export function BatchConflictTable({
                                                 <span className="text-emerald-400" title="Verified">✓</span>
                                             )}
                                             {existingHasProof && (
-                                                <span className="text-sky-400" title="Has Screenshot">📷</span>
+                                                <span className="text-[hsl(var(--info))]" title="Has Screenshot">📷</span>
                                             )}
                                         </div>
                                     </td>
@@ -241,7 +241,7 @@ export function BatchConflictTable({
                                                 {conflict.incoming.steps.toLocaleString()}
                                             </span>
                                             {incomingHasProof && (
-                                                <span className="text-sky-400" title="Has Screenshot">📷</span>
+                                                <span className="text-[hsl(var(--info))]" title="Has Screenshot">📷</span>
                                             )}
                                         </div>
                                     </td>
@@ -252,7 +252,7 @@ export function BatchConflictTable({
                                                 ...prev,
                                                 [conflict.date]: e.target.value as ConflictAction,
                                             }))}
-                                            className="rounded-md border border-slate-600 bg-slate-700 px-2 py-1 text-xs text-slate-200 focus:border-sky-500 focus:outline-none"
+                                            className="rounded-md border border-slate-600 bg-slate-700 px-2 py-1 text-xs text-slate-200 focus:border-primary focus:outline-none"
                                         >
                                             <option value="keep_existing">Keep Existing</option>
                                             <option value="use_incoming">Use New</option>
@@ -269,7 +269,7 @@ export function BatchConflictTable({
             {/* Legend */}
             <div className="mt-3 flex items-center gap-4 text-xs text-slate-500">
                 <span><span className="text-emerald-400">✓</span> = Verified</span>
-                <span><span className="text-sky-400">📷</span> = Has Screenshot</span>
+                <span><span className="text-[hsl(var(--info))]">📷</span> = Has Screenshot</span>
             </div>
 
             {/* Summary */}
@@ -306,7 +306,7 @@ export function BatchConflictTable({
                 <button
                     onClick={handleSubmit}
                     disabled={isLoading}
-                    className="rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-500 disabled:opacity-50"
+                    className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary/90 disabled:opacity-50"
                 >
                     {isLoading ? "Applying..." : "Apply Selections"}
                 </button>

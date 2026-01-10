@@ -274,7 +274,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                                 variant="dropdown"
                                 userRole={userRole}
                                 trigger={
-                                    <span className="text-amber-500 hover:text-amber-400 flex items-center gap-1">
+                                    <span className="text-[hsl(var(--warning))] hover:text-[hsl(var(--warning)/0.9)] flex items-center gap-1">
                                         ⚡ Admin <span className="text-[10px]">▼</span>
                                     </span>
                                 }

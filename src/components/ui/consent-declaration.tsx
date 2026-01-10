@@ -93,23 +93,23 @@ export function ConsentDeclaration({
     };
 
     return (
-        <div className={`rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 ${className}`}>
+        <div className={`rounded-lg border border-[hsl(var(--warning)/.3)] bg-[hsl(var(--warning)/.1)] p-4 ${className}`}>
             <div className="flex items-start gap-3">
                 <Checkbox
                     id={checkboxId}
                     checked={checked}
                     onCheckedChange={handleChange}
                     disabled={disabled}
-                    className="mt-1 border-amber-500 data-[state=checked]:bg-amber-600 data-[state=checked]:border-amber-600"
+                    className="mt-1 border-[hsl(var(--warning))] data-[state=checked]:bg-[hsl(var(--warning))] data-[state=checked]:border-[hsl(var(--warning))]"
                 />
                 <div className="flex-1">
                     <Label
                         htmlFor={checkboxId}
-                        className="text-sm font-medium text-amber-200 cursor-pointer"
+                        className="text-sm font-medium text-[hsl(var(--warning))] cursor-pointer"
                     >
                         {config.title}
                     </Label>
-                    <p className="mt-1 text-xs text-amber-200/70 leading-relaxed">
+                    <p className="mt-1 text-xs text-[hsl(var(--warning))]/70 leading-relaxed">
                         {config.description}
                     </p>
                 </div>

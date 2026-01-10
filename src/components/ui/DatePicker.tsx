@@ -99,7 +99,7 @@ export function DatePicker({
                     onChange={(e) => onChange(e.target.value)}
                     required={required}
                     disabled={disabled}
-                    className="flex-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-slate-50 focus:border-sky-500 focus:outline-none disabled:opacity-50"
+                    className="flex-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-slate-50 focus:border-primary focus:outline-none disabled:opacity-50"
                     style={{
                         colorScheme: "dark",
                     }}
@@ -126,7 +126,7 @@ export function DatePicker({
                             type="button"
                             onClick={() => handleQuickSelect(date)}
                             className={`w-full px-3 py-2 text-left text-sm transition hover:bg-slate-700 ${value === date.toISOString().slice(0, 10)
-                                ? "bg-sky-600/20 text-sky-400"
+                                ? "bg-primary/20 text-primary"
                                 : "text-slate-300"
                                 }`}
                         >

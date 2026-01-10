@@ -68,34 +68,34 @@ export function ProxySubmissionSection({
             {/* Collapsible Header */}
             <button
                 onClick={() => setExpanded(!expanded)}
-                className="w-full flex items-center justify-between rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-left hover:bg-amber-500/20 transition"
+                className="w-full flex items-center justify-between rounded-lg border border-[hsl(var(--warning)/.3)] bg-[hsl(var(--warning)/.1)] p-4 text-left hover:bg-[hsl(var(--warning)/.2)] transition"
             >
                 <div className="flex items-center gap-3">
                     <span className="text-lg">👤</span>
                     <div>
-                        <h3 className="font-medium text-amber-100">Submit for Proxy Member</h3>
-                        <p className="text-sm text-amber-200/70">
+                        <h3 className="font-medium text-foreground">Submit for Proxy Member</h3>
+                        <p className="text-sm text-muted-foreground">
                             Submit steps on behalf of someone who hasn&apos;t signed up yet
                         </p>
                     </div>
                 </div>
-                <span className="text-amber-400 text-xl">
+                <span className="text-[hsl(var(--warning))] text-xl">
                     {expanded ? "−" : "+"}
                 </span>
             </button>
 
             {/* Expanded Content */}
             {expanded && (
-                <div className="mt-4 rounded-lg border border-amber-500/20 bg-slate-900/50 p-4 space-y-4">
+                <div className="mt-4 rounded-lg border border-[hsl(var(--warning)/.2)] bg-card/50 p-4 space-y-4">
                     {/* Step 1: League Selection */}
                     <div>
-                        <label className="text-sm font-medium text-amber-200 block mb-2">
+                        <label className="text-sm font-medium text-[hsl(var(--warning))] block mb-2">
                             1. Select League
                         </label>
                         <select
                             value={selectedLeagueId}
                             onChange={(e) => handleLeagueChange(e.target.value)}
-                            className="w-full rounded-lg border border-slate-600 bg-slate-800 px-4 py-2.5 text-slate-100 focus:border-amber-500 focus:outline-none"
+                            className="w-full rounded-lg border border-input bg-secondary px-4 py-2.5 text-foreground focus:border-[hsl(var(--warning))] focus:outline-none"
                         >
                             <option value="">Choose a league...</option>
                             {adminLeagues.map((league) => (
@@ -109,7 +109,7 @@ export function ProxySubmissionSection({
                     {/* Step 2: Proxy Member Selection */}
                     {selectedLeagueId && (
                         <div>
-                            <label className="text-sm font-medium text-amber-200 block mb-2">
+                            <label className="text-sm font-medium text-[hsl(var(--warning))] block mb-2">
                                 2. Select or Create Proxy Member
                             </label>
                             <ProxyMembersDropdown
@@ -123,7 +123,7 @@ export function ProxySubmissionSection({
                     {/* Step 3: Consent Declaration */}
                     {selectedProxy && (
                         <div>
-                            <label className="text-sm font-medium text-amber-200 block mb-2">
+                            <label className="text-sm font-medium text-[hsl(var(--warning))] block mb-2">
                                 3. Authorization Declaration
                             </label>
                             <ConsentDeclaration
@@ -138,11 +138,11 @@ export function ProxySubmissionSection({
 
                     {/* Step 4: Submission Forms */}
                     {selectedProxy && consent && (
-                        <div className="pt-4 border-t border-slate-700">
-                            <div className="mb-4 rounded-lg bg-amber-600/20 border border-amber-600/40 p-3">
-                                <p className="text-sm text-amber-200">
+                        <div className="pt-4 border-t border-border">
+                            <div className="mb-4 rounded-lg bg-[hsl(var(--warning)/.2)] border border-[hsl(var(--warning)/.4)] p-3">
+                                <p className="text-sm text-[hsl(var(--warning))]">
                                     <span className="font-semibold">Submitting for:</span>{" "}
-                                    <span className="text-amber-100">{selectedProxy.display_name}</span>
+                                    <span className="text-foreground">{selectedProxy.display_name}</span>
                                 </p>
                             </div>
 

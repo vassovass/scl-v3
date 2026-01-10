@@ -54,7 +54,7 @@ export function LeagueInviteControl({ inviteCode, leagueName, className = "" }: 
                 data-tour="invite-button"
             >
                 <span>Invite Code:</span>
-                <span className="font-mono tracking-wider text-sky-400">{inviteCode}</span>
+                <span className="font-mono tracking-wider text-primary">{inviteCode}</span>
                 <span className="text-xs text-slate-500 ml-1">▼</span>
             </button>
 

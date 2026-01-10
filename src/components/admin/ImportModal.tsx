@@ -108,7 +108,7 @@ export default function ImportModal<T extends { id?: string }>({
                             className={`
                                 border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer
                                 ${isDragging
-                                    ? 'border-sky-500 bg-sky-500/10'
+                                    ? 'border-primary bg-primary/10'
                                     : 'border-slate-700 hover:border-slate-600 bg-slate-800/30'
                                 }
                             `}
@@ -124,7 +124,7 @@ export default function ImportModal<T extends { id?: string }>({
 
                             {isParsing ? (
                                 <div className="flex flex-col items-center gap-3">
-                                    <div className="animate-spin h-8 w-8 border-2 border-sky-500 border-t-transparent rounded-full" />
+                                    <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
                                     <span className="text-slate-400">Parsing CSV...</span>
                                 </div>
                             ) : (
@@ -167,9 +167,9 @@ export default function ImportModal<T extends { id?: string }>({
                             <h3 className="text-sm font-medium text-slate-300">Import Preview</h3>
 
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="p-4 bg-sky-900/20 border border-sky-800/50 rounded-lg">
-                                    <div className="text-2xl font-bold text-sky-400">{preview.toUpdate.length}</div>
-                                    <div className="text-sm text-sky-300">Items to Update</div>
+                                <div className="p-4 bg-[hsl(var(--info)/0.2)] border border-[hsl(var(--info)/0.5)] rounded-lg">
+                                    <div className="text-2xl font-bold text-[hsl(var(--info))]">{preview.toUpdate.length}</div>
+                                    <div className="text-sm text-[hsl(var(--info))]">Items to Update</div>
                                     <div className="text-xs text-slate-500 mt-1">Existing items with matching IDs</div>
                                 </div>
 
@@ -182,7 +182,7 @@ export default function ImportModal<T extends { id?: string }>({
 
                             {preview.errors.length > 0 && (
                                 <div className="p-3 bg-amber-900/20 border border-amber-800/50 rounded-lg">
-                                    <div className="flex items-center gap-2 text-sm text-amber-400">
+                                    <div className="flex items-center gap-2 text-sm text-[hsl(var(--warning))]">
                                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                         </svg>
@@ -206,7 +206,7 @@ export default function ImportModal<T extends { id?: string }>({
                                         <p>{result.summary.updated} items updated</p>
                                         <p>{result.summary.created} items created</p>
                                         {result.summary.errors > 0 && (
-                                            <p className="text-amber-400">{result.summary.errors} errors</p>
+                                            <p className="text-[hsl(var(--warning))]">{result.summary.errors} errors</p>
                                         )}
                                     </div>
                                 </div>
@@ -232,7 +232,7 @@ export default function ImportModal<T extends { id?: string }>({
                     {result ? (
                         <button
                             onClick={handleClose}
-                            className="px-4 py-2 text-sm font-medium text-white bg-sky-600 hover:bg-sky-500 rounded-lg transition-colors"
+                            className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg transition-colors"
                         >
                             Done
                         </button>
@@ -249,7 +249,7 @@ export default function ImportModal<T extends { id?: string }>({
                                 <button
                                     onClick={confirmImport}
                                     disabled={isImporting || (preview.toUpdate.length === 0 && preview.toCreate.length === 0)}
-                                    className="px-4 py-2 text-sm font-medium text-white bg-sky-600 hover:bg-sky-500 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                    className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                 >
                                     {isImporting ? (
                                         <>

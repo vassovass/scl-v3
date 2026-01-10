@@ -92,7 +92,7 @@ export function ProxyMembersDropdown({
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
                 className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition ${selectedProxy
-                        ? "border-amber-600 bg-amber-900/30 text-amber-300 hover:bg-amber-900/50"
+                        ? "border-[hsl(var(--warning)/0.5)] bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))] hover:bg-[hsl(var(--warning)/0.15)]"
                         : "border-slate-700 bg-slate-900/50 text-slate-300 hover:border-slate-500 hover:bg-slate-800"
                     }`}
             >
@@ -115,7 +115,7 @@ export function ProxyMembersDropdown({
                                     onSelectProxy(null);
                                     setIsOpen(false);
                                 }}
-                                className="text-sky-400 hover:text-sky-300 font-medium normal-case"
+                                className="text-primary hover:text-primary/80 font-medium normal-case"
                             >
                                 Clear
                             </button>
@@ -139,11 +139,11 @@ export function ProxyMembersDropdown({
                                         setIsOpen(false);
                                     }}
                                     className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition ${selectedProxy?.id === proxy.id
-                                            ? "bg-amber-900/30 text-amber-300"
+                                            ? "bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]"
                                             : "text-slate-200 hover:bg-slate-700 hover:text-white"
                                         }`}
                                 >
-                                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white text-sm font-medium shrink-0">
+                                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[hsl(var(--warning))] to-orange-600 flex items-center justify-center text-white text-sm font-medium shrink-0">
                                         {proxy.display_name.charAt(0).toUpperCase()}
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -151,7 +151,7 @@ export function ProxyMembersDropdown({
                                         <div className="text-xs text-slate-500">{proxy.submission_count} submissions</div>
                                     </div>
                                     {selectedProxy?.id === proxy.id && (
-                                        <span className="text-amber-400">✓</span>
+                                        <span className="text-[hsl(var(--warning))]">✓</span>
                                     )}
                                 </button>
                             ))}
@@ -185,7 +185,7 @@ export function ProxyMembersDropdown({
                                         type="button"
                                         onClick={handleCreate}
                                         disabled={creating || !newName.trim()}
-                                        className="flex-1 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-500 disabled:opacity-50"
+                                        className="flex-1 rounded-lg bg-[hsl(var(--warning))] px-3 py-1.5 text-xs font-medium text-white hover:bg-[hsl(var(--warning)/0.9)] disabled:opacity-50"
                                     >
                                         {creating ? "..." : "Create"}
                                     </button>
@@ -195,7 +195,7 @@ export function ProxyMembersDropdown({
                             <button
                                 type="button"
                                 onClick={() => setShowCreateInput(true)}
-                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-amber-400 hover:bg-amber-900/30 transition"
+                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[hsl(var(--warning))] hover:bg-[hsl(var(--warning)/0.1)] transition"
                             >
                                 <span>+</span>
                                 <span>Create New Proxy</span>

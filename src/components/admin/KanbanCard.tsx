@@ -55,9 +55,9 @@ const KanbanCard = memo(function KanbanCard({
                     {...provided.dragHandleProps}
                     onDoubleClick={handleDoubleClick}
                     className={`p-3 mb-2 bg-slate-800/80 rounded-lg border transition-all cursor-pointer ${snapshot.isDragging
-                        ? "border-sky-500 shadow-lg shadow-sky-500/20"
+                        ? "border-primary shadow-lg shadow-primary/20"
                         : isSelected
-                            ? "border-sky-500 ring-1 ring-sky-500/30 bg-sky-500/10"
+                            ? "border-primary ring-1 ring-primary/30 bg-primary/10"
                             : "border-slate-700 hover:border-slate-600"
                         }`}
                     title="Double-click to open details"
@@ -70,7 +70,7 @@ const KanbanCard = memo(function KanbanCard({
                                 checked={isSelected}
                                 onChange={(e) => onToggleSelection(item.id, e as unknown as React.MouseEvent)}
                                 onClick={(e) => e.stopPropagation()}
-                                className="w-3.5 h-3.5 rounded border-slate-600 bg-slate-800 text-sky-500 focus:ring-sky-500 focus:ring-offset-0 cursor-pointer"
+                                className="w-3.5 h-3.5 rounded border-slate-600 bg-slate-800 text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
                                 title="Select item"
                             />
                             <span
@@ -148,7 +148,7 @@ const KanbanCard = memo(function KanbanCard({
                             {/* Attachment count badge */}
                             {(item.attachment_count || 0) > 0 && (
                                 <span
-                                    className="px-1.5 py-0.5 bg-sky-500/20 text-sky-400 rounded text-[9px]"
+                                    className="px-1.5 py-0.5 bg-[hsl(var(--info)/0.2)] text-[hsl(var(--info))] rounded text-[9px]"
                                     title={`${item.attachment_count} attachment${item.attachment_count === 1 ? '' : 's'}`}
                                 >
                                     🖼️ {item.attachment_count}

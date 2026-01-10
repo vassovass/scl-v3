@@ -8,7 +8,7 @@ const KanbanBoard = dynamic(() => import("@/components/admin/KanbanBoard"), {
     ssr: false,
     loading: () => (
         <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-500"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
     ),
 });
@@ -64,8 +64,8 @@ export default async function AdminKanbanPage() {
         <div className="text-xs text-slate-500 mt-4 animate-fade-in animate-delay-300">
             <strong>Legend:</strong>{" "}
             <span className="inline-block px-1.5 py-0.5 bg-rose-500/20 text-rose-400 rounded mr-2">Bug</span>
-            <span className="inline-block px-1.5 py-0.5 bg-amber-500/20 text-amber-400 rounded mr-2">Feature</span>
-            <span className="inline-block px-1.5 py-0.5 bg-sky-500/20 text-sky-400 rounded mr-2">Improvement</span>
+            <span className="inline-block px-1.5 py-0.5 bg-[hsl(var(--warning)/0.2)] text-[hsl(var(--warning))] rounded mr-2">Feature</span>
+            <span className="inline-block px-1.5 py-0.5 bg-[hsl(var(--info)/0.2)] text-[hsl(var(--info))] rounded mr-2">Improvement</span>
             <span className="inline-block px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400 rounded mr-2">🌐 Public</span>
         </div>
     );

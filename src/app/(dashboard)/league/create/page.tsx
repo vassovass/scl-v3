@@ -69,10 +69,10 @@ export default function CreateLeaguePage() {
     // Redirect if not logged in
     if (!session) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-slate-950">
+            <div className="flex min-h-screen items-center justify-center bg-background">
                 <div className="text-center">
-                    <p className="text-slate-400">Please sign in to create a league</p>
-                    <Link href="/sign-in" className="mt-4 text-sky-400 hover:text-sky-300">
+                    <p className="text-muted-foreground">Please sign in to create a league</p>
+                    <Link href="/sign-in" className="mt-4 text-primary hover:text-primary/80">
                         Sign In
                     </Link>
                 </div>
@@ -81,13 +81,13 @@ export default function CreateLeaguePage() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-950">
+        <div className="min-h-screen bg-background">
             {/* Main */}
             <ModuleFeedback moduleId="create-league-form" moduleName="Create League Form">
                 <div className="mx-auto max-w-lg px-6 py-12">
                     <div className="text-center">
-                        <h1 className="text-2xl font-bold text-slate-50">Create a New League</h1>
-                        <p className="mt-2 text-slate-400">
+                        <h1 className="text-2xl font-bold text-foreground">Create a New League</h1>
+                        <p className="mt-2 text-muted-foreground">
                             Set up your step competition and invite friends
                         </p>
                     </div>
@@ -95,7 +95,7 @@ export default function CreateLeaguePage() {
                     <form onSubmit={handleSubmit} className="mt-8 space-y-6">
                         {/* Error message */}
                         {error && (
-                            <div className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-400">
+                            <div className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
                                 {error}
                             </div>
                         )}
@@ -104,7 +104,7 @@ export default function CreateLeaguePage() {
                         <div>
                             <label
                                 htmlFor="name"
-                                className="block text-sm font-medium text-slate-300"
+                                className="block text-sm font-medium text-foreground"
                             >
                                 League Name
                             </label>
@@ -115,24 +115,24 @@ export default function CreateLeaguePage() {
                                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                                 placeholder="My Awesome League"
                                 maxLength={100}
-                                className="mt-2 block w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-slate-50 placeholder:text-slate-500 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 transition"
+                                className="mt-2 block w-full rounded-lg border border-input bg-secondary px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition"
                                 disabled={loading}
                                 autoFocus
                             />
                             {nameError && (
-                                <p className="mt-2 text-sm text-rose-400">{nameError}</p>
+                                <p className="mt-2 text-sm text-destructive">{nameError}</p>
                             )}
-                            <p className="mt-2 text-xs text-slate-500">
+                            <p className="mt-2 text-xs text-muted-foreground">
                                 {formData.name.length}/100 characters
                             </p>
                         </div>
 
                         {/* Week Start Day */}
                         <div>
-                            <label className="block text-sm font-medium text-slate-300">
+                            <label className="block text-sm font-medium text-foreground">
                                 Week Starts On
                             </label>
-                            <p className="mt-1 text-xs text-slate-500">
+                            <p className="mt-1 text-xs text-muted-foreground">
                                 This determines when weekly leaderboards reset
                             </p>
                             <div className="mt-3 space-y-2">
@@ -146,11 +146,11 @@ export default function CreateLeaguePage() {
                                             ...prev,
                                             stepweek_start: e.target.value as "monday" | "sunday"
                                         }))}
-                                        className="h-4 w-4 border-slate-700 bg-slate-900 text-sky-500 focus:ring-sky-500 focus:ring-offset-slate-950"
+                                        className="h-4 w-4 border-input bg-secondary text-primary focus:ring-primary focus:ring-offset-background"
                                         disabled={loading}
                                     />
-                                    <span className="text-slate-300 group-hover:text-slate-100 transition">
-                                        Monday <span className="text-slate-500">(recommended)</span>
+                                    <span className="text-foreground group-hover:text-foreground/80 transition">
+                                        Monday <span className="text-muted-foreground">(recommended)</span>
                                     </span>
                                 </label>
                                 <label className="flex items-center gap-3 cursor-pointer group">
@@ -163,10 +163,10 @@ export default function CreateLeaguePage() {
                                             ...prev,
                                             stepweek_start: e.target.value as "monday" | "sunday"
                                         }))}
-                                        className="h-4 w-4 border-slate-700 bg-slate-900 text-sky-500 focus:ring-sky-500 focus:ring-offset-slate-950"
+                                        className="h-4 w-4 border-input bg-secondary text-primary focus:ring-primary focus:ring-offset-background"
                                         disabled={loading}
                                     />
-                                    <span className="text-slate-300 group-hover:text-slate-100 transition">
+                                    <span className="text-foreground group-hover:text-foreground/80 transition">
                                         Sunday
                                     </span>
                                 </label>
@@ -192,13 +192,13 @@ export default function CreateLeaguePage() {
                         <button
                             type="submit"
                             disabled={!isValid || loading}
-                            className="flex w-full items-center justify-center gap-2 rounded-lg bg-sky-500 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-sky-500"
+                            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary"
                         >
                             {loading && <Spinner size="sm" />}
                             {loading ? "Creating League..." : "Create League"}
                         </button>
 
-                        <p className="text-center text-xs text-slate-500">
+                        <p className="text-center text-xs text-muted-foreground">
                             Once created, you&apos;ll get an invite code to share with friends
                         </p>
                     </form>

@@ -290,12 +290,12 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                             type="checkbox"
                             checked={selectedIds.size === items.length && items.length > 0}
                             onChange={toggleSelectAll}
-                            className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-sky-500 focus:ring-sky-500 focus:ring-offset-0"
+                            className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-primary focus:ring-primary focus:ring-offset-0"
                         />
                         Select All ({items.length})
                     </label>
                     {selectedIds.size > 0 && (
-                        <span className="text-sky-400">
+                        <span className="text-[hsl(var(--info))]">
                             {selectedIds.size} selected
                         </span>
                     )}
@@ -314,9 +314,9 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                             <div
                                 key={item.id}
                                 className={`rounded-xl border bg-slate-900/50 p-5 transition hover:border-slate-700 ${isNew
-                                    ? "border-sky-500/50 ring-1 ring-sky-500/20"
+                                    ? "border-[hsl(var(--info)/0.5)] ring-1 ring-[hsl(var(--info)/0.2)]"
                                     : isSelected
-                                        ? "border-sky-500 ring-1 ring-sky-500/30 bg-sky-500/5"
+                                        ? "border-primary ring-1 ring-primary/30 bg-primary/5"
                                         : "border-slate-800"
                                     } ${isUpdating ? "opacity-60" : ""} cursor-pointer`}
                                 onClick={() => handleOpenDetail(item)}
@@ -328,13 +328,13 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                                             type="checkbox"
                                             checked={isSelected}
                                             onChange={() => toggleSelection(item.id)}
-                                            className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-sky-500 focus:ring-sky-500 focus:ring-offset-0 cursor-pointer"
+                                            className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
                                             onClick={(e) => e.stopPropagation()}
                                         />
 
                                         {/* NEW badge */}
                                         {isNew && (
-                                            <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-sky-400 animate-pulse">
+                                            <span className="rounded-full bg-[hsl(var(--info)/0.2)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[hsl(var(--info))] animate-pulse">
                                                 NEW
                                             </span>
                                         )}
@@ -347,7 +347,7 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                                             value={item.board_status || "backlog"}
                                             onChange={(e) => changeStatus(item.id, e.target.value)}
                                             disabled={isUpdating}
-                                            className="text-xs uppercase bg-slate-800/80 border border-slate-700 rounded px-2 py-1 text-slate-300 focus:border-sky-500 focus:outline-none cursor-pointer hover:border-slate-600 transition"
+                                            className="text-xs uppercase bg-slate-800/80 border border-slate-700 rounded px-2 py-1 text-slate-300 focus:border-primary focus:outline-none cursor-pointer hover:border-slate-600 transition"
                                             title="Change status"
                                         >
                                             {BOARD_STATUS_OPTIONS.filter(opt => opt.value).map(opt => (
@@ -405,7 +405,7 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                                             href={item.page_url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="hover:text-sky-400 hover:underline"
+                                            className="hover:text-primary hover:underline"
                                         >
                                             {item.page_url}
                                         </a>
@@ -416,7 +416,7 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                                 {item.screenshot_url && (
                                     <div className="mt-4">
                                         <details className="group">
-                                            <summary className="cursor-pointer text-xs font-medium text-sky-500 hover:text-sky-400">
+                                            <summary className="cursor-pointer text-xs font-medium text-primary hover:text-primary/80">
                                                 View Screenshot
                                             </summary>
                                             <div className="mt-2 overflow-hidden rounded-lg border border-slate-700">

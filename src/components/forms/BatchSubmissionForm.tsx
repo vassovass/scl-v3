@@ -300,7 +300,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
         switch (status) {
             case "pending": return "border-slate-700";
             case "extracting": return "border-amber-600";
-            case "review": return "border-sky-600";
+            case "review": return "border-primary";
             case "submitting": return "border-amber-600";
             case "success": return "border-emerald-600";
             case "error": return "border-rose-600";
@@ -350,13 +350,13 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                     multiple
                     onChange={handleFilesSelected}
                     disabled={processing || images.length >= MAX_FILES}
-                    className="text-sm text-slate-300 file:mr-3 file:rounded-md file:border-0 file:bg-sky-600 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-sky-500 disabled:opacity-50"
+                    className="text-sm text-slate-300 file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90 disabled:opacity-50"
                 />
                 <p className="text-xs text-slate-500">
                     Images will be auto-compressed. AI extracts date and steps - you can review and edit before submitting.
                 </p>
                 {limitWarning && (
-                    <p className="text-xs text-amber-400 bg-amber-500/10 px-3 py-2 rounded-md">
+                    <p className="text-xs text-[hsl(var(--warning))] bg-[hsl(var(--warning)/0.1)] px-3 py-2 rounded-md">
                         ⚠️ {limitWarning}
                     </p>
                 )}
@@ -400,7 +400,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                 <div className="flex items-center justify-between">
                                     <span className={`text-xs font-medium ${img.status === "success" ? "text-emerald-400" :
                                         img.status === "error" ? "text-rose-400" :
-                                            img.status === "review" ? "text-sky-400" :
+                                            img.status === "review" ? "text-primary" :
                                                 "text-slate-400"
                                         }`}>
                                         {getStatusText(img.status)}
@@ -432,12 +432,12 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                             />
                                         </div>
                                         {img.extractedData?.steps !== img.editedSteps && (
-                                            <p className="text-xs text-amber-400">
+                                            <p className="text-xs text-[hsl(var(--warning))]">
                                                 AI detected: {img.extractedData?.steps?.toLocaleString()} steps
                                             </p>
                                         )}
                                         {img.extractedData?.date !== img.editedDate && (
-                                            <p className="text-xs text-amber-400">
+                                            <p className="text-xs text-[hsl(var(--warning))]">
                                                 AI detected: {img.extractedData?.date}
                                             </p>
                                         )}
@@ -465,7 +465,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
 
             {/* Overall Status */}
             {overallStatus && (
-                <p className="text-sm text-sky-400">{overallStatus}</p>
+                <p className="text-sm text-[hsl(var(--info))]">{overallStatus}</p>
             )}
 
             {/* Action Buttons */}
@@ -474,7 +474,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                     <button
                         onClick={handleExtractAll}
                         disabled={processing}
-                        className="flex-1 rounded-md bg-amber-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="flex-1 rounded-md bg-[hsl(var(--warning))] px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-[hsl(var(--warning)/0.9)] disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         {processing ? "Extracting..." : `Extract Data (${pendingCount} image${pendingCount !== 1 ? "s" : ""})`}
                     </button>
@@ -484,7 +484,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                     <button
                         onClick={handleSubmitReviewed}
                         disabled={processing}
-                        className="flex-1 rounded-md bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="flex-1 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         {processing ? "Submitting..." : `Submit (${reviewCount} image${reviewCount !== 1 ? "s" : ""})`}
                     </button>

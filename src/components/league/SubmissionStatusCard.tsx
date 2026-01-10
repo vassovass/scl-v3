@@ -36,22 +36,22 @@ export function SubmissionStatusCard({
 
     // Warning state - missing submission
     return (
-        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-6">
+        <div className="rounded-xl border border-[hsl(var(--warning)/0.3)] bg-[hsl(var(--warning)/0.1)] p-6">
             <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/20">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[hsl(var(--warning)/0.2)]">
                         <span className="text-2xl">⚠️</span>
                     </div>
                     <div>
-                        <h3 className="font-semibold text-amber-100">You haven't submitted today</h3>
-                        <p className="text-sm text-amber-200/80">
+                        <h3 className="font-semibold text-foreground">You haven't submitted today</h3>
+                        <p className="text-sm text-[hsl(var(--warning)/0.8)]">
                             Don't break your streak – submit your steps now!
                         </p>
                     </div>
                 </div>
                 <Link
                     href="/submit-steps"
-                    className="flex-shrink-0 rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-amber-950 transition hover:bg-amber-400"
+                    className="flex-shrink-0 rounded-lg bg-[hsl(var(--warning))] px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-[hsl(var(--warning)/0.9)]"
                 >
                     Submit Steps →
                 </Link>
