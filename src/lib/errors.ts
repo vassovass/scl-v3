@@ -73,6 +73,8 @@ export enum ErrorCode {
     // Network errors
     NETWORK_ERROR = 'NETWORK_ERROR',
     TIMEOUT_ERROR = 'TIMEOUT_ERROR',
+    REQUEST_TIMEOUT = 'REQUEST_TIMEOUT',
+    RATE_LIMIT_EXCEEDED = 'RATE_LIMIT_EXCEEDED',
 
     // Generic fallback
     UNKNOWN_ERROR = 'UNKNOWN_ERROR',
@@ -138,6 +140,8 @@ export class AppError extends Error {
             [ErrorCode.UPLOAD_TOO_LARGE]: 'The file is too large. Please choose a smaller file.',
             [ErrorCode.UPLOAD_INVALID_TYPE]: 'This file type is not supported. Please use PNG, JPG, or GIF.',
             [ErrorCode.NETWORK_ERROR]: 'Connection lost. Please check your internet and try again.',
+            [ErrorCode.REQUEST_TIMEOUT]: 'Request timed out. Please try again.',
+            [ErrorCode.RATE_LIMIT_EXCEEDED]: 'Too many requests. Please wait a moment and try again.',
             [ErrorCode.API_UNAUTHORIZED]: 'Please sign in to continue.',
             [ErrorCode.API_FORBIDDEN]: "You don't have permission to do this.",
             [ErrorCode.MENU_NOT_FOUND]: 'Menu not found.',

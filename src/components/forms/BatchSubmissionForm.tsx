@@ -36,6 +36,10 @@ interface ImageFile {
     confirmedByUser?: boolean; // User confirmed low-confidence extraction
     proofPath?: string; // Stored after upload
     submissionId?: string;
+    // Retry state
+    retryCount?: number;     // Number of retry attempts
+    nextRetryAt?: Date;      // When to retry next
+    autoRetrying?: boolean;  // Currently in auto-retry
 }
 
 interface SignUploadResponse {
@@ -76,6 +80,10 @@ const compressionOptions = {
     maxWidthOrHeight: 1920,
     useWebWorker: true,
 };
+
+// Retry configuration
+const AUTO_RETRY_DELAYS = [5000, 10000, 20000]; // 5s, 10s, 20s
+const MAX_AUTO_RETRIES = 3;
 
 export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: BatchSubmissionFormProps) {
     // Get max batch uploads from app settings (SuperAdmin configurable)
@@ -148,6 +156,253 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
         return await imageCompression(file, compressionOptions);
     };
 
+    // Reusable extraction logic for both initial extraction and retries
+    const performExtraction = async (image: ImageFile): Promise<{ success: boolean; data?: ExtractResponse; error?: any }> => {
+        try {
+            // Compress
+            const compressedFile = await compressImage(image.file);
+
+            // Upload
+            const signed = await apiRequest<SignUploadResponse>("proofs/sign-upload", {
+                method: "POST",
+                body: JSON.stringify({ content_type: compressedFile.type }),
+            });
+
+            await fetch(signed.upload_url, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": compressedFile.type,
+                    "x-upsert": "true",
+                },
+                body: compressedFile,
+            });
+
+            // Extract data only (no submission)
+            const extractResponse = await apiRequest<ExtractResponse>("submissions/extract", {
+                method: "POST",
+                body: JSON.stringify({
+                    league_id: leagueId,
+                    proof_path: signed.path,
+                }),
+            });
+
+            return {
+                success: true,
+                data: {
+                    ...extractResponse,
+                    // Store proofPath in the response so we can use it later
+                    proofPath: signed.path
+                } as any
+            };
+        } catch (err) {
+            return { success: false, error: err };
+        }
+    };
+
+    // Auto-retry logic with exponential backoff
+    const scheduleAutoRetry = useCallback((imageId: string, retryCount: number) => {
+        if (retryCount >= MAX_AUTO_RETRIES) {
+            // Max retries reached - show manual retry option
+            setImages((prev) =>
+                prev.map((img) =>
+                    img.id === imageId
+                        ? { ...img, autoRetrying: false, retryable: true }
+                        : img
+                )
+            );
+            return;
+        }
+
+        const delay = AUTO_RETRY_DELAYS[Math.min(retryCount, AUTO_RETRY_DELAYS.length - 1)];
+        const nextRetryAt = new Date(Date.now() + delay);
+
+        setImages((prev) =>
+            prev.map((img) =>
+                img.id === imageId
+                    ? { ...img, autoRetrying: true, nextRetryAt, retryCount: retryCount + 1 }
+                    : img
+            )
+        );
+
+        setTimeout(() => {
+            retryImageAuto(imageId);
+        }, delay);
+    }, []);
+
+    // Auto-retry execution
+    const retryImageAuto = useCallback(async (id: string) => {
+        const image = images.find(i => i.id === id);
+        if (!image || !image.autoRetrying) return;
+
+        setImages((prev) =>
+            prev.map((img) =>
+                img.id === id ? { ...img, status: "extracting" } : img
+            )
+        );
+
+        const result = await performExtraction(image);
+
+        if (result.success && result.data) {
+            // Success!
+            const extractResponse = result.data as any;
+            setImages((prev) =>
+                prev.map((img) =>
+                    img.id === id
+                        ? {
+                            ...img,
+                            status: "review",
+                            proofPath: extractResponse.proofPath,
+                            extractedData: {
+                                steps: extractResponse.extracted_steps,
+                                date: extractResponse.extracted_date,
+                                km: extractResponse.extracted_km,
+                                calories: extractResponse.extracted_calories,
+                                confidence: extractResponse.confidence,
+                                notes: extractResponse.notes,
+                            },
+                            editedSteps: extractResponse.extracted_steps,
+                            editedDate: extractResponse.extracted_date,
+                            autoRetrying: false,
+                            retryCount: 0,
+                            error: undefined,
+                            errorDetails: undefined,
+                        }
+                        : img
+                )
+            );
+            toast({ title: "Retry successful!", description: "Image extracted successfully" });
+        } else {
+            // Failed - schedule next retry or give up
+            const appError = normalizeError(result.error, ErrorCode.API_REQUEST_FAILED);
+            const isRetryable =
+                appError.code === ErrorCode.NETWORK_ERROR ||
+                appError.code === ErrorCode.RATE_LIMIT_EXCEEDED ||
+                appError.code === ErrorCode.REQUEST_TIMEOUT;
+
+            if (isRetryable && (image.retryCount || 0) < MAX_AUTO_RETRIES) {
+                // Schedule next retry
+                scheduleAutoRetry(id, image.retryCount || 0);
+            } else {
+                // Give up
+                setImages((prev) =>
+                    prev.map((img) =>
+                        img.id === id
+                            ? {
+                                ...img,
+                                status: "error",
+                                autoRetrying: false,
+                                retryable: isRetryable,
+                                error: appError.toUserMessage(),
+                                errorCode: appError.code,
+                                errorDetails: JSON.stringify({
+                                    message: appError.message,
+                                    context: appError.context,
+                                    timestamp: new Date().toISOString(),
+                                    retriesAttempted: image.retryCount || 0
+                                }, null, 2),
+                            }
+                            : img
+                    )
+                );
+            }
+        }
+    }, [images, scheduleAutoRetry, toast]);
+
+    // Manual retry for single image
+    const retryImage = useCallback(async (id: string) => {
+        const image = images.find(i => i.id === id);
+        if (!image || image.status !== "error") return;
+
+        // Reset to extracting
+        setImages((prev) =>
+            prev.map((img) =>
+                img.id === id
+                    ? { ...img, status: "extracting", error: undefined, errorDetails: undefined, retryCount: 0 }
+                    : img
+            )
+        );
+
+        const result = await performExtraction(image);
+
+        if (result.success && result.data) {
+            const extractResponse = result.data as any;
+            setImages((prev) =>
+                prev.map((img) =>
+                    img.id === id
+                        ? {
+                            ...img,
+                            status: "review",
+                            proofPath: extractResponse.proofPath,
+                            extractedData: {
+                                steps: extractResponse.extracted_steps,
+                                date: extractResponse.extracted_date,
+                                km: extractResponse.extracted_km,
+                                calories: extractResponse.extracted_calories,
+                                confidence: extractResponse.confidence,
+                                notes: extractResponse.notes,
+                            },
+                            editedSteps: extractResponse.extracted_steps,
+                            editedDate: extractResponse.extracted_date,
+                        }
+                        : img
+                )
+            );
+            toast({ title: "Extraction successful" });
+        } else {
+            const appError = normalizeError(result.error, ErrorCode.API_REQUEST_FAILED);
+            reportErrorClient(appError);
+
+            const isRetryable =
+                appError.code === ErrorCode.NETWORK_ERROR ||
+                appError.code === ErrorCode.RATE_LIMIT_EXCEEDED ||
+                appError.code === ErrorCode.REQUEST_TIMEOUT;
+
+            setImages((prev) =>
+                prev.map((img) =>
+                    img.id === id
+                        ? {
+                            ...img,
+                            status: "error",
+                            error: appError.toUserMessage(),
+                            errorCode: appError.code,
+                            errorDetails: JSON.stringify({
+                                message: appError.message,
+                                context: appError.context,
+                                timestamp: new Date().toISOString()
+                            }, null, 2),
+                            retryable: isRetryable,
+                        }
+                        : img
+                )
+            );
+
+            toast({
+                variant: "destructive",
+                title: "Retry failed",
+                description: appError.toUserMessage()
+            });
+        }
+    }, [images, toast]);
+
+    // Retry all failed images
+    const handleRetryAllFailed = useCallback(async () => {
+        const failedImages = images.filter(i => i.status === "error" && i.retryable);
+        if (failedImages.length === 0) return;
+
+        setProcessing(true);
+        setOverallStatus(`Retrying ${failedImages.length} failed image${failedImages.length !== 1 ? 's' : ''}...`);
+
+        for (let i = 0; i < failedImages.length; i++) {
+            await retryImage(failedImages[i].id);
+            if (i < failedImages.length - 1) {
+                await new Promise((resolve) => setTimeout(resolve, 300));
+            }
+        }
+
+        setOverallStatus(null);
+        setProcessing(false);
+    }, [images, retryImage]);
+
     // Step 1: Extract data from all images (upload + AI extraction only, no submission yet)
     const handleExtractAll = async () => {
         if (images.length === 0) return;
@@ -161,41 +416,24 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
 
             setOverallStatus(`Extracting image ${i + 1} of ${images.length}...`);
 
-            try {
-                // Compress
-                const compressedFile = await compressImage(image.file);
+            // Update status to extracting
+            setImages((prev) =>
+                prev.map((img) =>
+                    img.id === image.id ? { ...img, status: "extracting" } : img
+                )
+            );
 
-                // Upload
-                const signed = await apiRequest<SignUploadResponse>("proofs/sign-upload", {
-                    method: "POST",
-                    body: JSON.stringify({ content_type: compressedFile.type }),
-                });
+            const result = await performExtraction(image);
 
-                await fetch(signed.upload_url, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": compressedFile.type,
-                        "x-upsert": "true",
-                    },
-                    body: compressedFile,
-                });
-
-                // Extract data only (no submission)
-                const extractResponse = await apiRequest<ExtractResponse>("submissions/extract", {
-                    method: "POST",
-                    body: JSON.stringify({
-                        league_id: leagueId,
-                        proof_path: signed.path,
-                    }),
-                });
-
+            if (result.success && result.data) {
+                const extractResponse = result.data as any;
                 setImages((prev) =>
                     prev.map((img) =>
                         img.id === image.id
                             ? {
                                 ...img,
                                 status: "review",
-                                proofPath: signed.path,
+                                proofPath: extractResponse.proofPath,
                                 extractedData: {
                                     steps: extractResponse.extracted_steps,
                                     date: extractResponse.extracted_date,
@@ -210,8 +448,8 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                             : img
                     )
                 );
-            } catch (err) {
-                const appError = normalizeError(err, ErrorCode.API_REQUEST_FAILED);
+            } else {
+                const appError = normalizeError(result.error, ErrorCode.API_REQUEST_FAILED);
                 reportErrorClient(appError);
 
                 // Determine if retryable
@@ -220,24 +458,30 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                     appError.code === ErrorCode.RATE_LIMIT_EXCEEDED ||
                     appError.code === ErrorCode.REQUEST_TIMEOUT;
 
-                setImages((prev) =>
-                    prev.map((img) =>
-                        img.id === image.id
-                            ? {
-                                ...img,
-                                status: "error",
-                                error: appError.toUserMessage(),
-                                errorCode: appError.code,
-                                errorDetails: JSON.stringify({
-                                    message: appError.message,
-                                    context: appError.context,
-                                    timestamp: new Date().toISOString()
-                                }, null, 2),
-                                retryable: isRetryable,
-                            }
-                            : img
-                    )
-                );
+                if (isRetryable) {
+                    // Start auto-retry
+                    scheduleAutoRetry(image.id, 0);
+                } else {
+                    // Non-retryable error
+                    setImages((prev) =>
+                        prev.map((img) =>
+                            img.id === image.id
+                                ? {
+                                    ...img,
+                                    status: "error",
+                                    error: appError.toUserMessage(),
+                                    errorCode: appError.code,
+                                    errorDetails: JSON.stringify({
+                                        message: appError.message,
+                                        context: appError.context,
+                                        timestamp: new Date().toISOString()
+                                    }, null, 2),
+                                    retryable: false,
+                                }
+                                : img
+                        )
+                    );
+                }
             }
 
             // Small delay
@@ -551,6 +795,15 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                     </p>
                                 )}
 
+                                {/* Auto-retry countdown display */}
+                                {img.autoRetrying && img.nextRetryAt && (
+                                    <div className="text-xs text-amber-400 flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 rounded p-2">
+                                        <span className="animate-spin">⟳</span>
+                                        Retrying in {Math.max(0, Math.ceil((img.nextRetryAt.getTime() - Date.now()) / 1000))}s
+                                        (Attempt {img.retryCount}/{MAX_AUTO_RETRIES})
+                                    </div>
+                                )}
+
                                 {/* Error display - ENHANCED */}
                                 {img.error && (
                                     <div className="space-y-2">
@@ -580,6 +833,17 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                                 </button>
                                             </details>
                                         )}
+
+                                        {/* Manual retry button */}
+                                        {img.retryable && !img.autoRetrying && (
+                                            <button
+                                                onClick={() => retryImage(img.id)}
+                                                disabled={processing}
+                                                className="w-full text-xs py-1.5 rounded bg-amber-600/20 text-amber-400 border border-amber-600/50 hover:bg-amber-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                                            >
+                                                🔄 Retry Extraction
+                                            </button>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -602,6 +866,17 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                         className="flex-1 rounded-md bg-[hsl(var(--warning))] px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-[hsl(var(--warning)/0.9)] disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         {processing ? "Extracting..." : `Extract Data (${pendingCount} image${pendingCount !== 1 ? "s" : ""})`}
+                    </button>
+                )}
+
+                {/* Retry All Failed Button */}
+                {images.filter(i => i.status === "error" && i.retryable).length > 0 && (
+                    <button
+                        onClick={handleRetryAllFailed}
+                        disabled={processing}
+                        className="flex-1 rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        🔄 Retry All Failed ({images.filter(i => i.status === "error" && i.retryable).length})
                     </button>
                 )}
 

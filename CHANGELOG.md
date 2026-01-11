@@ -21,6 +21,15 @@ All notable changes to StepLeague v3.
   - **Edge Case Handling**: Explicit instructions for hourly breakdowns, goals vs actual, partial day data, rotated images
   - **Error Details Copy Button**: Users can copy full error details for support tickets
 
+- **Batch Submission Retry Functionality** - Smart retry system for failed extractions
+  - **Auto-Retry with Exponential Backoff**: Automatically retries failed extractions (5s, 10s, 20s delays) for retryable errors
+  - **Visual Countdown Timer**: Shows "Retrying in Xs (Attempt N/3)" during auto-retry
+  - **Manual Retry Button**: Per-image "🔄 Retry Extraction" button for retryable failures
+  - **Retry All Failed**: Bulk retry button to reprocess all retryable errors at once
+  - **Retry State Tracking**: Tracks retry count, next retry time, and auto-retry status
+  - **Smart Error Classification**: Distinguishes retryable (network, rate limit, timeout) vs non-retryable errors
+  - **Graceful Degradation**: After 3 auto-retry attempts, shows manual retry option instead
+
 ### Changed
 
 - **Gemini Verification Prompt Logic** - Enhanced reliability for relative dates
