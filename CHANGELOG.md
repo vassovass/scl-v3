@@ -9,6 +9,18 @@ All notable changes to StepLeague v3.
 
 ## [2026-01-12]
 
+### Added
+
+- **Enhanced AI Step Verification System** - Comprehensive improvements to extraction accuracy and error handling
+  - **Multilingual Date Support**: Added support for 7 languages (English, Chinese, Spanish, German, Korean, French, Japanese)
+  - **App-Specific Pattern Recognition**: Added guidance for Samsung Health, Google Fit, Apple Health, Xiaomi Mi Fit, Fitbit
+  - **Confidence Scoring**: AI now returns "high", "medium", or "low" confidence with explanatory notes
+  - **Enhanced Error Reporting**: Categorized errors (network, rate limit, extraction failure) with detailed technical info
+  - **Low-Confidence Blocking**: Users must confirm low-confidence extractions before submission
+  - **AI Notes Display**: Shows AI reasoning and assumptions in expandable "AI Notes" section
+  - **Edge Case Handling**: Explicit instructions for hourly breakdowns, goals vs actual, partial day data, rotated images
+  - **Error Details Copy Button**: Users can copy full error details for support tickets
+
 ### Changed
 
 - **Gemini Verification Prompt Logic** - Enhanced reliability for relative dates

@@ -69,6 +69,7 @@ export async function POST(request: Request): Promise<Response> {
             extracted_date: extractedDate,
             extracted_km: verification.data.extracted_km,
             extracted_calories: verification.data.extracted_calories,
+            confidence: verification.data.confidence,
             notes: verification.data.notes,
         });
     } catch (error) {

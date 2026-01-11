@@ -18,6 +18,8 @@ export interface GeminiExtraction {
     km?: number;
     calories?: number;
     date?: string;
+    confidence?: "high" | "medium" | "low";
+    notes?: string;
 }
 
 export interface GeminiResult {
@@ -73,6 +75,8 @@ const extractionSchema = z.object({
     km: z.number().or(z.string().transform(val => Number(val))).nullish(),
     calories: z.number().or(z.string().transform(val => Number(val))).nullish(),
     date: z.string().nullish(),
+    confidence: z.enum(["high", "medium", "low"]).optional(),
+    notes: z.string().optional(),
 });
 
 // =============================================================================
@@ -89,29 +93,111 @@ export function generateVerificationPrompt(
     timezone: string = "UTC"
 ): string {
     const today = new Date();
-    // Note: In the future, use 'timezone' to adjust 'today' reference if needed.
-
     const fmt = (d: Date) => format(d, "yyyy-MM-dd");
+    const currentYear = fmt(today).split('-')[0];
 
-    return `The user states they walked ${claimedSteps} steps on ${claimedDate}. 
-    
-    CONTEXT FOR RELATIVE DATES (Reference: ${fmt(today)}):
-    - Today is ${fmt(today)}
-    - Yesterday was ${fmt(subDays(today, 1))}
-    - 2 days ago was ${fmt(subDays(today, 2))}
+    return `You are a specialized OCR and data extraction expert for fitness tracking applications.
 
-    INSTRUCTIONS:
-    From the attached screenshot, extract:
-    1. Actual steps
-    2. Distance in kilometers
-    3. Calories
-    4. The date displayed. 
-       - If the image says "Today", use ${fmt(today)}.
-       - If the image says "Yesterday", use ${fmt(subDays(today, 1))}.
-       - If the image says "2 days ago", use ${fmt(subDays(today, 2))}.
-       - If a specific date is shown (e.g., "Dec 31"), format it as YYYY-MM-DD using the year from the context dates above.
+YOUR CONSTRAINTS:
+- NEVER fabricate data - return null if you cannot confidently extract a value
+- NEVER guess dates - if ambiguous, explain why in the "notes" field
+- ALWAYS provide a confidence score and explain your reasoning in "notes"
+- ALWAYS return valid JSON matching the schema exactly
 
-    Respond strictly as JSON with keys steps, km, calories, date.`;
+TASK: Extract step count and date from fitness app screenshot.
+
+USER CLAIM:
+- Claimed steps: ${claimedSteps === 0 ? 'AUTO-EXTRACT (user did not specify)' : claimedSteps}
+- Claimed date: ${claimedDate}
+
+DATE CONTEXT (Reference: ${fmt(today)}):
+- Today = ${fmt(today)}
+- Yesterday = ${fmt(subDays(today, 1))}
+- 2 days ago = ${fmt(subDays(today, 2))}
+- 3 days ago = ${fmt(subDays(today, 3))}
+- Current year: ${currentYear}
+
+KNOWN FITNESS APP PATTERNS:
+
+**Samsung Health:**
+- Daily total: Large number at top or bottom of screen
+- Labels: "걸음" (Korean), "Steps", "steps"
+- Date format: "Sat, 22 Nov" or "오늘" (Today)
+- Chart: Hourly bars (IGNORE - extract the total, not hourly values)
+
+**Google Fit:**
+- Daily total: Center of screen, large font
+- Label: "Steps" with shoe icon
+- Ring chart shows goal progress (IGNORE goal, extract actual)
+
+**Apple Health:**
+- Daily total: Center card with "Steps" label
+- Bar chart background is decorative (IGNORE)
+
+**Xiaomi Mi Fit / Zepp Life:**
+- Labels: "步数" (Chinese), "Steps", "걸음수" (Korean)
+- Large number at top
+
+EXTRACTION RULES:
+
+1. **Steps**: Extract the TOTAL daily step count (usually the largest number)
+   - IGNORE hourly breakdowns, weekly totals, or goal numbers
+   - If multiple dates visible, extract ONLY for the claimed date
+   - Common labels: "Steps", "steps", "步数" (Chinese), "걸음" (Korean), "Schritte" (German), "Pas" (French)
+   - If hourly breakdown visible, the total is usually at the very top OR very bottom
+
+2. **Date**: Convert screenshot date to YYYY-MM-DD format (MULTILINGUAL)
+
+   **English:** "Today" → ${fmt(today)}, "Yesterday" → ${fmt(subDays(today, 1))}
+   **Chinese:** "今天"/"今日" → ${fmt(today)}, "昨天"/"昨日" → ${fmt(subDays(today, 1))}
+   **Spanish:** "Hoy" → ${fmt(today)}, "Ayer" → ${fmt(subDays(today, 1)}}
+   **German:** "Heute" → ${fmt(today)}, "Gestern" → ${fmt(subDays(today, 1)}}
+   **Korean:** "오늘" → ${fmt(today)}, "어제" → ${fmt(subDays(today, 1)}}
+   **French:** "Aujourd'hui" → ${fmt(today)}, "Hier" → ${fmt(subDays(today, 1)}}
+
+   **Partial dates:** "Sat, 22 Nov", "22 Nov", "Nov 22" → Use year ${currentYear}
+   **Weekday inference:** "Sat, 22 Nov" → Calculate year from weekday + current date
+
+   If language/format is ambiguous, analyze UI elements and note your reasoning.
+   If year is missing, use ${currentYear} and note the assumption.
+
+3. **Distance & Calories**: Extract if visible (optional)
+   - Handle both metric (km) and imperial (mi) units
+   - Convert miles to km if needed: 1 mi = 1.60934 km
+
+4. **Confidence Scoring:**
+   - **"high"**: Step count clearly visible, date explicit, good image quality, 95%+ confident
+   - **"medium"**: Minor issues (small font, inferred date, slight blur), 70-95% confident
+   - **"low"**: Blurry, rotated >15°, multiple totals unclear, weekly view, <70% confident
+   - **null**: Image unreadable or shows non-fitness data
+
+5. **Edge Cases:**
+   - **Goal vs Actual**: Extract ACTUAL steps, not goal (e.g., "Goal: 10,000 / Actual: 7,500" → extract 7500)
+   - **Weekly view**: If multiple days shown, extract only the claimed date
+   - **Partial day**: "So far today: 3,421 steps" → extract 3421, set confidence: "medium"
+   - **Zero steps**: If screenshot shows "0 steps" → return 0 (NOT null)
+   - **Rotated/cropped**: Attempt extraction, lower confidence, explain in notes
+
+RESPONSE FORMAT (strict JSON):
+{
+  "steps": number | null,
+  "km": number | null,
+  "calories": number | null,
+  "date": "YYYY-MM-DD" | null,
+  "confidence": "high" | "medium" | "low" | null,
+  "notes": "Explain your extraction process, reasoning, and any assumptions"
+}
+
+VALIDATION:
+- "steps": integer 0-100000 (if >100000, set confidence: "low")
+- "km": float 0-100 (if >100, set confidence: "low")
+- "date": Must be YYYY-MM-DD format
+- "notes": REQUIRED - always explain which number you chose and why
+
+EXAMPLES:
+{"steps": 12345, "date": "2024-11-20", "confidence": "high", "notes": "Samsung Health. Daily total clearly at top. Date 'Thu, 20 Nov' - inferred 2024."}
+{"steps": 9677, "date": "2024-11-22", "confidence": "medium", "notes": "Date 'Sat, 22 Nov' - inferred year ${currentYear} from context."}
+{"steps": null, "date": null, "confidence": "low", "notes": "Image blurry. Cannot distinguish daily total from hourly breakdown."}`;
 }
 
 /**
@@ -321,6 +407,8 @@ function parseGeminiText(rawText: string): GeminiExtraction {
                 km: result.data.km ?? undefined,
                 calories: result.data.calories ?? undefined,
                 date: result.data.date ?? undefined,
+                confidence: result.data.confidence ?? undefined,
+                notes: result.data.notes ?? undefined,
             };
         }
         console.warn("Gemini extraction failed schema validation:", result.error);

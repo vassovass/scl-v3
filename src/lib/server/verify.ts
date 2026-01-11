@@ -35,6 +35,7 @@ export type VerificationResult = {
         extracted_date?: string | null;
         extracted_km?: number | null;
         extracted_calories?: number | null;
+        confidence?: "high" | "medium" | "low";
         notes?: string;
     };
 };
@@ -95,6 +96,7 @@ export async function callVerificationFunction(payload: VerificationPayload): Pr
                 extracted_date: geminiResult.extraction.date ?? null,
                 extracted_km: evaluation.extractedKm,
                 extracted_calories: evaluation.extractedCalories,
+                confidence: geminiResult.extraction.confidence,
                 notes: evaluation.notes,
             },
         };
@@ -218,12 +220,26 @@ function evaluateVerdict({
     const notes: string[] = [];
     if (extractedSteps == null) {
         notes.push("Could not extract step count from screenshot.");
+        // Surface AI's explanation for why extraction failed
+        if (extraction.notes) {
+            notes.push(`AI: ${extraction.notes}`);
+        }
     }
     if (extraction.date && extraction.date !== claimedDate) {
         notes.push(`Screenshot date ${extraction.date} differs from claimed date ${claimedDate}.`);
     }
     if (!verified && extractedSteps != null && difference !== null) {
         notes.push(`Extracted ${extractedSteps} steps, which differs from claimed ${claimedSteps} by ${difference} (tolerance: ${tolerance}).`);
+    }
+
+    // Add confidence warning for low-confidence extractions
+    if (extraction.confidence === "low") {
+        notes.push(`⚠️ Low confidence extraction. Manual review recommended.`);
+    }
+
+    // Include AI notes for context (even on successful extractions)
+    if (extraction.notes && extractedSteps != null) {
+        notes.push(`AI notes: ${extraction.notes}`);
     }
 
     return {

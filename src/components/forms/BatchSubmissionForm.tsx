@@ -4,6 +4,8 @@ import React, { useState, useCallback } from "react";
 import imageCompression from "browser-image-compression";
 import { apiRequest, ApiError } from "@/lib/api/client";
 import { useAppSettings } from "@/hooks/useAppSettings";
+import { useToast } from "@/hooks/use-toast";
+import { normalizeError, reportErrorClient, ErrorCode } from "@/lib/errors";
 
 interface BatchSubmissionFormProps {
     leagueId: string;
@@ -17,15 +19,21 @@ interface ImageFile {
     preview: string;
     status: "pending" | "extracting" | "review" | "submitting" | "success" | "error";
     error?: string;
+    errorCode?: ErrorCode;
+    errorDetails?: string;
+    retryable?: boolean;
     extractedData?: {
         steps?: number;
         date?: string;
         km?: number;
         calories?: number;
+        confidence?: "high" | "medium" | "low";
+        notes?: string;
     };
     // User-edited values (override AI extraction)
     editedSteps?: number;
     editedDate?: string;
+    confirmedByUser?: boolean; // User confirmed low-confidence extraction
     proofPath?: string; // Stored after upload
     submissionId?: string;
 }
@@ -40,6 +48,8 @@ interface ExtractResponse {
     extracted_date?: string;
     extracted_km?: number;
     extracted_calories?: number;
+    confidence?: "high" | "medium" | "low";
+    notes?: string;
 }
 
 interface SubmissionResponse {
@@ -71,6 +81,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
     // Get max batch uploads from app settings (SuperAdmin configurable)
     const { getNumericSetting } = useAppSettings();
     const maxFiles = getNumericSetting("max_batch_uploads", 7);
+    const { toast } = useToast();
 
     const [images, setImages] = useState<ImageFile[]>([]);
     const [processing, setProcessing] = useState(false);
@@ -190,6 +201,8 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                     date: extractResponse.extracted_date,
                                     km: extractResponse.extracted_km,
                                     calories: extractResponse.extracted_calories,
+                                    confidence: extractResponse.confidence,
+                                    notes: extractResponse.notes,
                                 },
                                 editedSteps: extractResponse.extracted_steps,
                                 editedDate: extractResponse.extracted_date,
@@ -198,13 +211,29 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                     )
                 );
             } catch (err) {
+                const appError = normalizeError(err, ErrorCode.API_REQUEST_FAILED);
+                reportErrorClient(appError);
+
+                // Determine if retryable
+                const isRetryable =
+                    appError.code === ErrorCode.NETWORK_ERROR ||
+                    appError.code === ErrorCode.RATE_LIMIT_EXCEEDED ||
+                    appError.code === ErrorCode.REQUEST_TIMEOUT;
+
                 setImages((prev) =>
                     prev.map((img) =>
                         img.id === image.id
                             ? {
                                 ...img,
                                 status: "error",
-                                error: err instanceof Error ? err.message : "Extraction failed",
+                                error: appError.toUserMessage(),
+                                errorCode: appError.code,
+                                errorDetails: JSON.stringify({
+                                    message: appError.message,
+                                    context: appError.context,
+                                    timestamp: new Date().toISOString()
+                                }, null, 2),
+                                retryable: isRetryable,
                             }
                             : img
                     )
@@ -225,6 +254,20 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
     const handleSubmitReviewed = async () => {
         const reviewedImages = images.filter((i) => i.status === "review");
         if (reviewedImages.length === 0) return;
+
+        // BLOCK low-confidence submissions until user confirms
+        const lowConfidenceImages = reviewedImages.filter(
+            img => img.extractedData?.confidence === "low" && !img.confirmedByUser
+        );
+
+        if (lowConfidenceImages.length > 0) {
+            toast({
+                variant: "destructive",
+                title: "Low Confidence Extractions",
+                description: `${lowConfidenceImages.length} image(s) have low confidence. Please review and confirm before submitting.`
+            });
+            return; // Block submission
+        }
 
         setProcessing(true);
         let successCount = 0;
@@ -435,6 +478,34 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                                 className="flex-1 rounded border border-slate-600 bg-slate-900 px-2 py-1 text-xs text-slate-200"
                                             />
                                         </div>
+
+                                        {/* Confidence indicator */}
+                                        {img.extractedData?.confidence && (
+                                            <div className="flex items-center gap-2">
+                                                <span className={`text-xs ${
+                                                    img.extractedData.confidence === "high" ? "text-emerald-400" :
+                                                    img.extractedData.confidence === "medium" ? "text-amber-400" :
+                                                    "text-rose-400"
+                                                }`}>
+                                                    {img.extractedData.confidence === "high" ? "✓ High Confidence" :
+                                                     img.extractedData.confidence === "medium" ? "⚠️ Medium Confidence" :
+                                                     "⚠️ Low Confidence"}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {/* AI notes */}
+                                        {img.extractedData?.notes && (
+                                            <details className="text-xs">
+                                                <summary className="cursor-pointer text-slate-400 hover:text-slate-300">
+                                                    AI Notes
+                                                </summary>
+                                                <p className="mt-1 text-slate-300 bg-slate-950 p-2 rounded">
+                                                    {img.extractedData.notes}
+                                                </p>
+                                            </details>
+                                        )}
+
                                         {img.extractedData?.steps !== img.editedSteps && (
                                             <p className="text-xs text-[hsl(var(--warning))]">
                                                 AI detected: {img.extractedData?.steps?.toLocaleString()} steps
@@ -444,6 +515,31 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                             <p className="text-xs text-[hsl(var(--warning))]">
                                                 AI detected: {img.extractedData?.date}
                                             </p>
+                                        )}
+
+                                        {/* Low confidence confirmation checkbox */}
+                                        {img.extractedData?.confidence === "low" && (
+                                            <div className="bg-rose-500/10 border border-rose-500/30 rounded p-2">
+                                                <label className="flex items-start gap-2 cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={img.confirmedByUser || false}
+                                                        onChange={(e) => {
+                                                            setImages((prev) =>
+                                                                prev.map((i) =>
+                                                                    i.id === img.id
+                                                                        ? { ...i, confirmedByUser: e.target.checked }
+                                                                        : i
+                                                                )
+                                                            );
+                                                        }}
+                                                        className="mt-0.5"
+                                                    />
+                                                    <span className="text-xs text-rose-300">
+                                                        I confirm these values are correct despite low AI confidence
+                                                    </span>
+                                                </label>
+                                            </div>
                                         )}
                                     </div>
                                 )}
@@ -455,11 +551,36 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                     </p>
                                 )}
 
-                                {/* Error display */}
+                                {/* Error display - ENHANCED */}
                                 {img.error && (
-                                    <p className="text-xs text-rose-400 truncate" title={img.error}>
-                                        {img.error}
-                                    </p>
+                                    <div className="space-y-2">
+                                        <div className="flex items-start gap-2">
+                                            <span className="text-rose-400 text-xs">⚠️</span>
+                                            <p className="text-xs text-rose-400 flex-1">
+                                                {img.error}
+                                            </p>
+                                        </div>
+
+                                        {img.errorDetails && (
+                                            <details className="text-xs">
+                                                <summary className="cursor-pointer text-slate-400 hover:text-slate-300">
+                                                    Technical Details
+                                                </summary>
+                                                <pre className="mt-2 rounded bg-slate-950 p-2 text-xs text-slate-400 overflow-x-auto max-h-32 overflow-y-auto">
+                                                    {img.errorDetails}
+                                                </pre>
+                                                <button
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(img.errorDetails!);
+                                                        toast({ title: "Copied error details" });
+                                                    }}
+                                                    className="mt-1 text-xs text-primary hover:underline"
+                                                >
+                                                    📋 Copy Details
+                                                </button>
+                                            </details>
+                                        )}
+                                    </div>
                                 )}
                             </div>
                         </div>
