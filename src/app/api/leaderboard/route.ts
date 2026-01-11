@@ -49,12 +49,14 @@ interface ComparisonResult {
   current_streak: number;
   total_steps_lifetime: number;
   is_proxy?: boolean; // True if this is a proxy member
+  high_five_count: number;
+  user_has_high_fived: boolean;
 }
 
 // GET /api/leaderboard
 export const GET = withApiHandler({
   auth: 'league_member',  // Handler checks membership via query param
-}, async ({ request, adminClient }) => {
+}, async ({ request, adminClient, user }) => {
   const url = new URL(request.url);
   const rawParams = Object.fromEntries(url.searchParams.entries());
   const parsed = querySchema.safeParse(rawParams);
@@ -158,6 +160,28 @@ export const GET = withApiHandler({
 
   const recordsMap = new Map(userRecords?.map(r => [r.user_id, r]));
 
+  // Fetch High Fives for these users
+  const { data: highFivesData } = await adminClient
+    .from("high_fives")
+    .select("sender_id, recipient_id")
+    .in("recipient_id", allUserIds);
+
+  const highFiveCounts = new Map<string, number>();
+  const userHighFivedMap = new Map<string, boolean>(); // recipient_id -> true if current user sent one
+
+  if (highFivesData) {
+    for (const hf of highFivesData) {
+      // Count
+      highFiveCounts.set(hf.recipient_id, (highFiveCounts.get(hf.recipient_id) || 0) + 1);
+
+      // Check if current user sent it
+      if (user && hf.sender_id === user.id) {
+        userHighFivedMap.set(hf.recipient_id, true);
+      }
+    }
+  }
+
+
   // Build results
   const results: ComparisonResult[] = [];
 
@@ -203,7 +227,11 @@ export const GET = withApiHandler({
       rank: 0,
       current_streak: currentStreak,
       total_steps_lifetime: Number(lifetimeSteps),
+      current_streak: currentStreak,
+      total_steps_lifetime: Number(lifetimeSteps),
       is_proxy: false,
+      high_five_count: highFiveCounts.get(userId) || 0,
+      user_has_high_fived: userHighFivedMap.get(userId) || false,
     });
   }
 
@@ -231,6 +259,8 @@ export const GET = withApiHandler({
       current_streak: 0, // Proxies don't have streaks
       total_steps_lifetime: 0, // Proxies don't have lifetime stats
       is_proxy: true,
+      high_five_count: 0, // Proxies don't have high fives yet (or need DB support)
+      user_has_high_fived: false,
     });
   }
 
@@ -282,7 +312,9 @@ export const GET = withApiHandler({
       common_days_steps_a: r.common_days_steps_a,
       common_days_steps_b: r.common_days_steps_b,
       badges: r.badges,
-      is_proxy: r.is_proxy ?? false, // Indicate if this is a proxy member
+      is_proxy: r.is_proxy ?? false,
+      high_five_count: r.high_five_count,
+      user_has_high_fived: r.user_has_high_fived,
     })),
     meta: {
       total_members: results.length,

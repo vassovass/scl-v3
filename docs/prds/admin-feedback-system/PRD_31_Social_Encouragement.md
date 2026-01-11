@@ -45,11 +45,12 @@ A peer encouragement system where users can:
 
 ---
 
+
 ## What is Needed
 
 ### 1. High-Fives (Core Feature)
 
-One-click encouragement similar to Strava's "Kudos" system.
+One-click encouragement similar to Strava's "Kudos" system, but designed with a specific "Mindful/Zen" aesthetic.
 
 **Database Schema:**
 ```sql
@@ -76,12 +77,25 @@ CREATE TABLE high_fives (
 />
 ```
 
-**Animation:** Hand wave animation on tap + confetti burst.
+**Proactive Task #1 (Zen Interaction):** 
+- Animation must be a "gentle pulse" or "warm glow" rather than an explosive pop or confetti.
+- Visuals should feel calming and supportive (soft colors, smooth easing).
 
-### 3. Cheer Prompts
+**Proactive Task #2 (Mindful Copy):**
+- Tooltips and text must use encouraging, non-competitive language (e.g., "Send Support" instead of "Like" or "Nudge").
 
-Contextual prompts to encourage others:
-"Mike is 200 steps away from his goal. Send a cheer? 🙌"
+### 3. Cheer Prompts & Gratitude
+
+Contextual prompts to encourage others, framed positively.
+
+**Proactive Task #3 (Mindful Context):**
+- Instead of "Mike is beating you," use "Mike is doing great today, send them support? 🙌"
+- Focus on effort and progress, not rank.
+
+**Proactive Task #4 (Gratitude Summary):**
+- A dedicated dashboard card: `GratitudeCard`.
+- Summary: "5 friends supported your progress today."
+- Effect: Reinforces the positive feedback loop without notification noise. (Quiet Support).
 
 ---
 
@@ -103,11 +117,12 @@ Remove a high-five.
 
 | Check | URL/Location | Expected Result |
 |-------|--------------|-----------------|
-| Button visible | Leaderboard | Hand icon appears on rows |
-| Tap action | Leaderboard | Icon animates, count increases |
+| Button visible | Leaderboard | Hand icon (or support icon) appears on rows |
+| Zen Animation | Leaderboard | Icon pulses gently, no jarring effects |
 | Persistence | Reload page | Count remains updated |
-| Cheer prompt | Leaderboard | Shows "Cheer x?" if condition met |
-| Summary card | Dashboard | "You got 5 high fives" card |
+| Mindful text | Tooltips | Says "Send Support" or similar |
+| Cheer prompt | Leaderboard | Shows "Send support?" if condition met |
+| Gratitude card | Dashboard | "You got 5 supports" card present |
 
 ### Backend Checks
 
@@ -133,4 +148,5 @@ This feature is gated by `feature_high_fives` (PRD 26).
 
 | Date | Section | Change |
 |------|---------|--------|
+| 2026-01-12 | Requirements | Updated with proactive mindfulness tasks (Zen UI, Mindful Copy, Gratitude Card) |
 | 2026-01-05 | Initial | Created PRD based on external research |

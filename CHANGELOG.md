@@ -9,7 +9,32 @@ All notable changes to StepLeague v3.
 
 ## [2026-01-12]
 
+### Added
+
+- **PRD 31: Social Encouragement System ("High Fives")** - Supportive, mindful encouragement features
+  - **Modular Encouragement System** (`src/lib/encouragement/`)
+    - Shared configuration for "Zen" aesthetics (gentle pulsing animations, soft colors)
+    - Mindful quotes engine ("We rise by lifting others")
+    - Type-safe encouragement themes (High Five, Cheer, Milestone)
+  - **High Fives**
+    - `HighFiveButton` component: Replaces competitive interactions with supportive ones
+    - Uses "Warm Glow" pulse animation instead of jarring confetti
+    - Integrated into Leaderboard rows
+  - **Cheer Prompts**
+    - `CheerPrompt` component: Contextual, dismissible suggestions to encourage teammates
+    - "Zen" entrance animations (slow fade-in)
+  - **Gratitude Card**
+    - Dashboard widget summarizing support received ("5 friends sent support")
+    - Displays random mindful quotes
+  - **Database & API**
+    - `high_fives` table with unique sender/submission constraints
+    - `feature_high_fives` feature flag
+    - `POST /api/high-fives` and `DELETE /api/high-fives` endpoints
+    - Leaderboard API updated to return support counts
+
 ### Fixed
+
+- **Max Batch Uploads Setting Not Applied** - Setting now works correctly
 
 - **Max Batch Uploads Setting Not Applied** - Setting now works correctly
   - **Root Cause**: `BatchSubmissionForm.tsx` had hardcoded `MAX_FILES = 5` instead of using app settings

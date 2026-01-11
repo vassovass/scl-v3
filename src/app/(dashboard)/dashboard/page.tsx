@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
 import { useFetch } from "@/hooks/useFetch";
+import { GratitudeCard } from "@/components/dashboard/GratitudeCard";
 
 interface League {
   id: string;
@@ -49,6 +50,12 @@ export default function DashboardPage() {
             </div>
           </div>
         </ModuleFeedback>
+
+        {/* Gratitude summary (Proactive Mindfulness) */}
+        {/* Placeholder count until API is updated */}
+        <div className="mt-6 mb-2">
+          <GratitudeCard count={0} className="w-full md:max-w-md" />
+        </div>
 
         {loading ? (
           <div className="mt-12 text-center text-muted-foreground">Loading...</div>

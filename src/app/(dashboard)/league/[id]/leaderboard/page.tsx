@@ -13,6 +13,8 @@ import { useFilterPersistence } from "@/hooks/useFilterPersistence";
 import { APP_CONFIG } from "@/lib/config";
 import { BADGE_INFO } from "@/lib/badges";
 import { format } from "date-fns";
+import { HighFiveButton } from "@/components/encouragement/HighFiveButton";
+import { CheerPrompt } from "@/components/encouragement/CheerPrompt";
 
 // ... (Types remain same) ...
 
@@ -47,7 +49,10 @@ interface LeaderboardEntry {
   improvement_pct: number | null;
   common_days_steps_a: number | null;
   common_days_steps_b: number | null;
+  common_days_steps_b: number | null;
   badges: string[];
+  high_five_count?: number; // Optional until API is fully updated
+  user_has_high_fived?: boolean;
 }
 
 interface LeaderboardMeta {
@@ -343,6 +348,18 @@ function LeaderboardContent() {
         </div>
       </ModuleFeedback>
 
+      {/* Cheer Prompt (Proactive) */}
+      <div className="mx-auto max-w-3xl px-6 pt-4">
+        {userStats && userStats.streak >= 3 && (
+          <CheerPrompt
+            recipientName="Your Team"
+            recipientId="team" // Placeholder
+            reason="is crushing it this week!"
+            className="mb-2"
+          />
+        )}
+      </div>
+
       {/* Filters Row */}
       <ModuleFeedback moduleId="leaderboard-filters" moduleName="Leaderboard Filters">
         <div className="mx-auto max-w-3xl px-6 py-4 flex flex-wrap items-center gap-4" data-tour="leaderboard-filters">
@@ -437,6 +454,7 @@ function LeaderboardContent() {
                     )}
                     <th className="px-3 py-3 text-right text-muted-foreground font-medium">Avg/Day</th>
                     <th className="px-3 py-3 text-center text-muted-foreground font-medium">🔥</th>
+                    <th className="px-3 py-3 text-center text-muted-foreground font-medium">Support</th>
                     <th className="px-3 py-3 text-center text-muted-foreground font-medium">Badges</th>
                   </tr>
                 </thead>
@@ -515,6 +533,18 @@ function LeaderboardContent() {
                       </td>
                       <td className="px-3 py-3 text-center">
                         {entry.streak > 0 && <span className="text-orange-400">{entry.streak}</span>}
+                      </td>
+                      <td className="px-3 py-3 text-center">
+                        {entry.user_id !== session?.user?.id && (
+                          <div className="flex justify-center">
+                            <HighFiveButton
+                              recipientId={entry.user_id}
+                              initialCount={entry.high_five_count || 0}
+                              initialHasHighFived={entry.user_has_high_fived || false}
+                              size="sm"
+                            />
+                          </div>
+                        )}
                       </td>
                       <td className="px-3 py-3 text-center">
                         {entry.badges.map(badge => (
