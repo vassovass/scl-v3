@@ -26,6 +26,20 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Favicon and App Icons - Theme-aware using media queries */}
+        {/* Dark mode: use sky-blue icons (light version) for visibility */}
+        <link rel="icon" href="/favicon-16x16-light.png" sizes="16x16" type="image/png" media="(prefers-color-scheme: dark)" />
+        <link rel="icon" href="/favicon-32x32-light.png" sizes="32x32" type="image/png" media="(prefers-color-scheme: dark)" />
+        {/* Light mode: use deep-blue icons (dark version) for visibility */}
+        <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" media="(prefers-color-scheme: light)" />
+        <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" media="(prefers-color-scheme: light)" />
+        {/* PWA icons - dark version as default (works on both backgrounds) */}
+        <link rel="icon" href="/icon-192.png" sizes="192x192" type="image/png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/manifest.json" />
+        {/* Theme color matches browser chrome */}
+        <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#020617" media="(prefers-color-scheme: dark)" />
         {/* GTM: Consent defaults + script (must be in head) */}
         <GoogleTagManager />
       </head>
