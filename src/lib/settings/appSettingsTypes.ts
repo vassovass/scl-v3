@@ -29,12 +29,14 @@ export type AppSettingKey =
   | "show_global_leaderboard"
   | "maintenance_mode"
   // Appearance
-  | "theme_variants";
+  | "theme_variants"
+  // Branding (links to dedicated branding interface)
+  | "branding_settings";
 
 /**
  * Setting categories for organization
  */
-export type AppSettingCategory = "limits" | "features" | "defaults" | "display" | "general" | "appearance";
+export type AppSettingCategory = "limits" | "features" | "defaults" | "display" | "general" | "appearance" | "branding";
 
 /**
  * Roles for visibility control

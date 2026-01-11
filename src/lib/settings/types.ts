@@ -6,7 +6,7 @@
  * - Type-safe validation with compile-time + runtime checks
  */
 
-export type SettingType = "text" | "select" | "toggle" | "radio" | "date" | "number" | "textarea" | "json";
+export type SettingType = "text" | "select" | "toggle" | "radio" | "date" | "number" | "textarea" | "json" | "custom" | "link";
 
 export type SettingRole = "member" | "admin" | "owner" | "superadmin";
 
