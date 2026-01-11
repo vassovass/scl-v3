@@ -3,6 +3,7 @@
 import React, { useState, useCallback } from "react";
 import imageCompression from "browser-image-compression";
 import { apiRequest, ApiError } from "@/lib/api/client";
+import { useAppSettings } from "@/hooks/useAppSettings";
 
 interface BatchSubmissionFormProps {
     leagueId: string;
@@ -57,7 +58,6 @@ interface SubmissionResponse {
     };
 }
 
-const MAX_FILES = 5;
 const MAX_FILE_SIZE_MB = 2;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
@@ -68,6 +68,10 @@ const compressionOptions = {
 };
 
 export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: BatchSubmissionFormProps) {
+    // Get max batch uploads from app settings (SuperAdmin configurable)
+    const { getNumericSetting } = useAppSettings();
+    const maxFiles = getNumericSetting("max_batch_uploads", 7);
+
     const [images, setImages] = useState<ImageFile[]>([]);
     const [processing, setProcessing] = useState(false);
     const [overallStatus, setOverallStatus] = useState<string | null>(null);
@@ -81,10 +85,10 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
         setLimitWarning(null);
 
         // Calculate how many we can still add
-        const remainingSlots = MAX_FILES - images.length;
+        const remainingSlots = maxFiles - images.length;
 
         if (remainingSlots <= 0) {
-            setLimitWarning(`Already at maximum ${MAX_FILES} images. Remove some to add more.`);
+            setLimitWarning(`Already at maximum ${maxFiles} images. Remove some to add more.`);
             event.target.value = "";
             return;
         }
@@ -93,7 +97,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
         let filesToProcess = files;
         if (files.length > remainingSlots) {
             filesToProcess = files.slice(0, remainingSlots);
-            setLimitWarning(`Only first ${remainingSlots} image${remainingSlots !== 1 ? 's' : ''} added (max ${MAX_FILES} total). ${files.length - remainingSlots} skipped.`);
+            setLimitWarning(`Only first ${remainingSlots} image${remainingSlots !== 1 ? 's' : ''} added (max ${maxFiles} total). ${files.length - remainingSlots} skipped.`);
         }
 
         const newImages: ImageFile[] = [];
@@ -114,7 +118,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
 
         setImages((prev) => [...prev, ...newImages]);
         event.target.value = "";
-    }, [images.length]);
+    }, [images.length, maxFiles]);
 
     const removeImage = useCallback((id: string) => {
         setImages((prev) => {
@@ -335,10 +339,10 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
         <div className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/60 p-4 shadow-lg">
             <div className="flex items-center justify-between">
                 <h3 className="text-sm font-medium text-slate-300">
-                    Batch Upload (up to {MAX_FILES} images)
+                    Batch Upload (up to {maxFiles} images)
                 </h3>
                 <span className="text-xs text-slate-500">
-                    {images.length}/{MAX_FILES} selected
+                    {images.length}/{maxFiles} selected
                 </span>
             </div>
 
@@ -349,7 +353,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                     accept="image/png,image/jpeg,image/heic"
                     multiple
                     onChange={handleFilesSelected}
-                    disabled={processing || images.length >= MAX_FILES}
+                    disabled={processing || images.length >= maxFiles}
                     className="text-sm text-slate-300 file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90 disabled:opacity-50"
                 />
                 <p className="text-xs text-slate-500">

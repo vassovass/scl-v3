@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,9 +18,12 @@ interface SettingsFieldProps {
     id?: string;
 }
 
+const DEBOUNCE_MS = 500;
+
 /**
  * Reusable text/textarea input field for settings
  * Wraps shadcn Input/Textarea with consistent styling
+ * Includes debounce to prevent excessive API calls while typing
  */
 export function SettingsField({
     label,
@@ -35,6 +39,38 @@ export function SettingsField({
 }: SettingsFieldProps) {
     const fieldId = id || label.toLowerCase().replace(/\s+/g, "-");
 
+    // Local state for immediate UI feedback
+    const [localValue, setLocalValue] = useState<string>(String(value));
+    const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Sync local value when prop changes
+    useEffect(() => {
+        setLocalValue(String(value));
+    }, [value]);
+
+    const handleChange = (newValue: string) => {
+        setLocalValue(newValue);
+
+        // Clear existing debounce timer
+        if (debounceRef.current) {
+            clearTimeout(debounceRef.current);
+        }
+
+        // Debounce the onChange callback
+        debounceRef.current = setTimeout(() => {
+            onChange(type === "number" ? Number(newValue) : newValue);
+        }, DEBOUNCE_MS);
+    };
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (debounceRef.current) {
+                clearTimeout(debounceRef.current);
+            }
+        };
+    }, []);
+
     return (
         <div className="space-y-2">
             <Label htmlFor={fieldId}>
@@ -45,8 +81,8 @@ export function SettingsField({
             {type === "textarea" ? (
                 <Textarea
                     id={fieldId}
-                    value={value}
-                    onChange={(e) => onChange(e.target.value)}
+                    value={localValue}
+                    onChange={(e) => handleChange(e.target.value)}
                     disabled={disabled}
                     placeholder={placeholder}
                     maxLength={maxLength}
@@ -57,8 +93,8 @@ export function SettingsField({
                 <Input
                     id={fieldId}
                     type={type}
-                    value={value}
-                    onChange={(e) => onChange(type === "number" ? Number(e.target.value) : e.target.value)}
+                    value={localValue}
+                    onChange={(e) => handleChange(e.target.value)}
                     disabled={disabled}
                     placeholder={placeholder}
                     maxLength={maxLength}
@@ -69,9 +105,9 @@ export function SettingsField({
                 <p className="text-xs text-muted-foreground">{description}</p>
             )}
 
-            {maxLength && typeof value === "string" && (
+            {maxLength && typeof localValue === "string" && (
                 <p className="text-xs text-muted-foreground text-right">
-                    {value.length}/{maxLength}
+                    {localValue.length}/{maxLength}
                 </p>
             )}
         </div>

@@ -7,6 +7,27 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-01-12]
+
+### Fixed
+
+- **Max Batch Uploads Setting Not Applied** - Setting now works correctly
+  - **Root Cause**: `BatchSubmissionForm.tsx` had hardcoded `MAX_FILES = 5` instead of using app settings
+  - **Fix**: Now uses `useAppSettings().getNumericSetting('max_batch_uploads', 7)` for dynamic limit
+  - Updated heading text: "Batch Upload (up to X images)" reflects actual setting value
+  - Updated file limit enforcement to use configurable value
+- **Settings Input Debounce** - Number inputs in admin settings now debounce properly
+  - `NumberSetting.tsx`: Added 500ms debounce to prevent API calls on every keystroke
+  - `SettingsField.tsx`: Added 500ms debounce for text/number inputs
+  - Users can type complete values before save triggers
+
+### Changed
+
+- **Max Batch Uploads Constraint** - Increased maximum from 31 to 100 in `appSettings.ts`
+  - Allows SuperAdmins to set batch upload limits up to 100 images
+
+---
+
 ## [2026-01-09]
 
 ### Added

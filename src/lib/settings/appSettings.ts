@@ -23,7 +23,7 @@ const limitsSettings: AppSettingDefinition[] = [
     label: "Max Batch Uploads",
     description: "Maximum number of days that can be uploaded at once",
     default: 7,
-    constraints: { min: 1, max: 31 },
+    constraints: { min: 1, max: 100 },
     category: "limits",
     visibleTo: ["superadmin"],
     editableBy: ["superadmin"],
@@ -227,6 +227,23 @@ const appearanceSettings: AppSettingDefinition[] = [
 ];
 
 // ============================================================================
+// BRANDING SETTINGS
+// ============================================================================
+
+const brandingSettings: AppSettingDefinition[] = [
+  {
+    key: "branding_settings",
+    type: "custom" as any, // Special type for embedded branding UI
+    label: "Logo & Branding",
+    description: "Customize app logo, favicons, and theme colors. Changes affect the entire application including browser tabs, bookmarks, and PWA icons.",
+    default: null, // Handled by brand_settings table
+    category: "branding" as any,
+    visibleTo: ["superadmin"],
+    editableBy: ["superadmin"],
+  },
+];
+
+// ============================================================================
 // REGISTRY EXPORT
 // ============================================================================
 
@@ -276,6 +293,13 @@ export const APP_SETTING_SECTIONS: AppSettingsSection[] = [
     description: "Theme variants and visual customization",
     icon: "Palette",
     settings: appearanceSettings,
+  },
+  {
+    id: "branding" as any,
+    title: "Branding",
+    description: "Customize logo, favicons, and theme colors",
+    icon: "Paintbrush",
+    settings: brandingSettings,
   },
 ];
 
