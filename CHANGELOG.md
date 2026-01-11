@@ -40,6 +40,12 @@ All notable changes to StepLeague v3.
     - `POST /api/high-fives` and `DELETE /api/high-fives` endpoints
     - Leaderboard API updated to return support counts
 
+- **PRD 33: Pricing & How It Works** - Marketing pages
+  - Added `/pricing` page with comparison table
+  - Added `/how-it-works` page with visual guide
+  - Created `(public)` route group to replace `(home)`
+  - Updated global navigation menu and footer
+
 ### Changed
 
 - **Home Page Tone Softening** - Shifted from competitive to connective language to better align with retention strategy

@@ -309,6 +309,8 @@ export const FOOTER_NAVIGATION: MenuDefinition = {
     label: 'Navigation',
     items: [
         { id: 'footer-dashboard', label: 'Dashboard', href: '/dashboard' },
+        { id: 'footer-how-it-works', label: 'How It Works', href: '/how-it-works' },
+        { id: 'footer-pricing', label: 'Pricing', href: '/pricing' },
         { id: 'footer-create', label: 'Create League', href: '/league/create' },
         { id: 'footer-join', label: 'Join League', href: '/join' },
     ]
@@ -349,6 +351,8 @@ export const PUBLIC_MENU: MenuDefinition = {
     id: 'public',
     items: [
         { id: 'public-features', label: 'Features', href: '/#features', icon: '✨', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
+        { id: 'public-how-it-works', label: 'How It Works', href: '/how-it-works', icon: '⚡', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
+        { id: 'public-pricing', label: 'Pricing', href: '/pricing', icon: '💎', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
         { id: 'public-roadmap', label: 'Roadmap', href: '/roadmap', icon: '🗺️', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
         { id: 'public-beta', label: 'Stage Info', href: '/stage-info', icon: '📊', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
     ]
@@ -451,7 +455,7 @@ export function detectMenuLocation(pathname: string): MenuLocation {
     }
 
     // Public/marketing pages
-    const publicPages = ['/', '/privacy', '/terms', '/security', '/stage-info', '/beta', '/roadmap', '/feedback'];
+    const publicPages = ['/', '/pricing', '/how-it-works', '/privacy', '/terms', '/security', '/stage-info', '/beta', '/roadmap', '/feedback'];
     if (publicPages.includes(pathname) || publicPages.some(p => pathname === p)) {
         return 'public_header';
     }

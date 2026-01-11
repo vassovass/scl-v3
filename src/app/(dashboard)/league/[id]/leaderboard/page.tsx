@@ -49,7 +49,6 @@ interface LeaderboardEntry {
   improvement_pct: number | null;
   common_days_steps_a: number | null;
   common_days_steps_b: number | null;
-  common_days_steps_b: number | null;
   badges: string[];
   high_five_count?: number; // Optional until API is fully updated
   user_has_high_fived?: boolean;
@@ -350,7 +349,7 @@ function LeaderboardContent() {
 
       {/* Cheer Prompt (Proactive) */}
       <div className="mx-auto max-w-3xl px-6 pt-4">
-        {userStats && userStats.streak >= 3 && (
+        {userStats && userStats.current_streak >= 3 && (
           <CheerPrompt
             recipientName="Your Team"
             recipientId="team" // Placeholder
