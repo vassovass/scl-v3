@@ -227,8 +227,7 @@ export const GET = withApiHandler({
       rank: 0,
       current_streak: currentStreak,
       total_steps_lifetime: Number(lifetimeSteps),
-      current_streak: currentStreak,
-      total_steps_lifetime: Number(lifetimeSteps),
+
       is_proxy: false,
       high_five_count: highFiveCounts.get(userId) || 0,
       user_has_high_fived: userHighFivedMap.get(userId) || false,

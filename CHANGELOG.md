@@ -9,6 +9,14 @@ All notable changes to StepLeague v3.
 
 ## [2026-01-12]
 
+### Changed
+
+- **Gemini Verification Prompt Logic** - Enhanced reliability for relative dates
+  - **Relative Date Context**: Verification prompt now includes explicit "Today", "Yesterday", and "2 days ago" dates based on server time.
+  - **Modular Prompt Generation**: Extracted `generateVerificationPrompt` for better testability and maintenance.
+  - **Zod Schema Validation**: Added strict type validation for Gemini JSON responses to prevent runtime errors.
+  - **Bug Fix**: Resolved duplicate key error in Leaderboard API.
+
 ### Added
 
 - **PRD 31: Social Encouragement System ("High Fives")** - Supportive, mindful encouragement features

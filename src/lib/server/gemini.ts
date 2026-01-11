@@ -1,3 +1,6 @@
+import { z } from "zod";
+import { format, subDays } from "date-fns";
+
 /**
  * Gemini API client for StepLeague.
  * Handles step verification, feedback merging, and AI chat.
@@ -27,6 +30,7 @@ export interface GeminiCallParams {
     forDate: string;
     imageBase64: string;
     mimeType: string;
+    userTimezone?: string; // Proactive: Ready for client-side timezone injection
 }
 
 export interface FeedbackItem {
@@ -63,15 +67,58 @@ interface GeminiContent {
     parts: GeminiPart[];
 }
 
+// Proactive: Validation schema for robustness
+const extractionSchema = z.object({
+    steps: z.number().or(z.string().transform(val => Number(val))).nullish(), // Handle potential string "1000" from lenient JSON
+    km: z.number().or(z.string().transform(val => Number(val))).nullish(),
+    calories: z.number().or(z.string().transform(val => Number(val))).nullish(),
+    date: z.string().nullish(),
+});
+
 // =============================================================================
 // Public Functions
 // =============================================================================
 
 /**
+ * Generates the verification prompt with relative date context.
+ * Exported for testability (Proactive: Testability).
+ */
+export function generateVerificationPrompt(
+    claimedSteps: number,
+    claimedDate: string,
+    timezone: string = "UTC"
+): string {
+    const today = new Date();
+    // Note: In the future, use 'timezone' to adjust 'today' reference if needed.
+
+    const fmt = (d: Date) => format(d, "yyyy-MM-dd");
+
+    return `The user states they walked ${claimedSteps} steps on ${claimedDate}. 
+    
+    CONTEXT FOR RELATIVE DATES (Reference: ${fmt(today)}):
+    - Today is ${fmt(today)}
+    - Yesterday was ${fmt(subDays(today, 1))}
+    - 2 days ago was ${fmt(subDays(today, 2))}
+
+    INSTRUCTIONS:
+    From the attached screenshot, extract:
+    1. Actual steps
+    2. Distance in kilometers
+    3. Calories
+    4. The date displayed. 
+       - If the image says "Today", use ${fmt(today)}.
+       - If the image says "Yesterday", use ${fmt(subDays(today, 1))}.
+       - If the image says "2 days ago", use ${fmt(subDays(today, 2))}.
+       - If a specific date is shown (e.g., "Dec 31"), format it as YYYY-MM-DD using the year from the context dates above.
+
+    Respond strictly as JSON with keys steps, km, calories, date.`;
+}
+
+/**
  * Extract step data from a screenshot (Legacy/Current use)
  */
 export async function callGemini(params: GeminiCallParams): Promise<GeminiResult> {
-    const prompt = `The user states they walked ${params.stepsClaimed} steps on ${params.forDate}. From the attached screenshot, extract the actual steps, distance in kilometers, calories, and the date displayed. Respond strictly as JSON with keys steps, km, calories, date.`;
+    const prompt = generateVerificationPrompt(params.stepsClaimed, params.forDate, params.userTimezone);
 
     const contents: GeminiContent[] = [{
         role: "user",
@@ -218,7 +265,7 @@ async function callGeminiGenerative(contents: GeminiContent[], jsonMode = false)
     const body = {
         contents,
         generationConfig: {
-            temperature: 0.2,
+            temperature: 0.2, // Proactive: Low temp for more deterministic extraction
             topP: 0.8,
             responseMimeType: jsonMode ? "application/json" : "text/plain",
         },
@@ -265,13 +312,21 @@ function parseGeminiText(rawText: string): GeminiExtraction {
     const jsonText = extractJson(trimmed);
     try {
         const parsed = JSON.parse(jsonText);
-        return {
-            steps: typeof parsed.steps === "number" ? parsed.steps : undefined,
-            km: typeof parsed.km === "number" ? parsed.km : undefined,
-            calories: typeof parsed.calories === "number" ? parsed.calories : undefined,
-            date: typeof parsed.date === "string" ? parsed.date : undefined,
-        };
-    } catch {
+        // Proactive: Use Zod safeParse for typed validation
+        const result = extractionSchema.safeParse(parsed);
+
+        if (result.success) {
+            return {
+                steps: result.data.steps ?? undefined,
+                km: result.data.km ?? undefined,
+                calories: result.data.calories ?? undefined,
+                date: result.data.date ?? undefined,
+            };
+        }
+        console.warn("Gemini extraction failed schema validation:", result.error);
+        return {};
+    } catch (e) {
+        console.warn("Gemini JSON parse failed:", e);
         return {};
     }
 }
