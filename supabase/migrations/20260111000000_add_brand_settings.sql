@@ -12,13 +12,13 @@ CREATE TABLE IF NOT EXISTS brand_settings (
     logo_image_url TEXT, -- Custom logo for light mode (optional)
     logo_image_url_dark TEXT, -- Custom logo for dark mode (optional)
 
-    -- Favicon settings (store Supabase Storage URLs)
-    favicon_32 TEXT NOT NULL DEFAULT '/favicon-32x32.png',
-    favicon_16 TEXT NOT NULL DEFAULT '/favicon-16x16.png',
-    favicon_svg TEXT DEFAULT '/icon.svg',
-    apple_touch_icon TEXT NOT NULL DEFAULT '/apple-touch-icon.png',
-    icon_192 TEXT NOT NULL DEFAULT '/icon-192.png',
-    icon_512 TEXT NOT NULL DEFAULT '/icon-512.png',
+    -- Favicon settings (store Supabase Storage URLs or public paths)
+    favicon_32 TEXT NOT NULL DEFAULT '/favicon.ico',
+    favicon_16 TEXT NOT NULL DEFAULT '/favicon.ico',
+    favicon_svg TEXT, -- NULL by default (no SVG file)
+    apple_touch_icon TEXT NOT NULL DEFAULT '/apple-icon.png',
+    icon_192 TEXT NOT NULL DEFAULT '/icon.png',
+    icon_512 TEXT NOT NULL DEFAULT '/icon.png',
     icon_maskable TEXT, -- Android adaptive icon (optional)
 
     -- Theme colors

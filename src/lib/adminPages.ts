@@ -45,11 +45,6 @@ export const SUPERADMIN_PAGES: AdminPage[] = [
         label: "⚙️ App Settings",
         description: "Configure app-wide settings and development stage",
     },
-    {
-        href: "/admin/branding",
-        label: "🎨 Branding",
-        description: "Customize logo, favicon, and theme colors",
-    },
     // Add more superadmin pages here:
     // {
     //     href: "/admin/users",

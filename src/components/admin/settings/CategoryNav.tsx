@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Sliders, Flag, Settings2, Eye, Settings } from "lucide-react";
+import { Sliders, Flag, Settings2, Eye, Settings, Palette, Paintbrush } from "lucide-react";
 import { AppSettingCategory } from "@/lib/settings/appSettingsTypes";
 
 interface CategoryNavProps {
@@ -20,6 +20,8 @@ const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>
   Settings2,
   Eye,
   Settings,
+  Palette,
+  Paintbrush,
 };
 
 /**

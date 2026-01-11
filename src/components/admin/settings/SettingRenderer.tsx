@@ -3,6 +3,7 @@
 import { NumberSetting } from "./NumberSetting";
 import { BooleanSetting } from "./BooleanSetting";
 import { SelectSetting } from "./SelectSetting";
+import { BrandingSettingsRenderer } from "./BrandingSettingsRenderer";
 
 interface SelectOption {
   value: string;
@@ -104,6 +105,14 @@ export function SettingRenderer({
           </div>
         </div>
       );
+
+    case "custom":
+      // Custom setting renderers based on settingKey
+      if (settingKey === "branding_settings") {
+        return <BrandingSettingsRenderer />;
+      }
+      // Future custom renderers can be added here
+      return null;
 
     default:
       // Text input for unknown types

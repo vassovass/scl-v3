@@ -64,12 +64,12 @@ export const DEFAULT_BRANDING: BrandSettings = {
     textSecondary: 'League',
   },
   favicon: {
-    favicon32: '/favicon-32x32.png',
-    favicon16: '/favicon-16x16.png',
-    faviconSvg: '/icon.svg',
-    appleTouchIcon: '/apple-touch-icon.png',
-    icon192: '/icon-192.png',
-    icon512: '/icon-512.png',
+    favicon32: '/favicon.ico',           // Multi-size ICO (16x16, 32x32)
+    favicon16: '/favicon.ico',           // Multi-size ICO
+    faviconSvg: undefined,               // No SVG file exists
+    appleTouchIcon: '/apple-icon.png',   // 180x180 PNG
+    icon192: '/icon.png',                // 512x512 PNG (browser will resize)
+    icon512: '/icon.png',                // 512x512 PNG (native size)
   },
   themeColorLight: '#ffffff',
   themeColorDark: '#020617',
