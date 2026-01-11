@@ -51,12 +51,12 @@ export default function HomePage() {
             </h1>
 
             <p className="mt-6 text-xl sm:text-2xl font-light text-muted-foreground animate-fade-slide animate-delay-100">
-              Compete. Track. Win.
+              Motivate. Connect. Thrive.
             </p>
 
             <p className="mt-4 text-lg text-muted-foreground max-w-lg mx-auto lg:mx-0 animate-fade-slide animate-delay-200">
-              {APP_CONFIG.tagline}. Upload step screenshots, get AI-verified,
-              and climb the leaderboard against friends.
+              {APP_CONFIG.tagline}. Upload step screenshots, get verified instantly,
+              and stay motivated with friends.
             </p>
 
             {/* CTAs */}
@@ -107,7 +107,7 @@ export default function HomePage() {
               How It Works
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Three simple steps to start competing
+              Three simple steps to start your journey
             </p>
           </div>
 
@@ -135,7 +135,7 @@ export default function HomePage() {
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-3">AI Verifies</h3>
                 <p className="text-slate-400">
-                  Our AI instantly reads your screenshot and verifies the step count - no cheating, no manual entry errors.
+                  Our AI instantly reads your screenshot and verifies the step count - ensuring fair play and accurate tracking for everyone.
                 </p>
               </div>
             </div>
@@ -147,9 +147,9 @@ export default function HomePage() {
                 <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center text-2xl font-bold text-black mb-6">
                   3
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-3">Climb the Leaderboard</h3>
+                <h3 className="text-xl font-semibold text-white mb-3">Reach Your Goals</h3>
                 <p className="text-slate-400">
-                  See where you rank against friends in daily and weekly standings. Stay motivated and keep moving!
+                  Celebrate milestones and see your group's progress. Connect with friends and build healthy habits together.
                 </p>
               </div>
             </div>
@@ -166,7 +166,7 @@ export default function HomePage() {
               <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-8">
                 Everything you need to <br />
                 <span className="bg-gradient-to-r from-sky-400 to-cyan-400 bg-clip-text text-transparent">
-                  compete with friends
+                  move together
                 </span>
               </h2>
 
@@ -179,7 +179,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-foreground">AI-Powered Verification</h3>
-                    <p className="text-muted-foreground mt-1">Screenshots are verified by AI to prevent cheating and ensure fair competition.</p>
+                    <p className="text-muted-foreground mt-1">Screenshots are verified to ensure fairness and build trust within your group.</p>
                   </div>
                 </div>
 
@@ -190,8 +190,8 @@ export default function HomePage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white">Real-time Leaderboards</h3>
-                    <p className="text-slate-400 mt-1">Daily and weekly rankings update instantly. See who&apos;s leading and catch up!</p>
+                    <h3 className="text-lg font-semibold text-white">Real-time Progress</h3>
+                    <p className="text-slate-400 mt-1">Daily and weekly stats update instantly. Visualize your journey and celebrate consistency.</p>
                   </div>
                 </div>
 
@@ -265,10 +265,10 @@ export default function HomePage() {
 
         <div className="relative z-10 max-w-3xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-5xl font-bold text-foreground">
-            Ready to start competing?
+            Ready to get moving?
           </h2>
           <p className="mt-6 text-xl text-muted-foreground">
-            Join StepLeague for free and challenge your friends to move more.
+            Join StepLeague for free and motivate your friends to build healthy habits.
           </p>
           <Link
             href="/sign-up"
@@ -281,6 +281,6 @@ export default function HomePage() {
 
       {/* Footer spacer */}
       <div className="h-12 bg-background" />
-    </main>
+    </main >
   );
 }

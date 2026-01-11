@@ -32,6 +32,14 @@ All notable changes to StepLeague v3.
     - `POST /api/high-fives` and `DELETE /api/high-fives` endpoints
     - Leaderboard API updated to return support counts
 
+### Changed
+
+- **Home Page Tone Softening** - Shifted from competitive to connective language to better align with retention strategy
+  - Updated Hero copy: "Compete. Track. Win." → "Motivate. Connect. Thrive."
+  - Updated "How It Works" to focus on verification/fairness rather than "cheating"
+  - Updated Features section to emphasize progress and consistency
+  - Aligned with new "Social Encouragement" features for a cohesive friendly vibe
+
 ### Fixed
 
 - **Max Batch Uploads Setting Not Applied** - Setting now works correctly
