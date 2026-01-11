@@ -7,7 +7,6 @@ import Link from "next/link";
 import { Spinner } from "@/components/ui/Spinner";
 import { SystemBadge as Badge } from "@/components/ui/SystemBadge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Logo } from "@/components/ui/Logo";
 
 /**
  * SUPERADMIN-ONLY: Design System & Brand Guidelines
@@ -88,39 +87,60 @@ export default function DesignSystemPage() {
                     </h2>
 
                     <div className="glass-card p-6">
-                        <h3 className="text-sm font-medium text-slate-300 mb-4">Logo Component</h3>
-                        <div className="flex flex-col gap-8">
-                            {/* Variants */}
+                        <h3 className="text-sm font-medium text-slate-300 mb-4">Logo Treatment</h3>
+                        <div className="flex flex-col sm:flex-row gap-8">
+                            {/* Default State */}
                             <div className="space-y-3">
-                                <p className="text-xs text-slate-500">Size Variants</p>
-                                <div className="flex items-center gap-8 p-4 rounded-lg bg-slate-900 border border-slate-700">
-                                    <div className="flex flex-col items-center gap-2">
-                                        <Logo size="sm" href="#" />
-                                        <span className="text-xs text-slate-500">Small (sm)</span>
-                                    </div>
-                                    <div className="flex flex-col items-center gap-2">
-                                        <Logo size="md" href="#" />
-                                        <span className="text-xs text-slate-500">Medium (md)</span>
-                                    </div>
-                                    <div className="flex flex-col items-center gap-2">
-                                        <Logo size="lg" href="#" />
-                                        <span className="text-xs text-slate-500">Large (lg)</span>
-                                    </div>
+                                <p className="text-xs text-slate-500">Default State</p>
+                                <div className="flex items-center gap-2 p-4 rounded-lg bg-slate-900 border border-slate-700">
+                                    <span className="text-xl">👟</span>
+                                    <span className="text-lg font-bold">
+                                        <span className="text-slate-50">Step</span>
+                                        <span className="text-sky-500">League</span>
+                                    </span>
                                 </div>
                                 <p className="text-xs text-slate-400">
-                                    Modular component with hover effects built-in. Adapts icon to light/dark mode automatically.
+                                    &quot;Step&quot; in white (slate-50), &quot;League&quot; in brand blue (sky-500)
                                 </p>
+                            </div>
+
+                            {/* Hover State */}
+                            <div className="space-y-3">
+                                <p className="text-xs text-slate-500">Hover State (colors swap)</p>
+                                <div className="flex items-center gap-2 p-4 rounded-lg bg-slate-900 border border-slate-700">
+                                    <span className="text-xl">👟</span>
+                                    <span className="text-lg font-bold">
+                                        <span className="text-primary">Step</span>
+                                        <span className="text-slate-50">League</span>
+                                    </span>
+                                </div>
+                                <p className="text-xs text-slate-400">
+                                    On hover, colors invert: &quot;Step&quot; → sky-400, &quot;League&quot; → white
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="mt-6 pt-6 border-t border-slate-700">
+                            <p className="text-xs text-slate-500 mb-2">Live Demo (hover me):</p>
+                            <div className="inline-flex items-center gap-2 p-4 rounded-lg bg-slate-900 border border-slate-700 cursor-pointer group">
+                                <span className="text-xl">👟</span>
+                                <span className="text-lg font-bold">
+                                    <span className="text-slate-50 transition-colors group-hover:text-primary">Step</span>
+                                    <span className="text-primary transition-colors group-hover:text-slate-50">League</span>
+                                </span>
                             </div>
                         </div>
 
                         <div className="mt-6 pt-6 border-t border-slate-700">
                             <p className="text-xs text-slate-500 mb-4">Usage:</p>
                             <pre className="text-xs text-slate-400 bg-slate-900 p-4 rounded-lg overflow-x-auto">
-                                {`import { Logo } from "@/components/ui/Logo";
-
-<Logo size="md" />
-<Logo size="lg" showText={false} /> // Icon only
-<Logo size="sm" href="/" /> // Custom link`}
+                                {`<Link className="group flex items-center gap-2">
+  <span className="text-xl">👟</span>
+  <span className="text-lg font-bold">
+    <span className="text-slate-50 transition-colors group-hover:text-primary">Step</span>
+    <span className="text-primary transition-colors group-hover:text-slate-50">League</span>
+  </span>
+</Link>`}
                             </pre>
                         </div>
                     </div>

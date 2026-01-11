@@ -9,7 +9,6 @@ import { ShadcnMenuRenderer } from "./ShadcnMenuRenderer";
 import { MobileMenu } from "./MobileMenu";
 import { ModeToggle } from "@/components/mode-toggle";
 import { buttonVariants } from "@/components/ui/button";
-import { Logo } from "@/components/ui/Logo";
 import { MenuItem, UserRole, MenuLocation, detectMenuLocation } from "@/lib/menuConfig";
 import { useMenuConfig } from "@/hooks/useMenuConfig";
 import { APP_CONFIG } from "@/lib/config";
@@ -158,8 +157,16 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
     return (
         <header className={headerClasses}>
             <nav ref={navRef} className="mx-auto flex max-w-6xl items-center justify-between px-4 h-14">
-                {/* Logo - uses modular Logo component */}
-                <Logo size="md" />
+                {/* Logo */}
+                <Link href="/dashboard" className="group flex items-center gap-2">
+                    <span className="text-xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-10deg]">
+                        <span className="inline-block transition-all duration-300 group-hover:drop-shadow-[0_0_8px_hsl(var(--primary))]">👟</span>
+                    </span>
+                    <span className="text-lg font-bold">
+                        <span className="text-foreground transition-colors duration-300 group-hover:text-primary">Step</span>
+                        <span className="text-primary transition-colors duration-300 group-hover:text-foreground">League</span>
+                    </span>
+                </Link>
 
                 {/* Mobile hamburger button - shown for authenticated users OR public pages */}
                 {(session || isPublicLocation) && (
