@@ -18,6 +18,7 @@ import { openDB, DBSchema, IDBPDatabase } from 'idb';
 interface MenuCacheData {
   menus: Record<string, any>;
   locations: Record<string, any>;
+  cacheVersion: string; // Server-side version for staleness detection
   timestamp: number;
   version: string;
 }
@@ -113,7 +114,7 @@ class MenuCacheManager {
     return null;
   }
 
-  async set(data: { menus: Record<string, any>; locations: Record<string, any> }): Promise<void> {
+  async set(data: { menus: Record<string, any>; locations: Record<string, any>; cacheVersion: string }): Promise<void> {
     await this.initPromise;
 
     const cacheData: MenuCacheData = {

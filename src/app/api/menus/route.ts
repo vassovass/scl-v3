@@ -188,13 +188,25 @@ export const GET = withApiHandler({
     };
   });
 
-  console.log(`[Menu API /api/menus] Returning ${Object.keys(menusObj).length} menus and ${Object.keys(locationsObj).length} locations`);
+  // Get the latest update timestamp for cache versioning
+  // This allows frontend to detect stale cache and auto-invalidate
+  const { data: versionData } = await adminClient
+    .from('menu_items')
+    .select('updated_at')
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  const cacheVersion = versionData?.updated_at || new Date().toISOString();
+
+  console.log(`[Menu API /api/menus] Returning ${Object.keys(menusObj).length} menus and ${Object.keys(locationsObj).length} locations (version: ${cacheVersion})`);
 
   // Return with cache headers
   // Cache for 60 seconds, but allow stale content for 5 minutes while revalidating
   const response = Response.json({
     menus: menusObj,
     locations: locationsObj,
+    cacheVersion, // Version for frontend cache invalidation
     _timestamp: Date.now(), // Cache-busting timestamp
   });
 

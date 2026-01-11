@@ -40,8 +40,9 @@ export function useMenuConfig() {
   const loadMenus = useCallback(async (skipCache = false) => {
     try {
       // Layer 1-3: Try cache first (unless explicitly skipping)
+      let cached = null;
       if (!skipCache) {
-        const cached = await menuCache.get();
+        cached = await menuCache.get();
         if (cached) {
           setData(cached);
           setIsStale(menuCache.isStale(cached));
@@ -51,22 +52,30 @@ export function useMenuConfig() {
           if (!menuCache.isExpired(cached)) {
             setIsLoading(false);
             setError(null);
-            return; // Use fresh cache, don't fetch from API
+            // Continue to fetch in background to check version
+          } else {
+            // Cache is expired, show stale data but fetch fresh in foreground
           }
-          // Cache is expired, show stale data but fetch fresh in foreground
         }
       }
 
       // Layer 4: Fetch from API
-      setIsLoading(true);
+      setIsLoading(cached ? false : true); // Don't show loading if we have cached data
       const res = await fetch('/api/menus');
       const json = await res.json();
+
+      // Check if server version differs from cached version (cache invalidation check)
+      if (cached?.cacheVersion && json.cacheVersion && cached.cacheVersion !== json.cacheVersion) {
+        console.log(`[Menu Cache] Version mismatch: ${cached.cacheVersion} vs ${json.cacheVersion} - refreshing cache`);
+        await menuCache.invalidate();
+      }
 
       // Update cache with fresh data
       if (json.menus && json.locations) {
         await menuCache.set({
           menus: json.menus,
           locations: json.locations,
+          cacheVersion: json.cacheVersion || new Date().toISOString(),
         });
       }
 
