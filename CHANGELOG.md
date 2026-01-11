@@ -30,6 +30,13 @@ All notable changes to StepLeague v3.
   - **Smart Error Classification**: Distinguishes retryable (network, rate limit, timeout) vs non-retryable errors
   - **Graceful Degradation**: After 3 auto-retry attempts, shows manual retry option instead
 
+- **Filename-Based Date Hints** - Intelligent date extraction from image filenames
+  - **Automatic Date Parsing**: Extracts dates from filenames (e.g., "steps_2024-01-12.jpg", "IMG_20240112.png", "health_2024_01_12.png")
+  - **Fallback Support**: Uses filename date when screenshot date is ambiguous or missing
+  - **Confidence Boost**: Filename dates increase extraction confidence when screenshot is unclear
+  - **Multi-Pattern Support**: Handles YYYY-MM-DD, YYYYMMDD, and YYYY_MM_DD formats
+  - **Validation**: Only uses valid dates that pass Date.parse() validation
+
 ### Changed
 
 - **Gemini Verification Prompt Logic** - Enhanced reliability for relative dates

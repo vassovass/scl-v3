@@ -7,6 +7,7 @@ import { normalizeExtractedDate } from "@/lib/utils/date";
 const extractSchema = z.object({
     league_id: z.string().uuid(),
     proof_path: z.string().min(3),
+    filename: z.string().optional(), // Original filename for date hints
 });
 
 /**
@@ -51,6 +52,7 @@ export async function POST(request: Request): Promise<Response> {
             proof_path: input.proof_path,
             league_id: input.league_id,
             requester_id: user.id,
+            filename: input.filename, // Pass filename for date hints
         });
 
         if (!verification.ok) {

@@ -33,6 +33,7 @@ export interface GeminiCallParams {
     imageBase64: string;
     mimeType: string;
     userTimezone?: string; // Proactive: Ready for client-side timezone injection
+    filename?: string; // Original filename for date hints
 }
 
 export interface FeedbackItem {
@@ -84,17 +85,62 @@ const extractionSchema = z.object({
 // =============================================================================
 
 /**
+ * Extract potential date from filename
+ * Handles common patterns: YYYY-MM-DD, YYYYMMDD, YYYY_MM_DD, IMG_YYYYMMDD, screenshot_YYYY-MM-DD, etc.
+ */
+function extractDateFromFilename(filename?: string): string | null {
+    if (!filename) return null;
+
+    // Pattern 1: YYYY-MM-DD (e.g., "2024-01-12.jpg", "steps_2024-01-12.png")
+    const dashPattern = /(\d{4})-(\d{2})-(\d{2})/;
+    const dashMatch = filename.match(dashPattern);
+    if (dashMatch) {
+        const [_, year, month, day] = dashMatch;
+        const date = `${year}-${month}-${day}`;
+        // Validate it's a real date
+        if (!isNaN(Date.parse(date))) return date;
+    }
+
+    // Pattern 2: YYYYMMDD (e.g., "IMG_20240112.jpg", "screenshot_20240112.png")
+    const compactPattern = /(\d{4})(\d{2})(\d{2})/;
+    const compactMatch = filename.match(compactPattern);
+    if (compactMatch) {
+        const [_, year, month, day] = compactMatch;
+        const date = `${year}-${month}-${day}`;
+        if (!isNaN(Date.parse(date))) return date;
+    }
+
+    // Pattern 3: YYYY_MM_DD (e.g., "health_2024_01_12.png")
+    const underscorePattern = /(\d{4})_(\d{2})_(\d{2})/;
+    const underscoreMatch = filename.match(underscorePattern);
+    if (underscoreMatch) {
+        const [_, year, month, day] = underscoreMatch;
+        const date = `${year}-${month}-${day}`;
+        if (!isNaN(Date.parse(date))) return date;
+    }
+
+    return null;
+}
+
+/**
  * Generates the verification prompt with relative date context.
  * Exported for testability (Proactive: Testability).
  */
 export function generateVerificationPrompt(
     claimedSteps: number,
     claimedDate: string,
-    timezone: string = "UTC"
+    timezone: string = "UTC",
+    filename?: string
 ): string {
     const today = new Date();
     const fmt = (d: Date) => format(d, "yyyy-MM-dd");
     const currentYear = fmt(today).split('-')[0];
+
+    // Try to extract date hint from filename
+    const filenameDate = extractDateFromFilename(filename);
+    const filenameHint = filenameDate
+        ? `\n- Filename hint: "${filename}" suggests date ${filenameDate}`
+        : '';
 
     return `You are a specialized OCR and data extraction expert for fitness tracking applications.
 
@@ -108,7 +154,7 @@ TASK: Extract step count and date from fitness app screenshot.
 
 USER CLAIM:
 - Claimed steps: ${claimedSteps === 0 ? 'AUTO-EXTRACT (user did not specify)' : claimedSteps}
-- Claimed date: ${claimedDate}
+- Claimed date: ${claimedDate}${filenameHint}
 
 DATE CONTEXT (Reference: ${fmt(today)}):
 - Today = ${fmt(today)}
@@ -157,9 +203,10 @@ EXTRACTION RULES:
 
    **Partial dates:** "Sat, 22 Nov", "22 Nov", "Nov 22" → Use year ${currentYear}
    **Weekday inference:** "Sat, 22 Nov" → Calculate year from weekday + current date
+   **Filename hint:** If screenshot date is ambiguous/missing, use filename date as fallback (increases confidence)
 
    If language/format is ambiguous, analyze UI elements and note your reasoning.
-   If year is missing, use ${currentYear} and note the assumption.
+   If year is missing, use ${currentYear} and note the assumption.${filenameDate ? `\n   If screenshot date is unclear, the filename suggests ${filenameDate} - use this as a strong hint.` : ''}
 
 3. **Distance & Calories**: Extract if visible (optional)
    - Handle both metric (km) and imperial (mi) units
@@ -204,7 +251,7 @@ EXAMPLES:
  * Extract step data from a screenshot (Legacy/Current use)
  */
 export async function callGemini(params: GeminiCallParams): Promise<GeminiResult> {
-    const prompt = generateVerificationPrompt(params.stepsClaimed, params.forDate, params.userTimezone);
+    const prompt = generateVerificationPrompt(params.stepsClaimed, params.forDate, params.userTimezone, params.filename);
 
     const contents: GeminiContent[] = [{
         role: "user",

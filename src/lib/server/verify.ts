@@ -16,6 +16,7 @@ export type VerificationPayload = {
     requester_id: string;
     league_id?: string;
     submission_id?: string;
+    filename?: string; // Original filename for date hints
 };
 
 export type VerificationResult = {
@@ -63,6 +64,7 @@ export async function callVerificationFunction(payload: VerificationPayload): Pr
             forDate: payload.for_date,
             imageBase64: proof.base64,
             mimeType: proof.mimeType,
+            filename: payload.filename, // Pass filename for date hints
         });
 
         // Evaluate the result

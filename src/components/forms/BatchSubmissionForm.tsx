@@ -183,6 +183,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                 body: JSON.stringify({
                     league_id: leagueId,
                     proof_path: signed.path,
+                    filename: image.file.name, // Pass original filename for date hints
                 }),
             });
 
