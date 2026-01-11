@@ -36,6 +36,54 @@ All notable changes to StepLeague v3.
   - **SystemBadge** (`SystemBadge.tsx`) - Category-based for roadmap/kanban (type, status, release, achievement)
   - Updated imports across 4 files to use appropriate badge component
 
+## [2026-01-11]
+
+### Added
+
+- **Modular Branding System (95% Complete)** - Full database-backed logo and branding customization
+  - **Core Infrastructure**:
+    - `src/lib/branding.ts` - Type-safe branding configuration with defaults
+    - `src/lib/image-processing.ts` - Client-side compression, security validation, multi-size generation
+    - Database migration `20260111000000_add_brand_settings.sql` - Singleton table for branding
+    - Supabase Storage bucket `brand-assets` (public read, superadmin write)
+    - NPM packages: `browser-image-compression`, `file-type`, `swr`
+  - **API Layer**:
+    - `GET /api/admin/branding` - Fetch current branding (public endpoint)
+    - `PATCH /api/admin/branding` - Update branding (superadmin only, partial updates)
+    - `POST /api/admin/branding/upload-logo` - Upload custom logo images (light + dark)
+  - **Components**:
+    - `Logo.tsx` - Modular component with database support, theme-aware, supports custom images or emoji
+    - Updated `NavHeader.tsx` and `GlobalFooter.tsx` to use Logo component
+  - **React Hook**:
+    - `useBranding()` - SWR-powered hook with optimistic updates and cache management
+  - **SuperAdmin UI**:
+    - `/admin/branding` - Full branding management page
+    - Text-based logo editor (emoji, primary/secondary text)
+    - Custom logo image upload (light + dark mode variants)
+    - Theme color pickers (light + dark mode)
+    - Live logo preview
+    - Added to `adminPages.ts` config (accessible via nav dropdown)
+  - **Dynamic Metadata**:
+    - `layout.tsx` - Dynamic favicon URLs via `generateMetadata()` (SSR-optimized)
+    - `manifest.ts` - Dynamic PWA icons based on branding settings
+  - **Design System Integration**:
+    - Added Logo component documentation to design system page
+    - Live demos of all size variants (sm, md, lg)
+  - **Security**:
+    - Multi-layer validation: file extension, MIME type, magic bytes verification
+    - Max file size: 5MB with client-side compression before upload
+    - Row-Level Security (RLS) policies on database and storage
+  - **Performance**:
+    - Client-side image compression with Web Workers (non-blocking)
+    - CDN delivery via Supabase Storage with 1-year cache headers
+    - SWR caching (60s dedupe interval) to minimize API calls
+  - **SEO Optimization**:
+    - Dynamic page titles based on branding
+    - Theme-aware favicons (16x16, 32x32, 180x180)
+    - PWA icons (192x192, 512x512, maskable)
+    - Proper theme color meta tags for light/dark mode
+  - **Documentation**: Comprehensive PRD in `docs/prds/PRD_Modular_Branding_System.md` (95% complete)
+
 ## [2026-01-10]
 
 ### Added

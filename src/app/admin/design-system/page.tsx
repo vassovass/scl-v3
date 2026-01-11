@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Spinner } from "@/components/ui/Spinner";
 import { SystemBadge as Badge } from "@/components/ui/SystemBadge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Logo } from "@/components/ui/Logo";
 
 /**
  * SUPERADMIN-ONLY: Design System & Brand Guidelines
@@ -87,61 +88,92 @@ export default function DesignSystemPage() {
                     </h2>
 
                     <div className="glass-card p-6">
-                        <h3 className="text-sm font-medium text-slate-300 mb-4">Logo Treatment</h3>
-                        <div className="flex flex-col sm:flex-row gap-8">
-                            {/* Default State */}
-                            <div className="space-y-3">
-                                <p className="text-xs text-slate-500">Default State</p>
-                                <div className="flex items-center gap-2 p-4 rounded-lg bg-slate-900 border border-slate-700">
-                                    <span className="text-xl">👟</span>
-                                    <span className="text-lg font-bold">
-                                        <span className="text-slate-50">Step</span>
-                                        <span className="text-sky-500">League</span>
-                                    </span>
-                                </div>
-                                <p className="text-xs text-slate-400">
-                                    &quot;Step&quot; in white (slate-50), &quot;League&quot; in brand blue (sky-500)
-                                </p>
-                            </div>
+                        <h3 className="text-sm font-medium text-slate-300 mb-4">Logo Component (Modular)</h3>
+                        <p className="text-xs text-slate-400 mb-6">
+                            The Logo component is database-driven and supports custom images or emoji+text logos.
+                            SuperAdmins can customize via <Link href="/admin/branding" className="text-primary hover:underline">/admin/branding</Link>.
+                        </p>
 
-                            {/* Hover State */}
+                        {/* Live Demos */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
                             <div className="space-y-3">
-                                <p className="text-xs text-slate-500">Hover State (colors swap)</p>
-                                <div className="flex items-center gap-2 p-4 rounded-lg bg-slate-900 border border-slate-700">
-                                    <span className="text-xl">👟</span>
-                                    <span className="text-lg font-bold">
-                                        <span className="text-primary">Step</span>
-                                        <span className="text-slate-50">League</span>
-                                    </span>
+                                <p className="text-xs text-slate-500">Size: Small</p>
+                                <div className="p-4 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center">
+                                    <Logo size="sm" href="" />
+                                </div>
+                            </div>
+                            <div className="space-y-3">
+                                <p className="text-xs text-slate-500">Size: Medium (Default)</p>
+                                <div className="p-4 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center">
+                                    <Logo size="md" href="" />
+                                </div>
+                            </div>
+                            <div className="space-y-3">
+                                <p className="text-xs text-slate-500">Size: Large</p>
+                                <div className="p-4 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center">
+                                    <Logo size="lg" href="" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 pt-6 border-t border-slate-700">
+                            <div className="space-y-3">
+                                <p className="text-xs text-slate-500">Icon Only (no text)</p>
+                                <div className="p-4 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center">
+                                    <Logo size="md" showText={false} href="" />
+                                </div>
+                            </div>
+                            <div className="space-y-3">
+                                <p className="text-xs text-slate-500">With Link (hover me)</p>
+                                <div className="p-4 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center">
+                                    <Logo size="md" href="/dashboard" />
                                 </div>
                                 <p className="text-xs text-slate-400">
-                                    On hover, colors invert: &quot;Step&quot; → sky-400, &quot;League&quot; → white
+                                    Hover effect: colors swap + emoji glow
                                 </p>
                             </div>
                         </div>
 
-                        <div className="mt-6 pt-6 border-t border-slate-700">
-                            <p className="text-xs text-slate-500 mb-2">Live Demo (hover me):</p>
-                            <div className="inline-flex items-center gap-2 p-4 rounded-lg bg-slate-900 border border-slate-700 cursor-pointer group">
-                                <span className="text-xl">👟</span>
-                                <span className="text-lg font-bold">
-                                    <span className="text-slate-50 transition-colors group-hover:text-primary">Step</span>
-                                    <span className="text-primary transition-colors group-hover:text-slate-50">League</span>
-                                </span>
-                            </div>
+                        {/* Features */}
+                        <div className="pt-6 border-t border-slate-700 mb-6">
+                            <h4 className="text-xs font-medium text-slate-300 mb-3">Features</h4>
+                            <ul className="text-xs text-slate-400 space-y-2 list-disc list-inside">
+                                <li>Database-driven: Reads from <code className="text-primary">brand_settings</code> table</li>
+                                <li>Theme-aware: Separate images for light/dark mode</li>
+                                <li>Size variants: <code className="text-primary">sm</code>, <code className="text-primary">md</code>, <code className="text-primary">lg</code></li>
+                                <li>Hover effects: Color swap + glow animation</li>
+                                <li>Optional link: Set <code className="text-primary">href=""</code> for no link</li>
+                                <li>SSR-safe: Prevents hydration mismatch</li>
+                            </ul>
                         </div>
 
-                        <div className="mt-6 pt-6 border-t border-slate-700">
+                        {/* Usage Examples */}
+                        <div className="pt-6 border-t border-slate-700">
                             <p className="text-xs text-slate-500 mb-4">Usage:</p>
                             <pre className="text-xs text-slate-400 bg-slate-900 p-4 rounded-lg overflow-x-auto">
-                                {`<Link className="group flex items-center gap-2">
-  <span className="text-xl">👟</span>
-  <span className="text-lg font-bold">
-    <span className="text-slate-50 transition-colors group-hover:text-primary">Step</span>
-    <span className="text-primary transition-colors group-hover:text-slate-50">League</span>
-  </span>
-</Link>`}
+                                {`import { Logo } from "@/components/ui/Logo";
+
+// Full logo in header
+<Logo size="md" />
+
+// Small logo in footer
+<Logo size="sm" />
+
+// Icon only (no text)
+<Logo size="lg" showText={false} />
+
+// Without link
+<Logo size="md" href="" />`}
                             </pre>
+                            <p className="text-xs text-slate-500 mt-4">
+                                Component: <code className="text-primary">src/components/ui/Logo.tsx</code>
+                            </p>
+                            <p className="text-xs text-slate-500 mt-1">
+                                Hook: <code className="text-primary">src/hooks/useBranding.ts</code> (SWR-cached branding data)
+                            </p>
+                            <p className="text-xs text-slate-500 mt-1">
+                                Config: <code className="text-primary">src/lib/branding.ts</code> (defaults + types)
+                            </p>
                         </div>
                     </div>
                 </section>

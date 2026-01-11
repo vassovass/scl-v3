@@ -4,6 +4,7 @@ import Link from "next/link";
 import { APP_CONFIG } from "@/lib/config";
 import { useMenuConfig } from "@/hooks/useMenuConfig";
 import { useAppSettings } from "@/hooks/useAppSettings";
+import { Logo } from "@/components/ui/Logo";
 
 export function GlobalFooter() {
     const currentYear = new Date().getFullYear();
@@ -21,13 +22,7 @@ export function GlobalFooter() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                     {/* Brand */}
                     <div className="col-span-2 md:col-span-1">
-                        <Link href="/dashboard" className="group flex items-center gap-2">
-                            <span className="text-xl">👟</span>
-                            <span className="font-bold">
-                                <span className="text-foreground transition-colors group-hover:text-primary">Step</span>
-                                <span className="text-primary transition-colors group-hover:text-foreground">League</span>
-                            </span>
-                        </Link>
+                        <Logo size="sm" />
                         <p className="mt-2 text-xs text-muted-foreground">
                             {APP_CONFIG.tagline}
                         </p>
