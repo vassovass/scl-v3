@@ -19,6 +19,10 @@ All notable changes to StepLeague v3.
     - **Circuit Breaker**: `serverCache.ts` now protects DB from cascading failures (5 failures = 30s open circuit)
     - **SafeLazy**: Error-boundary protected wrapper for third-party scripts (GTM, Feedback)
   - **DevTools**: Added `CacheDevTools` for monitoring hit rates and circuit status
+- **Client Version & Commit Display** - Added version and commit hash to global footer
+  - **Configuration**: Exposes `NEXT_PUBLIC_APP_VERSION` and `NEXT_PUBLIC_COMMIT_SHA` via `next.config.js`
+  - **UI**: Displays subtle version info (e.g., `v0.1.0 (a1b2c3d)`) next to stage badge in `GlobalFooter.tsx`
+  - **Transparency**: Helps users/testers identify exactly which deploy they are using
 - **Server-Side Cache for Branding** - Implemented modular `serverCache.ts` utility
   - **Performance**: Fixed GTmetrix/PageSpeed timeouts via `unstable_cache` with 3s timeout
   - **Auto-Invalidation**: Admin branding updates instantly bust cache (`revalidateTag`)

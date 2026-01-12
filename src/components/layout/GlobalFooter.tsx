@@ -121,19 +121,31 @@ function FooterBottomBar({ currentYear }: { currentYear: number }) {
             <p className="text-xs text-muted-foreground">
                 © {currentYear} {APP_CONFIG.name}. All rights reserved.
             </p>
-            {!isLoading && stageData.badge_visible && (
-                <Link
-                    href="/stage-info"
-                    className="flex items-center gap-4 text-xs text-muted-foreground hover:text-foreground transition group"
-                >
-                    <span className="flex items-center gap-1.5">
-                        <span className={`w-2 h-2 rounded-full ${currentStage.glowColor} animate-pulse`} />
-                        <span className={`${currentStage.color} group-hover:underline`}>
-                            {currentStage.label}
-                        </span>
-                    </span>
-                </Link>
             )}
+            
+            {/* Version Info */}
+            <div className="flex items-center gap-4">
+                {!isLoading && stageData.badge_visible && (
+                    <Link
+                        href="/stage-info"
+                        className="flex items-center gap-4 text-xs text-muted-foreground hover:text-foreground transition group"
+                    >
+                        <span className="flex items-center gap-1.5">
+                            <span className={`w-2 h-2 rounded-full ${currentStage.glowColor} animate-pulse`} />
+                            <span className={`${currentStage.color} group-hover:underline`}>
+                                {currentStage.label}
+                            </span>
+                        </span>
+                    </Link>
+                )}
+                
+                <div className="flex items-center gap-2 text-[10px] text-muted-foreground/60 font-mono">
+                   <span>v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
+                   {process.env.NEXT_PUBLIC_COMMIT_SHA && (
+                       <span>({process.env.NEXT_PUBLIC_COMMIT_SHA.substring(0, 7)})</span>
+                   )}
+                </div>
+            </div>
         </div>
     );
 }
