@@ -46,6 +46,9 @@ export default function SubmitPage() {
     const [leagues, setLeagues] = useState<League[]>([]);
     const [selectedLeagueId, setSelectedLeagueId] = useState<string>(""); // Kept for legacy compatibility/defaults
     const [submissions, setSubmissions] = useState<Submission[]>([]);
+    const [submissionsTotal, setSubmissionsTotal] = useState(0);
+    const [submissionsPage, setSubmissionsPage] = useState(0);
+    const SUBMISSIONS_PER_PAGE = 10;
     const [loading, setLoading] = useState(true);
     const [submissionMode, setSubmissionMode] = useState<"single" | "batch" | "bulk-manual">("batch");
     const [expandedSubmissionId, setExpandedSubmissionId] = useState<string | null>(null);
@@ -116,14 +119,14 @@ export default function SubmitPage() {
         fetchLeagues();
     }, [session, selectedLeagueId, toast]);
 
-    // Fetch submissions
-    const fetchSubmissions = useCallback(async () => {
-        if (!session) return;
+    // Fetch submissions - ordered by upload time (created_at) to show recent uploads first
+    const fetchSubmissions = useCallback(async (page = 0) => {
+        if (!session || !selectedLeagueId) return;
 
         try {
-            // Fetch global submissions. 
-            // We don't filter by league_id anymore to show all user submissions.
-            const url = `/api/submissions?user_id=${session.user.id}&limit=20`;
+            const offset = page * SUBMISSIONS_PER_PAGE;
+            // Order by created_at to show most recent uploads first (regardless of step date)
+            const url = `/api/submissions?league_id=${selectedLeagueId}&user_id=${session.user.id}&limit=${SUBMISSIONS_PER_PAGE}&offset=${offset}&order_by=created_at`;
 
             const res = await fetch(url, {
                 headers: {
@@ -137,12 +140,14 @@ export default function SubmitPage() {
 
             const data = await res.json();
             setSubmissions(data.submissions || []);
+            setSubmissionsTotal(data.total || 0);
+            setSubmissionsPage(page);
         } catch (error) {
             const appError = normalizeError(error, ErrorCode.API_FETCH_FAILED);
             // Silent error for background fetch (common pattern) to avoid noisy toasts on every refresh
             console.error('[FetchSubmissions]', appError);
         }
-    }, [session]);
+    }, [session, selectedLeagueId]);
 
     useEffect(() => {
         fetchSubmissions();
@@ -315,76 +320,112 @@ export default function SubmitPage() {
                 {/* Your Recent Submissions */}
                 <ModuleFeedback moduleId="recent-submissions" moduleName="Recent Submissions">
                     <section className="mt-12">
-                        <h2 className="text-xl font-semibold text-foreground">Your Recent Submissions</h2>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                            Your step submissions from the past week.
-                        </p>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h2 className="text-xl font-semibold text-foreground">Your Recent Submissions</h2>
+                                <p className="mt-2 text-sm text-muted-foreground">
+                                    Your most recently uploaded steps, ordered by upload time.
+                                </p>
+                            </div>
+                            {submissionsTotal > 0 && (
+                                <span className="text-sm text-muted-foreground">
+                                    {submissionsTotal} total
+                                </span>
+                            )}
+                        </div>
 
                         <div className="mt-6">
                             {submissions.length === 0 ? (
                                 <div className="rounded-lg border border-border bg-card/50 p-6 text-center">
-                                    <p className="text-muted-foreground">No submissions this week yet.</p>
+                                    <p className="text-muted-foreground">No submissions yet.</p>
                                 </div>
                             ) : (
-                                <div className="overflow-hidden rounded-lg border border-border">
-                                    <table className="w-full">
-                                        <thead className="bg-card">
-                                            <tr>
-                                                <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Date</th>
-                                                <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Steps</th>
-                                                <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-border">
-                                            {submissions.map((sub) => {
-                                                const isExpanded = expandedSubmissionId === sub.id;
-                                                const canExpand = sub.verified === false && sub.verification_notes;
+                                <>
+                                    <div className="overflow-hidden rounded-lg border border-border">
+                                        <table className="w-full">
+                                            <thead className="bg-card">
+                                                <tr>
+                                                    <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Date</th>
+                                                    <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Steps</th>
+                                                    <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-border">
+                                                {submissions.map((sub) => {
+                                                    const isExpanded = expandedSubmissionId === sub.id;
+                                                    const canExpand = sub.verified === false && sub.verification_notes;
 
-                                                return (
-                                                    <React.Fragment key={sub.id}>
-                                                        <tr
-                                                            className={`hover:bg-muted/50 ${canExpand ? 'cursor-pointer' : ''}`}
-                                                            onClick={() => {
-                                                                if (canExpand) {
-                                                                    setExpandedSubmissionId(isExpanded ? null : sub.id);
-                                                                }
-                                                            }}
-                                                        >
-                                                            <td className="px-4 py-3 text-foreground">
-                                                                {formatDate(sub.for_date)}
-                                                                {sub.partial && (
-                                                                    <span className="ml-2 text-xs text-muted-foreground">(partial)</span>
-                                                                )}
-                                                                {canExpand && (
-                                                                    <span className="ml-2 text-xs text-muted-foreground">
-                                                                        {isExpanded ? '▼' : '▶'}
-                                                                    </span>
-                                                                )}
-                                                            </td>
-                                                            <td className="px-4 py-3 text-right font-mono text-foreground">
-                                                                {sub.steps.toLocaleString()}
-                                                            </td>
-                                                            <td className="px-4 py-3 text-right">
-                                                                {getVerificationBadge(sub.verified)}
-                                                            </td>
-                                                        </tr>
-                                                        {/* Expanded verification details */}
-                                                        {isExpanded && sub.verification_notes && (
-                                                            <tr>
-                                                                <td colSpan={3} className="bg-muted/50 px-4 py-3">
-                                                                    <div className="rounded-md border border-border bg-card/50 p-3 space-y-2">
-                                                                        <p className="text-sm font-medium text-foreground">Verification Details</p>
-                                                                        <p className="text-sm text-muted-foreground">{sub.verification_notes}</p>
-                                                                    </div>
+                                                    return (
+                                                        <React.Fragment key={sub.id}>
+                                                            <tr
+                                                                className={`hover:bg-muted/50 ${canExpand ? 'cursor-pointer' : ''}`}
+                                                                onClick={() => {
+                                                                    if (canExpand) {
+                                                                        setExpandedSubmissionId(isExpanded ? null : sub.id);
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <td className="px-4 py-3 text-foreground">
+                                                                    {formatDate(sub.for_date)}
+                                                                    {sub.partial && (
+                                                                        <span className="ml-2 text-xs text-muted-foreground">(partial)</span>
+                                                                    )}
+                                                                    {canExpand && (
+                                                                        <span className="ml-2 text-xs text-muted-foreground">
+                                                                            {isExpanded ? '▼' : '▶'}
+                                                                        </span>
+                                                                    )}
+                                                                </td>
+                                                                <td className="px-4 py-3 text-right font-mono text-foreground">
+                                                                    {sub.steps.toLocaleString()}
+                                                                </td>
+                                                                <td className="px-4 py-3 text-right">
+                                                                    {getVerificationBadge(sub.verified)}
                                                                 </td>
                                                             </tr>
-                                                        )}
-                                                    </React.Fragment>
-                                                );
-                                            })}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                                            {/* Expanded verification details */}
+                                                            {isExpanded && sub.verification_notes && (
+                                                                <tr>
+                                                                    <td colSpan={3} className="bg-muted/50 px-4 py-3">
+                                                                        <div className="rounded-md border border-border bg-card/50 p-3 space-y-2">
+                                                                            <p className="text-sm font-medium text-foreground">Verification Details</p>
+                                                                            <p className="text-sm text-muted-foreground">{sub.verification_notes}</p>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            )}
+                                                        </React.Fragment>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    {/* Pagination Controls */}
+                                    {submissionsTotal > SUBMISSIONS_PER_PAGE && (
+                                        <div className="mt-4 flex items-center justify-between">
+                                            <p className="text-sm text-muted-foreground">
+                                                Showing {submissionsPage * SUBMISSIONS_PER_PAGE + 1}-{Math.min((submissionsPage + 1) * SUBMISSIONS_PER_PAGE, submissionsTotal)} of {submissionsTotal}
+                                            </p>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => fetchSubmissions(submissionsPage - 1)}
+                                                    disabled={submissionsPage === 0}
+                                                    className="rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground transition hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    ← Previous
+                                                </button>
+                                                <button
+                                                    onClick={() => fetchSubmissions(submissionsPage + 1)}
+                                                    disabled={(submissionsPage + 1) * SUBMISSIONS_PER_PAGE >= submissionsTotal}
+                                                    className="rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground transition hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    Next →
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </div>
                     </section>

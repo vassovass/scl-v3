@@ -60,38 +60,38 @@ const newUserTour: OnboardingStep[] = [
 
 /**
  * SUBMISSION TOUR - Deep-dive into the 3 submission modes
- * Focused only on submission, explains each mode clearly
+ * Explains each mode clearly and the difference between verified/unverified
  */
 const memberTour: OnboardingStep[] = [
     {
         target: "body",
-        content: "📝 Let's learn how to submit your daily steps! There are 3 different modes to choose from.",
+        content: "📝 Welcome! Let's learn how to submit your daily steps. There are 3 different ways to upload, each with different verification levels.",
         placement: "center",
         disableBeacon: true,
     },
     {
         target: '[data-tour="batch-toggle"]',
-        content: "⭐ CHOOSE YOUR MODE: Pick between Single Entry, Batch Upload, or Bulk Manual. Each works differently!",
+        content: "🎛️ MODE SELECTOR: Switch between the 3 submission modes here. Let me explain what each one does...",
         placement: "bottom",
     },
     {
         target: '[data-tour="submission-form"]',
-        content: "📸 BATCH UPLOAD (Recommended): Upload up to 5 screenshots at once. AI automatically extracts dates and step counts. You can review and correct before submitting!",
-        placement: "right",
+        content: "📸 BATCH UPLOAD (Recommended)\n\n• Upload multiple screenshots at once\n• AI automatically extracts dates & step counts\n• Review and edit before submitting\n• Result: ✅ VERIFIED submissions",
+        placement: "top",
     },
     {
-        target: '[data-tour="date-picker"]',
-        content: "📝 SINGLE ENTRY: Pick a date, enter your steps manually, and upload one screenshot. AI verifies the count matches.",
-        placement: "bottom",
+        target: '[data-tour="submission-form"]',
+        content: "📷 SINGLE ENTRY\n\n• Pick a specific date manually\n• Enter your step count\n• Upload one screenshot for AI verification\n• Result: ✅ VERIFIED if AI confirms match",
+        placement: "top",
     },
     {
-        target: '[data-tour="submit-button"]',
-        content: "⚡ BULK MANUAL: For catching up without screenshots. Enter multiple days at once - these are marked as 'unverified'.",
+        target: '[data-tour="submission-form"]',
+        content: "✏️ BULK MANUAL\n\n• Enter multiple days of steps at once\n• No screenshot required\n• Great for catching up on missed days\n• Result: ⚠️ UNVERIFIED submissions",
         placement: "top",
     },
     {
         target: "body",
-        content: "🤖 HOW VERIFICATION WORKS: AI checks your screenshot matches your steps. If there's a mismatch, it's flagged for your league admin to review. Verified submissions get a ✓ badge!",
+        content: "✅ VERIFIED vs ⚠️ UNVERIFIED\n\n• Verified = AI confirmed your screenshot matches your steps\n• Unverified = Manual entry without proof\n\nLeague admins can filter leaderboards to 'verified only' for fair competition. Your verified submissions get a ✓ badge!",
         placement: "center",
     },
 ];

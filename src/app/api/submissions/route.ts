@@ -19,6 +19,7 @@ const querySchema = z.object({
     to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     limit: z.coerce.number().int().min(1).max(200).default(50),
     offset: z.coerce.number().int().min(0).default(0),
+    order_by: z.enum(["for_date", "created_at"]).default("for_date"),
 });
 
 const submissionSelect = "id, league_id, user_id, for_date, steps, partial, proof_path, verified, tolerance_used, extracted_km, extracted_calories, verification_notes, created_at";
@@ -271,7 +272,7 @@ export async function GET(request: Request): Promise<Response> {
             return badRequest("Invalid query parameters");
         }
 
-        const { league_id, user_id, from, to, limit, offset } = parsed.data;
+        const { league_id, user_id, from, to, limit, offset, order_by } = parsed.data;
 
         const supabase = await createServerSupabaseClient();
         const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -295,12 +296,16 @@ export async function GET(request: Request): Promise<Response> {
         }
 
         // Build query - Agnostic of league_id for the submission itself
+        // Order by the specified field (for_date for calendar view, created_at for recent uploads)
+        const primaryOrder = order_by === "created_at" ? "created_at" : "for_date";
+        const secondaryOrder = order_by === "created_at" ? "for_date" : "created_at";
+
         let query = adminClient
             .from("submissions")
             .select(submissionSelect, { count: "exact" })
             // .eq("league_id", league_id) // Removed to show ALL user submissions
-            .order("for_date", { ascending: false })
-            .order("created_at", { ascending: false });
+            .order(primaryOrder, { ascending: false })
+            .order(secondaryOrder, { ascending: false });
 
         if (user_id) {
             query = query.eq("user_id", user_id);
