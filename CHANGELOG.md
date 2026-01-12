@@ -112,6 +112,10 @@ All notable changes to StepLeague v3.
   - `NumberSetting.tsx`: Added 500ms debounce to prevent API calls on every keystroke
   - `SettingsField.tsx`: Added 500ms debounce for text/number inputs
   - Users can type complete values before save triggers
+- **Build System Fixes** - Resolved type errors and missing page handlers
+  - Fixed `BrandSettings` type mismatch (`updated_at` → `updatedAt`) in `layout.tsx`
+  - Fixed JSX syntax error (stray closing brace) in `GlobalFooter.tsx`
+  - Added `not-found.tsx` to resolve Next.js build failure for 404 routes
 
 ### Changed
 

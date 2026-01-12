@@ -121,8 +121,8 @@ function FooterBottomBar({ currentYear }: { currentYear: number }) {
             <p className="text-xs text-muted-foreground">
                 © {currentYear} {APP_CONFIG.name}. All rights reserved.
             </p>
-            )}
-            
+
+
             {/* Version Info */}
             <div className="flex items-center gap-4">
                 {!isLoading && stageData.badge_visible && (
@@ -138,12 +138,12 @@ function FooterBottomBar({ currentYear }: { currentYear: number }) {
                         </span>
                     </Link>
                 )}
-                
+
                 <div className="flex items-center gap-2 text-[10px] text-muted-foreground/60 font-mono">
-                   <span>v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
-                   {process.env.NEXT_PUBLIC_COMMIT_SHA && (
-                       <span>({process.env.NEXT_PUBLIC_COMMIT_SHA.substring(0, 7)})</span>
-                   )}
+                    <span>v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
+                    {process.env.NEXT_PUBLIC_COMMIT_SHA && (
+                        <span>({process.env.NEXT_PUBLIC_COMMIT_SHA.substring(0, 7)})</span>
+                    )}
                 </div>
             </div>
         </div>

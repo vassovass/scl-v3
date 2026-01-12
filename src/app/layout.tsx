@@ -69,7 +69,7 @@ export default async function RootLayout({
   // For now, using branding timestamp as proxy for "System Config Version"
   const branding = await getCachedBranding();
   // Simple hash or timestamp string
-  const serverVersion = branding.updated_at || new Date().toISOString().slice(0, 10);
+  const serverVersion = branding.updatedAt || new Date().toISOString().slice(0, 10);
 
   return (
     <html lang="en" suppressHydrationWarning>
