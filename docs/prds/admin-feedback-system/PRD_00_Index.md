@@ -79,6 +79,7 @@
 | # | PRD | Outcome | Status |
 |---|-----|---------|--------|
 | 37 | [In-App Chat](./PRD_37_In_App_Chat.md) | Database schema for future chat/messaging | 📋 Proposed |
+| 40 | [Submission Audit](./PRD_40_Submission_Audit.md) | Abuse detection & audit logs | 📋 Proposed |
 
 ---
 

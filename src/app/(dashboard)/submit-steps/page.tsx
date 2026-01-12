@@ -9,8 +9,10 @@ import { SubmissionForm } from "@/components/forms/SubmissionForm";
 import { BatchSubmissionForm } from "@/components/forms/BatchSubmissionForm";
 import { BulkUnverifiedForm } from "@/components/forms/BulkUnverifiedForm";
 import { ProxySubmissionSection } from "@/components/forms/ProxySubmissionSection";
+import { SubmissionEditPanel } from "@/components/forms/SubmissionEditPanel";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
 import { SystemBadge } from "@/components/ui/SystemBadge";
+import { ProofThumbnail } from "@/components/ui/ProofThumbnail";
 
 interface League {
     id: string;
@@ -29,6 +31,7 @@ interface Submission {
     created_at: string;
     verification_notes?: string | null;
     league_name?: string;
+    proof_path?: string | null;
 }
 
 /**
@@ -52,9 +55,108 @@ export default function SubmitPage() {
     const [loading, setLoading] = useState(true);
     const [submissionMode, setSubmissionMode] = useState<"single" | "batch" | "bulk-manual">("batch");
     const [expandedSubmissionId, setExpandedSubmissionId] = useState<string | null>(null);
+    const [editingSubmissionId, setEditingSubmissionId] = useState<string | null>(null);
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+    const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
+    const [showBulkDateEdit, setShowBulkDateEdit] = useState(false);
+    const [bulkDate, setBulkDate] = useState("");
 
     // Compute admin leagues for proxy submission
     const adminLeagues = leagues.filter(l => l.role === "owner" || l.role === "admin");
+
+    const toggleSelection = (id: string) => {
+        const newSelected = new Set(selectedIds);
+        if (newSelected.has(id)) {
+            newSelected.delete(id);
+        } else {
+            newSelected.add(id);
+        }
+        setSelectedIds(newSelected);
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.size === submissions.length) {
+            setSelectedIds(new Set());
+        } else {
+            setSelectedIds(new Set(submissions.map(s => s.id)));
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        setIsBulkDeleting(true);
+        try {
+            // Sequential delete for MVP - in production should be a bulk endpoint
+            const promises = Array.from(selectedIds).map(id =>
+                fetch(`/api/submissions/${id}?reason=${encodeURIComponent("Bulk delete")}`, { method: "DELETE" })
+            );
+
+            await Promise.all(promises);
+
+            toast({
+                title: "Bulk Delete Complete",
+                description: `Deleted ${selectedIds.size} submissions.`,
+            });
+
+            setSelectedIds(new Set());
+            fetchSubmissions(submissionsPage);
+        } catch (err) {
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: "Failed to delete some submissions.",
+            });
+        } finally {
+            setIsBulkDeleting(false);
+            setShowBulkDeleteConfirm(false);
+        }
+    };
+
+    const handleBulkDateEdit = async () => {
+        if (!bulkDate) return;
+
+        setIsBulkDeleting(true); // Reuse loading state
+        try {
+            // Client-side validation
+            const today = new Date();
+            today.setHours(23, 59, 59, 999);
+            const newDate = new Date(bulkDate + "T00:00:00");
+            if (newDate > today) {
+                toast({ variant: "destructive", title: "Invalid Date", description: "Cannot set future dates." });
+                return;
+            }
+
+            const promises = Array.from(selectedIds).map(id =>
+                fetch(`/api/submissions/${id}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        for_date: bulkDate,
+                        reason: "Bulk date update"
+                    })
+                })
+            );
+
+            await Promise.all(promises);
+
+            toast({
+                title: "Bulk Update Complete",
+                description: `Updated date for ${selectedIds.size} submissions.`,
+            });
+
+            setSelectedIds(new Set());
+            setShowBulkDateEdit(false);
+            fetchSubmissions(submissionsPage);
+        } catch (err) {
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: "Failed to update some submissions.",
+            });
+        } finally {
+            setIsBulkDeleting(false);
+        }
+    };
 
     // Online status check
     useEffect(() => {
@@ -335,6 +437,29 @@ export default function SubmitPage() {
                         </div>
 
                         <div className="mt-6">
+                            {/* Bulk Actions Bar */}
+                            {selectedIds.size > 0 && (
+                                <div className="mb-4 p-2 bg-primary/10 border border-primary/20 rounded-md flex items-center justify-between">
+                                    <span className="text-sm font-medium ml-2">
+                                        {selectedIds.size} selected
+                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => setShowBulkDateEdit(true)}
+                                            className="px-3 py-1.5 text-xs font-medium bg-background border border-border rounded hover:bg-muted transition-colors"
+                                        >
+                                            Change Date
+                                        </button>
+                                        <button
+                                            onClick={() => setShowBulkDeleteConfirm(true)}
+                                            className="px-3 py-1.5 text-xs font-medium bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 transition-colors"
+                                        >
+                                            Delete Selected
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
                             {submissions.length === 0 ? (
                                 <div className="rounded-lg border border-border bg-card/50 p-6 text-center">
                                     <p className="text-muted-foreground">No submissions yet.</p>
@@ -345,26 +470,64 @@ export default function SubmitPage() {
                                         <table className="w-full">
                                             <thead className="bg-card">
                                                 <tr>
+                                                    <th className="px-4 py-3 w-10">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedIds.size === submissions.length && submissions.length > 0}
+                                                            onChange={toggleSelectAll}
+                                                            className="rounded border-border"
+                                                        />
+                                                    </th>
+                                                    <th className="px-2 py-3 text-left text-sm font-medium text-muted-foreground w-12">📷</th>
                                                     <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Date</th>
                                                     <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Steps</th>
+                                                    <th className="px-4 py-3 text-center text-sm font-medium text-muted-foreground">Submitted</th>
                                                     <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Status</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-border">
                                                 {submissions.map((sub) => {
                                                     const isExpanded = expandedSubmissionId === sub.id;
+                                                    const isEditing = editingSubmissionId === sub.id;
                                                     const canExpand = sub.verified === false && sub.verification_notes;
+                                                    const submittedDate = new Date(sub.created_at);
+                                                    const submittedStr = submittedDate.toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 
                                                     return (
                                                         <React.Fragment key={sub.id}>
                                                             <tr
-                                                                className={`hover:bg-muted/50 ${canExpand ? 'cursor-pointer' : ''}`}
+                                                                className={`hover:bg-muted/50 cursor-pointer ${isEditing ? 'bg-muted/30' : ''}`}
                                                                 onClick={() => {
-                                                                    if (canExpand) {
+                                                                    if (isEditing) {
+                                                                        // Already editing, don't toggle
+                                                                    } else if (canExpand && !isEditing) {
                                                                         setExpandedSubmissionId(isExpanded ? null : sub.id);
+                                                                        setEditingSubmissionId(null);
+                                                                    } else {
+                                                                        // Toggle edit mode
+                                                                        setEditingSubmissionId(isEditing ? null : sub.id);
+                                                                        setExpandedSubmissionId(null);
                                                                     }
                                                                 }}
                                                             >
+                                                                {/* Checkbox */}
+                                                                <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        checked={selectedIds.has(sub.id)}
+                                                                        onChange={() => toggleSelection(sub.id)}
+                                                                        className="rounded border-border"
+                                                                    />
+                                                                </td>
+                                                                {/* Proof Image */}
+                                                                <td className="px-2 py-3">
+                                                                    {sub.proof_path ? (
+                                                                        <ProofThumbnail proofPath={sub.proof_path} size={36} />
+                                                                    ) : (
+                                                                        <div className="w-9 h-9 flex items-center justify-center text-muted-foreground text-xs">—</div>
+                                                                    )}
+                                                                </td>
+                                                                {/* Date */}
                                                                 <td className="px-4 py-3 text-foreground">
                                                                     {formatDate(sub.for_date)}
                                                                     {sub.partial && (
@@ -376,9 +539,15 @@ export default function SubmitPage() {
                                                                         </span>
                                                                     )}
                                                                 </td>
+                                                                {/* Steps */}
                                                                 <td className="px-4 py-3 text-right font-mono text-foreground">
                                                                     {sub.steps.toLocaleString()}
                                                                 </td>
+                                                                {/* Submitted */}
+                                                                <td className="px-4 py-3 text-center text-xs text-muted-foreground">
+                                                                    {submittedStr}
+                                                                </td>
+                                                                {/* Status */}
                                                                 <td className="px-4 py-3 text-right">
                                                                     {getVerificationBadge(sub.verified)}
                                                                 </td>
@@ -386,11 +555,33 @@ export default function SubmitPage() {
                                                             {/* Expanded verification details */}
                                                             {isExpanded && sub.verification_notes && (
                                                                 <tr>
-                                                                    <td colSpan={3} className="bg-muted/50 px-4 py-3">
+                                                                    <td colSpan={5} className="bg-muted/50 px-4 py-3">
                                                                         <div className="rounded-md border border-border bg-card/50 p-3 space-y-2">
                                                                             <p className="text-sm font-medium text-foreground">Verification Details</p>
                                                                             <p className="text-sm text-muted-foreground">{sub.verification_notes}</p>
+                                                                            <button
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    setEditingSubmissionId(sub.id);
+                                                                                    setExpandedSubmissionId(null);
+                                                                                }}
+                                                                                className="text-sm text-primary hover:underline"
+                                                                            >
+                                                                                Edit this submission
+                                                                            </button>
                                                                         </div>
+                                                                    </td>
+                                                                </tr>
+                                                            )}
+                                                            {/* Edit Panel */}
+                                                            {isEditing && (
+                                                                <tr>
+                                                                    <td colSpan={5} onClick={(e) => e.stopPropagation()}>
+                                                                        <SubmissionEditPanel
+                                                                            submission={sub}
+                                                                            onUpdate={() => fetchSubmissions(submissionsPage)}
+                                                                            onClose={() => setEditingSubmissionId(null)}
+                                                                        />
                                                                     </td>
                                                                 </tr>
                                                             )}
@@ -426,6 +617,67 @@ export default function SubmitPage() {
                                         </div>
                                     )}
                                 </>
+                            )}
+                        </div>
+
+                        {/* Bulk Delete Confirm */}
+                        <div className="fixed">
+                            {showBulkDeleteConfirm && (
+                                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                                    <div className="bg-background p-6 rounded-lg max-w-md w-full border border-border shadow-lg">
+                                        <h3 className="text-lg font-semibold mb-2">Delete {selectedIds.size} Submissions?</h3>
+                                        <p className="text-muted-foreground mb-4">This action cannot be undone.</p>
+                                        <div className="flex justify-end gap-2">
+                                            <button
+                                                onClick={() => setShowBulkDeleteConfirm(false)}
+                                                className="px-4 py-2 text-sm hover:bg-muted rounded"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={handleBulkDelete}
+                                                disabled={isBulkDeleting}
+                                                className="px-4 py-2 text-sm bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 disabled:opacity-50"
+                                            >
+                                                {isBulkDeleting ? "Deleting..." : "Delete"}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Bulk Date Edit Dialog */}
+                            {showBulkDateEdit && (
+                                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                                    <div className="bg-background p-6 rounded-lg max-w-md w-full border border-border shadow-lg">
+                                        <h3 className="text-lg font-semibold mb-2">Change Date for {selectedIds.size} Submissions</h3>
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium mb-1">New Date</label>
+                                            <input
+                                                type="date"
+                                                value={bulkDate}
+                                                onChange={(e) => setBulkDate(e.target.value)}
+                                                max={new Date().toISOString().split("T")[0]}
+                                                className="w-full rounded border border-border bg-background px-3 py-2"
+                                            />
+                                        </div>
+                                        <div className="flex justify-end gap-2">
+                                            <button
+                                                onClick={() => setShowBulkDateEdit(false)}
+                                                className="px-4 py-2 text-sm hover:bg-muted rounded"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={handleBulkDateEdit}
+                                                disabled={isBulkDeleting || !bulkDate}
+                                                className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded hover:bg-primary/90 disabled:opacity-50"
+                                            >
+                                                {isBulkDeleting ? "Updating..." : "Update Date"}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             )}
                         </div>
                     </section>

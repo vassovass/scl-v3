@@ -487,3 +487,16 @@ export type SiteSetting = Tables<"site_settings">;
 export type AuditLog = Tables<"audit_log">;
 export type ProxyMember = Tables<"proxy_members">;
 export type UserPreferences = Tables<"user_preferences">;
+
+// Submission change audit type (defined manually as table is new)
+export interface SubmissionChange {
+  id: string;
+  submission_id: string;
+  user_id: string;
+  field_name: string;
+  old_value: string | null;
+  new_value: string | null;
+  reason: string | null;
+  created_at: string;
+}
+

@@ -149,6 +149,7 @@ YOUR CONSTRAINTS:
 - NEVER guess dates - if ambiguous, explain why in the "notes" field
 - ALWAYS provide a confidence score and explain your reasoning in "notes"
 - ALWAYS return valid JSON matching the schema exactly
+- **CRITICAL**: Dates CANNOT be in the future. Today is ${fmt(today)}. If extracted date > today, set date: null.
 
 TASK: Extract step count and date from fitness app screenshot.
 
