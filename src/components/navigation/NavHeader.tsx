@@ -101,6 +101,8 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
 
     // Handle menu actions (tours, sign out, etc.)
     const handleMenuAction = async (actionName: string, item: MenuItem) => {
+        console.log('[NavHeader] handleMenuAction called:', { actionName, itemId: item.id, itemHref: item.href });
+
         if (actionName === 'signOut') {
             handleSignOut();
             return;
