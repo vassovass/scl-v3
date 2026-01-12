@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import dynamic from "next/dynamic";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
@@ -47,6 +47,13 @@ export async function generateMetadata(): Promise<Metadata> {
         { url: branding.favicon.appleTouchIcon, sizes: '180x180', type: 'image/png' },
       ],
     },
+  };
+}
+
+export async function generateViewport(): Promise<Viewport> {
+  const branding = await getCachedBranding();
+
+  return {
     themeColor: [
       { media: '(prefers-color-scheme: light)', color: branding.themeColorLight },
       { media: '(prefers-color-scheme: dark)', color: branding.themeColorDark },

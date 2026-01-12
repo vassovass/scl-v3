@@ -99,6 +99,7 @@
 ## Completed
 *Recently shipped features*
 
+- [x] Build warning cleanup (viewport theme colors, dynamic API routes, IndexedDB guard)
 - [x] **Modular Menu System** (centralized config, role-based visibility, unlimited nesting)
 - [x] **Internal Kanban Board** (`/admin/kanban`) - drag-and-drop task management
 - [x] **Public Roadmap with Voting** (`/roadmap`) - users can vote on priorities
@@ -118,4 +119,4 @@
 
 ---
 
-*Last updated: 2025-12-24*
+*Last updated: 2026-01-12*

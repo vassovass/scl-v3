@@ -42,10 +42,17 @@ class MenuCacheManager {
   private initPromise: Promise<void> | null = null;
 
   constructor() {
+    if (typeof window === 'undefined') {
+      this.initPromise = Promise.resolve();
+      return;
+    }
+
     this.initPromise = this.init();
   }
 
   private async init() {
+    if (typeof window === 'undefined') return;
+
     // Initialize IndexedDB
     try {
       this.db = await openDB<MenuCacheDB>('menu-cache-db', 1, {
@@ -73,6 +80,10 @@ class MenuCacheManager {
   }
 
   async get(): Promise<MenuCacheData | null> {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
     await this.initPromise;
 
     // Layer 1: Check memory cache
@@ -115,6 +126,10 @@ class MenuCacheManager {
   }
 
   async set(data: { menus: Record<string, any>; locations: Record<string, any>; cacheVersion: string }): Promise<void> {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     await this.initPromise;
 
     const cacheData: MenuCacheData = {

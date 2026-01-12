@@ -4,6 +4,8 @@ import { badRequest } from "@/lib/api";
 import { createAdminClient } from "@/lib/supabase/server";
 import { presetToDateRange, calculateStreak, type PeriodPreset } from "@/lib/utils/periods";
 
+export const dynamic = "force-dynamic";
+
 const querySchema = z.object({
   league_id: z.string().uuid(),
   period: z.string().default("this_week"),
