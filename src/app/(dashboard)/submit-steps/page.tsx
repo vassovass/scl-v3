@@ -106,14 +106,30 @@ export default function SubmitPage() {
                 // My Bulk API takes IDs.
                 let allIds: string[] = [];
                 if (viewContext === "me") {
-                    // Fetch all IDs for me
-                    const res = await fetch(`/api/submissions?league_id=${selectedLeagueId}&user_id=${session.user.id}&exclude_proxy=true&limit=${submissionsTotal}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
-                    const data = await res.json();
-                    allIds = data.submissions.map((s: any) => s.id);
+                    // Fetch all IDs for me using loop to handle limit
+                    let offset = 0;
+                    let hasMore = true;
+                    while (hasMore) {
+                        const res = await fetch(`/api/submissions?league_id=${selectedLeagueId}&user_id=${session.user.id}&exclude_proxy=true&limit=100&offset=${offset}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
+                        if (!res.ok) break;
+                        const data = await res.json();
+                        const ids = data.submissions.map((s: any) => s.id);
+                        allIds.push(...ids);
+                        offset += 100;
+                        if (ids.length < 100) hasMore = false;
+                    }
                 } else if (selectedProxyId && selectedProxyId !== "all_proxy") {
-                    const res = await fetch(`/api/submissions?league_id=${selectedLeagueId}&proxy_member_id=${selectedProxyId}&limit=${submissionsTotal}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
-                    const data = await res.json();
-                    allIds = data.submissions.map((s: any) => s.id);
+                    let offset = 0;
+                    let hasMore = true;
+                    while (hasMore) {
+                        const res = await fetch(`/api/submissions?league_id=${selectedLeagueId}&proxy_member_id=${selectedProxyId}&limit=100&offset=${offset}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
+                        if (!res.ok) break;
+                        const data = await res.json();
+                        const ids = data.submissions.map((s: any) => s.id);
+                        allIds.push(...ids);
+                        offset += 100;
+                        if (ids.length < 100) hasMore = false;
+                    }
                 }
 
                 if (allIds.length > 0) {
@@ -224,16 +240,32 @@ export default function SubmitPage() {
                     return;
                 }
                 // Fetch IDs
-                // (Simplified repetition of fetch logic above - refactor ideally)
+                // Fetch IDs loop
                 let allIds: string[] = [];
                 if (viewContext === "me") {
-                    const res = await fetch(`/api/submissions?league_id=${selectedLeagueId}&user_id=${session.user.id}&exclude_proxy=true&limit=${submissionsTotal}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
-                    const data = await res.json();
-                    allIds = data.submissions.map((s: any) => s.id);
+                    let offset = 0;
+                    let hasMore = true;
+                    while (hasMore) {
+                        const res = await fetch(`/api/submissions?league_id=${selectedLeagueId}&user_id=${session.user.id}&exclude_proxy=true&limit=100&offset=${offset}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
+                        if (!res.ok) break;
+                        const data = await res.json();
+                        const ids = data.submissions.map((s: any) => s.id);
+                        allIds.push(...ids);
+                        offset += 100;
+                        if (ids.length < 100) hasMore = false;
+                    }
                 } else if (selectedProxyId && selectedProxyId !== "all_proxy") {
-                    const res = await fetch(`/api/submissions?league_id=${selectedLeagueId}&proxy_member_id=${selectedProxyId}&limit=${submissionsTotal}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
-                    const data = await res.json();
-                    allIds = data.submissions.map((s: any) => s.id);
+                    let offset = 0;
+                    let hasMore = true;
+                    while (hasMore) {
+                        const res = await fetch(`/api/submissions?league_id=${selectedLeagueId}&proxy_member_id=${selectedProxyId}&limit=100&offset=${offset}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
+                        if (!res.ok) break;
+                        const data = await res.json();
+                        const ids = data.submissions.map((s: any) => s.id);
+                        allIds.push(...ids);
+                        offset += 100;
+                        if (ids.length < 100) hasMore = false;
+                    }
                 }
                 ids = allIds;
             }
@@ -826,10 +858,10 @@ export default function SubmitPage() {
                                     </div>
 
                                     {/* Pagination Controls */}
-                                    {submissionsTotal > SUBMISSIONS_PER_PAGE && (
+                                    {submissionsTotal > itemsPerPage && (
                                         <div className="mt-4 flex items-center justify-between">
                                             <p className="text-sm text-muted-foreground">
-                                                Showing {submissionsPage * SUBMISSIONS_PER_PAGE + 1}-{Math.min((submissionsPage + 1) * SUBMISSIONS_PER_PAGE, submissionsTotal)} of {submissionsTotal}
+                                                Showing {submissionsPage * itemsPerPage + 1}-{Math.min((submissionsPage + 1) * itemsPerPage, submissionsTotal)} of {submissionsTotal}
                                             </p>
                                             <div className="flex gap-2">
                                                 <button
@@ -841,7 +873,7 @@ export default function SubmitPage() {
                                                 </button>
                                                 <button
                                                     onClick={() => fetchSubmissions(submissionsPage + 1)}
-                                                    disabled={(submissionsPage + 1) * SUBMISSIONS_PER_PAGE >= submissionsTotal}
+                                                    disabled={(submissionsPage + 1) * itemsPerPage >= submissionsTotal}
                                                     className="rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground transition hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
                                                 >
                                                     Next →
@@ -858,7 +890,7 @@ export default function SubmitPage() {
                             {showBulkDeleteConfirm && (
                                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
                                     <div className="bg-background p-6 rounded-lg max-w-md w-full border border-border shadow-lg">
-                                        <h3 className="text-lg font-semibold mb-2">Delete {selectedIds.size} Submissions?</h3>
+                                        <h3 className="text-lg font-semibold mb-2">Delete {selectAllGlobal ? submissionsTotal : selectedIds.size} Submissions?</h3>
                                         <p className="text-muted-foreground mb-4">This action cannot be undone.</p>
                                         <div className="flex justify-end gap-2">
                                             <button
@@ -883,7 +915,7 @@ export default function SubmitPage() {
                             {showBulkDateEdit && (
                                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
                                     <div className="bg-background p-6 rounded-lg max-w-md w-full border border-border shadow-lg">
-                                        <h3 className="text-lg font-semibold mb-2">Change Date for {selectedIds.size} Submissions</h3>
+                                        <h3 className="text-lg font-semibold mb-2">Change Date for {selectAllGlobal ? submissionsTotal : selectedIds.size} Submissions</h3>
                                         <div className="mb-4">
                                             <label className="block text-sm font-medium mb-1">New Date</label>
                                             <input
