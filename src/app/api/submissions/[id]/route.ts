@@ -40,8 +40,10 @@ export async function GET(
             return notFound("Submission not found");
         }
 
-        // Verify ownership
+        // Verify ownership or proxy admin status
         if (submission.user_id !== user.id) {
+            let hasAccess = false;
+
             // Check if superadmin
             const { data: userData } = await adminClient
                 .from("users")
@@ -49,8 +51,24 @@ export async function GET(
                 .eq("id", user.id)
                 .single();
 
-            if (!userData?.is_superadmin) {
-                return forbidden("You can only view your own submissions");
+            if (userData?.is_superadmin) {
+                hasAccess = true;
+            } else if (submission.proxy_member_id && submission.league_id) {
+                // Check if user is admin/owner of the league this proxy submission belongs to
+                const { data: membership } = await adminClient
+                    .from("memberships")
+                    .select("role")
+                    .eq("league_id", submission.league_id)
+                    .eq("user_id", user.id)
+                    .single();
+
+                if (membership && ["owner", "admin"].includes(membership.role)) {
+                    hasAccess = true;
+                }
+            }
+
+            if (!hasAccess) {
+                return forbidden("You do not have permission to view this submission");
             }
         }
 
@@ -108,9 +126,36 @@ export async function PATCH(
             return notFound("Submission not found");
         }
 
-        // Verify ownership
+        // Verify ownership or proxy admin status
         if (existing.user_id !== user.id) {
-            return forbidden("You can only edit your own submissions");
+            let hasAccess = false;
+
+            // Allow superadmins? (Usually yes, but strict check here previously)
+            // Let's check proxy admin
+            if (existing.proxy_member_id && existing.league_id) {
+                const { data: membership } = await adminClient
+                    .from("memberships")
+                    .select("role")
+                    .eq("league_id", existing.league_id)
+                    .eq("user_id", user.id)
+                    .single();
+
+                if (membership && ["owner", "admin"].includes(membership.role)) {
+                    hasAccess = true;
+                }
+            }
+
+            // Also allow superadmin if needed (good practice)
+            const { data: userData } = await adminClient
+                .from("users")
+                .select("is_superadmin")
+                .eq("id", user.id)
+                .single();
+            if (userData?.is_superadmin) hasAccess = true;
+
+            if (!hasAccess) {
+                return forbidden("You do not have permission to edit this submission");
+            }
         }
 
         // Validate: no future dates
@@ -247,9 +292,33 @@ export async function DELETE(
             return notFound("Submission not found");
         }
 
-        // Verify ownership
+        // Verify ownership or proxy admin status
         if (existing.user_id !== user.id) {
-            return forbidden("You can only delete your own submissions");
+            let hasAccess = false;
+
+            if (existing.proxy_member_id && existing.league_id) {
+                const { data: membership } = await adminClient
+                    .from("memberships")
+                    .select("role")
+                    .eq("league_id", existing.league_id)
+                    .eq("user_id", user.id)
+                    .single();
+
+                if (membership && ["owner", "admin"].includes(membership.role)) {
+                    hasAccess = true;
+                }
+            }
+
+            const { data: userData } = await adminClient
+                .from("users")
+                .select("is_superadmin")
+                .eq("id", user.id)
+                .single();
+            if (userData?.is_superadmin) hasAccess = true;
+
+            if (!hasAccess) {
+                return forbidden("You do not have permission to delete this submission");
+            }
         }
 
         // Log deletion before removing

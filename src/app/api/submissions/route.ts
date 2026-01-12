@@ -17,7 +17,7 @@ const querySchema = z.object({
     user_id: z.string().uuid().optional(),
     from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-    limit: z.coerce.number().int().min(1).max(200).default(50),
+    limit: z.coerce.number().int().min(1).max(100).default(50),
     offset: z.coerce.number().int().min(0).default(0),
     order_by: z.enum(["for_date", "created_at"]).default("for_date"),
     exclude_proxy: z.enum(["true", "false"]).default("true").transform(v => v === "true"),
