@@ -196,10 +196,10 @@ EXTRACTION RULES:
 
    **English:** "Today" → ${fmt(today)}, "Yesterday" → ${fmt(subDays(today, 1))}
    **Chinese:** "今天"/"今日" → ${fmt(today)}, "昨天"/"昨日" → ${fmt(subDays(today, 1))}
-   **Spanish:** "Hoy" → ${fmt(today)}, "Ayer" → ${fmt(subDays(today, 1)}}
-   **German:** "Heute" → ${fmt(today)}, "Gestern" → ${fmt(subDays(today, 1)}}
-   **Korean:** "오늘" → ${fmt(today)}, "어제" → ${fmt(subDays(today, 1)}}
-   **French:** "Aujourd'hui" → ${fmt(today)}, "Hier" → ${fmt(subDays(today, 1)}}
+   **Spanish:** "Hoy" → ${fmt(today)}, "Ayer" → ${fmt(subDays(today, 1))}
+   **German:** "Heute" → ${fmt(today)}, "Gestern" → ${fmt(subDays(today, 1))}
+   **Korean:** "오늘" → ${fmt(today)}, "어제" → ${fmt(subDays(today, 1))}
+   **French:** "Aujourd'hui" → ${fmt(today)}, "Hier" → ${fmt(subDays(today, 1))}
 
    **Partial dates:** "Sat, 22 Nov", "22 Nov", "Nov 22" → Use year ${currentYear}
    **Weekday inference:** "Sat, 22 Nov" → Calculate year from weekday + current date
