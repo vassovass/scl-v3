@@ -43,7 +43,7 @@ export function ModeToggle() {
     }
 
     const items = [
-        { value: "light", label: "Light", icon: Sun, comingSoon: "Light mode coming soon" },
+D        { value: "light", label: "Light", icon: Sun, comingSoon: "Light mode coming soon" },
         { value: "dark", label: "Dark", icon: Moon, comingSoon: "Dark mode coming soon" },
         { value: "system", label: "System", icon: Monitor, comingSoon: "System mode coming soon" },
     ];

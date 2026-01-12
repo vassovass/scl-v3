@@ -786,3 +786,12 @@ body {
 [data-theme="light"] .glow-primary {
   box-shadow: 0 0 40px hsl(var(--brand-primary) / 0.15);
 }
+
+/* ============================================
+   JOYRIDE GUIDED TOURS
+   Lower header z-index when tour is active so
+   tooltips/spotlight aren't covered by sticky nav
+   ============================================ */
+body.joyride-active header {
+  z-index: 30 !important;
+}

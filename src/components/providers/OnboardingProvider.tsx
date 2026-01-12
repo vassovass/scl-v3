@@ -276,6 +276,16 @@ export function OnboardingProvider({ children, isAdmin = false, hasLeagues = fal
         }
     }, [state, isHydrated]);
 
+    // Toggle body class when tour is running to allow CSS to lower header z-index
+    useEffect(() => {
+        if (run) {
+            document.body.classList.add('joyride-active');
+        } else {
+            document.body.classList.remove('joyride-active');
+        }
+        return () => document.body.classList.remove('joyride-active');
+    }, [run]);
+
     const hasCompletedTour = useCallback((tour: TourName) => {
         return state.completedTours.includes(tour);
     }, [state.completedTours]);
