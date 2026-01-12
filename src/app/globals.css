@@ -643,7 +643,7 @@ body {
 }
 
 .scrollbar-thumb-slate-700::-webkit-scrollbar-thumb {
-  background: rgb(51 65 85);
+  background: hsl(var(--border-default));
 }
 
 /* ============================================
@@ -685,7 +685,7 @@ body {
   background: hsl(var(--menu-bg));
   border: 1px solid hsl(var(--menu-border));
   border-radius: var(--radius-xl);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 15px -3px hsl(var(--foreground) / 0.1), 0 4px 6px -4px hsl(var(--foreground) / 0.1);
   z-index: calc(var(--z-dropdown) + 10);
 
   /* Hidden state */
@@ -746,4 +746,43 @@ body {
   * {
     @apply border-border;
   }
+}
+
+/* ============================================
+   THEME-AWARE UTILITY CLASSES (Foundation)
+   ============================================ */
+
+/* Brand Gradients (Theme-Aware) */
+.bg-gradient-brand-primary {
+  background: linear-gradient(135deg,
+    hsl(var(--brand-primary-light)) 0%,
+    hsl(var(--brand-primary)) 100%);
+}
+
+.text-gradient-brand {
+  background: linear-gradient(135deg,
+    hsl(var(--brand-primary-light)) 0%,
+    hsl(var(--brand-primary)) 50%,
+    hsl(var(--brand-accent)) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Feature Icon Backgrounds (Light/Dark Aware) */
+.feature-icon-bg-primary {
+  background: hsl(var(--primary) / 0.15);
+}
+
+[data-theme="light"] .feature-icon-bg-primary {
+  background: hsl(var(--primary) / 0.10);
+}
+
+/* Glow Effects (Theme-Aware) */
+.glow-primary {
+  box-shadow: 0 0 40px hsl(var(--brand-primary) / 0.3);
+}
+
+[data-theme="light"] .glow-primary {
+  box-shadow: 0 0 40px hsl(var(--brand-primary) / 0.15);
 }

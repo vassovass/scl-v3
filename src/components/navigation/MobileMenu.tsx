@@ -142,7 +142,7 @@ export function MobileMenu({
             {/* User Account Section */}
             <div className="pt-4 border-t border-border space-y-1">
                 <div className="px-4 py-2 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-emerald-500 flex items-center justify-center text-white font-medium shadow-lg">
+                    <div className="w-10 h-10 rounded-full bg-gradient-brand-primary flex items-center justify-center text-primary-foreground font-medium shadow-lg">
                         {displayName[0]?.toUpperCase()}
                     </div>
                     <div>

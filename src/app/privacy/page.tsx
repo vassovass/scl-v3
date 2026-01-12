@@ -2,16 +2,16 @@ import Link from "next/link";
 
 export default function PrivacyPolicyPage() {
     return (
-        <main className="min-h-screen bg-slate-950 text-slate-300">
+        <main className="min-h-screen bg-background text-foreground">
             <div className="mx-auto max-w-3xl px-6 py-12">
-                <Link href="/" className="text-sm text-sky-400 hover:text-sky-300">← Back to Home</Link>
+                <Link href="/" className="text-sm text-primary hover:text-primary/80">← Back to Home</Link>
 
-                <h1 className="mt-8 text-3xl font-bold text-slate-100">Privacy Policy</h1>
-                <p className="mt-2 text-sm text-slate-500">Last updated: December 2024</p>
+                <h1 className="mt-8 text-3xl font-bold text-foreground">Privacy Policy</h1>
+                <p className="mt-2 text-sm text-muted-foreground">Last updated: December 2024</p>
 
                 <section className="mt-8 space-y-6">
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">1. Information We Collect</h2>
+                        <h2 className="text-xl font-semibold text-foreground">1. Information We Collect</h2>
                         <p className="mt-2">
                             We collect information you provide directly to us when you create an account, including:
                         </p>
@@ -24,7 +24,7 @@ export default function PrivacyPolicyPage() {
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">2. How We Use Your Information</h2>
+                        <h2 className="text-xl font-semibold text-foreground">2. How We Use Your Information</h2>
                         <p className="mt-2">We use the information we collect to:</p>
                         <ul className="mt-2 list-disc list-inside space-y-1">
                             <li>Provide, maintain, and improve our services</li>
@@ -35,7 +35,7 @@ export default function PrivacyPolicyPage() {
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">3. Data Storage & Security</h2>
+                        <h2 className="text-xl font-semibold text-foreground">3. Data Storage & Security</h2>
                         <p className="mt-2">
                             Your data is stored securely using Supabase, a trusted cloud database provider.
                             We implement industry-standard security measures including encryption in transit (HTTPS)
@@ -45,7 +45,7 @@ export default function PrivacyPolicyPage() {
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">4. Data Sharing</h2>
+                        <h2 className="text-xl font-semibold text-foreground">4. Data Sharing</h2>
                         <p className="mt-2">
                             We do not sell your personal information. Your step data and display name are visible
                             to other members of leagues you join. We may share aggregated, anonymized data for
@@ -54,7 +54,7 @@ export default function PrivacyPolicyPage() {
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">5. Your Rights</h2>
+                        <h2 className="text-xl font-semibold text-foreground">5. Your Rights</h2>
                         <p className="mt-2">You have the right to:</p>
                         <ul className="mt-2 list-disc list-inside space-y-1">
                             <li>Access your personal data</li>
@@ -65,7 +65,7 @@ export default function PrivacyPolicyPage() {
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">6. Contact Us</h2>
+                        <h2 className="text-xl font-semibold text-foreground">6. Contact Us</h2>
                         <p className="mt-2">
                             If you have questions about this Privacy Policy, please contact us through the
                             in-app feedback form or email the league administrator.

@@ -19,11 +19,11 @@ export default function StageInfoPage() {
 
     // Color mapping for each stage
     const stageColors: Record<string, { bg: string; border: string; text: string; glow: string }> = {
-        'pre-alpha': { bg: 'bg-purple-900/10', border: 'border-purple-600/30', text: 'text-purple-400', glow: 'bg-purple-500' },
+        'pre-alpha': { bg: 'bg-[hsl(var(--brand-accent)/0.1)]', border: 'border-[hsl(var(--brand-accent)/0.3)]', text: 'text-[hsl(var(--brand-accent))]', glow: 'bg-[hsl(var(--brand-accent))]' },
         'alpha': { bg: 'bg-[hsl(var(--info)/0.1)]', border: 'border-[hsl(var(--info)/0.3)]', text: 'text-[hsl(var(--info))]', glow: 'bg-[hsl(var(--info))]' },
-        'beta': { bg: 'bg-amber-900/10', border: 'border-amber-600/30', text: 'text-[hsl(var(--warning))]', glow: 'bg-amber-500' },
-        'product-hunt': { bg: 'bg-orange-900/10', border: 'border-orange-600/30', text: 'text-orange-400', glow: 'bg-orange-500' },
-        'production': { bg: 'bg-emerald-900/10', border: 'border-emerald-600/30', text: 'text-emerald-400', glow: 'bg-emerald-500' },
+        'beta': { bg: 'bg-[hsl(var(--warning)/0.1)]', border: 'border-[hsl(var(--warning)/0.3)]', text: 'text-[hsl(var(--warning))]', glow: 'bg-[hsl(var(--warning))]' },
+        'product-hunt': { bg: 'bg-[hsl(var(--warning)/0.1)]', border: 'border-[hsl(var(--warning)/0.3)]', text: 'text-[hsl(var(--warning))]', glow: 'bg-[hsl(var(--warning))]' },
+        'production': { bg: 'bg-[hsl(var(--success)/0.1)]', border: 'border-[hsl(var(--success)/0.3)]', text: 'text-[hsl(var(--success))]', glow: 'bg-[hsl(var(--success))]' },
     };
 
     const colors = stageColors[currentStageData.stage] || stageColors['beta'];

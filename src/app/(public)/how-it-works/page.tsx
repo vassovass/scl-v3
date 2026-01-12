@@ -29,8 +29,8 @@ export default function HowItWorksPage() {
                         icon={Footprints}
                         title="Walk & Track"
                         description="Use your favorite app (Apple Health, Google Fit, Garmin, etc.) to track your daily steps. Just keep moving!"
-                        color="text-sky-400"
-                        bg="bg-sky-500/10"
+                        color="text-primary"
+                        bg="bg-primary/10"
                     />
                     <StepCard
                         number="2"
@@ -68,12 +68,12 @@ export default function HowItWorksPage() {
                                 Our AI analyzes every screenshot to verify the date, step count, and source app. We assume good intentions, but we verify everything to keep execution fair for everyone.
                             </p>
                         </div>
-                        <div className="flex-shrink-0 relative w-full md:w-80 aspect-square bg-slate-900 rounded-2xl flex items-center justify-center border border-slate-800 shadow-2xl">
+                        <div className="flex-shrink-0 relative w-full md:w-80 aspect-square bg-card rounded-2xl flex items-center justify-center border border-border shadow-2xl">
                             {/* Abstract visual of scanning */}
                             <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent rounded-2xl" />
-                            <Camera className="w-24 h-24 text-slate-700" />
+                            <Camera className="w-24 h-24 text-muted-foreground" />
                             <div className="absolute inset-x-0 top-1/2 h-1 bg-green-500/50 shadow-[0_0_20px_rgba(34,197,94,0.5)] animate-pulse" />
-                            <div className="absolute bottom-8 bg-slate-800 px-4 py-2 rounded-lg text-green-400 font-mono text-sm border border-slate-700">
+                            <div className="absolute bottom-8 bg-muted px-4 py-2 rounded-lg text-green-400 font-mono text-sm border border-border">
                                 Verified: 10,432 steps
                             </div>
                         </div>
@@ -105,7 +105,7 @@ export default function HowItWorksPage() {
                 <div className="mt-16 text-center">
                     <Link
                         href="/sign-up"
-                        className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-black bg-gradient-to-r from-sky-400 to-cyan-400 rounded-full hover:scale-105 transition-transform shadow-[0_0_40px_rgba(56,189,248,0.3)]"
+                        className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-primary-foreground bg-gradient-brand-primary rounded-full hover:scale-105 transition-transform glow-primary"
                     >
                         Start Your Journey
                     </Link>

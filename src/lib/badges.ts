@@ -40,7 +40,7 @@ export const BADGE_CONFIG: Record<string, Record<string, BadgeConfig>> = {
         general: {
             label: '💬 General',
             icon: '💬',
-            className: 'bg-slate-500/20 text-slate-400 border-slate-500/30',
+            className: 'bg-muted text-muted-foreground border-border',
         },
         positive: {
             label: '👍 Positive',
@@ -59,12 +59,12 @@ export const BADGE_CONFIG: Record<string, Record<string, BadgeConfig>> = {
         backlog: {
             label: '📋 Backlog',
             icon: '📋',
-            className: 'bg-slate-500/20 text-slate-500',
+            className: 'bg-muted text-muted-foreground',
         },
         todo: {
             label: '📝 To Do',
             icon: '📝',
-            className: 'bg-slate-500/20 text-slate-400',
+            className: 'bg-muted text-muted-foreground',
         },
         in_progress: {
             label: '🔨 In Progress',
@@ -129,7 +129,7 @@ export const BADGE_CONFIG: Record<string, Record<string, BadgeConfig>> = {
         future: {
             label: '🔮 Future',
             icon: '🔮',
-            className: 'bg-slate-500/20 text-slate-400',
+            className: 'bg-muted text-muted-foreground',
         },
     },
 

@@ -5,16 +5,16 @@ import { APP_CONFIG } from "@/lib/config";
 
 export default function TermsOfServicePage() {
     return (
-        <main className="min-h-screen bg-slate-950 text-slate-300">
+        <main className="min-h-screen bg-background text-foreground">
             <div className="mx-auto max-w-3xl px-6 py-12">
-                <Link href="/" className="text-sm text-sky-400 hover:text-sky-300">← Back to Home</Link>
+                <Link href="/" className="text-sm text-primary hover:text-primary/80">← Back to Home</Link>
 
-                <h1 className="mt-8 text-3xl font-bold text-slate-100">Terms of Service</h1>
-                <p className="mt-2 text-sm text-slate-500">Last updated: December 2024</p>
+                <h1 className="mt-8 text-3xl font-bold text-foreground">Terms of Service</h1>
+                <p className="mt-2 text-sm text-muted-foreground">Last updated: December 2024</p>
 
                 <section className="mt-8 space-y-6">
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">1. Acceptance of Terms</h2>
+                        <h2 className="text-xl font-semibold text-foreground">1. Acceptance of Terms</h2>
                         <p className="mt-2">
                             By accessing or using {APP_CONFIG.name} (&quot;the Service&quot;), you agree to be bound by these
                             Terms of Service. If you do not agree to these terms, please do not use the Service.
@@ -22,7 +22,7 @@ export default function TermsOfServicePage() {
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">2. Description of Service</h2>
+                        <h2 className="text-xl font-semibold text-foreground">2. Description of Service</h2>
                         <p className="mt-2">
                             {APP_CONFIG.name} is a step-tracking competition platform that allows users to create
                             leagues, submit step counts via screenshots, and compete with friends. The Service
@@ -31,7 +31,7 @@ export default function TermsOfServicePage() {
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">3. Service Availability</h2>
+                        <h2 className="text-xl font-semibold text-foreground">3. Service Availability</h2>
                         <p className="mt-2">
                             The Service is provided on an &quot;as is&quot; and &quot;as available&quot; basis. We reserve the right to:
                         </p>
@@ -44,7 +44,7 @@ export default function TermsOfServicePage() {
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">4. Subscription Plans & Payments</h2>
+                        <h2 className="text-xl font-semibold text-foreground">4. Subscription Plans & Payments</h2>
                         <p className="mt-2">
                             Paid subscription plans grant access to premium features. By subscribing, you agree to:
                         </p>
@@ -56,7 +56,7 @@ export default function TermsOfServicePage() {
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">5. Lifetime Access Plans</h2>
+                        <h2 className="text-xl font-semibold text-foreground">5. Lifetime Access Plans</h2>
                         <p className="mt-2">
                             &quot;Lifetime&quot; access means access for the lifetime of the Service, not the lifetime of
                             the user. Lifetime plans are subject to the following terms:
@@ -71,7 +71,7 @@ export default function TermsOfServicePage() {
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">6. Refund Policy</h2>
+                        <h2 className="text-xl font-semibold text-foreground">6. Refund Policy</h2>
                         <p className="mt-2">
                             Refunds are handled as follows:
                         </p>
@@ -85,7 +85,7 @@ export default function TermsOfServicePage() {
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">7. User Conduct</h2>
+                        <h2 className="text-xl font-semibold text-foreground">7. User Conduct</h2>
                         <p className="mt-2">You agree not to:</p>
                         <ul className="mt-2 list-disc list-inside space-y-1">
                             <li>Submit fraudulent, manipulated, or fake screenshots</li>
@@ -98,7 +98,7 @@ export default function TermsOfServicePage() {
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">8. Account Termination</h2>
+                        <h2 className="text-xl font-semibold text-foreground">8. Account Termination</h2>
                         <p className="mt-2">
                             We reserve the right to suspend or terminate accounts that violate these terms.
                             You may delete your account at any time through the app settings. Upon termination:
@@ -111,7 +111,7 @@ export default function TermsOfServicePage() {
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">9. Intellectual Property</h2>
+                        <h2 className="text-xl font-semibold text-foreground">9. Intellectual Property</h2>
                         <p className="mt-2">
                             The Service, including its code, design, and branding, is owned by {APP_CONFIG.name}.
                             You retain ownership of content you submit (screenshots, profile information) but
@@ -120,7 +120,7 @@ export default function TermsOfServicePage() {
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">10. Disclaimer of Warranties</h2>
+                        <h2 className="text-xl font-semibold text-foreground">10. Disclaimer of Warranties</h2>
                         <p className="mt-2">
                             The Service is provided &quot;as is&quot; without warranties of any kind, express or implied.
                             We do not guarantee:
@@ -134,7 +134,7 @@ export default function TermsOfServicePage() {
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">11. Limitation of Liability</h2>
+                        <h2 className="text-xl font-semibold text-foreground">11. Limitation of Liability</h2>
                         <p className="mt-2">
                             To the maximum extent permitted by law, {APP_CONFIG.name} shall not be liable for any
                             indirect, incidental, special, consequential, or punitive damages, including loss of
@@ -144,7 +144,7 @@ export default function TermsOfServicePage() {
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">12. Changes to Terms</h2>
+                        <h2 className="text-xl font-semibold text-foreground">12. Changes to Terms</h2>
                         <p className="mt-2">
                             We may update these Terms from time to time. Continued use of the Service after
                             changes constitutes acceptance of the new terms. Material changes will be
@@ -153,7 +153,7 @@ export default function TermsOfServicePage() {
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">13. Governing Law</h2>
+                        <h2 className="text-xl font-semibold text-foreground">13. Governing Law</h2>
                         <p className="mt-2">
                             These Terms shall be governed by and construed in accordance with applicable laws.
                             Any disputes shall be resolved through good-faith negotiation before pursuing
@@ -162,7 +162,7 @@ export default function TermsOfServicePage() {
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-100">14. Contact</h2>
+                        <h2 className="text-xl font-semibold text-foreground">14. Contact</h2>
                         <p className="mt-2">
                             For questions about these Terms, please contact us through the in-app feedback form.
                         </p>

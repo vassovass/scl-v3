@@ -12,7 +12,7 @@ export default function PricingPage() {
             <div className="max-w-4xl mx-auto text-center mb-16">
                 <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4 animate-fade-slide">
                     Compete for{" "}
-                    <span className="bg-gradient-to-r from-sky-400 to-cyan-400 bg-clip-text text-transparent">
+                    <span className="text-gradient-brand">
                         Free
                     </span>
                     .
@@ -57,17 +57,17 @@ export default function PricingPage() {
                 </div>
 
                 {/* PREMIUM TIER */}
-                <div className="relative bg-gradient-to-b from-slate-900 to-slate-800 border-2 border-primary/20 rounded-3xl p-8 flex flex-col shadow-2xl shadow-sky-900/20">
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-sky-500 to-blue-600 text-white px-4 py-1 rounded-full text-sm font-bold tracking-wide uppercase shadow-lg">
+                <div className="relative bg-gradient-to-b from-card to-muted border-2 border-primary/20 rounded-3xl p-8 flex flex-col shadow-2xl glow-primary">
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-brand-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-bold tracking-wide uppercase shadow-lg">
                         Coming Soon
                     </div>
                     <div className="mb-6">
-                        <h3 className="text-2xl font-bold text-white">Premium</h3>
-                        <div className="mt-4 flex items-baseline text-white">
+                        <h3 className="text-2xl font-bold text-foreground">Premium</h3>
+                        <div className="mt-4 flex items-baseline text-foreground">
                             <span className="text-4xl font-extrabold tracking-tight">$?</span>
-                            <span className="ml-1 text-xl font-semibold text-slate-400">/ month</span>
+                            <span className="ml-1 text-xl font-semibold text-muted-foreground">/ month</span>
                         </div>
-                        <p className="mt-4 text-slate-300">
+                        <p className="mt-4 text-muted-foreground">
                             For privacy-conscious athletes and office teams who want full control.
                         </p>
                     </div>
@@ -103,12 +103,12 @@ function FeatureItem({ children, included, dark }: { children: React.ReactNode; 
         <li className="flex items-start">
             <div className="flex-shrink-0">
                 {included ? (
-                    <Check className={`h-6 w-6 ${dark ? "text-sky-400" : "text-primary"}`} />
+                    <Check className="h-6 w-6 text-primary" />
                 ) : (
                     <X className="h-6 w-6 text-muted-foreground/50" />
                 )}
             </div>
-            <p className={`ml-3 text-base ${dark ? "text-slate-200" : "text-muted-foreground"}`}>{children}</p>
+            <p className="ml-3 text-base text-muted-foreground">{children}</p>
         </li>
     );
 }
@@ -116,7 +116,7 @@ function FeatureItem({ children, included, dark }: { children: React.ReactNode; 
 function ButtonLink({ href, children, primary }: { href: string; children: React.ReactNode; primary?: boolean }) {
     // Determine classes based on variant
     const baseClasses = "w-full inline-flex items-center justify-center px-6 py-3 border text-base font-medium rounded-full transition-all duration-300";
-    const primaryClasses = "border-transparent text-white bg-gradient-to-r from-sky-400 to-blue-600 hover:scale-[1.02] hover:shadow-lg shadow-sky-500/25";
+    const primaryClasses = "border-transparent text-primary-foreground bg-gradient-brand-primary hover:scale-[1.02] glow-primary";
     const secondaryClasses = "border-border text-foreground hover:bg-muted";
 
     return (

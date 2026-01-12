@@ -10,7 +10,7 @@ const alertVariants = cva(
       variant: {
         default: "bg-background text-foreground",
         destructive:
-          "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
+          "border-destructive/50 bg-destructive/10 text-destructive [&>svg]:text-destructive",
         warning:
           "border-[hsl(var(--warning)/.5)] bg-[hsl(var(--warning)/.1)] text-[hsl(var(--warning))] [&>svg]:text-[hsl(var(--warning))]",
         success:

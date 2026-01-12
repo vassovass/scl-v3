@@ -107,11 +107,11 @@ function FooterBottomBar({ currentYear }: { currentYear: number }) {
 
     // Stage display configuration
     const stageConfig: Record<string, { label: string; color: string; glowColor: string }> = {
-        'pre-alpha': { label: 'Pre-Alpha', color: 'text-purple-400', glowColor: 'bg-purple-500' },
+        'pre-alpha': { label: 'Pre-Alpha', color: 'text-[hsl(var(--brand-accent))]', glowColor: 'bg-[hsl(var(--brand-accent))]' },
         'alpha': { label: 'Alpha', color: 'text-[hsl(var(--info))]', glowColor: 'bg-[hsl(var(--info))]' },
-        'beta': { label: 'Beta', color: 'text-[hsl(var(--warning))]', glowColor: 'bg-amber-500' },
-        'product-hunt': { label: 'Product Hunt', color: 'text-orange-400', glowColor: 'bg-orange-500' },
-        'production': { label: 'Production', color: 'text-emerald-400', glowColor: 'bg-emerald-500' },
+        'beta': { label: 'Beta', color: 'text-[hsl(var(--warning))]', glowColor: 'bg-[hsl(var(--warning))]' },
+        'product-hunt': { label: 'Product Hunt', color: 'text-[hsl(var(--warning))]', glowColor: 'bg-[hsl(var(--warning))]' },
+        'production': { label: 'Production', color: 'text-[hsl(var(--success))]', glowColor: 'bg-[hsl(var(--success))]' },
     };
 
     const currentStage = stageConfig[stageData.stage] || stageConfig['beta'];

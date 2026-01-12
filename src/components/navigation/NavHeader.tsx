@@ -291,7 +291,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                                 userRole={userRole}
                                 trigger={
                                     <button className={buttonVariants({ variant: "ghost", size: "sm", className: "gap-2 px-2" })}>
-                                        <span className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-emerald-500 flex items-center justify-center text-white text-sm font-medium shadow-md ring-2 ring-background hover:ring-accent transition-all">
+                                        <span className="w-8 h-8 rounded-full bg-gradient-brand-primary flex items-center justify-center text-primary-foreground text-sm font-medium shadow-md ring-2 ring-background hover:ring-accent transition-all">
                                             {displayName[0]?.toUpperCase()}
                                         </span>
                                         <span className="text-[10px] text-muted-foreground">▼</span>
