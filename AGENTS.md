@@ -307,43 +307,6 @@ export default function LeaguePage({ params }: { params: { id: string } }) {
 }
 ```
 
-#### 7.5 Agent Skills & MCP Configuration
-
-> **Check [`.agent/SKILLS.md`](.agent/SKILLS.md)** for all available agent capabilities.
-
-This project uses a **modular skills system** for AI agent capabilities:
-
-```
-.agent/
-├── SKILLS.md           # Master skills manifest (START HERE)
-├── mcp.json            # Universal MCP config (single source of truth)
-├── MCP.md              # MCP setup documentation
-└── skills/
-    └── mcp/            # MCP skill documentation
-        └── supabase.md # Database access skill
-```
-
-**Available MCPs:**
-
-| Server | Capabilities | Skill Doc | Status |
-|--------|--------------|-----------|--------|
-| **Supabase** | query, schema, tables, rls | [supabase.md](.agent/skills/mcp/supabase.md) | ✅ Active |
-
-**Key Commands:**
-
-```bash
-npm run mcp:sync   # Generate tool-specific configs from universal source
-```
-
-**Adding New MCPs/Skills:**
-
-1. Edit `.agent/mcp.json` - add server to `servers` section
-2. Create skill doc at `.agent/skills/mcp/[name].md`
-3. Run `npm run mcp:sync` to generate tool configs
-4. Update `.agent/SKILLS.md` manifest
-
-See [`.agent/MCP.md`](.agent/MCP.md) for detailed setup instructions.
-
 ## Project Structure
 
 ```
