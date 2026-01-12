@@ -245,6 +245,7 @@ function DropdownItem({
         active ? "bg-primary/20 text-primary focus:bg-primary/30 focus:text-primary" : "text-foreground"
     );
 
+    // Items with href but NO onClick - render as Link
     if (item.href && !item.onClick) {
         return (
             <DropdownMenuItem asChild className={className}>
@@ -265,15 +266,23 @@ function DropdownItem({
         );
     }
 
+    // Items with onClick handler (including tours)
     return (
         <DropdownMenuItem
             className={className}
-            onClick={() => onAction(item)}
+            onSelect={(event) => {
+                // Prevent default close behavior until action completes
+                event.preventDefault();
+                onAction(item);
+            }}
             data-module-id={`menu-${item.id}`}
             data-module-name={item.label}
         >
             {item.icon && <span className="mr-2">{item.icon}</span>}
             <span className="flex-1">{item.label}</span>
+            {item.description && (
+                <span className="ml-2 text-xs text-muted-foreground">{item.description}</span>
+            )}
         </DropdownMenuItem>
     );
 }
