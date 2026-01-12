@@ -7,6 +7,19 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-01-13]
+
+### Added
+- **Bulk Submission Management**: Adjustable pagination (10-100), global "Select All", and bulk actions (Delete, Date Edit, Resubmit).
+- **Proxy Context Switching**: "View As" dropdown for Admins to view and manage proxy member submissions as if they were their own.
+- **Bulk APIs**: Dedicated endpoints for bulk Delete, Patch (date), and AI Re-analysis.
+- **Resubmit to AI**: Capacity to re-process failed or stale submissions in bulk (rate-limited).
+
+### Fixed
+- **Bulk Delete Limits**: Resolved payload size issues for large bulk deletions (>100 items) via backend limit increase and frontend chunking.
+- **Pagination**: Corrected "Showing X-Y of Z" display logic.
+- **Proxy Permissions**: Hardened permission checks for modifying proxy data.
+
 ## [2026-01-12]
 
 ### Added

@@ -3,11 +3,11 @@ import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/se
 import { json, badRequest, unauthorized, forbidden, serverError, jsonError } from "@/lib/api";
 
 const deleteSchema = z.object({
-    ids: z.array(z.string().uuid()).min(1).max(100),
+    ids: z.array(z.string().uuid()).min(1).max(1000),
 });
 
 const patchSchema = z.object({
-    ids: z.array(z.string().uuid()).min(1).max(100),
+    ids: z.array(z.string().uuid()).min(1).max(1000),
     updates: z.object({
         for_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     }),

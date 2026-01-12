@@ -95,65 +95,67 @@ export default function SubmitPage() {
         }
     };
 
+    const fetchAllGlobalIds = async (): Promise<string[]> => {
+        if (!session) return [];
+        let allIds: string[] = [];
+        const limit = 100;
+
+        if (viewContext === "me") {
+            let offset = 0;
+            let hasMore = true;
+            while (hasMore) {
+                const res = await fetch(`/api/submissions?league_id=${selectedLeagueId}&user_id=${session.user.id}&exclude_proxy=true&limit=${limit}&offset=${offset}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
+                if (!res.ok) throw new Error("Fetch failed");
+                const data = await res.json();
+                const ids = data.submissions.map((s: any) => s.id);
+                allIds.push(...ids);
+                offset += limit;
+                if (ids.length < limit) hasMore = false;
+            }
+        } else if (selectedProxyId && selectedProxyId !== "all_proxy") {
+            let offset = 0;
+            let hasMore = true;
+            while (hasMore) {
+                const res = await fetch(`/api/submissions?league_id=${selectedLeagueId}&proxy_member_id=${selectedProxyId}&limit=${limit}&offset=${offset}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
+                if (!res.ok) throw new Error("Fetch failed");
+                const data = await res.json();
+                const ids = data.submissions.map((s: any) => s.id);
+                allIds.push(...ids);
+                offset += limit;
+                if (ids.length < limit) hasMore = false;
+            }
+        }
+        return allIds;
+    };
+
     const handleBulkDelete = async () => {
         if (!session) return;
         setIsBulkDeleting(true);
         try {
-            if (selectAllGlobal) {
-                // Use Bulk API with filter logic (for now, fetch all IDs if feasible or implement filter-based bulk OP)
-                // For safety/simplicity in this step, we'll fetch all IDs first
-                // Note: In a real large-scale app, we'd pass filters to the DELETE endpoint.
-                // My Bulk API takes IDs.
-                let allIds: string[] = [];
-                if (viewContext === "me") {
-                    // Fetch all IDs for me using loop to handle limit
-                    let offset = 0;
-                    let hasMore = true;
-                    while (hasMore) {
-                        const res = await fetch(`/api/submissions?league_id=${selectedLeagueId}&user_id=${session.user.id}&exclude_proxy=true&limit=100&offset=${offset}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
-                        if (!res.ok) break;
-                        const data = await res.json();
-                        const ids = data.submissions.map((s: any) => s.id);
-                        allIds.push(...ids);
-                        offset += 100;
-                        if (ids.length < 100) hasMore = false;
-                    }
-                } else if (selectedProxyId && selectedProxyId !== "all_proxy") {
-                    let offset = 0;
-                    let hasMore = true;
-                    while (hasMore) {
-                        const res = await fetch(`/api/submissions?league_id=${selectedLeagueId}&proxy_member_id=${selectedProxyId}&limit=100&offset=${offset}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
-                        if (!res.ok) break;
-                        const data = await res.json();
-                        const ids = data.submissions.map((s: any) => s.id);
-                        allIds.push(...ids);
-                        offset += 100;
-                        if (ids.length < 100) hasMore = false;
-                    }
-                }
+            let idsToDelete: string[] = [];
 
-                if (allIds.length > 0) {
+            if (selectAllGlobal) {
+                idsToDelete = await fetchAllGlobalIds();
+            } else {
+                idsToDelete = Array.from(selectedIds);
+            }
+
+            if (idsToDelete.length > 0) {
+                const CHUNK_SIZE = 500;
+                for (let i = 0; i < idsToDelete.length; i += CHUNK_SIZE) {
+                    const chunk = idsToDelete.slice(i, i + CHUNK_SIZE);
                     const res = await fetch("/api/submissions/bulk", {
                         method: "DELETE",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ ids: allIds }),
+                        body: JSON.stringify({ ids: chunk }),
                     });
                     if (!res.ok) throw new Error("Bulk delete failed");
                 }
-            } else {
-                // IDs are in selectedIds
-                const ids = Array.from(selectedIds);
-                const res = await fetch("/api/submissions/bulk", {
-                    method: "DELETE",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ ids }),
-                });
-                if (!res.ok) throw new Error("Bulk delete failed");
             }
 
             toast({
                 title: "Bulk Delete Complete",
-                description: `Deleted selected submissions.`,
+                description: `Deleted ${selectAllGlobal ? submissionsTotal : selectedIds.size} submissions.`,
             });
 
             setSelectedIds(new Set());
@@ -185,12 +187,28 @@ export default function SubmitPage() {
                 return;
             }
 
-            const promises = Array.from(selectedIds).map(id =>
-                fetch(`/api/submissions/${id}`, {
+            let idsToUpdate: string[] = [];
+
+            if (selectAllGlobal) {
+                idsToUpdate = await fetchAllGlobalIds();
+            } else {
+                idsToUpdate = Array.from(selectedIds);
+            }
+
+            // Chunking for PATCH
+            const CHUNK_SIZE = 500;
+            const chunks = [];
+            for (let i = 0; i < idsToUpdate.length; i += CHUNK_SIZE) {
+                chunks.push(idsToUpdate.slice(i, i + CHUNK_SIZE));
+            }
+
+            const promises = chunks.map(chunk =>
+                fetch(`/api/submissions/bulk`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        for_date: bulkDate,
+                        ids: chunk,
+                        updates: { for_date: bulkDate },
                         reason: "Bulk date update"
                     })
                 })
@@ -240,33 +258,7 @@ export default function SubmitPage() {
                     return;
                 }
                 // Fetch IDs
-                // Fetch IDs loop
-                let allIds: string[] = [];
-                if (viewContext === "me") {
-                    let offset = 0;
-                    let hasMore = true;
-                    while (hasMore) {
-                        const res = await fetch(`/api/submissions?league_id=${selectedLeagueId}&user_id=${session.user.id}&exclude_proxy=true&limit=100&offset=${offset}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
-                        if (!res.ok) break;
-                        const data = await res.json();
-                        const ids = data.submissions.map((s: any) => s.id);
-                        allIds.push(...ids);
-                        offset += 100;
-                        if (ids.length < 100) hasMore = false;
-                    }
-                } else if (selectedProxyId && selectedProxyId !== "all_proxy") {
-                    let offset = 0;
-                    let hasMore = true;
-                    while (hasMore) {
-                        const res = await fetch(`/api/submissions?league_id=${selectedLeagueId}&proxy_member_id=${selectedProxyId}&limit=100&offset=${offset}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
-                        if (!res.ok) break;
-                        const data = await res.json();
-                        const ids = data.submissions.map((s: any) => s.id);
-                        allIds.push(...ids);
-                        offset += 100;
-                        if (ids.length < 100) hasMore = false;
-                    }
-                }
+                const allIds = await fetchAllGlobalIds();
                 ids = allIds;
             }
 
