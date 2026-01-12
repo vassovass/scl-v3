@@ -43,10 +43,10 @@ export function ModeToggle() {
     }
 
     const items = [
-        { value: "light", label: "Light", icon: Sun },
-        { value: "dark", label: "Dark", icon: Moon },
-        { value: "system", label: "System", icon: Monitor },
-    ].filter((item) => allowedModes.includes(item.value as ThemeMode));
+D        { value: "light", label: "Light", icon: Sun, comingSoon: "Light mode coming soon" },
+        { value: "dark", label: "Dark", icon: Moon, comingSoon: "Dark mode coming soon" },
+        { value: "system", label: "System", icon: Monitor, comingSoon: "System mode coming soon" },
+    ];
 
     return (
         <DropdownMenu>
@@ -64,11 +64,24 @@ export function ModeToggle() {
             <DropdownMenuContent align="end">
                 {items.map((item) => {
                     const Icon = item.icon;
+                    const isAllowed = allowedModes.includes(item.value as ThemeMode);
+                    const isDisabled = !isAllowed;
                     return (
                         <DropdownMenuItem
                             key={item.value}
-                            onClick={() => updateTheme(item.value as ThemeMode)}
-                            className={theme === item.value ? "bg-accent" : ""}
+                            onClick={() => {
+                                if (!isDisabled) {
+                                    updateTheme(item.value as ThemeMode);
+                                }
+                            }}
+                            disabled={isDisabled}
+                            title={isDisabled ? item.comingSoon : undefined}
+                            className={[
+                                theme === item.value ? "bg-accent" : "",
+                                isDisabled ? "text-muted-foreground opacity-60" : "",
+                            ]
+                                .filter(Boolean)
+                                .join(" ")}
                         >
                             <Icon className="mr-2 h-4 w-4" />
                             {item.label}

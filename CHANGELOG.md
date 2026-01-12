@@ -57,6 +57,7 @@ All notable changes to StepLeague v3.
 
 ### Changed
 
+- **Theme Toggle Availability** - Disabled theme options now stay visible with "coming soon" hover hints when not allowed.
 - **Gemini Verification Prompt Logic** - Enhanced reliability for relative dates
   - **Relative Date Context**: Verification prompt now includes explicit "Today", "Yesterday", and "2 days ago" dates based on server time.
   - **Modular Prompt Generation**: Extracted `generateVerificationPrompt` for better testability and maintenance.
