@@ -34,55 +34,80 @@
   --z-tooltip: 110;
 
   /* Core Brand Colors - Base Palette (HSL) */
-  --brand-primary: 199 89% 48%;          /* sky-500 #0ea5e9 */
-  --brand-primary-dark: 204 80% 40%;     /* sky-600 #0284c7 */
-  --brand-primary-light: 199 92% 56%;    /* sky-400 #38bdf8 */
-  --brand-accent: 271 91% 65%;           /* purple-500 #a855f7 */
+  --brand-primary: 199 89% 48%;
+  /* sky-500 #0ea5e9 */
+  --brand-primary-dark: 204 80% 40%;
+  /* sky-600 #0284c7 */
+  --brand-primary-light: 199 92% 56%;
+  /* sky-400 #38bdf8 */
+  --brand-accent: 271 91% 65%;
+  /* purple-500 #a855f7 */
   --glow-primary: 199 89% 48%;
   --glow-accent: 271 91% 65%;
 
   /* === SEMANTIC SYSTEM (Shadcn Compatible) === */
 
   /* Page Backgrounds - Deep Slate for "Modern SaaS" look */
-  --background: 222.2 84% 4.9%;          /* slate-950 #020617 */
-  --foreground: 210 40% 98%;             /* slate-50 #f8fafc */
+  --background: 222.2 84% 4.9%;
+  /* slate-950 #020617 */
+  --foreground: 210 40% 98%;
+  /* slate-50 #f8fafc */
 
   /* Surface / Cards */
-  --card: 222.2 47.4% 11.2%;             /* slate-900 #0f172a */
-  --card-foreground: 210 40% 98%;        /* slate-50 */
+  --card: 222.2 47.4% 11.2%;
+  /* slate-900 #0f172a */
+  --card-foreground: 210 40% 98%;
+  /* slate-50 */
 
   /* Popovers / Modals */
-  --popover: 222.2 47.4% 11.2%;          /* slate-900 */
-  --popover-foreground: 210 40% 98%;     /* slate-50 */
+  --popover: 222.2 47.4% 11.2%;
+  /* slate-900 */
+  --popover-foreground: 210 40% 98%;
+  /* slate-50 */
 
   /* Primary Actions (Brand) */
-  --primary: 199 89% 48%;                /* sky-500 */
-  --primary-foreground: 222.2 47.4% 11.2%; /* slate-900 */
+  --primary: 199 89% 48%;
+  /* sky-500 */
+  --primary-foreground: 222.2 47.4% 11.2%;
+  /* slate-900 */
 
   /* Secondary Actions (Muted) */
-  --secondary: 217.2 32.6% 17.5%;        /* slate-800 */
-  --secondary-foreground: 210 40% 98%;   /* slate-50 */
+  --secondary: 217.2 32.6% 17.5%;
+  /* slate-800 */
+  --secondary-foreground: 210 40% 98%;
+  /* slate-50 */
 
   /* Subtle / Muted Elements */
-  --muted: 217.2 32.6% 17.5%;            /* slate-800 */
-  --muted-foreground: 215 20.2% 65.1%;   /* slate-400 */
+  --muted: 217.2 32.6% 17.5%;
+  /* slate-800 */
+  --muted-foreground: 215 20.2% 65.1%;
+  /* slate-400 */
 
   /* Interactive Accents */
-  --accent: 217.2 32.6% 17.5%;           /* slate-800 */
-  --accent-foreground: 210 40% 98%;      /* slate-50 */
+  --accent: 217.2 32.6% 17.5%;
+  /* slate-800 */
+  --accent-foreground: 210 40% 98%;
+  /* slate-50 */
 
   /* Destructive Actions */
-  --destructive: 0 62.8% 30.6%;          /* red-900ish */
-  --destructive-foreground: 210 40% 98%; /* slate-50 */
+  --destructive: 0 62.8% 30.6%;
+  /* red-900ish */
+  --destructive-foreground: 210 40% 98%;
+  /* slate-50 */
 
   /* Borders & Dividers */
-  --border: 217.2 32.6% 17.5%;           /* slate-800 */
-  --input: 217.2 32.6% 17.5%;            /* slate-800 */
-  --ring: 199 89% 48%;                   /* sky-500 */
+  --border: 217.2 32.6% 17.5%;
+  /* slate-800 */
+  --input: 217.2 32.6% 17.5%;
+  /* slate-800 */
+  --ring: 199 89% 48%;
+  /* sky-500 */
 
   /* Link System */
-  --link-text: 199 92% 56%;              /* sky-400 */
-  --link-hover: 199 95% 74%;             /* sky-300 */
+  --link-text: 199 92% 56%;
+  /* sky-400 */
+  --link-hover: 199 95% 74%;
+  /* sky-300 */
 
   /* Charts */
   --chart-1: 220 70% 50%;
@@ -115,79 +140,120 @@
   --date-picker-accent: 199 89% 48%;
 
   /* Semantic Status Colors */
-  --success: 160 65% 45%;      /* #1abc7b - Emerald-ish for dark mode */
-  --warning: 45 93% 60%;       /* #fbbf24 - Amber/yellow for dark mode, readable on dark */
-  --info: 199 89% 48%;         /* #0ea5e9 - Sky-500 (matches primary) */
+  --success: 160 65% 45%;
+  /* #1abc7b - Emerald-ish for dark mode */
+  --warning: 45 93% 60%;
+  /* #fbbf24 - Amber/yellow for dark mode, readable on dark */
+  --info: 199 89% 48%;
+  /* #0ea5e9 - Sky-500 (matches primary) */
 }
 
 /* === LIGHT THEME === */
 /* Palette generated with tonal surface approach for softer, professional look */
 [data-theme="light"] {
   /* Core Brand Colors - Teal/Cyan primary from user's palette */
-  --brand-primary: 189 35% 43%;          /* #468594 - teal primary */
-  --brand-primary-dark: 189 35% 38%;     /* #3f7582 - darker */
-  --brand-primary-light: 189 35% 48%;    /* lighter teal */
-  --brand-accent: 271 91% 65%;           /* purple-500 - keep accent */
+  --brand-primary: 189 35% 43%;
+  /* #468594 - teal primary */
+  --brand-primary-dark: 189 35% 38%;
+  /* #3f7582 - darker */
+  --brand-primary-light: 189 35% 48%;
+  /* lighter teal */
+  --brand-accent: 271 91% 65%;
+  /* purple-500 - keep accent */
   --glow-primary: 189 35% 43%;
   --glow-accent: 271 91% 65%;
 
   /* Page Backgrounds - Tonal surface (NOT pure white) */
-  --background: 192 15% 95%;             /* #ecf2f4 - tonal surface a0 */
-  --foreground: 189 30% 20%;             /* #2b4950 - primary a40 for text */
+  --background: 192 15% 95%;
+  /* #ecf2f4 - tonal surface a0 */
+  --foreground: 189 30% 20%;
+  /* #2b4950 - primary a40 for text */
 
   /* Surface / Cards - Slightly elevated tonal */
-  --card: 0 0% 100%;                     /* white for cards - lift effect */
-  --card-foreground: 189 30% 20%;        /* dark teal text */
+  --card: 0 0% 100%;
+  /* white for cards - lift effect */
+  --card-foreground: 189 30% 20%;
+  /* dark teal text */
 
   /* Popovers / Modals */
-  --popover: 0 0% 100%;                  /* white */
-  --popover-foreground: 189 30% 20%;     /* dark teal text */
+  --popover: 0 0% 100%;
+  /* white */
+  --popover-foreground: 189 30% 20%;
+  /* dark teal text */
 
   /* Primary Actions - Teal brand */
-  --primary: 189 35% 43%;                /* #468594 */
-  --primary-foreground: 0 0% 100%;       /* white */
+  --primary: 189 35% 43%;
+  /* #468594 */
+  --primary-foreground: 0 0% 100%;
+  /* white */
 
   /* Secondary Actions - Tonal surface */
-  --secondary: 192 10% 90%;              /* #dfe5e6 - tonal a10 */
-  --secondary-foreground: 189 30% 20%;   /* dark teal */
+  --secondary: 192 10% 90%;
+  /* #dfe5e6 - tonal a10 */
+  --secondary-foreground: 189 30% 20%;
+  /* dark teal */
 
   /* Subtle / Muted - Tonal grays */
-  --muted: 192 10% 90%;                  /* #dfe5e6 */
-  --muted-foreground: 189 20% 35%;       /* #57777e - medium teal-gray */
+  --muted: 192 10% 90%;
+  /* #dfe5e6 */
+  --muted-foreground: 189 20% 35%;
+  /* #57777e - medium teal-gray */
 
   /* Accents - Tonal hover state */
-  --accent: 192 8% 85%;                  /* #d3d8d9 - tonal a20 */
-  --accent-foreground: 189 30% 20%;      /* dark teal */
+  --accent: 192 8% 85%;
+  /* #d3d8d9 - tonal a20 */
+  --accent-foreground: 189 30% 20%;
+  /* dark teal */
 
   /* Destructive - Keep semantic reds */
-  --destructive: 0 58% 45%;              /* #b13535 - danger a0 */
-  --destructive-foreground: 0 0% 100%;   /* white */
+  --destructive: 0 58% 45%;
+  /* #b13535 - danger a0 */
+  --destructive-foreground: 0 0% 100%;
+  /* white */
 
   /* Borders - Subtle tonal */
-  --border: 192 8% 85%;                  /* #d3d8d9 - tonal a20 */
-  --input: 192 8% 85%;                   /* same */
-  --ring: 189 35% 43%;                   /* teal primary */
+  --border: 192 8% 85%;
+  /* #d3d8d9 - tonal a20 */
+  --input: 192 8% 85%;
+  /* same */
+  --ring: 189 35% 43%;
+  /* teal primary */
 
   /* Link System */
-  --link-text: 189 35% 38%;              /* #3f7582 - primary a10 */
-  --link-hover: 189 35% 30%;             /* #325760 - primary a30 */
+  --link-text: 189 35% 38%;
+  /* #3f7582 - primary a10 */
+  --link-hover: 189 35% 30%;
+  /* #325760 - primary a30 */
 
   /* Legacy alignment */
-  --bg-base: 192 15% 95%;                /* tonal surface */
-  --bg-elevated: 0 0% 100%;              /* white */
-  --bg-card: 0 0% 100%;                  /* white */
-  --bg-card-hover: 192 10% 90%;          /* tonal a10 */
-  --text-primary: 189 30% 20%;           /* dark teal */
-  --text-secondary: 189 20% 35%;         /* medium teal-gray */
-  --border-subtle: 192 8% 85%;           /* tonal a20 */
-  --border-default: 192 5% 75%;          /* tonal a40 */
+  --bg-base: 192 15% 95%;
+  /* tonal surface */
+  --bg-elevated: 0 0% 100%;
+  /* white */
+  --bg-card: 0 0% 100%;
+  /* white */
+  --bg-card-hover: 192 10% 90%;
+  /* tonal a10 */
+  --text-primary: 189 30% 20%;
+  /* dark teal */
+  --text-secondary: 189 20% 35%;
+  /* medium teal-gray */
+  --border-subtle: 192 8% 85%;
+  /* tonal a20 */
+  --border-default: 192 5% 75%;
+  /* tonal a40 */
 
   /* Menu System */
-  --menu-bg: 0 0% 100%;                  /* white */
-  --menu-border: 192 8% 85%;             /* tonal border */
-  --menu-item-text: 189 20% 35%;         /* medium teal-gray */
-  --menu-item-hover-bg: 192 10% 90%;     /* tonal a10 */
-  --menu-item-hover-text: 189 30% 20%;   /* dark teal */
+  --menu-bg: 0 0% 100%;
+  /* white */
+  --menu-border: 192 8% 85%;
+  /* tonal border */
+  --menu-item-text: 189 20% 35%;
+  /* medium teal-gray */
+  --menu-item-hover-bg: 192 10% 90%;
+  /* tonal a10 */
+  --menu-item-hover-text: 189 30% 20%;
+  /* dark teal */
 
   /* Date Picker */
   --date-picker-bg: 0 0% 100%;
@@ -196,9 +262,12 @@
   --date-picker-accent: 189 35% 43%;
 
   /* Semantic Status Colors - Darker for proper contrast */
-  --success: 160 65% 30%;                /* #1b7f5c - Dark green (good) */
-  --warning: 25 85% 40%;                 /* #c2610b - Dark orange (better than amber) */
-  --info: 214 68% 35%;                   /* #1a4d8f - Dark blue (darker for better contrast) */
+  --success: 160 65% 30%;
+  /* #1b7f5c - Dark green (good) */
+  --warning: 25 85% 40%;
+  /* #c2610b - Dark orange (better than amber) */
+  --info: 214 68% 35%;
+  /* #1a4d8f - Dark blue (darker for better contrast) */
 }
 
 /* ============================================
@@ -755,15 +824,15 @@ body {
 /* Brand Gradients (Theme-Aware) */
 .bg-gradient-brand-primary {
   background: linear-gradient(135deg,
-    hsl(var(--brand-primary-light)) 0%,
-    hsl(var(--brand-primary)) 100%);
+      hsl(var(--brand-primary-light)) 0%,
+      hsl(var(--brand-primary)) 100%);
 }
 
 .text-gradient-brand {
   background: linear-gradient(135deg,
-    hsl(var(--brand-primary-light)) 0%,
-    hsl(var(--brand-primary)) 50%,
-    hsl(var(--brand-accent)) 100%);
+      hsl(var(--brand-primary-light)) 0%,
+      hsl(var(--brand-primary)) 50%,
+      hsl(var(--brand-accent)) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -791,7 +860,9 @@ body {
    JOYRIDE GUIDED TOURS
    Lower header z-index when tour is active so
    tooltips/spotlight aren't covered by sticky nav
+   Joyride uses z-index 10000 for overlay
    ============================================ */
 body.joyride-active header {
-  z-index: 30 !important;
+  z-index: 0 !important;
+  position: relative !important;
 }

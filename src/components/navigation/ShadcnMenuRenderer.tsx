@@ -98,7 +98,13 @@ export function ShadcnMenuRenderer({
 
     // Handle item click (actions)
     const handleItemClick = (item: MenuItem) => {
+        console.log('[ShadcnMenuRenderer] handleItemClick called:', {
+            itemId: item.id,
+            itemOnClick: item.onClick,
+            hasOnAction: !!onAction
+        });
         if (item.onClick && onAction) {
+            console.log('[ShadcnMenuRenderer] Calling onAction with:', item.onClick);
             onAction(item.onClick, item);
         }
         // For Links, we don't need to do anything, Next.js handles it.
@@ -270,10 +276,13 @@ function DropdownItem({
     return (
         <DropdownMenuItem
             className={className}
-            onSelect={(event) => {
-                // Prevent default close behavior until action completes
-                event.preventDefault();
-                onAction(item);
+            onSelect={() => {
+                // Use setTimeout to ensure action fires AFTER menu closes
+                // This prevents issues with shadcn's internal state management
+                console.log('[ShadcnMenuRenderer] Tour item clicked:', item.id, item.onClick);
+                setTimeout(() => {
+                    onAction(item);
+                }, 0);
             }}
             data-module-id={`menu-${item.id}`}
             data-module-name={item.label}
