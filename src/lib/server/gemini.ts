@@ -248,17 +248,18 @@ RESPONSE FORMAT (strict JSON):
   "calories": number | null,
   "date": "YYYY-MM-DD" | null,
   "confidence": "high" | "medium" | "low" | null,
-  "notes": "Explain your extraction process, reasoning, and any assumptions"
+  "notes": "REQUIRED: State EXACTLY where the date was found (e.g. 'Date found in filename', 'Date found in top header', 'Date inferred from 'Today' text'). Then explain reasoning."
 }
 
 VALIDATION:
 - "steps": integer 0-100000
 - "date": Must be YYYY-MM-DD format. Check specifically for year logic errors.
-- "notes": REQUIRED - always explain which number you chose and why. Explictly mention year inference logic used.
+- "notes": REQUIRED - must mention the SOURCE of the date (Filename vs Image Location).
+- "confidence": If date is from filename, confidence is usually high.
 
 EXAMPLES:
-{"steps": 12345, "date": "2025-11-20", "confidence": "high", "notes": "Samsung Health. Date '20 Nov' seen in Jan 2026 -> Inferred 2025."}
-{"steps": 9677, "date": "${currentYear}-01-10", "confidence": "medium", "notes": "Date '10 Jan' - Current year inferred."}`;
+{"steps": 12345, "date": "2025-11-20", "confidence": "high", "notes": "Date found in filename 'step_2025-11-20.jpg'. Image shows 'Today'."}
+{"steps": 9677, "date": "${currentYear}-01-10", "confidence": "medium", "notes": "Date found in top-left header '10 Jan'. Year inferred from current date."}`;
 }
 
 /**
