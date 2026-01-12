@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useAuth } from "@/components/providers/AuthProvider";
 import { SubmissionForm } from "@/components/forms/SubmissionForm";
 import { BatchSubmissionForm } from "@/components/forms/BatchSubmissionForm";
 import { BulkUnverifiedForm } from "@/components/forms/BulkUnverifiedForm";
 import { ProxyMembersDropdown } from "@/components/league/ProxyMembersDropdown";
 import { ConsentDeclaration } from "@/components/ui/consent-declaration";
+import { SystemBadge } from "@/components/ui/SystemBadge";
 
 interface League {
     id: string;
@@ -17,6 +19,15 @@ interface ProxyMember {
     id: string;
     display_name: string;
     submission_count: number;
+}
+
+interface ProxySubmission {
+    id: string;
+    for_date: string;
+    steps: number;
+    verified: boolean | null;
+    partial: boolean;
+    created_at: string;
 }
 
 interface ProxySubmissionSectionProps {
@@ -36,31 +47,84 @@ interface ProxySubmissionSectionProps {
  * - Proxy member selection/creation
  * - Authorization consent declaration
  * - Submission forms (reuses regular forms with proxyMemberId)
+ * - Proxy's submission history
  */
 export function ProxySubmissionSection({
     adminLeagues,
     submissionMode,
     onSubmitted
 }: ProxySubmissionSectionProps) {
+    const { session } = useAuth();
     const [expanded, setExpanded] = useState(false);
     const [selectedLeagueId, setSelectedLeagueId] = useState<string>("");
     const [selectedProxy, setSelectedProxy] = useState<ProxyMember | null>(null);
     const [consent, setConsent] = useState(false);
+    const [proxySubmissions, setProxySubmissions] = useState<ProxySubmission[]>([]);
+    const [loadingSubmissions, setLoadingSubmissions] = useState(false);
 
     // Don't render if user has no admin leagues
     if (adminLeagues.length === 0) {
         return null;
     }
 
+    // Fetch proxy member's submissions
+    const fetchProxySubmissions = useCallback(async (proxyId: string, leagueId: string) => {
+        if (!session) return;
+        setLoadingSubmissions(true);
+        try {
+            const url = `/api/submissions?league_id=${leagueId}&proxy_member_id=${proxyId}&limit=20&order_by=created_at`;
+            const res = await fetch(url, {
+                headers: { Authorization: `Bearer ${session.access_token}` },
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setProxySubmissions(data.submissions || []);
+            }
+        } catch (error) {
+            console.error("[FetchProxySubmissions]", error);
+        } finally {
+            setLoadingSubmissions(false);
+        }
+    }, [session]);
+
+    // Reload proxy submissions when proxy is selected or after submission
+    useEffect(() => {
+        if (selectedProxy && selectedLeagueId) {
+            fetchProxySubmissions(selectedProxy.id, selectedLeagueId);
+        } else {
+            setProxySubmissions([]);
+        }
+    }, [selectedProxy, selectedLeagueId, fetchProxySubmissions]);
+
     const handleLeagueChange = (leagueId: string) => {
         setSelectedLeagueId(leagueId);
         setSelectedProxy(null);
         setConsent(false);
+        setProxySubmissions([]);
     };
 
     const handleProxySelect = (proxy: ProxyMember | null) => {
         setSelectedProxy(proxy);
         setConsent(false);
+    };
+
+    const handleProxySubmissionComplete = () => {
+        // Refresh proxy submissions after new upload
+        if (selectedProxy && selectedLeagueId) {
+            fetchProxySubmissions(selectedProxy.id, selectedLeagueId);
+        }
+        onSubmitted?.();
+    };
+
+    const formatDate = (dateStr: string) => {
+        const date = new Date(dateStr + "T00:00:00");
+        return date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+    };
+
+    const getVerificationBadge = (verified: boolean | null) => {
+        if (verified === true) return <SystemBadge category="status" value="verified" size="sm" />;
+        if (verified === false) return <SystemBadge category="status" value="failed" size="sm" />;
+        return <SystemBadge category="status" value="pending" size="sm" />;
     };
 
     return (
@@ -151,7 +215,7 @@ export function ProxySubmissionSection({
                                     leagueId={selectedLeagueId}
                                     proxyMemberId={selectedProxy.id}
                                     proxyDisplayName={selectedProxy.display_name}
-                                    onSubmitted={onSubmitted}
+                                    onSubmitted={handleProxySubmissionComplete}
                                     settings={{
                                         allow_manual_entry: true,
                                         require_verification_photo: false
@@ -161,13 +225,64 @@ export function ProxySubmissionSection({
                                 <BatchSubmissionForm
                                     leagueId={selectedLeagueId}
                                     proxyMemberId={selectedProxy.id}
-                                    onSubmitted={onSubmitted}
+                                    onSubmitted={handleProxySubmissionComplete}
                                 />
                             ) : (
                                 <BulkUnverifiedForm
                                     leagueId={selectedLeagueId}
-                                    onSubmitted={onSubmitted}
+                                    onSubmitted={handleProxySubmissionComplete}
                                 />
+                            )}
+                        </div>
+                    )}
+
+                    {/* Proxy's Submission History */}
+                    {selectedProxy && (
+                        <div className="pt-4 border-t border-border">
+                            <h4 className="text-sm font-medium text-[hsl(var(--warning))] mb-3">
+                                {selectedProxy.display_name}&apos;s Submissions
+                            </h4>
+
+                            {loadingSubmissions ? (
+                                <div className="text-center py-4 text-muted-foreground text-sm">
+                                    Loading submissions...
+                                </div>
+                            ) : proxySubmissions.length === 0 ? (
+                                <div className="rounded-lg border border-border bg-card/50 p-4 text-center">
+                                    <p className="text-sm text-muted-foreground">
+                                        No submissions yet for {selectedProxy.display_name}
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="overflow-hidden rounded-lg border border-border">
+                                    <table className="w-full text-sm">
+                                        <thead className="bg-card">
+                                            <tr>
+                                                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">Date</th>
+                                                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground">Steps</th>
+                                                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-border">
+                                            {proxySubmissions.map((sub) => (
+                                                <tr key={sub.id} className="hover:bg-muted/50">
+                                                    <td className="px-3 py-2 text-foreground">
+                                                        {formatDate(sub.for_date)}
+                                                        {sub.partial && (
+                                                            <span className="ml-1 text-xs text-muted-foreground">(partial)</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-3 py-2 text-right font-mono text-foreground">
+                                                        {sub.steps.toLocaleString()}
+                                                    </td>
+                                                    <td className="px-3 py-2 text-right">
+                                                        {getVerificationBadge(sub.verified)}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             )}
                         </div>
                     )}

@@ -20,9 +20,11 @@ const querySchema = z.object({
     limit: z.coerce.number().int().min(1).max(200).default(50),
     offset: z.coerce.number().int().min(0).default(0),
     order_by: z.enum(["for_date", "created_at"]).default("for_date"),
+    exclude_proxy: z.enum(["true", "false"]).default("true").transform(v => v === "true"),
+    proxy_member_id: z.string().uuid().optional(),
 });
 
-const submissionSelect = "id, league_id, user_id, for_date, steps, partial, proof_path, verified, tolerance_used, extracted_km, extracted_calories, verification_notes, created_at";
+const submissionSelect = "id, league_id, user_id, for_date, steps, partial, proof_path, verified, tolerance_used, extracted_km, extracted_calories, verification_notes, created_at, proxy_member_id";
 
 // POST /api/submissions - Create a new step submission
 export async function POST(request: Request): Promise<Response> {
@@ -272,7 +274,7 @@ export async function GET(request: Request): Promise<Response> {
             return badRequest("Invalid query parameters");
         }
 
-        const { league_id, user_id, from, to, limit, offset, order_by } = parsed.data;
+        const { league_id, user_id, from, to, limit, offset, order_by, exclude_proxy, proxy_member_id: proxyMemberIdFilter } = parsed.data;
 
         const supabase = await createServerSupabaseClient();
         const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -307,8 +309,15 @@ export async function GET(request: Request): Promise<Response> {
             .order(primaryOrder, { ascending: false })
             .order(secondaryOrder, { ascending: false });
 
-        if (user_id) {
+        // Filter by specific proxy member (for viewing proxy's submissions)
+        if (proxyMemberIdFilter) {
+            query = query.eq("proxy_member_id", proxyMemberIdFilter);
+        } else if (user_id) {
             query = query.eq("user_id", user_id);
+            // Exclude proxy submissions from user's own list by default
+            if (exclude_proxy) {
+                query = query.is("proxy_member_id", null);
+            }
         } else {
             // If user_id not provided, we must fallback to filtering by league to avoid exposing others' data 
             // without explicit intent (though usually this endpoint is consumed by the user for themselves).
