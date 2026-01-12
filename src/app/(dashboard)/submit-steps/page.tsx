@@ -351,31 +351,41 @@ export default function SubmitPage() {
     }, [session, selectedLeagueId, toast]);
 
     // Fetch proxy members for admin leagues
+    // Load proxies for ALL admin leagues so the View As filter is complete
     useEffect(() => {
         if (!session || adminLeagues.length === 0) return;
 
         const loadProxies = async () => {
-            // For simplicity, we'll fetch only for the SELECTED league if it's an admin league
-            // Or fetch for all? Fetching for selected is better for context switching.
-            const currentLeague = leagues.find(l => l.id === selectedLeagueId);
-            if (currentLeague && (currentLeague.role === "owner" || currentLeague.role === "admin")) {
+            const allProxies: any[] = [];
+
+            // We need to fetch proxies for ALL leagues where user is admin/owner
+            // to populate the "View as" dropdown correctly.
+            // Using Promise.all for parallel fetching
+            const promises = adminLeagues.map(async (league) => {
                 try {
-                    const res = await fetch(`/api/leagues/${selectedLeagueId}/proxy-members`, {
+                    const res = await fetch(`/api/leagues/${league.id}/proxy-members`, {
                         headers: { Authorization: `Bearer ${session.access_token}` }
                     });
                     if (res.ok) {
                         const data = await res.json();
-                        setProxyMembers(data.proxy_members || []);
+                        return data.proxy_members || [];
                     }
                 } catch (e) {
-                    console.error("Failed to load proxies", e);
+                    console.error(`Failed to load proxies for league ${league.id}`, e);
                 }
-            } else {
-                setProxyMembers([]);
-            }
+                return [];
+            });
+
+            const results = await Promise.all(promises);
+
+            // Flatten and deduplicate by ID
+            const flatProxies = results.flat();
+            const uniqueProxies = Array.from(new Map(flatProxies.map((p: any) => [p.id, p])).values());
+
+            setProxyMembers(uniqueProxies);
         };
         loadProxies();
-    }, [session, selectedLeagueId, leagues]);
+    }, [session, adminLeagues]);
 
     // Fetch submissions
     const fetchSubmissions = useCallback(async (page = 0) => {

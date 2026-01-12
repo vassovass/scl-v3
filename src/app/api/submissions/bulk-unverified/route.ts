@@ -11,6 +11,7 @@ const bulkUnverifiedSchema = z.object({
     league_id: z.string().uuid(),
     reason: z.string().min(10, "Please provide a reason (at least 10 characters)"),
     entries: z.array(entrySchema).min(1).max(31), // Max 31 entries (roughly a month)
+    proxy_member_id: z.string().uuid().optional(),
 });
 
 interface Conflict {
@@ -42,10 +43,11 @@ export async function POST(request: Request): Promise<Response> {
             return badRequest(firstError?.message || "Invalid payload");
         }
 
-        const { league_id, reason, entries } = parsed.data;
+        const { league_id, reason, entries, proxy_member_id } = parsed.data;
         const adminClient = createAdminClient();
 
-        // Check membership and get backfill limit
+        // Check membership/roles and permissions
+        // If submitting for proxy, must be admin/owner
         const { data: membershipData } = await adminClient
             .from("memberships")
             .select("role, league:leagues(backfill_limit)")
@@ -55,6 +57,23 @@ export async function POST(request: Request): Promise<Response> {
 
         if (!membershipData) {
             return forbidden("You are not a member of this league");
+        }
+
+        if (proxy_member_id) {
+            if (!["owner", "admin"].includes(membershipData.role)) {
+                return forbidden("Only league admins can submit for proxy members");
+            }
+            // Verify proxy exists in this league
+            const { data: proxyMember } = await adminClient
+                .from("proxy_members")
+                .select("id")
+                .eq("id", proxy_member_id)
+                .eq("league_id", league_id)
+                .single();
+
+            if (!proxyMember) {
+                return badRequest("Proxy member not found in this league");
+            }
         }
 
         const league = membershipData.league as unknown as { backfill_limit: number | null };
@@ -139,7 +158,9 @@ export async function POST(request: Request): Promise<Response> {
                     partial: false,
                     proof_path: null,
                     verified: false,
+                    verified: false,
                     verification_notes: `[Bulk Manual] ${reason}`,
+                    proxy_member_id: proxy_member_id || null,
                 });
 
             if (insertError) {

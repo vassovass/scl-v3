@@ -5,6 +5,7 @@ import { apiRequest, ApiError } from "@/lib/api/client";
 
 interface BulkUnverifiedFormProps {
     leagueId: string;
+    proxyMemberId?: string;
     onSubmitted?: () => void;
 }
 
@@ -41,7 +42,7 @@ function getDefaultDate() {
     return new Date().toISOString().split("T")[0];
 }
 
-export function BulkUnverifiedForm({ leagueId, onSubmitted }: BulkUnverifiedFormProps) {
+export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: BulkUnverifiedFormProps) {
     const [reason, setReason] = useState("");
     const [entries, setEntries] = useState<Entry[]>([
         { id: generateId(), date: getDefaultDate(), steps: "" },
@@ -103,6 +104,7 @@ export function BulkUnverifiedForm({ leagueId, onSubmitted }: BulkUnverifiedForm
                     league_id: leagueId,
                     reason: reason.trim(),
                     entries: validEntries,
+                    proxy_member_id: proxyMemberId,
                 }),
             });
 

@@ -183,6 +183,7 @@ export function ProxySubmissionSection({
                             ) : (
                                 <BulkUnverifiedForm
                                     leagueId={selectedLeagueId}
+                                    proxyMemberId={selectedProxy.id}
                                     onSubmitted={handleProxySubmissionComplete}
                                 />
                             )}
