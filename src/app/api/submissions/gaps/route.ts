@@ -2,6 +2,8 @@ import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/se
 import { json, unauthorized, badRequest } from "@/lib/api";
 import { analyzeSubmissionGaps, getNotification } from "@/lib/submissions/analytics";
 
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/submissions/gaps
  * 

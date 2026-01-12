@@ -1,6 +1,8 @@
 import { withApiHandler } from "@/lib/api/handler";
 import { AppError, ErrorCode } from "@/lib/errors";
 
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/menus
  * Public endpoint - returns all menus with items for frontend consumption
