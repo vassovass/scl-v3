@@ -235,8 +235,8 @@ export const HELP_MENU: MenuDefinition = {
                 { id: 'tour-navigation', label: 'Navigation & Menus', href: '#tour-navigation', icon: '🧭', description: '~30s', onClick: 'startTour' },
                 { id: 'tour-new-user', label: 'Dashboard Basics', href: '#tour-new-user', icon: '🏠', description: '~30s', onClick: 'startTour' },
                 { id: 'tour-member', label: 'How to Submit Steps', href: '#tour-member', icon: '📝', description: '~1m', onClick: 'startTour' },
-                { id: 'tour-leaderboard', label: 'Leaderboard & Filters', href: '#tour-leaderboard', icon: '🏆', description: '~30s', onClick: 'startTour' },
-                { id: 'tour-admin', label: 'League Owner Guide', href: '#tour-admin', icon: '👑', description: '~30s', onClick: 'startTour', visibleTo: ['admin', 'owner', 'superadmin'] },
+                { id: 'tour-leaderboard', label: 'Leaderboard & Filters', href: '#tour-leaderboard', icon: '🏆', description: '~30s', onClick: 'startTour', requiresLeague: true },
+                { id: 'tour-admin', label: 'League Owner Guide', href: '#tour-admin', icon: '👑', description: '~30s', onClick: 'startTour', visibleTo: ['admin', 'owner', 'superadmin'], requiresLeague: true },
             ]
         },
         { id: 'feedback', label: 'Send Feedback', href: '/feedback', icon: '💬' },

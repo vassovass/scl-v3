@@ -111,12 +111,13 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
             setOpenDropdown(null);
 
             // Map tour IDs to required paths
+            // NOTE: member tour uses /submit-steps which is league-agnostic (AGENTS.md 7.1)
             const tourPaths: Record<string, string> = {
                 "navigation": pathname, // Can run from anywhere
                 "new-user": "/dashboard",
-                "member": `/league/${currentLeagueId || ""}`,
-                "leaderboard": `/league/${currentLeagueId || ""}/leaderboard`,
-                "admin": `/league/${currentLeagueId || ""}`
+                "member": "/submit-steps", // League-agnostic step submission page
+                "leaderboard": currentLeagueId ? `/league/${currentLeagueId}/leaderboard` : "",
+                "admin": currentLeagueId ? `/league/${currentLeagueId}` : ""
             };
 
             const targetPath = tourPaths[tourId];
@@ -125,10 +126,10 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                 window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: tourId } }));
             };
 
-            if (targetPath) {
-                // For league pages, ensure we have a league ID
-                if ((tourId === 'member' || tourId === 'leaderboard' || tourId === 'admin') && !currentLeagueId) {
-                    // Import toast dynamically, show warning toast instead of alert
+            // Validate target path - prevent navigation to malformed URLs
+            if (!targetPath || targetPath.includes('undefined') || targetPath === '') {
+                // Tours requiring league context but no league is selected
+                if (tourId === 'leaderboard' || tourId === 'admin') {
                     const { toast } = await import("@/hooks/use-toast");
                     toast({
                         title: "Navigate to a league first",
@@ -137,8 +138,13 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                     });
                     return;
                 }
+            }
 
-                if (pathname !== targetPath && !pathname.includes(targetPath)) {
+            if (targetPath) {
+                // Check if already on the target page or a subpage
+                const isOnTargetPage = pathname === targetPath || pathname.startsWith(targetPath + '/');
+
+                if (!isOnTargetPage) {
                     const separator = targetPath.includes("?") ? "&" : "?";
                     router.push(`${targetPath}${separator}start_tour=${tourId}`);
                 } else {
