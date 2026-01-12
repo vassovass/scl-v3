@@ -158,7 +158,6 @@ export async function POST(request: Request): Promise<Response> {
                     partial: false,
                     proof_path: null,
                     verified: false,
-                    verified: false,
                     verification_notes: `[Bulk Manual] ${reason}`,
                     proxy_member_id: proxy_member_id || null,
                 });
