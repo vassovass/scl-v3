@@ -11,6 +11,7 @@ All notable changes to StepLeague v3.
 
 ### Added
 
+- **SuperAdmin Theme Mode Controls** - Configure default theme and allowed modes (dark/light/system) globally
 - **PRD 39: Performance Architecture & Stability** - Complete system overhaul for speed and resilience
   - **Server Components**: Refactored Dashboard to async RSC, eliminating client-side fetch waterfalls
   - **Caching Registry** (`src/lib/cache/registry.ts`): Type-safe source of truth for all cache keys/TTLs

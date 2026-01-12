@@ -22,6 +22,7 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { createClient } from "@/lib/supabase/client";
+import { useThemeSettings } from "@/hooks/useThemeSettings";
 
 type Theme = "dark" | "light" | "system";
 
@@ -38,8 +39,16 @@ interface UseUserThemeReturn {
 
 export function useUserTheme(): UseUserThemeReturn {
   const { theme, setTheme } = useTheme();
+  const { allowedModes, defaultMode, isLoading: isSettingsLoading } = useThemeSettings();
   const [isLoading, setIsLoading] = useState(true);
   const [isSynced, setIsSynced] = useState(false);
+
+  const resolveTheme = (value: Theme | undefined): Theme => {
+    if (value && allowedModes.includes(value)) {
+      return value;
+    }
+    return defaultMode;
+  };
 
   // Load user's saved theme preference on mount
   useEffect(() => {
@@ -64,11 +73,12 @@ export function useUserTheme(): UseUserThemeReturn {
         }
 
         const preferences = await response.json();
-        const savedTheme = preferences.theme as Theme;
+        const savedTheme = preferences.theme as Theme | undefined;
+        const resolvedTheme = resolveTheme(savedTheme ?? defaultMode);
 
-        if (savedTheme && savedTheme !== theme) {
+        if (resolvedTheme && resolvedTheme !== theme) {
           // Apply saved theme from database
-          setTheme(savedTheme);
+          setTheme(resolvedTheme);
         }
 
         setIsSynced(true);
@@ -79,14 +89,27 @@ export function useUserTheme(): UseUserThemeReturn {
       }
     }
 
-    loadUserTheme();
+    if (!isSettingsLoading) {
+      loadUserTheme();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run on mount
+  }, [isSettingsLoading]); // Only run on mount once settings are ready
+
+  useEffect(() => {
+    if (isSettingsLoading) return;
+    if (theme && !allowedModes.includes(theme as Theme)) {
+      setTheme(defaultMode);
+    }
+  }, [allowedModes, defaultMode, isSettingsLoading, setTheme, theme]);
 
   /**
    * Update theme and sync to database if logged in
    */
   const updateTheme = async (newTheme: Theme) => {
+    if (!allowedModes.includes(newTheme)) {
+      setTheme(defaultMode);
+      return;
+    }
     // Update client-side theme immediately (optimistic update)
     setTheme(newTheme);
 

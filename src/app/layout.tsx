@@ -10,10 +10,10 @@ import {
   GoogleTagManager,
   GoogleTagManagerNoscript,
 } from "@/components/analytics";
-import { createAdminClient } from "@/lib/supabase/server";
-import { DEFAULT_BRANDING, getFullLogoText } from "@/lib/branding";
+import { getFullLogoText } from "@/lib/branding";
 import { getCachedBranding } from "@/lib/branding-server";
 import { SafeLazy } from "@/components/ui/SafeLazy";
+import { getCachedThemeSettings } from "@/lib/settings/themeSettingsServer";
 
 // Lazy load heavy widgets with SafeLazy protection
 const FeedbackWidget = dynamic(
@@ -75,6 +75,7 @@ export default async function RootLayout({
   // Generate a version hash based on branding update time (or a global system tick)
   // For now, using branding timestamp as proxy for "System Config Version"
   const branding = await getCachedBranding();
+  const themeSettings = await getCachedThemeSettings();
   // Simple hash or timestamp string
   const serverVersion = branding.updatedAt || new Date().toISOString().slice(0, 10);
 
@@ -91,7 +92,11 @@ export default async function RootLayout({
         {/* Hybrid Sync: Bridges Server Cache -> Client Cache */}
         <HybridCacheSync serverVersion={serverVersion} />
 
-        <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
+        <ThemeProvider
+          attribute="data-theme"
+          defaultTheme={themeSettings.defaultMode}
+          enableSystem={themeSettings.allowedModes.includes("system")}
+        >
           <AuthProvider>
             {children}
 

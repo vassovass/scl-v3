@@ -10,6 +10,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useUserTheme } from "@/hooks/useUserTheme";
+import { useThemeSettings } from "@/hooks/useThemeSettings";
+import { ThemeMode } from "@/lib/settings/themeSettings";
 
 /**
  * ModeToggle - Theme selector dropdown (Light/Dark/System)
@@ -20,6 +22,7 @@ import { useUserTheme } from "@/hooks/useUserTheme";
 export function ModeToggle() {
     const { theme } = useTheme(); // For display only
     const { updateTheme } = useUserTheme(); // For database sync
+    const { allowedModes } = useThemeSettings();
     const [mounted, setMounted] = React.useState(false);
 
     // Avoid hydration mismatch by only rendering after mount
@@ -39,6 +42,12 @@ export function ModeToggle() {
         );
     }
 
+    const items = [
+        { value: "light", label: "Light", icon: Sun },
+        { value: "dark", label: "Dark", icon: Moon },
+        { value: "system", label: "System", icon: Monitor },
+    ].filter((item) => allowedModes.includes(item.value as ThemeMode));
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -53,27 +62,19 @@ export function ModeToggle() {
                 </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                    onClick={() => updateTheme("light")}
-                    className={theme === "light" ? "bg-accent" : ""}
-                >
-                    <Sun className="mr-2 h-4 w-4" />
-                    Light
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                    onClick={() => updateTheme("dark")}
-                    className={theme === "dark" ? "bg-accent" : ""}
-                >
-                    <Moon className="mr-2 h-4 w-4" />
-                    Dark
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                    onClick={() => updateTheme("system")}
-                    className={theme === "system" ? "bg-accent" : ""}
-                >
-                    <Monitor className="mr-2 h-4 w-4" />
-                    System
-                </DropdownMenuItem>
+                {items.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                        <DropdownMenuItem
+                            key={item.value}
+                            onClick={() => updateTheme(item.value as ThemeMode)}
+                            className={theme === item.value ? "bg-accent" : ""}
+                        >
+                            <Icon className="mr-2 h-4 w-4" />
+                            {item.label}
+                        </DropdownMenuItem>
+                    );
+                })}
             </DropdownMenuContent>
         </DropdownMenu>
     );
