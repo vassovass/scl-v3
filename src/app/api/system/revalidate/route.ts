@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Deduplicate
-        const uniqueTags = [...new Set(tagsToInvalidate)];
+        const uniqueTags = Array.from(new Set(tagsToInvalidate));
 
         // Execute revalidation
         for (const tag of uniqueTags) {
