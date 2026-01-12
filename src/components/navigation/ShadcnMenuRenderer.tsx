@@ -98,13 +98,7 @@ export function ShadcnMenuRenderer({
 
     // Handle item click (actions)
     const handleItemClick = (item: MenuItem) => {
-        console.log('[ShadcnMenuRenderer] handleItemClick called:', {
-            itemId: item.id,
-            itemOnClick: item.onClick,
-            hasOnAction: !!onAction
-        });
         if (item.onClick && onAction) {
-            console.log('[ShadcnMenuRenderer] Calling onAction with:', item.onClick);
             onAction(item.onClick, item);
         }
         // For Links, we don't need to do anything, Next.js handles it.
@@ -273,28 +267,27 @@ function DropdownItem({
     }
 
     // Items with onClick handler (including tours)
-    // Use asChild with a button for more reliable click handling in submenus
+    // Use onPointerDown to fire before shadcn's dropdown event handling
     return (
         <DropdownMenuItem
-            asChild
             className={className}
             data-module-id={`menu-${item.id}`}
             data-module-name={item.label}
+            onPointerDown={(e) => {
+                // Fire immediately on pointer down, before shadcn closes the menu
+                e.preventDefault();
+                onAction(item);
+            }}
+            onSelect={(e) => {
+                // Prevent default select behavior
+                e.preventDefault();
+            }}
         >
-            <button
-                type="button"
-                onClick={() => {
-                    console.log('[ShadcnMenuRenderer] Tour button clicked:', item.id, item.onClick);
-                    onAction(item);
-                }}
-                className="w-full flex items-center cursor-pointer"
-            >
-                {item.icon && <span className="mr-2">{item.icon}</span>}
-                <span className="flex-1">{item.label}</span>
-                {item.description && (
-                    <span className="ml-2 text-xs text-muted-foreground">{item.description}</span>
-                )}
-            </button>
+            {item.icon && <span className="mr-2">{item.icon}</span>}
+            <span className="flex-1">{item.label}</span>
+            {item.description && (
+                <span className="ml-2 text-xs text-muted-foreground">{item.description}</span>
+            )}
         </DropdownMenuItem>
     );
 }
