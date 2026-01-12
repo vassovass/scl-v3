@@ -14,6 +14,8 @@ import {
   deleteFromStorage,
   generateUniqueFilename
 } from '@/lib/image-processing';
+import { invalidateCache } from '@/lib/cache/serverCache';
+
 
 const uploadLogoSchema = z.object({
   imageLight: z.string(), // Base64 data URL
@@ -51,11 +53,11 @@ export const POST = withApiHandler({
 
   const compressedDark = darkFile
     ? await compressImage(darkFile, {
-        maxSizeMB: 0.5,
-        maxWidthOrHeight: 512,
-        format: 'webp',
-        quality: 0.9,
-      })
+      maxSizeMB: 0.5,
+      maxWidthOrHeight: 512,
+      format: 'webp',
+      quality: 0.9,
+    })
     : null;
 
   // Generate unique filenames
@@ -89,6 +91,9 @@ export const POST = withApiHandler({
     }
     throw new Error(`Failed to update brand settings: ${error.message}`);
   }
+
+  // Invalidate cache so new logo appears immediately
+  invalidateCache('branding');
 
   return {
     success: true,

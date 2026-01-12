@@ -8,6 +8,8 @@
 import { withApiHandler } from '@/lib/api/handler';
 import { z } from 'zod';
 import { DEFAULT_BRANDING } from '@/lib/branding';
+import { invalidateCache } from '@/lib/cache/serverCache';
+
 
 // Validation schema for PATCH requests
 const brandSettingsSchema = z.object({
@@ -103,6 +105,9 @@ export const PATCH = withApiHandler({
   if (error) {
     throw new Error(`Failed to update brand settings: ${error.message}`);
   }
+
+  // Invalidate cache so new settings appear immediately
+  invalidateCache('branding');
 
   // Transform response
   return {

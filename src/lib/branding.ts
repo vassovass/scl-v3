@@ -5,6 +5,7 @@
  * - Default branding values (fallback when database is unavailable)
  * - Type definitions for brand settings
  * - Helper functions for branding operations
+ * - Cached server-side fetcher for SSR metadata (fixes GTmetrix/PageSpeed timeouts)
  *
  * SuperAdmins can customize branding via /admin/branding settings page.
  * Database values override these defaults.

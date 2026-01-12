@@ -307,6 +307,37 @@ export default function LeaguePage({ params }: { params: { id: string } }) {
 }
 ```
 
+#### 7.5 Server-Side Caching (SSR Performance)
+
+Use `serverCache.ts` for SSR metadata and expensive DB calls to prevent timeouts (e.g., GTmetrix bots) and improve TTFB:
+
+```typescript
+import { createCachedFetcher, invalidateCache } from '@/lib/cache/serverCache';
+
+// 1. Define cached fetcher with fallback and timeout
+export const getCachedBranding = createCachedFetcher({
+  tag: 'branding',
+  fetcher: async () => { /* Expensive DB call */ },
+  fallback: DEFAULT_BRANDING,
+  timeoutMs: 3000, // Important for bot timeouts
+});
+
+// 2. Invalidate on admin update (API routes)
+invalidateCache('branding');
+```
+
+**When to use:**
+- `generateMetadata()` implementations
+- Root layout data fetching (menus, settings)
+- Expensive singleton DB calls that rarely change
+
+**Adding new cache types:**
+1. Add tag to `CacheTag` type in `src/lib/cache/serverCache.ts`
+2. Implement fetcher using `createCachedFetcher`
+3. Add invalidation hooks in relevant Admin Modification API routes
+
+
+
 ## Project Structure
 
 ```

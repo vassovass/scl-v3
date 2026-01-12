@@ -11,6 +11,11 @@ All notable changes to StepLeague v3.
 
 ### Added
 
+- **Server-Side Cache for Branding** - Implemented modular `serverCache.ts` utility
+  - **Performance**: Fixed GTmetrix/PageSpeed timeouts via `unstable_cache` with 3s timeout
+  - **Auto-Invalidation**: Admin branding updates instantly bust cache (`revalidateTag`)
+  - **Modular Design**: Reusable `createCachedFetcher` factory for future SSR needs
+  - **Safety**: Graceful fallback to default values on timeout or error
 - **Enhanced AI Step Verification System** - Comprehensive improvements to extraction accuracy and error handling
   - **Multilingual Date Support**: Added support for 7 languages (English, Chinese, Spanish, German, Korean, French, Japanese)
   - **App-Specific Pattern Recognition**: Added guidance for Samsung Health, Google Fit, Apple Health, Xiaomi Mi Fit, Fitbit
