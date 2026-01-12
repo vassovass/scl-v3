@@ -92,7 +92,8 @@ export function useMenuConfig() {
     } finally {
       setIsLoading(false);
     }
-  }, [data]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- loadMenus should only run once on mount
+  }, []);
 
   useEffect(() => {
     loadMenus();
