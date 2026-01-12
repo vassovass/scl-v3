@@ -11,7 +11,7 @@ const VERIFY_TIMEOUT_MS = parseInt(process.env.VERIFY_TIMEOUT_MS ?? "30000", 10)
 
 export type VerificationPayload = {
     steps: number;
-    for_date: string;
+    for_date?: string;
     proof_path: string;
     requester_id: string;
     league_id?: string;
@@ -61,7 +61,7 @@ export async function callVerificationFunction(payload: VerificationPayload): Pr
         // Call Gemini directly
         const geminiResult = await callGemini({
             stepsClaimed: payload.steps,
-            forDate: payload.for_date,
+            forDate: payload.for_date ?? "", // Pass empty string if undefined to signal "no claim"
             imageBase64: proof.base64,
             mimeType: proof.mimeType,
             filename: payload.filename, // Pass filename for date hints
@@ -187,7 +187,7 @@ function evaluateVerdict({
     extraction,
 }: {
     claimedSteps: number;
-    claimedDate: string;
+    claimedDate?: string;
     extraction: GeminiExtraction;
 }): EvaluationResult {
     const isAutoExtract = claimedSteps === 0;
@@ -227,7 +227,8 @@ function evaluateVerdict({
             notes.push(`AI: ${extraction.notes}`);
         }
     }
-    if (extraction.date && extraction.date !== claimedDate) {
+    // Only verify date if claimedDate was provided
+    if (claimedDate && extraction.date && extraction.date !== claimedDate) {
         notes.push(`Screenshot date ${extraction.date} differs from claimed date ${claimedDate}.`);
     }
     if (!verified && extractedSteps != null && difference !== null) {

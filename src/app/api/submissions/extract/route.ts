@@ -48,7 +48,7 @@ export async function POST(request: Request): Promise<Response> {
         // Call verification to extract data from the image (extraction only, no DB write)
         const verification = await callVerificationFunction({
             steps: 0, // Will be extracted
-            for_date: new Date().toISOString().slice(0, 10), // Placeholder
+            for_date: undefined, // Let AI extract date without bias
             proof_path: input.proof_path,
             league_id: input.league_id,
             requester_id: user.id,

@@ -126,21 +126,30 @@ function extractDateFromFilename(filename?: string): string | null {
  * Generates the verification prompt with relative date context.
  * Exported for testability (Proactive: Testability).
  */
+/**
+ * Generates the verification prompt with relative date context.
+ * Exported for testability (Proactive: Testability).
+ */
 export function generateVerificationPrompt(
     claimedSteps: number,
-    claimedDate: string,
+    claimedDate?: string,
     timezone: string = "UTC",
     filename?: string
 ): string {
     const today = new Date();
     const fmt = (d: Date) => format(d, "yyyy-MM-dd");
     const currentYear = fmt(today).split('-')[0];
+    const currentMonth = today.getMonth() + 1; // 1-12
 
     // Try to extract date hint from filename
     const filenameDate = extractDateFromFilename(filename);
     const filenameHint = filenameDate
         ? `\n- Filename hint: "${filename}" suggests date ${filenameDate}`
         : '';
+
+    const claimedDateInfo = claimedDate
+        ? `- Claimed date: ${claimedDate}${filenameHint}`
+        : `- Claimed date: NOT SPECIFIED (Extract from image intent)${filenameHint}`;
 
     return `You are a specialized OCR and data extraction expert for fitness tracking applications.
 
@@ -149,20 +158,19 @@ YOUR CONSTRAINTS:
 - NEVER guess dates - if ambiguous, explain why in the "notes" field
 - ALWAYS provide a confidence score and explain your reasoning in "notes"
 - ALWAYS return valid JSON matching the schema exactly
-- **CRITICAL**: Dates CANNOT be in the future. Today is ${fmt(today)}. If extracted date > today, set date: null.
+- **CRITICAL**: Dates CANNOT be in the future. Today is ${fmt(today)}. If extracted date > today, checks your year assumption.
 
 TASK: Extract step count and date from fitness app screenshot.
 
 USER CLAIM:
 - Claimed steps: ${claimedSteps === 0 ? 'AUTO-EXTRACT (user did not specify)' : claimedSteps}
-- Claimed date: ${claimedDate}${filenameHint}
+${claimedDateInfo}
 
 DATE CONTEXT (Reference: ${fmt(today)}):
 - Today = ${fmt(today)}
 - Yesterday = ${fmt(subDays(today, 1))}
-- 2 days ago = ${fmt(subDays(today, 2))}
-- 3 days ago = ${fmt(subDays(today, 3))}
-- Current year: ${currentYear}
+- Current Month = ${currentMonth}
+- Current Year = ${currentYear}
 
 KNOWN FITNESS APP PATTERNS:
 
@@ -189,9 +197,8 @@ EXTRACTION RULES:
 
 1. **Steps**: Extract the TOTAL daily step count (usually the largest number)
    - IGNORE hourly breakdowns, weekly totals, or goal numbers
-   - If multiple dates visible, extract ONLY for the claimed date
+   - If multiple dates visible, extract ONLY for the claimed date (if specified) or the most prominent date coverage
    - Common labels: "Steps", "steps", "步数" (Chinese), "걸음" (Korean), "Schritte" (German), "Pas" (French)
-   - If hourly breakdown visible, the total is usually at the very top OR very bottom
 
 2. **Date**: Convert screenshot date to YYYY-MM-DD format (MULTILINGUAL)
 
@@ -202,29 +209,37 @@ EXTRACTION RULES:
    **Korean:** "오늘" → ${fmt(today)}, "어제" → ${fmt(subDays(today, 1))}
    **French:** "Aujourd'hui" → ${fmt(today)}, "Hier" → ${fmt(subDays(today, 1))}
 
-   **Partial dates:** "Sat, 22 Nov", "22 Nov", "Nov 22" → Use year ${currentYear}
-   **Weekday inference:** "Sat, 22 Nov" → Calculate year from weekday + current date
-   **Filename hint:** If screenshot date is ambiguous/missing, use filename date as fallback (increases confidence)
+   **Smart Year Inference (CRITICAL):**
+   - If the screenshot shows a month WITHOUT a year (e.g., "25 Nov"):
+     - If Image Month > Current Month (${currentMonth}): It MUST be the **previous year** (${parseInt(currentYear) - 1}).
+     - Example: "25 Nov" seen in "Jan ${currentYear}" = 2025-11-25.
+     - Example: "02 Feb" seen in "Jan ${currentYear}" = ${currentYear}-02-02 (Future? Check context).
+   
+   **Filename Priority (CRITICAL):**
+   - If a valid date was extracted from the filename ("${filenameDate || 'N/A'}"):
+     - **TRUST THE FILENAME DATE** as the primary source of truth. 
+     - Users often include the date in the filename for organization.
+     - If image says "Today" or "Yesterday", use the filename date as the anchor.
+     - Only ignore filename date if the image EXPLICITLY contradicts it with a full calendar date (e.g. filename says 20th but image clearly says 25th).
 
    If language/format is ambiguous, analyze UI elements and note your reasoning.
-   If year is missing, use ${currentYear} and note the assumption.${filenameDate ? `\n   If screenshot date is unclear, the filename suggests ${filenameDate} - use this as a strong hint.` : ''}
+   ${filenameDate ? `\n   Filename suggests ${filenameDate} - PREFER THIS DATE over ambiguous image text.` : ''}
 
 3. **Distance & Calories**: Extract if visible (optional)
    - Handle both metric (km) and imperial (mi) units
    - Convert miles to km if needed: 1 mi = 1.60934 km
 
 4. **Confidence Scoring:**
-   - **"high"**: Step count clearly visible, date explicit, good image quality, 95%+ confident
-   - **"medium"**: Minor issues (small font, inferred date, slight blur), 70-95% confident
-   - **"low"**: Blurry, rotated >15°, multiple totals unclear, weekly view, <70% confident
+   - **"high"**: Step count clearly visible, date explicit, good image quality
+   - **"medium"**: Minor issues (small font, inferred date, slight blur)
+   - **"low"**: Blurry, rotated >15°, multiple totals unclear, weekly view
    - **null**: Image unreadable or shows non-fitness data
 
 5. **Edge Cases:**
    - **Goal vs Actual**: Extract ACTUAL steps, not goal (e.g., "Goal: 10,000 / Actual: 7,500" → extract 7500)
-   - **Weekly view**: If multiple days shown, extract only the claimed date
+   - **Weekly view**: If multiple days shown, extract the specific day selected or the main daily total shown
    - **Partial day**: "So far today: 3,421 steps" → extract 3421, set confidence: "medium"
    - **Zero steps**: If screenshot shows "0 steps" → return 0 (NOT null)
-   - **Rotated/cropped**: Attempt extraction, lower confidence, explain in notes
 
 RESPONSE FORMAT (strict JSON):
 {
@@ -237,15 +252,13 @@ RESPONSE FORMAT (strict JSON):
 }
 
 VALIDATION:
-- "steps": integer 0-100000 (if >100000, set confidence: "low")
-- "km": float 0-100 (if >100, set confidence: "low")
-- "date": Must be YYYY-MM-DD format
-- "notes": REQUIRED - always explain which number you chose and why
+- "steps": integer 0-100000
+- "date": Must be YYYY-MM-DD format. Check specifically for year logic errors.
+- "notes": REQUIRED - always explain which number you chose and why. Explictly mention year inference logic used.
 
 EXAMPLES:
-{"steps": 12345, "date": "2024-11-20", "confidence": "high", "notes": "Samsung Health. Daily total clearly at top. Date 'Thu, 20 Nov' - inferred 2024."}
-{"steps": 9677, "date": "2024-11-22", "confidence": "medium", "notes": "Date 'Sat, 22 Nov' - inferred year ${currentYear} from context."}
-{"steps": null, "date": null, "confidence": "low", "notes": "Image blurry. Cannot distinguish daily total from hourly breakdown."}`;
+{"steps": 12345, "date": "2025-11-20", "confidence": "high", "notes": "Samsung Health. Date '20 Nov' seen in Jan 2026 -> Inferred 2025."}
+{"steps": 9677, "date": "${currentYear}-01-10", "confidence": "medium", "notes": "Date '10 Jan' - Current year inferred."}`;
 }
 
 /**
