@@ -118,7 +118,7 @@ export async function PATCH(
         // Fetch existing submission
         const { data: existing, error: fetchError } = await adminClient
             .from("submissions")
-            .select("id, user_id, for_date, steps, proof_path")
+            .select("id, user_id, for_date, steps, proof_path, proxy_member_id, league_id")
             .eq("id", id)
             .single();
 
@@ -284,7 +284,7 @@ export async function DELETE(
         // Fetch existing submission
         const { data: existing, error: fetchError } = await adminClient
             .from("submissions")
-            .select("id, user_id, for_date, steps")
+            .select("id, user_id, for_date, steps, proxy_member_id, league_id")
             .eq("id", id)
             .single();
 

@@ -96,6 +96,7 @@ export default function SubmitPage() {
     };
 
     const handleBulkDelete = async () => {
+        if (!session) return;
         setIsBulkDeleting(true);
         try {
             if (selectAllGlobal) {
@@ -203,6 +204,7 @@ export default function SubmitPage() {
     };
 
     const handleBulkResubmit = async () => {
+        if (!session) return;
         setIsBulkDeleting(true); // Reuse loading state
         try {
             // Limit check
@@ -585,333 +587,332 @@ export default function SubmitPage() {
                         </div>
 
                         <div className="mt-6">
-                            <div className="mt-6">
-                                {/* Toolbar (Pagination + Context) */}
-                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
-                                    <div className="flex items-center gap-3">
-                                        {/* Pagination Size */}
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-xs text-muted-foreground">Show</span>
+                            {/* Toolbar (Pagination + Context) */}
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+                                <div className="flex items-center gap-3">
+                                    {/* Pagination Size */}
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs text-muted-foreground">Show</span>
+                                        <select
+                                            value={itemsPerPage}
+                                            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                                            className="h-8 rounded-md border border-input bg-background px-2 text-xs"
+                                        >
+                                            {[10, 20, 50, 100].map(n => <option key={n} value={n}>{n}</option>)}
+                                        </select>
+                                    </div>
+
+                                    {/* Admin Context Switch */}
+                                    {adminLeagues.length > 0 && proxyMembers.length > 0 && (
+                                        <div className="flex items-center gap-2 border-l border-border pl-3 ml-1">
+                                            <span className="text-xs text-muted-foreground">View as:</span>
                                             <select
-                                                value={itemsPerPage}
-                                                onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                                                className="h-8 rounded-md border border-input bg-background px-2 text-xs"
+                                                value={viewContext === "me" ? "me" : selectedProxyId}
+                                                onChange={(e) => {
+                                                    const val = e.target.value;
+                                                    if (val === "me") {
+                                                        setViewContext("me");
+                                                        setSelectedProxyId("all_proxy");
+                                                    } else {
+                                                        setViewContext("proxy");
+                                                        setSelectedProxyId(val);
+                                                    }
+                                                }}
+                                                className="h-8 max-w-[200px] rounded-md border border-input bg-background px-2 text-xs"
                                             >
-                                                {[10, 20, 50, 100].map(n => <option key={n} value={n}>{n}</option>)}
+                                                <option value="me">My Submissions</option>
+                                                <option disabled className="text-muted-foreground font-semibold">-- Proxies --</option>
+                                                {proxyMembers.map(p => (
+                                                    <option key={p.id} value={p.id}>{p.display_name}</option>
+                                                ))}
                                             </select>
                                         </div>
+                                    )}
+                                </div>
+                            </div>
 
-                                        {/* Admin Context Switch */}
-                                        {adminLeagues.length > 0 && proxyMembers.length > 0 && (
-                                            <div className="flex items-center gap-2 border-l border-border pl-3 ml-1">
-                                                <span className="text-xs text-muted-foreground">View as:</span>
-                                                <select
-                                                    value={viewContext === "me" ? "me" : selectedProxyId}
-                                                    onChange={(e) => {
-                                                        const val = e.target.value;
-                                                        if (val === "me") {
-                                                            setViewContext("me");
-                                                            setSelectedProxyId("all_proxy");
-                                                        } else {
-                                                            setViewContext("proxy");
-                                                            setSelectedProxyId(val);
-                                                        }
-                                                    }}
-                                                    className="h-8 max-w-[200px] rounded-md border border-input bg-background px-2 text-xs"
-                                                >
-                                                    <option value="me">My Submissions</option>
-                                                    <option disabled className="text-muted-foreground font-semibold">-- Proxies --</option>
-                                                    {proxyMembers.map(p => (
-                                                        <option key={p.id} value={p.id}>{p.display_name}</option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                        )}
+                            {/* Bulk Actions Bar */}
+                            {selectedIds.size > 0 && (
+                                <div className="mb-4 space-y-2">
+                                    {/* Global Selection Banner */}
+                                    {selectedIds.size === submissions.length && submissionsTotal > submissions.length && !selectAllGlobal && (
+                                        <div className="bg-primary/10 border border-primary/20 p-2 rounded-md text-xs flex justify-center gap-2 items-center">
+                                            <span>All {selectedIds.size} on this page are selected.</span>
+                                            <button
+                                                onClick={() => setSelectAllGlobal(true)}
+                                                className="font-semibold text-primary hover:underline focus:outline-none"
+                                            >
+                                                Select all {submissionsTotal} submissions
+                                            </button>
+                                        </div>
+                                    )}
+                                    {selectAllGlobal && (
+                                        <div className="bg-primary/10 border border-primary/20 p-2 rounded-md text-xs flex justify-center gap-2 items-center">
+                                            <span>All {submissionsTotal} submissions are selected.</span>
+                                            <button
+                                                onClick={() => { setSelectedIds(new Set()); setSelectAllGlobal(false); }}
+                                                className="font-semibold text-primary hover:underline focus:outline-none"
+                                            >
+                                                Clear selection
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    <div className="p-2 bg-muted/40 border border-border rounded-md flex items-center justify-between">
+                                        <span className="text-xs font-medium ml-2">
+                                            {selectAllGlobal ? submissionsTotal : selectedIds.size} selected
+                                            {viewContext === "proxy" && selectedProxyId !== "all_proxy" && (
+                                                <span className="ml-1 text-muted-foreground">
+                                                    (for {proxyMembers.find(p => p.id === selectedProxyId)?.display_name || "Proxy"})
+                                                </span>
+                                            )}
+                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={handleBulkResubmit}
+                                                disabled={isBulkDeleting}
+                                                className="px-3 py-1.5 text-xs font-medium bg-secondary text-secondary-foreground border border-border rounded hover:bg-secondary/80 transition-colors disabled:opacity-50"
+                                                title={`Re-run AI verification (Max ${maxBatchUploads})`}
+                                            >
+                                                Resubmit to AI
+                                            </button>
+                                            <button
+                                                onClick={() => setShowBulkDateEdit(true)}
+                                                className="px-3 py-1.5 text-xs font-medium bg-background border border-border rounded hover:bg-muted transition-colors"
+                                            >
+                                                Change Date
+                                            </button>
+                                            <button
+                                                onClick={() => setShowBulkDeleteConfirm(true)}
+                                                className="px-3 py-1.5 text-xs font-medium bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 transition-colors"
+                                            >
+                                                Delete Selected
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
+                            )}
 
-                                {/* Bulk Actions Bar */}
-                                {selectedIds.size > 0 && (
-                                    <div className="mb-4 space-y-2">
-                                        {/* Global Selection Banner */}
-                                        {selectedIds.size === submissions.length && submissionsTotal > submissions.length && !selectAllGlobal && (
-                                            <div className="bg-primary/10 border border-primary/20 p-2 rounded-md text-xs flex justify-center gap-2 items-center">
-                                                <span>All {selectedIds.size} on this page are selected.</span>
-                                                <button
-                                                    onClick={() => setSelectAllGlobal(true)}
-                                                    className="font-semibold text-primary hover:underline focus:outline-none"
-                                                >
-                                                    Select all {submissionsTotal} submissions
-                                                </button>
-                                            </div>
-                                        )}
-                                        {selectAllGlobal && (
-                                            <div className="bg-primary/10 border border-primary/20 p-2 rounded-md text-xs flex justify-center gap-2 items-center">
-                                                <span>All {submissionsTotal} submissions are selected.</span>
-                                                <button
-                                                    onClick={() => { setSelectedIds(new Set()); setSelectAllGlobal(false); }}
-                                                    className="font-semibold text-primary hover:underline focus:outline-none"
-                                                >
-                                                    Clear selection
-                                                </button>
-                                            </div>
-                                        )}
+                            {submissions.length === 0 ? (
+                                <div className="rounded-lg border border-border bg-card/50 p-6 text-center">
+                                    <p className="text-muted-foreground">No submissions yet.</p>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="overflow-hidden rounded-lg border border-border">
+                                        <table className="w-full">
+                                            <thead className="bg-card">
+                                                <tr>
+                                                    <th className="px-4 py-3 w-10">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedIds.size === submissions.length && submissions.length > 0}
+                                                            onChange={toggleSelectAll}
+                                                            className="rounded border-border"
+                                                        />
+                                                    </th>
+                                                    <th className="px-2 py-3 text-left text-sm font-medium text-muted-foreground w-12">📷</th>
+                                                    <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Date</th>
+                                                    <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Steps</th>
+                                                    <th className="px-4 py-3 text-center text-sm font-medium text-muted-foreground">Submitted</th>
+                                                    <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-border">
+                                                {submissions.map((sub) => {
+                                                    const isExpanded = expandedSubmissionId === sub.id;
+                                                    const isEditing = editingSubmissionId === sub.id;
+                                                    const canExpand = sub.verified === false && sub.verification_notes;
+                                                    const submittedDate = new Date(sub.created_at);
+                                                    const submittedStr = submittedDate.toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 
-                                        <div className="p-2 bg-muted/40 border border-border rounded-md flex items-center justify-between">
-                                            <span className="text-xs font-medium ml-2">
-                                                {selectAllGlobal ? submissionsTotal : selectedIds.size} selected
-                                                {viewContext === "proxy" && selectedProxyId !== "all_proxy" && (
-                                                    <span className="ml-1 text-muted-foreground">
-                                                        (for {proxyMembers.find(p => p.id === selectedProxyId)?.display_name || "Proxy"})
-                                                    </span>
-                                                )}
-                                            </span>
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    onClick={handleBulkResubmit}
-                                                    disabled={isBulkDeleting}
-                                                    className="px-3 py-1.5 text-xs font-medium bg-secondary text-secondary-foreground border border-border rounded hover:bg-secondary/80 transition-colors disabled:opacity-50"
-                                                    title={`Re-run AI verification (Max ${maxBatchUploads})`}
-                                                >
-                                                    Resubmit to AI
-                                                </button>
-                                                <button
-                                                    onClick={() => setShowBulkDateEdit(true)}
-                                                    className="px-3 py-1.5 text-xs font-medium bg-background border border-border rounded hover:bg-muted transition-colors"
-                                                >
-                                                    Change Date
-                                                </button>
-                                                <button
-                                                    onClick={() => setShowBulkDeleteConfirm(true)}
-                                                    className="px-3 py-1.5 text-xs font-medium bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 transition-colors"
-                                                >
-                                                    Delete Selected
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {submissions.length === 0 ? (
-                                    <div className="rounded-lg border border-border bg-card/50 p-6 text-center">
-                                        <p className="text-muted-foreground">No submissions yet.</p>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <div className="overflow-hidden rounded-lg border border-border">
-                                            <table className="w-full">
-                                                <thead className="bg-card">
-                                                    <tr>
-                                                        <th className="px-4 py-3 w-10">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={selectedIds.size === submissions.length && submissions.length > 0}
-                                                                onChange={toggleSelectAll}
-                                                                className="rounded border-border"
-                                                            />
-                                                        </th>
-                                                        <th className="px-2 py-3 text-left text-sm font-medium text-muted-foreground w-12">📷</th>
-                                                        <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Date</th>
-                                                        <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Steps</th>
-                                                        <th className="px-4 py-3 text-center text-sm font-medium text-muted-foreground">Submitted</th>
-                                                        <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="divide-y divide-border">
-                                                    {submissions.map((sub) => {
-                                                        const isExpanded = expandedSubmissionId === sub.id;
-                                                        const isEditing = editingSubmissionId === sub.id;
-                                                        const canExpand = sub.verified === false && sub.verification_notes;
-                                                        const submittedDate = new Date(sub.created_at);
-                                                        const submittedStr = submittedDate.toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
-
-                                                        return (
-                                                            <React.Fragment key={sub.id}>
-                                                                <tr
-                                                                    className={`hover:bg-muted/50 cursor-pointer ${isEditing ? 'bg-muted/30' : ''}`}
-                                                                    onClick={() => {
-                                                                        if (isEditing) {
-                                                                            // Already editing, don't toggle
-                                                                        } else if (canExpand && !isEditing) {
-                                                                            setExpandedSubmissionId(isExpanded ? null : sub.id);
-                                                                            setEditingSubmissionId(null);
-                                                                        } else {
-                                                                            // Toggle edit mode
-                                                                            setEditingSubmissionId(isEditing ? null : sub.id);
-                                                                            setExpandedSubmissionId(null);
-                                                                        }
-                                                                    }}
-                                                                >
-                                                                    {/* Checkbox */}
-                                                                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            checked={selectedIds.has(sub.id)}
-                                                                            onChange={() => toggleSelection(sub.id)}
-                                                                            className="rounded border-border"
-                                                                        />
-                                                                    </td>
-                                                                    {/* Proof Image */}
-                                                                    <td className="px-2 py-3">
-                                                                        {sub.proof_path ? (
-                                                                            <ProofThumbnail proofPath={sub.proof_path} size={36} />
-                                                                        ) : (
-                                                                            <div className="w-9 h-9 flex items-center justify-center text-muted-foreground text-xs">—</div>
-                                                                        )}
-                                                                    </td>
-                                                                    {/* Date */}
-                                                                    <td className="px-4 py-3 text-foreground">
-                                                                        {formatDate(sub.for_date)}
-                                                                        {sub.partial && (
-                                                                            <span className="ml-2 text-xs text-muted-foreground">(partial)</span>
-                                                                        )}
-                                                                        {canExpand && (
-                                                                            <span className="ml-2 text-xs text-muted-foreground">
-                                                                                {isExpanded ? '▼' : '▶'}
-                                                                            </span>
-                                                                        )}
-                                                                    </td>
-                                                                    {/* Steps */}
-                                                                    <td className="px-4 py-3 text-right font-mono text-foreground">
-                                                                        {sub.steps.toLocaleString()}
-                                                                    </td>
-                                                                    {/* Submitted */}
-                                                                    <td className="px-4 py-3 text-center text-xs text-muted-foreground">
-                                                                        {submittedStr}
-                                                                    </td>
-                                                                    {/* Status */}
-                                                                    <td className="px-4 py-3 text-right">
-                                                                        {getVerificationBadge(sub.verified)}
+                                                    return (
+                                                        <React.Fragment key={sub.id}>
+                                                            <tr
+                                                                className={`hover:bg-muted/50 cursor-pointer ${isEditing ? 'bg-muted/30' : ''}`}
+                                                                onClick={() => {
+                                                                    if (isEditing) {
+                                                                        // Already editing, don't toggle
+                                                                    } else if (canExpand && !isEditing) {
+                                                                        setExpandedSubmissionId(isExpanded ? null : sub.id);
+                                                                        setEditingSubmissionId(null);
+                                                                    } else {
+                                                                        // Toggle edit mode
+                                                                        setEditingSubmissionId(isEditing ? null : sub.id);
+                                                                        setExpandedSubmissionId(null);
+                                                                    }
+                                                                }}
+                                                            >
+                                                                {/* Checkbox */}
+                                                                <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        checked={selectedIds.has(sub.id)}
+                                                                        onChange={() => toggleSelection(sub.id)}
+                                                                        className="rounded border-border"
+                                                                    />
+                                                                </td>
+                                                                {/* Proof Image */}
+                                                                <td className="px-2 py-3">
+                                                                    {sub.proof_path ? (
+                                                                        <ProofThumbnail proofPath={sub.proof_path} size={36} />
+                                                                    ) : (
+                                                                        <div className="w-9 h-9 flex items-center justify-center text-muted-foreground text-xs">—</div>
+                                                                    )}
+                                                                </td>
+                                                                {/* Date */}
+                                                                <td className="px-4 py-3 text-foreground">
+                                                                    {formatDate(sub.for_date)}
+                                                                    {sub.partial && (
+                                                                        <span className="ml-2 text-xs text-muted-foreground">(partial)</span>
+                                                                    )}
+                                                                    {canExpand && (
+                                                                        <span className="ml-2 text-xs text-muted-foreground">
+                                                                            {isExpanded ? '▼' : '▶'}
+                                                                        </span>
+                                                                    )}
+                                                                </td>
+                                                                {/* Steps */}
+                                                                <td className="px-4 py-3 text-right font-mono text-foreground">
+                                                                    {sub.steps.toLocaleString()}
+                                                                </td>
+                                                                {/* Submitted */}
+                                                                <td className="px-4 py-3 text-center text-xs text-muted-foreground">
+                                                                    {submittedStr}
+                                                                </td>
+                                                                {/* Status */}
+                                                                <td className="px-4 py-3 text-right">
+                                                                    {getVerificationBadge(sub.verified)}
+                                                                </td>
+                                                            </tr>
+                                                            {/* Expanded verification details */}
+                                                            {isExpanded && sub.verification_notes && (
+                                                                <tr>
+                                                                    <td colSpan={5} className="bg-muted/50 px-4 py-3">
+                                                                        <div className="rounded-md border border-border bg-card/50 p-3 space-y-2">
+                                                                            <p className="text-sm font-medium text-foreground">Verification Details</p>
+                                                                            <p className="text-sm text-muted-foreground">{sub.verification_notes}</p>
+                                                                            <button
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    setEditingSubmissionId(sub.id);
+                                                                                    setExpandedSubmissionId(null);
+                                                                                }}
+                                                                                className="text-sm text-primary hover:underline"
+                                                                            >
+                                                                                Edit this submission
+                                                                            </button>
+                                                                        </div>
                                                                     </td>
                                                                 </tr>
-                                                                {/* Expanded verification details */}
-                                                                {isExpanded && sub.verification_notes && (
-                                                                    <tr>
-                                                                        <td colSpan={5} className="bg-muted/50 px-4 py-3">
-                                                                            <div className="rounded-md border border-border bg-card/50 p-3 space-y-2">
-                                                                                <p className="text-sm font-medium text-foreground">Verification Details</p>
-                                                                                <p className="text-sm text-muted-foreground">{sub.verification_notes}</p>
-                                                                                <button
-                                                                                    onClick={(e) => {
-                                                                                        e.stopPropagation();
-                                                                                        setEditingSubmissionId(sub.id);
-                                                                                        setExpandedSubmissionId(null);
-                                                                                    }}
-                                                                                    className="text-sm text-primary hover:underline"
-                                                                                >
-                                                                                    Edit this submission
-                                                                                </button>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
-                                                                )}
-                                                                {/* Edit Panel */}
-                                                                {isEditing && (
-                                                                    <tr>
-                                                                        <td colSpan={5} onClick={(e) => e.stopPropagation()}>
-                                                                            <SubmissionEditPanel
-                                                                                submission={sub}
-                                                                                onUpdate={() => fetchSubmissions(submissionsPage)}
-                                                                                onClose={() => setEditingSubmissionId(null)}
-                                                                            />
-                                                                        </td>
-                                                                    </tr>
-                                                                )}
-                                                            </React.Fragment>
-                                                        );
-                                                    })}
-                                                </tbody>
-                                            </table>
+                                                            )}
+                                                            {/* Edit Panel */}
+                                                            {isEditing && (
+                                                                <tr>
+                                                                    <td colSpan={5} onClick={(e) => e.stopPropagation()}>
+                                                                        <SubmissionEditPanel
+                                                                            submission={sub}
+                                                                            onUpdate={() => fetchSubmissions(submissionsPage)}
+                                                                            onClose={() => setEditingSubmissionId(null)}
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                            )}
+                                                        </React.Fragment>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    {/* Pagination Controls */}
+                                    {submissionsTotal > SUBMISSIONS_PER_PAGE && (
+                                        <div className="mt-4 flex items-center justify-between">
+                                            <p className="text-sm text-muted-foreground">
+                                                Showing {submissionsPage * SUBMISSIONS_PER_PAGE + 1}-{Math.min((submissionsPage + 1) * SUBMISSIONS_PER_PAGE, submissionsTotal)} of {submissionsTotal}
+                                            </p>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => fetchSubmissions(submissionsPage - 1)}
+                                                    disabled={submissionsPage === 0}
+                                                    className="rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground transition hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    ← Previous
+                                                </button>
+                                                <button
+                                                    onClick={() => fetchSubmissions(submissionsPage + 1)}
+                                                    disabled={(submissionsPage + 1) * SUBMISSIONS_PER_PAGE >= submissionsTotal}
+                                                    className="rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground transition hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    Next →
+                                                </button>
+                                            </div>
                                         </div>
+                                    )}
+                                </>
+                            )}
+                        </div>
 
-                                        {/* Pagination Controls */}
-                                        {submissionsTotal > SUBMISSIONS_PER_PAGE && (
-                                            <div className="mt-4 flex items-center justify-between">
-                                                <p className="text-sm text-muted-foreground">
-                                                    Showing {submissionsPage * SUBMISSIONS_PER_PAGE + 1}-{Math.min((submissionsPage + 1) * SUBMISSIONS_PER_PAGE, submissionsTotal)} of {submissionsTotal}
-                                                </p>
-                                                <div className="flex gap-2">
-                                                    <button
-                                                        onClick={() => fetchSubmissions(submissionsPage - 1)}
-                                                        disabled={submissionsPage === 0}
-                                                        className="rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground transition hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
-                                                    >
-                                                        ← Previous
-                                                    </button>
-                                                    <button
-                                                        onClick={() => fetchSubmissions(submissionsPage + 1)}
-                                                        disabled={(submissionsPage + 1) * SUBMISSIONS_PER_PAGE >= submissionsTotal}
-                                                        className="rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground transition hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
-                                                    >
-                                                        Next →
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </>
-                                )}
-                            </div>
-
-                            {/* Bulk Delete Confirm */}
-                            <div className="fixed">
-                                {showBulkDeleteConfirm && (
-                                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                                        <div className="bg-background p-6 rounded-lg max-w-md w-full border border-border shadow-lg">
-                                            <h3 className="text-lg font-semibold mb-2">Delete {selectedIds.size} Submissions?</h3>
-                                            <p className="text-muted-foreground mb-4">This action cannot be undone.</p>
-                                            <div className="flex justify-end gap-2">
-                                                <button
-                                                    onClick={() => setShowBulkDeleteConfirm(false)}
-                                                    className="px-4 py-2 text-sm hover:bg-muted rounded"
-                                                >
-                                                    Cancel
-                                                </button>
-                                                <button
-                                                    onClick={handleBulkDelete}
-                                                    disabled={isBulkDeleting}
-                                                    className="px-4 py-2 text-sm bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 disabled:opacity-50"
-                                                >
-                                                    {isBulkDeleting ? "Deleting..." : "Delete"}
-                                                </button>
-                                            </div>
+                        {/* Bulk Delete Confirm */}
+                        <div className="fixed">
+                            {showBulkDeleteConfirm && (
+                                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                                    <div className="bg-background p-6 rounded-lg max-w-md w-full border border-border shadow-lg">
+                                        <h3 className="text-lg font-semibold mb-2">Delete {selectedIds.size} Submissions?</h3>
+                                        <p className="text-muted-foreground mb-4">This action cannot be undone.</p>
+                                        <div className="flex justify-end gap-2">
+                                            <button
+                                                onClick={() => setShowBulkDeleteConfirm(false)}
+                                                className="px-4 py-2 text-sm hover:bg-muted rounded"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={handleBulkDelete}
+                                                disabled={isBulkDeleting}
+                                                className="px-4 py-2 text-sm bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 disabled:opacity-50"
+                                            >
+                                                {isBulkDeleting ? "Deleting..." : "Delete"}
+                                            </button>
                                         </div>
                                     </div>
-                                )}
+                                </div>
+                            )}
 
-                                {/* Bulk Date Edit Dialog */}
-                                {showBulkDateEdit && (
-                                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                                        <div className="bg-background p-6 rounded-lg max-w-md w-full border border-border shadow-lg">
-                                            <h3 className="text-lg font-semibold mb-2">Change Date for {selectedIds.size} Submissions</h3>
-                                            <div className="mb-4">
-                                                <label className="block text-sm font-medium mb-1">New Date</label>
-                                                <input
-                                                    type="date"
-                                                    value={bulkDate}
-                                                    onChange={(e) => setBulkDate(e.target.value)}
-                                                    max={new Date().toISOString().split("T")[0]}
-                                                    className="w-full rounded border border-border bg-background px-3 py-2"
-                                                />
-                                            </div>
-                                            <div className="flex justify-end gap-2">
-                                                <button
-                                                    onClick={() => setShowBulkDateEdit(false)}
-                                                    className="px-4 py-2 text-sm hover:bg-muted rounded"
-                                                >
-                                                    Cancel
-                                                </button>
-                                                <button
-                                                    onClick={handleBulkDateEdit}
-                                                    disabled={isBulkDeleting || !bulkDate}
-                                                    className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded hover:bg-primary/90 disabled:opacity-50"
-                                                >
-                                                    {isBulkDeleting ? "Updating..." : "Update Date"}
-                                                </button>
-                                            </div>
+                            {/* Bulk Date Edit Dialog */}
+                            {showBulkDateEdit && (
+                                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                                    <div className="bg-background p-6 rounded-lg max-w-md w-full border border-border shadow-lg">
+                                        <h3 className="text-lg font-semibold mb-2">Change Date for {selectedIds.size} Submissions</h3>
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium mb-1">New Date</label>
+                                            <input
+                                                type="date"
+                                                value={bulkDate}
+                                                onChange={(e) => setBulkDate(e.target.value)}
+                                                max={new Date().toISOString().split("T")[0]}
+                                                className="w-full rounded border border-border bg-background px-3 py-2"
+                                            />
+                                        </div>
+                                        <div className="flex justify-end gap-2">
+                                            <button
+                                                onClick={() => setShowBulkDateEdit(false)}
+                                                className="px-4 py-2 text-sm hover:bg-muted rounded"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={handleBulkDateEdit}
+                                                disabled={isBulkDeleting || !bulkDate}
+                                                className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded hover:bg-primary/90 disabled:opacity-50"
+                                            >
+                                                {isBulkDeleting ? "Updating..." : "Update Date"}
+                                            </button>
                                         </div>
                                     </div>
-                                )}
-                            </div>
+                                </div>
+                            )}
+                        </div>
                     </section>
                 </ModuleFeedback>
 
