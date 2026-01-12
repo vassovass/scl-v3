@@ -129,6 +129,7 @@ scl-v3/
 - ✅ Mobile-responsive navigation
 - ✅ Guided onboarding tours
 - ✅ Footer with legal links
+- ✅ SuperAdmin theme mode controls (default and allowed modes)
 
 See **[ROADMAP.md](./ROADMAP.md)** for upcoming features.
 

@@ -30,6 +30,10 @@ export type AppSettingKey =
   | "maintenance_mode"
   // Appearance
   | "theme_variants"
+  | "default_theme_mode"
+  | "allow_theme_dark"
+  | "allow_theme_light"
+  | "allow_theme_system"
   // Branding (links to dedicated branding interface)
   | "branding_settings";
 
