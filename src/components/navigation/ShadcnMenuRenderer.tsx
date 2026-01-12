@@ -273,25 +273,28 @@ function DropdownItem({
     }
 
     // Items with onClick handler (including tours)
+    // Use asChild with a button for more reliable click handling in submenus
     return (
         <DropdownMenuItem
+            asChild
             className={className}
-            onSelect={() => {
-                // Use setTimeout to ensure action fires AFTER menu closes
-                // This prevents issues with shadcn's internal state management
-                console.log('[ShadcnMenuRenderer] Tour item clicked:', item.id, item.onClick);
-                setTimeout(() => {
-                    onAction(item);
-                }, 0);
-            }}
             data-module-id={`menu-${item.id}`}
             data-module-name={item.label}
         >
-            {item.icon && <span className="mr-2">{item.icon}</span>}
-            <span className="flex-1">{item.label}</span>
-            {item.description && (
-                <span className="ml-2 text-xs text-muted-foreground">{item.description}</span>
-            )}
+            <button
+                type="button"
+                onClick={() => {
+                    console.log('[ShadcnMenuRenderer] Tour button clicked:', item.id, item.onClick);
+                    onAction(item);
+                }}
+                className="w-full flex items-center cursor-pointer"
+            >
+                {item.icon && <span className="mr-2">{item.icon}</span>}
+                <span className="flex-1">{item.label}</span>
+                {item.description && (
+                    <span className="ml-2 text-xs text-muted-foreground">{item.description}</span>
+                )}
+            </button>
         </DropdownMenuItem>
     );
 }
