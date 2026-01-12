@@ -38,7 +38,14 @@ export function useAppSettings() {
 
   const loadSettings = useCallback(async () => {
     try {
-      const response = await fetch('/api/admin/settings');
+      // Try admin endpoint first (for authenticated users with full settings)
+      let response = await fetch('/api/admin/settings');
+
+      // If unauthorized, fall back to public endpoint (for guests)
+      if (response.status === 401) {
+        response = await fetch('/api/settings/public');
+      }
+
       if (!response.ok) {
         throw new Error('Failed to fetch settings');
       }

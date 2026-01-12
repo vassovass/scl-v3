@@ -323,6 +323,8 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                                 {item.label}
                             </Link>
                         ))}
+                        {/* Theme Toggle - visible to everyone */}
+                        <ModeToggle />
                     </div>
                 )}
 
@@ -366,6 +368,11 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                                 {item.label}
                             </Link>
                         ))}
+                        {/* Theme Toggle in mobile menu */}
+                        <div className="flex items-center justify-between px-4 py-3">
+                            <span className="text-base font-medium text-muted-foreground">Theme</span>
+                            <ModeToggle />
+                        </div>
                         <Link
                             href="/sign-in"
                             onClick={() => setMobileMenuOpen(false)}

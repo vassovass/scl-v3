@@ -91,7 +91,7 @@ export default async function RootLayout({
         {/* Hybrid Sync: Bridges Server Cache -> Client Cache */}
         <HybridCacheSync serverVersion={serverVersion} />
 
-        <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem>
+        <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
           <AuthProvider>
             {children}
 
