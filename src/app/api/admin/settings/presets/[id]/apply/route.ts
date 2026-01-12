@@ -1,5 +1,6 @@
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
 import { json, unauthorized } from "@/lib/api";
+import { invalidateCache } from "@/lib/cache/serverCache";
 
 /**
  * POST /api/admin/settings/presets/:id/apply
@@ -80,6 +81,8 @@ export async function POST(
 
   const successCount = results.filter((r) => r.success).length;
   const failCount = results.filter((r) => !r.success).length;
+
+  invalidateCache("settings");
 
   return json({
     success: failCount === 0,

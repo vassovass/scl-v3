@@ -7,8 +7,15 @@
  */
 
 import { withApiHandler } from "@/lib/api/handler";
+import { badRequest } from "@/lib/api";
 import { z } from "zod";
 import { getUserPreferenceDefaults } from "@/lib/settings/userPreferences";
+import type { createAdminClient } from "@/lib/supabase/server";
+import {
+    DEFAULT_THEME_SETTINGS,
+    getThemeSettingsFromValues,
+    ThemeMode,
+} from "@/lib/settings/themeSettings";
 
 // Validation schema for PATCH request
 const patchSchema = z.object({
@@ -21,6 +28,37 @@ const patchSchema = z.object({
     email_weekly_digest: z.boolean().optional(),
     push_enabled: z.boolean().optional(),
 });
+
+const THEME_SETTING_KEYS = [
+    "default_theme_mode",
+    "allow_theme_dark",
+    "allow_theme_light",
+    "allow_theme_system",
+];
+
+async function fetchThemeSettings(adminClient: ReturnType<typeof createAdminClient>) {
+    const { data, error } = await adminClient
+        .from("app_settings")
+        .select("key, value")
+        .in("key", THEME_SETTING_KEYS);
+
+    if (error) {
+        console.error("Failed to load theme settings:", error);
+        return DEFAULT_THEME_SETTINGS;
+    }
+
+    const settingsMap = (data || []).reduce<Record<string, unknown>>((acc, setting) => {
+        acc[setting.key] = setting.value;
+        return acc;
+    }, {});
+
+    return getThemeSettingsFromValues({
+        defaultMode: settingsMap.default_theme_mode,
+        allowDark: settingsMap.allow_theme_dark,
+        allowLight: settingsMap.allow_theme_light,
+        allowSystem: settingsMap.allow_theme_system,
+    });
+}
 
 /**
  * GET /api/user/preferences
@@ -43,18 +81,28 @@ export const GET = withApiHandler(
             throw error;
         }
 
+        const themeSettings = await fetchThemeSettings(adminClient);
+
         // If no preferences exist, return defaults
         if (!preferences) {
             const defaults = getUserPreferenceDefaults();
             return {
                 user_id: user!.id,
                 ...defaults,
+                theme: themeSettings.defaultMode,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
             };
         }
 
-        return preferences;
+        const resolvedTheme = themeSettings.allowedModes.includes(preferences.theme as ThemeMode)
+            ? preferences.theme
+            : themeSettings.defaultMode;
+
+        return {
+            ...preferences,
+            theme: resolvedTheme,
+        };
     }
 );
 
@@ -68,6 +116,12 @@ export const PATCH = withApiHandler(
         schema: patchSchema,
     },
     async ({ user, body, adminClient }) => {
+        const themeSettings = await fetchThemeSettings(adminClient);
+
+        if (body.theme && !themeSettings.allowedModes.includes(body.theme as ThemeMode)) {
+            return badRequest("Theme mode is not allowed by admin settings");
+        }
+
         // Check if preferences exist
         const { data: existing } = await adminClient
             .from("user_preferences")
@@ -98,6 +152,7 @@ export const PATCH = withApiHandler(
                 .insert({
                     user_id: user!.id,
                     ...defaults,
+                    theme: themeSettings.defaultMode,
                     ...body,
                 })
                 .select()

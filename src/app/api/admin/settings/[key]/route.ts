@@ -1,5 +1,6 @@
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
 import { json, unauthorized, badRequest } from "@/lib/api";
+import { invalidateCache } from "@/lib/cache/serverCache";
 
 /**
  * PATCH /api/admin/settings/:key
@@ -72,6 +73,8 @@ export async function PATCH(
     changed_by: user.id,
     change_reason: "value_update",
   });
+
+  invalidateCache("settings");
 
   return json({ setting });
 }

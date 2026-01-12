@@ -99,6 +99,8 @@
 ## Completed
 *Recently shipped features*
 
+- [x] SuperAdmin theme mode controls (default + allowed modes)
+- [x] Theme toggle shows "coming soon" hints for disabled modes
 - [x] Build warning cleanup (viewport theme colors, dynamic API routes, IndexedDB guard)
 - [x] **Modular Menu System** (centralized config, role-based visibility, unlimited nesting)
 - [x] **Internal Kanban Board** (`/admin/kanban`) - drag-and-drop task management
