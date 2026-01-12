@@ -1,0 +1,77 @@
+{
+  "_schema": "Universal MCP Configuration - Single Source of Truth",
+  "_docs": "See .agent/MCP.md for documentation",
+  "_updated": "2026-01-12",
+  "version": "1.0",
+
+  "servers": {
+    "supabase": {
+      "name": "Supabase",
+      "description": "StepLeague PostgreSQL database - direct access for queries, schema inspection, and data management",
+      "skill": "skills/mcp/supabase.md",
+      "status": "active",
+      "capabilities": ["query", "schema", "tables", "rls"],
+      "connections": {
+        "url": {
+          "_comment": "OAuth-based hosted MCP - no secrets needed",
+          "type": "http",
+          "url": "https://mcp.supabase.com/mcp?project_ref=nwhvkhydryulgxobqioi",
+          "auth": "oauth",
+          "supports": ["claude-code", "cursor"]
+        },
+        "postgres": {
+          "_comment": "Direct Postgres connection - requires SUPABASE_DB_URL env var",
+          "type": "stdio",
+          "command": "npx",
+          "args": ["-y", "@modelcontextprotocol/server-postgres", "${SUPABASE_DB_URL}"],
+          "env": {
+            "SUPABASE_DB_URL": "postgresql://postgres:${SUPABASE_DB_PASSWORD}@db.nwhvkhydryulgxobqioi.supabase.co:5432/postgres"
+          },
+          "supports": ["antigravity", "claude-code", "cursor"]
+        }
+      }
+    }
+  },
+
+  "tools": {
+    "claude-code": {
+      "name": "Claude Code",
+      "configPath": ".mcp.json",
+      "configFormat": "mcpServers",
+      "preferredConnection": "url",
+      "projectScoped": true
+    },
+    "cursor": {
+      "name": "Cursor",
+      "configPath": ".cursor/mcp.json",
+      "configFormat": "mcpServers",
+      "preferredConnection": "url",
+      "projectScoped": true
+    },
+    "antigravity": {
+      "name": "Google Antigravity",
+      "configPath": "~/.gemini/antigravity/mcp_config.json",
+      "configFormat": "mcpServers",
+      "preferredConnection": "postgres",
+      "projectScoped": false,
+      "userHomeRequired": true,
+      "_note": "Antigravity only supports stdio (command-based) MCPs, not HTTP URLs"
+    }
+  },
+
+  "_future_servers": {
+    "_comment": "Planned MCPs - move to 'servers' when activated",
+    "github": {
+      "name": "GitHub",
+      "description": "Repository access, issues, PRs",
+      "status": "planned",
+      "capabilities": ["repos", "issues", "prs", "commits"]
+    },
+    "filesystem": {
+      "name": "Filesystem",
+      "description": "Extended file operations",
+      "status": "planned",
+      "capabilities": ["read", "write", "search"]
+    }
+  }
+}

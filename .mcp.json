@@ -1,0 +1,11 @@
+{
+  "_generated": true,
+  "_source": ".agent/mcp.json",
+  "_generatedAt": "2026-01-12T05:10:25.297Z",
+  "_docs": "DO NOT EDIT - Run `npm run mcp:sync` to regenerate",
+  "mcpServers": {
+    "supabase": {
+      "url": "https://mcp.supabase.com/mcp?project_ref=nwhvkhydryulgxobqioi"
+    }
+  }
+}
