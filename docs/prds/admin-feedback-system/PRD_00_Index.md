@@ -70,6 +70,7 @@
 | # | PRD | Outcome | Status |
 |---|-----|---------|--------|
 | 36 | [Technical Debt](./PRD_36_Technical_Debt.md) | Cleanup, Refactoring & Optimization | 🔄 Ongoing |
+| 39 | [Performance Architecture](./PRD_39_Performance_Architecture.md) | Server Components, Hybrid Caching, Stability | 📋 Proposed |
 
 ---
 

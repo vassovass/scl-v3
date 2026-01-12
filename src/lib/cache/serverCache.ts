@@ -41,10 +41,27 @@ export function createCachedFetcher<T>({
     revalidateSeconds = 3600
 }: CacheOptions<T>): () => Promise<T> {
 
+    // Circuit Breaker State (Closure-based per fetcher instance)
+    let failures = 0;
+    let lastFailure = 0;
+    const FAILURE_THRESHOLD = 5;
+    const COOLDOWN_MS = 30000; // 30 seconds
+
     // The actual data fetcher wrapped with timeout
     const cachedFn = unstable_cache(
         async () => {
             const stats = getStats(tag);
+
+            // 1. Check Circuit Breaker
+            if (failures >= FAILURE_THRESHOLD) {
+                const now = Date.now();
+                if (now - lastFailure < COOLDOWN_MS) {
+                    console.warn(`[Cache] Circuit open for ${tag}. Returning fallback.`);
+                    return fallback;
+                }
+                // Reset trial
+                failures = 0;
+            }
 
             // Timeout promise
             const timeoutPromise = new Promise<null>((resolve) =>
@@ -57,6 +74,8 @@ export function createCachedFetcher<T>({
 
                 if (result === null) {
                     stats.timeouts++;
+                    failures++;
+                    lastFailure = Date.now();
                     // Log timeout as a warning, not critical error
                     console.warn(`[Cache] Timeout for ${tag} (${timeoutMs}ms), using fallback`);
 
@@ -71,10 +90,11 @@ export function createCachedFetcher<T>({
                     return fallback;
                 }
 
-                stats.misses++; // If we ran this function, it was a cache miss (or revalidation)
                 return result;
             } catch (err: any) {
                 console.error(`[Cache] Fetch failed for ${tag}:`, err);
+                failures++;
+                lastFailure = Date.now();
 
                 // Report actual errors
                 reportError(new AppError({

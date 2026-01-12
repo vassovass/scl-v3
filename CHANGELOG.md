@@ -11,6 +11,14 @@ All notable changes to StepLeague v3.
 
 ### Added
 
+- **PRD 39: Performance Architecture & Stability** - Complete system overhaul for speed and resilience
+  - **Server Components**: Refactored Dashboard to async RSC, eliminating client-side fetch waterfalls
+  - **Caching Registry** (`src/lib/cache/registry.ts`): Type-safe source of truth for all cache keys/TTLs
+  - **Hybrid Sync**: `HybridCacheSync` bridge ensuring zero-jitter updates between Server Cache and Client IndexedDB
+  - **Resilience**: 
+    - **Circuit Breaker**: `serverCache.ts` now protects DB from cascading failures (5 failures = 30s open circuit)
+    - **SafeLazy**: Error-boundary protected wrapper for third-party scripts (GTM, Feedback)
+  - **DevTools**: Added `CacheDevTools` for monitoring hit rates and circuit status
 - **Server-Side Cache for Branding** - Implemented modular `serverCache.ts` utility
   - **Performance**: Fixed GTmetrix/PageSpeed timeouts via `unstable_cache` with 3s timeout
   - **Auto-Invalidation**: Admin branding updates instantly bust cache (`revalidateTag`)

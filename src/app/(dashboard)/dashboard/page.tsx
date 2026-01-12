@@ -1,24 +1,20 @@
-"use client";
-
 import Link from "next/link";
-import { useAuth } from "@/components/providers/AuthProvider";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
-import { useFetch } from "@/hooks/useFetch";
 import { GratitudeCard } from "@/components/dashboard/GratitudeCard";
+import { getUserLeagues } from "@/lib/leagues";
+import { redirect } from "next/navigation";
 
-interface League {
-  id: string;
-  name: string;
-  role: string;
-  member_count: number;
-  user_rank: number;
-  user_steps_this_week: number;
-}
+export default async function DashboardPage() {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-export default function DashboardPage() {
-  const { user, session } = useAuth();
-  const { data, loading } = useFetch<{ leagues: League[] }>("/api/leagues");
-  const leagues = data?.leagues || [];
+  if (!user) {
+    redirect("/auth/sign-in");
+  }
+
+  // Server-side fetch (Zero Waterfall)
+  const leagues = await getUserLeagues(user.id);
 
   return (
     <div className="min-h-screen bg-background">
@@ -57,9 +53,7 @@ export default function DashboardPage() {
           <GratitudeCard count={0} className="w-full md:max-w-md" />
         </div>
 
-        {loading ? (
-          <div className="mt-12 text-center text-muted-foreground">Loading...</div>
-        ) : leagues.length === 0 ? (
+        {leagues.length === 0 ? (
           <div className="mt-12 rounded-xl border border-border bg-card/50 p-12 text-center">
             <p className="text-lg text-muted-foreground">You haven&apos;t joined any leagues yet.</p>
             <p className="mt-2 text-sm text-muted-foreground/70">

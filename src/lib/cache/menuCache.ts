@@ -148,6 +148,27 @@ class MenuCacheManager {
     }
   }
 
+  /**
+   * Version Handshake
+   * Compares the server-provided hash with the client cache.
+   * If mismatch, silent invalidation triggers a re-fetch.
+   */
+  async checkVersion(serverVersion: string): Promise<boolean> {
+    const current = await this.get();
+    if (!current) return false;
+
+    // If stored version doesn't match server version, it's stale
+    // Note: serverVersion (hash) is different from the schema version (CACHE_VERSION)
+    if (current.cacheVersion !== serverVersion) {
+      console.log('[Cache] Version mismatch (Server vs Client)', serverVersion, current.cacheVersion);
+      // We can chose to invalidate immediately OR just return false
+      // Returning false tells the consumer "fetch fresh data"
+      // We then update the cache with the new data + new version
+      return false;
+    }
+    return true;
+  }
+
   async invalidate(): Promise<void> {
     await this.initPromise;
 

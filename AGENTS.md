@@ -785,6 +785,29 @@ This ensures documentation stays current for future sessions and developers.
 
 ---
 
+### 8. Performance & Caching Rules (NEW)
+ 
+> **Refer to `ARCHITECTURE.md` for the full technical guide.**
+ 
+#### 8.1 Server vs Client Fetching
+ 
+*   **Data Reading**: Use **Server Components** + `serverCache` wrapper.
+    *   ❌ `useFetch('/api/data')` in Client Component (Waterfall risk)
+    *   ✅ `await getData()` in Server Component (Instant HTML)
+*   **Interactive/Live Data**: Use Client Components.
+ 
+#### 8.2 Safe Script Loading
+*   **Rule:** NEVER import heavy widgets (Feedback, Chat, Analytics) directly.
+*   **Pattern:** Use `SafeLazy` wrapper.
+*   **Offline:** Check `navigator.onLine` before loading non-essential scripts.
+ 
+#### 8.3 The Registry Rule
+*   **Rule:** Do not invent cache tags inline.
+*   **Correct:** `tags: [CacheRegistry.BRANDING]`
+*   **Incorrect:** `tags: ['branding']`
+ 
+---
+ 
 ## 📊 Analytics & Tracking (MANDATORY)
 
 > **Architecture:** All analytics runs through GTM dataLayer → GTM forwards to GA4, Hotjar, PostHog, etc.
