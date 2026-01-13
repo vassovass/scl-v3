@@ -25,6 +25,7 @@ All notable changes to StepLeague v3.
 - **Submissions API**: Added missing `proxy_member_id` to query schema validation.
 - **Proxy Management**: Fixed state setter name in `ProxyMemberManagement` component.
 - **Build Integrity**: Fixed missing `Link` import in `NavHeader` and `trackEvent` usage in `AuthProvider`.
+- **Menu Interaction**: Fixed a regression where dropdown menu links were not clickable (conflict between Radix `asChild` and Next.js `Link`).
 
 ## [2026-01-12]
 
