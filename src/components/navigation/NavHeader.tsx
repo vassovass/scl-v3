@@ -7,6 +7,7 @@ import { ProfileSwitcher } from "@/components/auth/ProfileSwitcher";
 
 
 import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { createClient } from "@/lib/supabase/client";

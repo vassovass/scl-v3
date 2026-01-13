@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState, useRef } from 
 import { useRouter } from "next/navigation";
 import type { Session, User, AuthChangeEvent } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
-import { analytics, identifyUser, clearUser } from "@/lib/analytics";
+import { analytics, identifyUser, clearUser, trackEvent } from "@/lib/analytics";
 
 
 interface AuthContextValue {
@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Track the switch
     if (profile && profile.id !== session.user.id) {
-      analytics.trackEvent("profile_switch", {
+      trackEvent("profile_switch", {
         category: "user",
         action: "switch",
         target_profile_id: profile.id
@@ -143,6 +143,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+// Hook for consuming auth context
 export function useAuth(): AuthContextValue {
   const context = useContext(AuthContext);
   if (!context) {

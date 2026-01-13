@@ -24,6 +24,7 @@ All notable changes to StepLeague v3.
 - **Proxy Claim API**: Resolved `user` null check and error handling in claim route.
 - **Submissions API**: Added missing `proxy_member_id` to query schema validation.
 - **Proxy Management**: Fixed state setter name in `ProxyMemberManagement` component.
+- **Build Integrity**: Fixed missing `Link` import in `NavHeader` and `trackEvent` usage in `AuthProvider`.
 
 ## [2026-01-12]
 
