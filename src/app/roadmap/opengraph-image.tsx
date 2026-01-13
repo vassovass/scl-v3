@@ -1,6 +1,8 @@
 import { ImageResponse } from "next/og";
 import { OgTemplate } from "@/lib/og-template";
 
+// NOTE: On Windows/Node builds, @vercel/og can throw "Invalid URL" during prerender.
+// Using Edge runtime avoids that and keeps OG generation reliable.
 export const runtime = "edge";
 
 export const alt = "Roadmap | StepLeague";
