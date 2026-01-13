@@ -176,7 +176,7 @@ export const POST = withApiHandler({
             .select("role")
             .eq("user_id", user!.id)
             .eq("league_id", body.league_id)
-            .single();
+            .maybeSingle();
 
         if (managerMembership) {
             await adminClient
@@ -189,18 +189,23 @@ export const POST = withApiHandler({
         }
     }
 
-    // Step 5: Log creation in audit
-    await adminClient
-        .from("audit_log")
-        .insert({
-            action: "proxy_created",
-            actor_id: user!.id,
-            target_id: newProxy.id,
-            details: {
-                display_name: body.display_name,
-                league_id: body.league_id || null,
-            },
-        });
+    // Step 5: Log creation (non-blocking - audit_log table may not exist yet)
+    try {
+        await adminClient
+            .from("audit_log")
+            .insert({
+                action: "proxy_created",
+                actor_id: user!.id,
+                target_id: newProxy.id,
+                details: {
+                    display_name: body.display_name,
+                    league_id: body.league_id || null,
+                },
+            });
+    } catch (auditError) {
+        // Audit logging is non-critical - log to console instead
+        console.log("[AUDIT] proxy_created:", { actor: user!.id, target: newProxy.id, display_name: body.display_name });
+    }
 
     return {
         success: true,
@@ -295,17 +300,21 @@ export const DELETE = withApiHandler({
         return { error: `Failed to delete proxy: ${deleteError.message}`, status: 500 };
     }
 
-    // Log deletion
-    await adminClient
-        .from("audit_log")
-        .insert({
-            action: "proxy_deleted",
-            actor_id: user!.id,
-            target_id: proxyId,
-            details: {
-                display_name: proxy.display_name,
-            },
-        });
+    // Log deletion (non-blocking - audit_log table may not exist yet)
+    try {
+        await adminClient
+            .from("audit_log")
+            .insert({
+                action: "proxy_deleted",
+                actor_id: user!.id,
+                target_id: proxyId,
+                details: {
+                    display_name: proxy.display_name,
+                },
+            });
+    } catch (auditError) {
+        console.log("[AUDIT] proxy_deleted:", { actor: user!.id, target: proxyId, display_name: proxy.display_name });
+    }
 
     return {
         success: true,

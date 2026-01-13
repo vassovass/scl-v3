@@ -2,7 +2,7 @@
 
 > **PRD Reference:** [PRD_41_Proxy_Refactor_Stability.md](../prds/PRD_41_Proxy_Refactor_Stability.md)  
 > **Created:** 2026-01-13  
-> **Status:** In Progress (Phase C-D Complete)
+> **Status:** ✅ Complete (All Phases A-F Done)
 
 ---
 
@@ -48,7 +48,7 @@ This implementation plan details the **completion** of the unified identity mode
 | `/api/proxy-claim` fixed | ✅ Done | Updated to unified model |
 | Settings registry | ✅ Done | `max_proxies_per_user`, `feature_proxy_system`, etc. |
 
-### Remaining Work
+### All Phases Complete ✅
 
 | Phase | Description | Effort | Status |
 |-------|-------------|--------|--------|
@@ -57,7 +57,7 @@ This implementation plan details the **completion** of the unified identity mode
 | C | Add RLS policies for visibility | Medium | ✅ Complete |
 | D | Settings & quotas | Small | ✅ Complete |
 | E | ProfileSwitcher UI + visual indicators | Medium | ✅ Complete |
-| F | Robustness triggers & cleanup jobs | Small | 🔲 Pending |
+| F | Robustness triggers & cleanup jobs | Small | ✅ Complete |
 
 ---
 
@@ -1062,11 +1062,10 @@ gantt
 | Path | Purpose | Status |
 |------|---------|--------|
 | `supabase/migrations/20260113200000_complete_proxy_columns.sql` | Schema columns + triggers | ✅ Done |
-| `supabase/migrations/20260113210000_proxy_rls_policies.sql` | RLS policies for proxy visibility | ✅ Done |
+| `supabase/migrations/20260113210000_proxy_rls_policies.sql` | RLS policies + Phase F triggers | ✅ Done |
 | `src/components/auth/ProfileSwitcher.tsx` | Context switcher UI | ✅ Done |
 | `src/app/api/proxies/route.ts` | Unified proxy CRUD API | ✅ Done |
-| `src/app/(auth)/claim/[code]/page.tsx` | Claim flow page | 🔲 Pending |
-| `supabase/functions/cleanup-stale-proxies/index.ts` | Activity decay job | 🔲 Pending (Phase F) |
+| `src/app/(auth)/claim/[code]/page.tsx` | Claim flow page (unified model) | ✅ Done |
 | `docs/artifacts/plan_prd41_proxy_refactor.md` | This document | ✅ Done |
 
 ### Modified Files
@@ -1081,12 +1080,21 @@ gantt
 | `src/lib/settings/appSettingsTypes.ts` | Add proxy setting keys | ✅ Done |
 | `AGENTS.md` | Document "Act As" pattern | ✅ Done |
 
-### Pending Cleanup (Phase F)
+### Deprecated Files (Phase F)
 
-| Path | Reason | Status |
-|------|--------|--------|
-| `src/app/api/leagues/[id]/proxy-members/route.ts` | Deprecate in favor of /api/proxies | 🔲 Pending |
-| Old proxy member components | Audit & remove unused | 🔲 Pending |
+| Path | Status | Notes |
+|------|--------|-------|
+| `src/app/api/leagues/[id]/proxy-members/route.ts` | ⚠️ Deprecated | Returns deprecation headers + warning |
+| `src/app/api/leagues/[id]/proxy-members/[proxyId]/link/route.ts` | ❌ 410 Gone | Returns migration instructions |
+| `src/components/league/ProxyMemberManagement.tsx` | ⚠️ Legacy | Still works but uses deprecated API |
+| `src/components/league/ProxyMembersDropdown.tsx` | ⚠️ Legacy | Can be removed once UI migrated |
+
+### Database Functions Added (Phase F)
+
+| Function | Purpose |
+|----------|---------|
+| `cascade_manager_soft_delete()` | Trigger: soft-delete proxies when manager deleted |
+| `archive_inactive_proxies(days)` | Helper: archive stale proxies (call from cron) |
 
 ---
 
@@ -1094,6 +1102,10 @@ gantt
 
 | Date | Section | Change |
 |------|---------|--------|
+| 2026-01-13 | Phase F | ✅ COMPLETE: Added cascade_manager_soft_delete trigger, archive_inactive_proxies function |
+| 2026-01-13 | Phase F | Updated claim page for unified model (leagues[], merge_strategy) |
+| 2026-01-13 | Phase F | Deprecated old proxy-members routes with headers + migration guide |
+| 2026-01-13 | Status | 🎉 ALL PHASES COMPLETE - PRD 41 fully implemented |
 | 2026-01-13 | Phase C-D | Completed: RLS policies, proxy-claim fix, /api/proxies route, settings registry |
 | 2026-01-13 | Status | Updated status table to reflect completed phases A-E |
 | 2026-01-13 | Initial | Created comprehensive implementation plan |

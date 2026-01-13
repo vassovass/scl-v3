@@ -194,7 +194,7 @@ export const POST = withApiHandler({
                 .select("league_id")
                 .eq("user_id", user!.id)
                 .eq("league_id", membership.league_id)
-                .single();
+                .maybeSingle();
 
             if (!existing) {
                 // Transfer membership
@@ -239,21 +239,30 @@ export const POST = withApiHandler({
         // Not critical - submissions already transferred
     }
 
-    // Step 5: Log the claim in audit_log
-    await adminClient
-        .from("audit_log")
-        .insert({
-            action: "proxy_claimed",
-            actor_id: user!.id,
-            target_id: proxy.id,
-            details: {
-                proxy_display_name: proxy.display_name,
-                manager_id: managerId,
-                submissions_transferred: transferredCount,
-                memberships_transferred: membershipsTransferred,
-                merge_strategy: body.merge_strategy,
-            },
+    // Step 5: Log the claim (non-blocking - audit_log table may not exist yet)
+    try {
+        await adminClient
+            .from("audit_log")
+            .insert({
+                action: "proxy_claimed",
+                actor_id: user!.id,
+                target_id: proxy.id,
+                details: {
+                    proxy_display_name: proxy.display_name,
+                    manager_id: managerId,
+                    submissions_transferred: transferredCount,
+                    memberships_transferred: membershipsTransferred,
+                    merge_strategy: body.merge_strategy,
+                },
+            });
+    } catch (auditError) {
+        console.log("[AUDIT] proxy_claimed:", { 
+            actor: user!.id, 
+            target: proxy.id, 
+            submissions: transferredCount,
+            memberships: membershipsTransferred 
         });
+    }
 
     return {
         success: true,

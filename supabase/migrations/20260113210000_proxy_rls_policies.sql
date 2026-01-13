@@ -238,19 +238,24 @@ BEGIN
         WHERE managed_by = NEW.id
           AND deleted_at IS NULL;
           
-        -- Log the cascade in audit_log
-        INSERT INTO audit_log (action, actor_id, target_id, details)
-        SELECT 
-            'proxy_cascade_deleted',
-            NEW.id,
-            id,
-            jsonb_build_object(
-                'reason', 'manager_soft_deleted',
-                'manager_id', NEW.id
-            )
-        FROM users
-        WHERE managed_by = NEW.id
-          AND deleted_at = NEW.deleted_at;  -- Recently deleted in this cascade
+        -- Try to log the cascade in audit_log (table may not exist yet)
+        BEGIN
+            INSERT INTO audit_log (action, actor_id, target_id, details)
+            SELECT 
+                'proxy_cascade_deleted',
+                NEW.id,
+                id,
+                jsonb_build_object(
+                    'reason', 'manager_soft_deleted',
+                    'manager_id', NEW.id
+                )
+            FROM users
+            WHERE managed_by = NEW.id
+              AND deleted_at = NEW.deleted_at;  -- Recently deleted in this cascade
+        EXCEPTION WHEN undefined_table THEN
+            -- audit_log table doesn't exist yet - skip logging
+            RAISE NOTICE 'audit_log table not found, skipping cascade log';
+        END;
     END IF;
     RETURN NEW;
 END;
