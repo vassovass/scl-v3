@@ -84,6 +84,19 @@ export function ProxyMembersDropdown({
                 const data = await res.json();
                 // New API returns { proxy: {...} } instead of { proxy_member: {...} }
                 const newProxy = data.proxy;
+                
+                // Safety check: ensure proxy object exists
+                if (!newProxy || !newProxy.display_name) {
+                    console.error("API returned success but proxy data is missing:", data);
+                    setError("Proxy created but data is incomplete. Please refresh.");
+                    toast({
+                        title: "Warning",
+                        description: "Proxy may have been created. Please refresh to see it.",
+                        variant: "destructive",
+                    });
+                    return;
+                }
+                
                 setProxyMembers(prev => [{ ...newProxy, submission_count: 0 }, ...prev]);
                 onSelectProxy({ ...newProxy, submission_count: 0 });
                 setNewName("");

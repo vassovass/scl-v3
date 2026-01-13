@@ -168,6 +168,12 @@ export const POST = withApiHandler({
         return { error: `Failed to create proxy: ${createError.message}`, status: 500 };
     }
 
+    // Safety check: ensure proxy was created
+    if (!newProxy) {
+        console.error("Proxy insert returned no data (RLS or constraint issue?)");
+        return { error: "Failed to create proxy: No data returned", status: 500 };
+    }
+
     // Step 4: If league_id provided, add proxy to league
     if (body.league_id) {
         // Verify manager is in the league
