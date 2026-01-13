@@ -20,6 +20,7 @@ All notable changes to StepLeague v3.
 - **Bulk Delete Limits**: Resolved payload size issues for large bulk deletions (>100 items) via backend limit increase and frontend chunking.
 - **Pagination**: Corrected "Showing X-Y of Z" display logic.
 - **Proxy Permissions**: Hardened permission checks for modifying proxy data.
+- **Proxy API Types**: Fixed TypeScript errors in proxy API route (`user` null check, `ErrorCode` usage).
 
 ## [2026-01-12]
 

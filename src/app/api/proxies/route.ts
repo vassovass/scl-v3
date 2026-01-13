@@ -13,15 +13,15 @@ export const GET = withApiHandler({
     const { data: proxies, error } = await adminClient
         .from("users")
         .select("id, display_name, nickname, created_at, invite_code")
-        .eq("managed_by", user.id)
+        .eq("managed_by", user!.id)
         .eq("is_proxy", true)
         .order("created_at", { ascending: false });
 
     if (error) {
         throw new AppError({
-            code: ErrorCode.DB_ERROR,
+            code: ErrorCode.DB_QUERY_FAILED,
             message: "Failed to fetch proxies",
-            originalError: error
+            cause: error
         });
     }
 
@@ -48,7 +48,7 @@ export const POST = withApiHandler({
             // Checking schema... users.id is UUID.
             display_name: body.display_name,
             nickname: body.display_name,
-            managed_by: user.id,
+            managed_by: user!.id,
             is_proxy: true,
             invite_code: inviteCode,
             is_superadmin: false,
@@ -58,9 +58,9 @@ export const POST = withApiHandler({
 
     if (error) {
         throw new AppError({
-            code: ErrorCode.DB_ERROR,
+            code: ErrorCode.DB_INSERT_FAILED,
             message: "Failed to create proxy user",
-            originalError: error
+            cause: error
         });
     }
 
@@ -70,8 +70,8 @@ export const POST = withApiHandler({
 // DELETE /api/proxies?id=xxx - Delete a proxy user
 export const DELETE = withApiHandler({
     auth: "required",
-}, async ({ user, req, adminClient }) => {
-    const url = new URL(req.url);
+}, async ({ user, request, adminClient }) => {
+    const url = new URL(request.url);
     const id = url.searchParams.get("id");
 
     if (!id) {
@@ -85,7 +85,7 @@ export const DELETE = withApiHandler({
         .eq("id", id)
         .single();
 
-    if (!proxy || proxy.managed_by !== user.id) {
+    if (!proxy || proxy.managed_by !== user!.id) {
         return { error: "Proxy not found or unauthorized", status: 404 };
     }
 
@@ -96,9 +96,9 @@ export const DELETE = withApiHandler({
 
     if (error) {
         throw new AppError({
-            code: ErrorCode.DB_ERROR,
+            code: ErrorCode.DB_DELETE_FAILED,
             message: "Failed to delete proxy",
-            originalError: error
+            cause: error
         });
     }
 
