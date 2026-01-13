@@ -222,7 +222,7 @@ export const PUT = withApiHandler({
     auth: "required",
     schema: updateProxySchema,
 }, async ({ user, body, adminClient }) => {
-    // Verify ownership
+    // Verify ownership (use maybeSingle to return null instead of throwing on no match)
     const { data: proxy } = await adminClient
         .from("users")
         .select("id, managed_by")
@@ -230,7 +230,7 @@ export const PUT = withApiHandler({
         .eq("managed_by", user!.id)
         .eq("is_proxy", true)
         .is("deleted_at", null)
-        .single();
+        .maybeSingle();
 
     if (!proxy) {
         return { error: "Proxy not found or you don't have permission", status: 404 };
@@ -276,7 +276,7 @@ export const DELETE = withApiHandler({
         return { error: "proxy_id is required", status: 400 };
     }
 
-    // Verify ownership
+    // Verify ownership (use maybeSingle to return null instead of throwing on no match)
     const { data: proxy } = await adminClient
         .from("users")
         .select("id, display_name, managed_by")
@@ -284,7 +284,7 @@ export const DELETE = withApiHandler({
         .eq("managed_by", user!.id)
         .eq("is_proxy", true)
         .is("deleted_at", null)
-        .single();
+        .maybeSingle();
 
     if (!proxy) {
         return { error: "Proxy not found or you don't have permission", status: 404 };
