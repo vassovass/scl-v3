@@ -102,6 +102,10 @@
 - [x] SuperAdmin theme mode controls (default + allowed modes)
 - [x] Theme toggle shows "coming soon" hints for disabled modes
 - [x] Build warning cleanup (viewport theme colors, dynamic API routes, IndexedDB guard)
+- [x] Desktop dropdown navigation fix (Submit Steps link works reliably on desktop)
+- [x] League overview stats endpoint (`/api/leagues/[id]/stats`)
+- [x] Consent-gated analytics loading + reduced Workbox noise from blocked endpoints
+- [x] Edge middleware compatibility fix (avoid supabase-js in middleware runtime)
 - [x] **Modular Menu System** (centralized config, role-based visibility, unlimited nesting)
 - [x] **Internal Kanban Board** (`/admin/kanban`) - drag-and-drop task management
 - [x] **Public Roadmap with Voting** (`/roadmap`) - users can vote on priorities
@@ -121,4 +125,4 @@
 
 ---
 
-*Last updated: 2026-01-12*
+*Last updated: 2026-01-13*

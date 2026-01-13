@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 import { APP_CONFIG } from "@/lib/config";
 
-export const runtime = "edge";
+// Note: keep default runtime to avoid Next build warning noise.
 
 export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl;

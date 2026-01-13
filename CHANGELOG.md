@@ -19,6 +19,16 @@ All notable changes to StepLeague v3.
 - **Bulk Delete Limits**: Resolved payload size issues for large bulk deletions (>100 items) via backend limit increase and frontend chunking.
 - **Pagination**: Corrected "Showing X-Y of Z" display logic.
 - **Proxy Permissions**: Hardened permission checks for modifying proxy data.
+- **Desktop dropdown navigation**: Fixed desktop menu items (e.g. “Submit Steps”) not navigating due to a conflicting outside-click handler with Radix portals.
+- **League overview stats 404**: Added missing `/api/leagues/[id]/stats` endpoint used by the league overview page.
+- **Submissions API resilience**: Prevented schema-drift 500s by using `select("*")` for submissions listing.
+- **Edge middleware compatibility**: Removed `supabase-js`/`@supabase/ssr` dependency from middleware to avoid Edge runtime incompatibilities.
+- **Workbox noise**: Reduced noisy Workbox “no-response” errors for commonly blocked analytics/telemetry endpoints.
+
+### Changed
+- **Analytics loading**: Gate GTM + Vercel Analytics/Speed Insights behind cookie consent and online status.
+- **PWA build artifacts**: Stop tracking generated service-worker/workbox files in `public/` (build-time outputs).
+- **Theme tokens**: Replaced hardcoded Tailwind colors in Feedback + Install Prompt UI with semantic design tokens (light/dark safe).
 
 ## [2026-01-12]
 

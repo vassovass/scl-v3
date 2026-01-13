@@ -21,7 +21,13 @@ const nextConfig = {
   },
 };
 
-const withPWA = require("@ducanh2912/next-pwa").default({
+// Default Workbox runtime caching rules from @ducanh2912/next-pwa
+// We prepend a few "NetworkOnly" rules for third-party/telemetry scripts that are
+// commonly blocked (adblock, privacy settings). This prevents noisy Workbox
+// "no-response" errors when those requests fail.
+const nextPwa = require("@ducanh2912/next-pwa");
+
+const withPWA = nextPwa.default({
   dest: "public",
   register: true,
   skipWaiting: true,
@@ -29,6 +35,20 @@ const withPWA = require("@ducanh2912/next-pwa").default({
   // Exclude API and Admin routes from SW caching to avoid stale administrative data
   buildExcludes: [/middleware-manifest\.json$/],
   publicExcludes: ['!api/**/*', '!admin/**/*'],
+  workboxOptions: {
+    runtimeCaching: [
+      // Third-party analytics (often blocked)
+      { urlPattern: /^https:\/\/www\.googletagmanager\.com\/gtm\.js/i, handler: "NetworkOnly" },
+      { urlPattern: /^https:\/\/www\.googletagmanager\.com\/gtag\/js/i, handler: "NetworkOnly" },
+
+      // Vercel telemetry endpoints (can be blocked by privacy tools)
+      { urlPattern: /\/_vercel\/(insights|speed-insights)\//i, handler: "NetworkOnly" },
+      { urlPattern: /\/\.well-known\/vercel\/jwe$/i, handler: "NetworkOnly" },
+
+      // Everything else: fall back to package defaults
+      ...(nextPwa.runtimeCaching || []),
+    ],
+  },
 });
 
 module.exports = withPWA(nextConfig);

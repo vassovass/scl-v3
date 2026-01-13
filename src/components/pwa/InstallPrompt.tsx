@@ -53,11 +53,11 @@ export function InstallPrompt({ className }: InstallPromptProps = {}) {
                     </DialogHeader>
                     <div className="flex flex-col gap-4 text-sm mt-2">
                         <div className="flex items-center gap-3">
-                            <Share className="h-5 w-5 text-sky-500" />
+                            <Share className="h-5 w-5 text-primary" />
                             <p>1. Tap the <strong>Share</strong> button in the menu bar.</p>
                         </div>
                         <div className="flex items-center gap-3">
-                            <PlusSquare className="h-5 w-5 text-sky-500" />
+                            <PlusSquare className="h-5 w-5 text-primary" />
                             <p>2. Scroll down and tap <strong>Add to Home Screen</strong>.</p>
                         </div>
                     </div>
@@ -70,7 +70,7 @@ export function InstallPrompt({ className }: InstallPromptProps = {}) {
         <Button
             variant="outline"
             size="sm"
-            className={`gap-2 border-sky-500/50 text-sky-500 hover:bg-sky-500/10 ${className}`}
+            className={`gap-2 border-primary/50 text-primary hover:bg-primary/10 ${className}`}
             onClick={promptInstall}
         >
             <Download className="h-4 w-4" />

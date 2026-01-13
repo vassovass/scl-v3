@@ -20,7 +20,10 @@ export function HybridCacheSync({ serverVersion }: { serverVersion: string }) {
             try {
                 const isFresh = await menuCache.checkVersion(serverVersion);
                 if (!isFresh) {
-                    console.log("[HybridSync] Version mismatch detected. Cache marked stale.");
+                    // Avoid noisy console logs in production (this can happen naturally after deploys)
+                    if (process.env.NODE_ENV !== "production") {
+                        console.debug("[HybridSync] Version mismatch detected. Cache marked stale.");
+                    }
                     // Note: The actual re-fetching logic typically happens when the Menu component mounts
                     // OR we can trigger a proactive fetch here if we have a global fetcher available.
                     // For now, `checkVersion` returning false simply ensures the *next* read misses.
