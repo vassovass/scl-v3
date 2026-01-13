@@ -32,12 +32,26 @@ export function FeedbackWidget() {
 
     const [isCapturing, setIsCapturing] = useState(false);
 
+    const getThemeBackgroundForScreenshot = (): string => {
+        try {
+            const raw = getComputedStyle(document.documentElement)
+                .getPropertyValue("--background")
+                .trim();
+            // globals.css stores HSL triplets like: "222.2 84% 4.9%"
+            if (raw) return `hsl(${raw})`;
+        } catch {
+            // ignore
+        }
+        // Safe fallback (dark default)
+        return "#020617";
+    };
+
     const handleCapture = async () => {
         setIsCapturing(true);
         try {
             const html2canvas = (await import("html2canvas")).default;
             const canvas = await html2canvas(document.body, {
-                backgroundColor: "#020617", // slate-950
+                backgroundColor: getThemeBackgroundForScreenshot(),
                 ignoreElements: (element) => element.id === "feedback-widget",
                 useCORS: true, // Crucial for external images (Supabase, etc)
                 logging: false, // Reduce console noise
@@ -91,7 +105,7 @@ export function FeedbackWidget() {
             {!isOpen && (
                 <button
                     onClick={() => setIsOpen(true)}
-                    className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-600 text-white shadow-lg shadow-sky-900/20 transition hover:bg-sky-500 hover:scale-105 active:scale-95"
+                    className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary/90 hover:scale-105 active:scale-95"
                     title="Send Feedback"
                 >
                     <span className="text-xl">💬</span>
@@ -114,10 +128,10 @@ export function FeedbackWidget() {
 
                     {status === "success" ? (
                         <div className="py-8 text-center">
-                            <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 text-2xl text-emerald-400">
+                            <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-[hsl(var(--success)/0.2)] text-2xl text-[hsl(var(--success))]">
                                 ✓
                             </div>
-                            <p className="text-emerald-400">Feedback sent!</p>
+                            <p className="text-[hsl(var(--success))]">Feedback sent!</p>
                             <p className="text-xs text-muted-foreground">Thank you for helping us improve.</p>
                         </div>
                     ) : (
@@ -131,9 +145,9 @@ export function FeedbackWidget() {
                                         onClick={() => setType(t)}
                                         className={`flex-1 rounded-md py-1.5 text-xs font-medium transition ${type === t
                                             ? t === "bug"
-                                                ? "bg-rose-500/20 text-rose-400"
+                                                ? "bg-destructive/20 text-destructive"
                                                 : t === "feature"
-                                                    ? "bg-amber-500/20 text-[hsl(var(--warning))]"
+                                                    ? "bg-[hsl(var(--warning)/0.2)] text-[hsl(var(--warning))]"
                                                     : "bg-primary/20 text-primary"
                                             : "text-muted-foreground hover:text-foreground"
                                             }`}
@@ -177,7 +191,7 @@ export function FeedbackWidget() {
                                     onClick={handleCapture}
                                     disabled={isCapturing}
                                     className={`flex flex-1 items-center justify-center gap-2 rounded-lg border border-dashed px-3 py-2 text-xs transition ${screenshot
-                                        ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
+                                        ? "border-[hsl(var(--success)/0.5)] bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]"
                                         : "border-border text-muted-foreground hover:border-border/80 hover:text-foreground"
                                         }`}
                                 >
@@ -189,7 +203,7 @@ export function FeedbackWidget() {
                                                     e.stopPropagation();
                                                     setScreenshot(null);
                                                 }}
-                                                className="ml-auto hover:text-emerald-300"
+                                                className="ml-auto hover:text-[hsl(var(--success))]"
                                             >
                                                 ✕
                                             </span>
@@ -209,13 +223,13 @@ export function FeedbackWidget() {
                             <button
                                 type="submit"
                                 disabled={status === "submitting" || !description}
-                                className="w-full rounded-lg bg-sky-600 py-2.5 text-sm font-medium text-white hover:bg-sky-500 disabled:opacity-50"
+                                className="w-full rounded-lg bg-primary py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                             >
                                 {status === "submitting" ? "Sending..." : "Send Feedback"}
                             </button>
 
                             {status === "error" && (
-                                <p className="text-center text-xs text-rose-400">Failed to send. Please try again.</p>
+                                <p className="text-center text-xs text-destructive">Failed to send. Please try again.</p>
                             )}
                         </form>
                     )}
