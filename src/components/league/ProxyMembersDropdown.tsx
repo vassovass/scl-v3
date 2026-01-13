@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { toast } from "@/hooks/use-toast";
 
 interface ProxyMember {
     id: string;
@@ -27,6 +28,7 @@ export function ProxyMembersDropdown({
     const [showCreateInput, setShowCreateInput] = useState(false);
     const [newName, setNewName] = useState("");
     const [creating, setCreating] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     // Close dropdown when clicking outside
@@ -66,6 +68,7 @@ export function ProxyMembersDropdown({
     const handleCreate = async () => {
         if (!newName.trim()) return;
         setCreating(true);
+        setError(null);
         try {
             // PRD 41: Use unified /api/proxies endpoint with league_id
             const res = await fetch(`/api/proxies`, {
@@ -82,9 +85,30 @@ export function ProxyMembersDropdown({
                 setNewName("");
                 setShowCreateInput(false);
                 setIsOpen(false);
+                toast({
+                    title: "Proxy created",
+                    description: `"${newProxy.display_name}" has been created.`,
+                });
+            } else {
+                // Handle API error response
+                const errData = await res.json().catch(() => ({}));
+                const errorMessage = errData.error || "Failed to create proxy";
+                setError(errorMessage);
+                toast({
+                    title: "Error",
+                    description: errorMessage,
+                    variant: "destructive",
+                });
             }
         } catch (err) {
             console.error("Failed to create proxy:", err);
+            const errorMessage = "Failed to create proxy. Please try again.";
+            setError(errorMessage);
+            toast({
+                title: "Error",
+                description: errorMessage,
+                variant: "destructive",
+            });
         } finally {
             setCreating(false);
         }
@@ -168,7 +192,10 @@ export function ProxyMembersDropdown({
                                 <input
                                     type="text"
                                     value={newName}
-                                    onChange={(e) => setNewName(e.target.value)}
+                                    onChange={(e) => {
+                                        setNewName(e.target.value);
+                                        if (error) setError(null); // Clear error on input change
+                                    }}
                                     placeholder="Name (e.g., Joe Soap)"
                                     className="w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-sky-500 focus:outline-none"
                                     autoFocus
@@ -177,6 +204,9 @@ export function ProxyMembersDropdown({
                                         if (e.key === "Escape") setShowCreateInput(false);
                                     }}
                                 />
+                                {error && (
+                                    <div className="text-xs text-destructive">{error}</div>
+                                )}
                                 <div className="flex gap-2">
                                     <button
                                         type="button"
