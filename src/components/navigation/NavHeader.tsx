@@ -70,17 +70,6 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
             });
     }, [user]);
 
-    // Close dropdown when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (navRef.current && !navRef.current.contains(e.target as Node)) {
-                setOpenDropdown(null);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
-
     // Close mobile menu on route change
     useEffect(() => {
         setMobileMenuOpen(false);
