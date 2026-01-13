@@ -20,9 +20,6 @@ export type Database = {
           units: "metric" | "imperial";
           is_superadmin: boolean;
           created_at: string;
-          managed_by: string | null;
-          invite_code: string | null;
-          is_proxy: boolean;
         };
         Insert: {
           id: string;
@@ -30,9 +27,6 @@ export type Database = {
           units?: "metric" | "imperial";
           is_superadmin?: boolean;
           created_at?: string;
-          managed_by?: string | null;
-          invite_code?: string | null;
-          is_proxy?: boolean;
         };
         Update: {
           id?: string;
@@ -40,19 +34,8 @@ export type Database = {
           units?: "metric" | "imperial";
           is_superadmin?: boolean;
           created_at?: string;
-          managed_by?: string | null;
-          invite_code?: string | null;
-          is_proxy?: boolean;
         };
-        Relationships: [
-          {
-            foreignKeyName: "users_managed_by_fkey";
-            columns: ["managed_by"];
-            isOneToOne: false;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
-          }
-        ];
+        Relationships: [];
       };
       leagues: {
         Row: {
@@ -162,6 +145,7 @@ export type Database = {
           verified: boolean | null;
           ai_extracted_steps: number | null;
           tolerance_used: number | null;
+          proxy_member_id: string | null;
           created_at: string;
         };
         Insert: {
@@ -176,6 +160,7 @@ export type Database = {
           verified?: boolean | null;
           ai_extracted_steps?: number | null;
           tolerance_used?: number | null;
+          proxy_member_id?: string | null;
           created_at?: string;
         };
         Update: {
@@ -190,6 +175,7 @@ export type Database = {
           verified?: boolean | null;
           ai_extracted_steps?: number | null;
           tolerance_used?: number | null;
+          proxy_member_id?: string | null;
           created_at?: string;
         };
         Relationships: [
@@ -205,6 +191,13 @@ export type Database = {
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "submissions_proxy_member_id_fkey";
+            columns: ["proxy_member_id"];
+            isOneToOne: false;
+            referencedRelation: "proxy_members";
             referencedColumns: ["id"];
           }
         ];
@@ -276,7 +269,48 @@ export type Database = {
           }
         ];
       };
-
+      proxy_members: {
+        Row: {
+          id: string;
+          league_id: string;
+          display_name: string;
+          created_by: string;
+          created_at: string;
+          invite_code: string | null;
+        };
+        Insert: {
+          id?: string;
+          league_id: string;
+          display_name: string;
+          created_by: string;
+          created_at?: string;
+          invite_code?: string | null;
+        };
+        Update: {
+          id?: string;
+          league_id?: string;
+          display_name?: string;
+          created_by?: string;
+          created_at?: string;
+          invite_code?: string | null;
+        };
+        Relations: [
+          {
+            foreignKeyName: "proxy_members_league_id_fkey";
+            columns: ["league_id"];
+            isOneToOne: false;
+            referencedRelation: "leagues";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "proxy_members_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       feedback: {
         Row: {
           id: string;
@@ -451,7 +485,7 @@ export type Membership = Tables<"memberships">;
 export type Submission = Tables<"submissions">;
 export type SiteSetting = Tables<"site_settings">;
 export type AuditLog = Tables<"audit_log">;
-
+export type ProxyMember = Tables<"proxy_members">;
 export type UserPreferences = Tables<"user_preferences">;
 
 // Submission change audit type (defined manually as table is new)

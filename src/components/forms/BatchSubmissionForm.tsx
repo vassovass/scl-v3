@@ -10,6 +10,7 @@ import { useFeedback } from "@/components/feedback/FeedbackContext";
 
 interface BatchSubmissionFormProps {
     leagueId: string;
+    proxyMemberId?: string;
     onSubmitted?: () => void;
 }
 
@@ -85,9 +86,10 @@ const compressionOptions = {
 const AUTO_RETRY_DELAYS = [5000, 10000, 20000]; // 5s, 10s, 20s
 const MAX_AUTO_RETRIES = 3;
 
-export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFormProps) {
+export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: BatchSubmissionFormProps) {
     // Get max batch uploads from app settings (SuperAdmin configurable)
     const { getNumericSetting } = useAppSettings();
+    const maxFiles = getNumericSetting("max_batch_uploads", 7);
     const maxFiles = getNumericSetting("max_batch_uploads", 7);
     const { toast } = useToast();
     const { openFeedback } = useFeedback();
@@ -559,6 +561,7 @@ export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFo
                         steps: image.editedSteps,
                         date: image.editedDate,
                         overwrite: true, // Allow overwriting if date already exists
+                        proxy_member_id: proxyMemberId || undefined,
                     }),
                 });
 
@@ -864,6 +867,8 @@ export function BatchSubmissionForm({ leagueId, onSubmitted }: BatchSubmissionFo
                                         )}
 
                                         {/* Manual retry button */}
+                                        {img.retryable && !img.autoRetrying && (
+                                            {/* Manual retry button */ }
                                         {img.retryable && !img.autoRetrying && (
                                             <div className="flex gap-2">
                                                 {img.extractedData && img.proofPath ? (

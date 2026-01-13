@@ -350,7 +350,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                     flagged,
                     flag_reason: flagged ? flagReason : null,
                     overwrite,
-                    user_id: user?.id, // Send active profile ID as target
+                    proxy_member_id: proxyMemberId || undefined,
                 }),
             });
 

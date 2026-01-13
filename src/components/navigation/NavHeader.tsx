@@ -1,11 +1,6 @@
 "use client";
 
-import { ProfileSwitcher } from "@/components/auth/ProfileSwitcher";
-
-// ... existing imports ...
-
-
-
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
@@ -270,12 +265,6 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                             onAction={handleMenuAction}
                             currentPath={pathname}
                         />
-
-                        {/* Profile Switcher */}
-                        <div className="ml-2">
-                            <ProfileSwitcher />
-                        </div>
-
 
                         {/* SuperAdmin Menu */}
                         {isSuperadmin && (

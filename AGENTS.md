@@ -380,7 +380,7 @@ scl-v3/
 
 | Table | Key Columns |
 |-------|------------|
-| `users` | id, display_name, `nickname`, units, is_superadmin, `managed_by`, `invite_code`, `is_proxy` |
+| `users` | id, display_name, `nickname`, units, is_superadmin |
 | `leagues` | id, name, invite_code, owner_id, `deleted_at` (soft delete) |
 | `memberships` | league_id, user_id, role |
 | `submissions` | league_id, user_id, for_date, steps, verified, `flagged` |
