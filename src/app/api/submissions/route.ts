@@ -9,7 +9,8 @@ const createSchema = z.object({
     steps: z.number().int().positive(),
     partial: z.boolean().optional().default(false),
     proof_path: z.string().min(3).nullable().optional(),
-    proxy_member_id: z.string().uuid().optional(),
+    // PRD 41: proxy_member_id removed. Proxy submissions now use the proxy's user_id directly.
+    // If submitting for a proxy, pass acting_as user_id via the auth layer.
 });
 
 const querySchema = z.object({
@@ -126,6 +127,7 @@ export async function POST(request: Request): Promise<Response> {
         }
 
         // Build submission data
+        // PRD 41: proxy_member_id removed. For proxy submissions, the user_id IS the proxy's ID.
         const submissionData = {
             league_id: input.league_id, // can be null now
             user_id: user.id,
@@ -135,7 +137,6 @@ export async function POST(request: Request): Promise<Response> {
             proof_path: input.proof_path,
             flagged: (body as any).flagged ?? false,
             flag_reason: (body as any).flag_reason ?? null,
-            proxy_member_id: input.proxy_member_id ?? null,
         };
 
         let submission;
@@ -312,15 +313,9 @@ export async function GET(request: Request): Promise<Response> {
             .order(primaryOrder, { ascending: false })
             .order(secondaryOrder, { ascending: false });
 
-        // Filter by specific proxy member (for viewing proxy's submissions)
-        if (proxyMemberIdFilter) {
-            query = query.eq("proxy_member_id", proxyMemberIdFilter);
-        } else if (user_id) {
+        // PRD 41: Filter by user_id directly. Proxy users have their own user_id.
+        if (user_id) {
             query = query.eq("user_id", user_id);
-            // Exclude proxy submissions from user's own list by default
-            if (exclude_proxy) {
-                query = query.is("proxy_member_id", null);
-            }
         } else {
             // If user_id not provided, we must fallback to filtering by league to avoid exposing others' data 
             // without explicit intent (though usually this endpoint is consumed by the user for themselves).

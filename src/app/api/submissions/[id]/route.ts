@@ -10,7 +10,9 @@ const updateSchema = z.object({
     reason: z.string().max(500).optional(), // User comment for audit log
 });
 
-const submissionSelect = "id, league_id, user_id, for_date, steps, partial, proof_path, verified, tolerance_used, extracted_km, extracted_calories, verification_notes, created_at, proxy_member_id";
+// PRD 41: Use "*" to avoid runtime 500s when DB schema changes.
+// proxy_member_id was removed - proxies now use user_id directly.
+const submissionSelect = "*";
 
 // GET /api/submissions/[id] - Fetch single submission with change history
 export async function GET(
@@ -53,16 +55,15 @@ export async function GET(
 
             if (userData?.is_superadmin) {
                 hasAccess = true;
-            } else if (submission.proxy_member_id && submission.league_id) {
-                // Check if user is admin/owner of the league this proxy submission belongs to
-                const { data: membership } = await adminClient
-                    .from("memberships")
-                    .select("role")
-                    .eq("league_id", submission.league_id)
-                    .eq("user_id", user.id)
-                    .single();
+            } else {
+                // PRD 41: Check if submission belongs to a proxy managed by current user
+                const { data: proxyUser } = await adminClient
+                    .from("users")
+                    .select("managed_by")
+                    .eq("id", submission.user_id)
+                    .maybeSingle();
 
-                if (membership && ["owner", "admin"].includes(membership.role)) {
+                if (proxyUser?.managed_by === user.id) {
                     hasAccess = true;
                 }
             }
@@ -118,7 +119,7 @@ export async function PATCH(
         // Fetch existing submission
         const { data: existing, error: fetchError } = await adminClient
             .from("submissions")
-            .select("id, user_id, for_date, steps, proof_path, proxy_member_id, league_id")
+            .select("id, user_id, for_date, steps, proof_path, league_id")
             .eq("id", id)
             .single();
 
@@ -126,26 +127,22 @@ export async function PATCH(
             return notFound("Submission not found");
         }
 
-        // Verify ownership or proxy admin status
+        // Verify ownership or proxy manager status
         if (existing.user_id !== user.id) {
             let hasAccess = false;
 
-            // Allow superadmins? (Usually yes, but strict check here previously)
-            // Let's check proxy admin
-            if (existing.proxy_member_id && existing.league_id) {
-                const { data: membership } = await adminClient
-                    .from("memberships")
-                    .select("role")
-                    .eq("league_id", existing.league_id)
-                    .eq("user_id", user.id)
-                    .single();
+            // PRD 41: Check if submission belongs to a proxy managed by current user
+            const { data: proxyUser } = await adminClient
+                .from("users")
+                .select("managed_by")
+                .eq("id", existing.user_id)
+                .maybeSingle();
 
-                if (membership && ["owner", "admin"].includes(membership.role)) {
-                    hasAccess = true;
-                }
+            if (proxyUser?.managed_by === user.id) {
+                hasAccess = true;
             }
 
-            // Also allow superadmin if needed (good practice)
+            // Also allow superadmin
             const { data: userData } = await adminClient
                 .from("users")
                 .select("is_superadmin")
@@ -284,7 +281,7 @@ export async function DELETE(
         // Fetch existing submission
         const { data: existing, error: fetchError } = await adminClient
             .from("submissions")
-            .select("id, user_id, for_date, steps, proxy_member_id, league_id")
+            .select("id, user_id, for_date, steps, league_id")
             .eq("id", id)
             .single();
 
@@ -292,21 +289,19 @@ export async function DELETE(
             return notFound("Submission not found");
         }
 
-        // Verify ownership or proxy admin status
+        // Verify ownership or proxy manager status
         if (existing.user_id !== user.id) {
             let hasAccess = false;
 
-            if (existing.proxy_member_id && existing.league_id) {
-                const { data: membership } = await adminClient
-                    .from("memberships")
-                    .select("role")
-                    .eq("league_id", existing.league_id)
-                    .eq("user_id", user.id)
-                    .single();
+            // PRD 41: Check if submission belongs to a proxy managed by current user
+            const { data: proxyUser } = await adminClient
+                .from("users")
+                .select("managed_by")
+                .eq("id", existing.user_id)
+                .maybeSingle();
 
-                if (membership && ["owner", "admin"].includes(membership.role)) {
-                    hasAccess = true;
-                }
+            if (proxyUser?.managed_by === user.id) {
+                hasAccess = true;
             }
 
             const { data: userData } = await adminClient
