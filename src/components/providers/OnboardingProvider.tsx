@@ -244,6 +244,7 @@ export function OnboardingProvider({ children, isAdmin = false, hasLeagues = fal
     const [run, setRun] = useState(false);
     const [steps, setSteps] = useState<Step[]>([]);
     const [stepIndex, setStepIndex] = useState(0);
+    const [activeTour, setActiveTour] = useState<TourName | null>(null);
     const [state, setState] = useState<OnboardingState>({
         completedTours: [],
         lastSeenVersion: CURRENT_VERSION,
@@ -336,6 +337,7 @@ export function OnboardingProvider({ children, isAdmin = false, hasLeagues = fal
             return;
         }
 
+        setActiveTour(tour);
         setSteps(visibleSteps);
         setStepIndex(0);
         setRun(true);
@@ -424,12 +426,11 @@ export function OnboardingProvider({ children, isAdmin = false, hasLeagues = fal
     const skipTour = useCallback(() => {
         setRun(false);
         // Mark current tour as complete so it doesn't auto-start again
-        if (pathname === "/dashboard") {
-            markTourComplete("new-user");
-        } else if (pathname.match(/\/league\/[^/]+/)) {
-            markTourComplete("member");
+        if (activeTour) {
+            markTourComplete(activeTour);
+            setActiveTour(null);
         }
-    }, [pathname, markTourComplete]);
+    }, [activeTour, markTourComplete]);
 
     const handleJoyrideCallback = useCallback((data: CallBackProps) => {
         const { status, action, index, type } = data;
@@ -438,25 +439,19 @@ export function OnboardingProvider({ children, isAdmin = false, hasLeagues = fal
             setStepIndex(index + (action === ACTIONS.PREV ? -1 : 1));
         }
 
-        if (status === STATUS.FINISHED) {
+        if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
             setRun(false);
-            // Mark appropriate tour as complete
-            if (pathname === "/dashboard") {
-                markTourComplete("new-user");
-            } else if (pathname.match(/\/league\/[^/]+/)) {
-                markTourComplete("member");
-                if (isAdmin) {
-                    markTourComplete("admin");
-                }
+            // Mark the active tour as complete so it doesn't auto-start again
+            if (activeTour) {
+                markTourComplete(activeTour);
+                setActiveTour(null);
             }
-            // Show feedback prompt
-            setShowFeedback(true);
+            // Show feedback prompt only if finished (not skipped)
+            if (status === STATUS.FINISHED) {
+                setShowFeedback(true);
+            }
         }
-
-        if (status === STATUS.SKIPPED) {
-            setRun(false);
-        }
-    }, [pathname, isAdmin, markTourComplete]);
+    }, [activeTour, markTourComplete]);
 
     const handleFeedbackSubmit = async () => {
         if (!feedbackType) return;
