@@ -1,7 +1,7 @@
 # StepLeague Technical Architecture
 
 > **Status:** Draft (Phase A)
-> **Last Updated:** 2026-01-12
+> **Last Updated:** 2026-01-13
 
 This document serves as the "Source of Truth" for the technical architecture of StepLeague. All agents and developers must align their implementation with these patterns.
 
@@ -80,3 +80,66 @@ Third-party scripts (GTM, Feedback Widgets) are treated as **Untrusted External 
 *   **API Routes:** Only for external clients (Mobile App) or Mutations (POST/PUT).
 *   **Server Actions:** Preferred for Form submissions.
 *   **Direct Lib Calls:** Preferred for Server Components (Reading data).
+
+---
+
+## 5. Unified User Model (PRD 41)
+
+### 5.1 Core Principle: "A Proxy IS a User"
+
+The `users` table uses a **self-referential pattern** for proxy management:
+
+```mermaid
+erDiagram
+    users {
+        uuid id PK
+        text display_name
+        uuid managed_by FK "NULL = real user"
+        boolean is_proxy "Derived from managed_by"
+        text invite_code UK "For claiming"
+    }
+    
+    users ||--o{ users : "managed_by (self-ref)"
+    users ||--o{ submissions : "user_id"
+```
+
+### 5.2 User Types
+
+| Type | `managed_by` | `is_proxy` | Description |
+|------|--------------|------------|-------------|
+| **Real User** | `NULL` | `false` | Authenticated user with email |
+| **Proxy User** | `manager_id` | `true` | Ghost profile managed by another user |
+| **Claimed Proxy** | `NULL` | `false` | Was proxy, now independent user |
+
+### 5.3 "Act As" Context Flow
+
+```mermaid
+sequenceDiagram
+    participant User as Manager
+    participant Auth as AuthProvider
+    participant API as API Routes
+    participant DB as Database
+    
+    User->>Auth: switchProfile(proxy_id)
+    Auth->>Auth: Set activeProfile = proxy
+    Auth->>Auth: Set isActingAsProxy = true
+    
+    User->>API: POST /api/submissions
+    API->>API: Use activeProfile.id as user_id
+    API->>DB: INSERT submission (user_id = proxy_id)
+    API->>DB: Log audit (actor_id = real_user_id)
+```
+
+### 5.4 Reference Files
+
+| File | Purpose |
+|------|---------|
+| `src/components/providers/AuthProvider.tsx` | `switchProfile()`, `activeProfile`, `isActingAsProxy` |
+| `src/components/auth/ProfileSwitcher.tsx` | UI for context switching |
+| `src/lib/api/handler.ts` | Extract `acting_as_id` from requests |
+
+### 5.5 RLS Visibility Rules
+
+*   **Manager-Only View:** Proxies only visible to their `managed_by` manager
+*   **SuperAdmin Override:** SuperAdmins can see all users including proxies
+*   **No Public Listing:** Proxies never appear in public leaderboards/lists

@@ -20,6 +20,13 @@ export type Database = {
           units: "metric" | "imperial";
           is_superadmin: boolean;
           created_at: string;
+          // PRD 41: Proxy fields
+          managed_by: string | null;
+          is_proxy: boolean;
+          invite_code: string | null;
+          claims_remaining: number;
+          is_archived: boolean;
+          deleted_at: string | null;
         };
         Insert: {
           id: string;
@@ -27,6 +34,13 @@ export type Database = {
           units?: "metric" | "imperial";
           is_superadmin?: boolean;
           created_at?: string;
+          // PRD 41: Proxy fields
+          managed_by?: string | null;
+          is_proxy?: boolean;
+          invite_code?: string | null;
+          claims_remaining?: number;
+          is_archived?: boolean;
+          deleted_at?: string | null;
         };
         Update: {
           id?: string;
@@ -34,8 +48,23 @@ export type Database = {
           units?: "metric" | "imperial";
           is_superadmin?: boolean;
           created_at?: string;
+          // PRD 41: Proxy fields
+          managed_by?: string | null;
+          is_proxy?: boolean;
+          invite_code?: string | null;
+          claims_remaining?: number;
+          is_archived?: boolean;
+          deleted_at?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "users_managed_by_fkey";
+            columns: ["managed_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
       };
       leagues: {
         Row: {
@@ -145,8 +174,8 @@ export type Database = {
           verified: boolean | null;
           ai_extracted_steps: number | null;
           tolerance_used: number | null;
-          proxy_member_id: string | null;
           created_at: string;
+          // NOTE: proxy_member_id removed in PRD 41 - user_id now points directly to proxy user
         };
         Insert: {
           id?: string;
@@ -160,7 +189,6 @@ export type Database = {
           verified?: boolean | null;
           ai_extracted_steps?: number | null;
           tolerance_used?: number | null;
-          proxy_member_id?: string | null;
           created_at?: string;
         };
         Update: {
@@ -175,7 +203,6 @@ export type Database = {
           verified?: boolean | null;
           ai_extracted_steps?: number | null;
           tolerance_used?: number | null;
-          proxy_member_id?: string | null;
           created_at?: string;
         };
         Relationships: [
@@ -193,13 +220,6 @@ export type Database = {
             referencedRelation: "users";
             referencedColumns: ["id"];
           },
-          {
-            foreignKeyName: "submissions_proxy_member_id_fkey";
-            columns: ["proxy_member_id"];
-            isOneToOne: false;
-            referencedRelation: "proxy_members";
-            referencedColumns: ["id"];
-          }
         ];
       };
       site_settings: {
@@ -269,48 +289,7 @@ export type Database = {
           }
         ];
       };
-      proxy_members: {
-        Row: {
-          id: string;
-          league_id: string;
-          display_name: string;
-          created_by: string;
-          created_at: string;
-          invite_code: string | null;
-        };
-        Insert: {
-          id?: string;
-          league_id: string;
-          display_name: string;
-          created_by: string;
-          created_at?: string;
-          invite_code?: string | null;
-        };
-        Update: {
-          id?: string;
-          league_id?: string;
-          display_name?: string;
-          created_by?: string;
-          created_at?: string;
-          invite_code?: string | null;
-        };
-        Relations: [
-          {
-            foreignKeyName: "proxy_members_league_id_fkey";
-            columns: ["league_id"];
-            isOneToOne: false;
-            referencedRelation: "leagues";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "proxy_members_created_by_fkey";
-            columns: ["created_by"];
-            isOneToOne: false;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
-          }
-        ];
-      };
+      // NOTE: proxy_members table removed in PRD 41 - proxies are now rows in users table
       feedback: {
         Row: {
           id: string;
@@ -485,8 +464,35 @@ export type Membership = Tables<"memberships">;
 export type Submission = Tables<"submissions">;
 export type SiteSetting = Tables<"site_settings">;
 export type AuditLog = Tables<"audit_log">;
-export type ProxyMember = Tables<"proxy_members">;
 export type UserPreferences = Tables<"user_preferences">;
+
+// PRD 41: "Act As" Proxy Types
+// ============================
+
+/** Active profile context for "Act As" system */
+export interface ActiveProfile {
+  id: string;
+  display_name: string | null;
+  is_proxy: boolean;
+  managed_by: string | null;
+}
+
+/** Payload for creating a new proxy user */
+export interface CreateProxyPayload {
+  display_name: string;
+}
+
+/** Payload for claiming a proxy */
+export interface ClaimProxyPayload {
+  merge_strategy: 'keep_proxy_profile' | 'keep_my_profile';
+}
+
+/** Proxy user with submission count (for UI lists) */
+export interface ProxyWithStats extends ActiveProfile {
+  submission_count: number;
+  created_at: string;
+  is_archived: boolean;
+}
 
 // Submission change audit type (defined manually as table is new)
 export interface SubmissionChange {

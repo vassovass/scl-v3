@@ -307,7 +307,49 @@ export default function LeaguePage({ params }: { params: { id: string } }) {
 }
 ```
 
-#### 7.5 Server-Side Caching (SSR Performance)
+#### 7.5 "Act As" Proxy Pattern (PRD 41)
+
+The "Act As" system allows managers to create and manage **proxy users** (ghost profiles) and submit steps on their behalf.
+
+**Key Concept:** A Proxy is just a `users` row where `managed_by IS NOT NULL`.
+
+```typescript
+// Check if current context is proxy
+const { isActingAsProxy, activeProfile, switchProfile } = useAuth();
+
+// Switch to proxy context
+await switchProfile(proxyUserId);  // Now all submissions use proxyUserId
+
+// Switch back to self
+await switchProfile(null);  // Back to real user
+```
+
+**Reference Files for "Act As" Implementation:**
+
+| File | Purpose |
+|------|---------|
+| `src/components/providers/AuthProvider.tsx` | Core `switchProfile()` and `activeProfile` state |
+| `src/components/auth/ProfileSwitcher.tsx` | UI dropdown for switching contexts |
+| `src/lib/api/handler.ts` | Extract `acting_as_id` from requests |
+| `supabase/migrations/*_proxy_*.sql` | RLS policies for proxy visibility |
+
+**Database Model:**
+
+```sql
+-- Proxy is a user with managed_by set
+users WHERE managed_by IS NOT NULL  -- These are proxies
+
+-- Query manager's proxies
+SELECT * FROM users WHERE managed_by = :manager_id AND deleted_at IS NULL;
+```
+
+**Visibility Rules:**
+
+- Proxies are ONLY visible to their `managed_by` manager
+- SuperAdmins can see all proxies
+- RLS enforces this at database level
+
+#### 7.6 Server-Side Caching (SSR Performance)
 
 Use `serverCache.ts` for SSR metadata and expensive DB calls to prevent timeouts (e.g., GTmetrix bots) and improve TTFB:
 
@@ -380,16 +422,27 @@ scl-v3/
 
 | Table | Key Columns |
 |-------|------------|
-| `users` | id, display_name, `nickname`, units, is_superadmin |
+| `users` | id, display_name, `nickname`, units, is_superadmin, **`managed_by`** (proxy FK), **`is_proxy`**, **`invite_code`** |
 | `leagues` | id, name, invite_code, owner_id, `deleted_at` (soft delete) |
 | `memberships` | league_id, user_id, role |
 | `submissions` | league_id, user_id, for_date, steps, verified, `flagged` |
-| `feedback` | type, subject, description, screenshot_url |
+| `feedback` | type, subject, description, screenshot_url, board_status, is_public |
 | `module_feedback` | module_id, feedback_type, comment, screenshot_url |
 | `user_records` | user_id, best_day_steps, best_day_date, current_streak, total_steps_lifetime |
+| `app_settings` | key, value (jsonb), category, value_type, visible_to, editable_by |
 | `menu_definitions` | id, label, description (PRD 24) |
 | `menu_items` | id, menu_id, parent_id, item_key, label, href, icon, visible_to, requires_league, on_click, sort_order (PRD 24) |
 | `menu_locations` | location, menu_ids[], show_logo, show_sign_in, show_user_menu, show_admin_menu (PRD 24) |
+
+### Proxy User Model (PRD 41)
+
+A "proxy" is simply a `users` row where `managed_by IS NOT NULL`:
+
+```sql
+-- Real user: managed_by = NULL, is_proxy = false
+-- Proxy user: managed_by = manager_id, is_proxy = true
+-- Claimed proxy: managed_by = NULL, is_proxy = false (converted to real user)
+```
 
 ---
 
@@ -1031,4 +1084,4 @@ When adding a new trackable feature:
 
 ---
 
-*Last updated: 2026-01-07. This file is the canonical source for AI agents.*
+*Last updated: 2026-01-13. This file is the canonical source for AI agents.*
