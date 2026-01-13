@@ -23,6 +23,7 @@ All notable changes to StepLeague v3.
 - **Proxy API Types**: Fixed TypeScript errors in proxy API route (`user` null check, `ErrorCode` usage).
 - **Proxy Claim API**: Resolved `user` null check and error handling in claim route.
 - **Submissions API**: Added missing `proxy_member_id` to query schema validation.
+- **Proxy Management**: Fixed state setter name in `ProxyMemberManagement` component.
 
 ## [2026-01-12]
 
