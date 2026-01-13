@@ -37,7 +37,7 @@ interface ClaimPageProps {
 
 export default function ClaimPage({ params }: ClaimPageProps) {
     const router = useRouter();
-    const { session, activeProfile, loading: authLoading } = useAuth();
+    const { session, userProfile, loading: authLoading } = useAuth();
     const { toast } = useToast();
 
     const [code, setCode] = useState<string>("");
@@ -263,7 +263,7 @@ export default function ClaimPage({ params }: ClaimPageProps) {
                                             Keep my current profile
                                         </div>
                                         <div className="text-xs text-muted-foreground">
-                                            Use your existing name: {activeProfile?.display_name || "Your account"}
+                                            Use your existing name: {userProfile?.display_name || "Your account"}
                                         </div>
                                     </div>
                                 </label>

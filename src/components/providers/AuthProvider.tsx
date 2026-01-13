@@ -19,6 +19,8 @@ interface AuthContextValue {
   signOut: (redirectTo?: string) => Promise<void>;
 
   // PRD 41: "Act As" Proxy Context
+  /** The real user's profile (never a proxy) */
+  userProfile: ActiveProfile | null;
   /** Currently active profile (user or proxy) */
   activeProfile: ActiveProfile | null;
   /** True if currently acting as a proxy */
@@ -317,6 +319,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signOut,
 
     // PRD 41: "Act As" context
+    userProfile,
     activeProfile,
     isActingAsProxy,
     managedProxies,
