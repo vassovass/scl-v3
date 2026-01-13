@@ -805,22 +805,6 @@ This ensures documentation stays current for future sessions and developers.
 *   **Rule:** Do not invent cache tags inline.
 *   **Correct:** `tags: [CacheRegistry.BRANDING]`
 *   **Incorrect:** `tags: ['branding']`
-
----
-
-## 9. Tools & Skills (MANDATORY)
-
-> **Agent Capability**: You have access to specialized skills defined in `docs/skills/`.
-
-### 9.1 Code Visualization Skill
-**[📄 Skill Definition: docs/skills/code-visualization/README.md](./docs/skills/code-visualization/README.md)**
-
-**Rule**: Use `graph-it-live` MCP tools (via this skill) when:
-1.  **Refactoring**: Check impact with `graphitlive_find_referencing_files`.
-2.  **Architecting**: Map dependencies with `graphitlive_crawl_dependency_graph`.
-3.  **Explaining**: Visualize relationships rather than guessing.
-
-**Do NOT** blindly read files to "search" for usages. Use the exact tools provided by the skill to ensure O(1) accuracy.
  
 ---
  
