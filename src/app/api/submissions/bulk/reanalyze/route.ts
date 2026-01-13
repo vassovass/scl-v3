@@ -28,9 +28,10 @@ export async function POST(request: Request): Promise<Response> {
         const adminClient = createAdminClient();
 
         // 1. Fetch details for permission check AND processing
+        // PRD 41: proxy_member_id removed
         const { data: detailedSubmissions } = await adminClient
             .from("submissions")
-            .select("id, user_id, league_id, proxy_member_id, proof_path, steps, for_date, created_at")
+            .select("id, user_id, league_id, proof_path, steps, for_date, created_at")
             .in("id", ids);
 
         if (!detailedSubmissions || detailedSubmissions.length !== ids.length) {
@@ -55,7 +56,8 @@ export async function POST(request: Request): Promise<Response> {
         const invalidAccess = detailedSubmissions.some(sub => {
             if (isSuperAdmin) return false;
             if (sub.user_id === user.id) return false;
-            if (sub.proxy_member_id && sub.league_id && adminLeagueIds.has(sub.league_id)) return false;
+            // PRD 41: Admins can manage submissions in their leagues
+            if (sub.league_id && adminLeagueIds.has(sub.league_id)) return false;
             return true;
         });
 

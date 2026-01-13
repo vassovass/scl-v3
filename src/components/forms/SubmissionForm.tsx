@@ -234,7 +234,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                     flagged,
                     flag_reason: flagged ? flagReason : null,
                     overwrite: true,
-                    proxy_member_id: proxyMemberId || undefined,
+                    // PRD 41: proxy_member_id removed - handled via AuthProvider activeProfile
                 }),
             });
 
@@ -350,7 +350,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                     flagged,
                     flag_reason: flagged ? flagReason : null,
                     overwrite,
-                    proxy_member_id: proxyMemberId || undefined,
+                    // PRD 41: proxy_member_id removed - handled via AuthProvider activeProfile
                 }),
             });
 

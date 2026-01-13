@@ -531,7 +531,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                         steps: image.editedSteps,
                         date: image.editedDate,
                         overwrite: true, // Allow overwriting if date already exists
-                        proxy_member_id: proxyMemberId || undefined,
+                        // PRD 41: proxy_member_id removed - handled via AuthProvider activeProfile
                     }),
                 });
 
@@ -727,14 +727,13 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                         {/* Confidence indicator */}
                                         {img.extractedData?.confidence && (
                                             <div className="flex items-center gap-2">
-                                                <span className={`text-xs ${
-                                                    img.extractedData.confidence === "high" ? "text-emerald-400" :
-                                                    img.extractedData.confidence === "medium" ? "text-amber-400" :
-                                                    "text-rose-400"
-                                                }`}>
+                                                <span className={`text-xs ${img.extractedData.confidence === "high" ? "text-emerald-400" :
+                                                        img.extractedData.confidence === "medium" ? "text-amber-400" :
+                                                            "text-rose-400"
+                                                    }`}>
                                                     {img.extractedData.confidence === "high" ? "✓ High Confidence" :
-                                                     img.extractedData.confidence === "medium" ? "⚠️ Medium Confidence" :
-                                                     "⚠️ Low Confidence"}
+                                                        img.extractedData.confidence === "medium" ? "⚠️ Medium Confidence" :
+                                                            "⚠️ Low Confidence"}
                                                 </span>
                                             </div>
                                         )}

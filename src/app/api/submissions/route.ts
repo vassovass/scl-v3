@@ -22,7 +22,7 @@ const querySchema = z.object({
     offset: z.coerce.number().int().min(0).default(0),
     order_by: z.enum(["for_date", "created_at"]).default("for_date"),
     exclude_proxy: z.enum(["true", "false"]).default("true").transform(v => v === "true"),
-    proxy_member_id: z.string().uuid().optional(),
+    // PRD 41: proxy_member_id removed - use user_id for proxy user filtering
 });
 
 // IMPORTANT:
@@ -278,7 +278,7 @@ export async function GET(request: Request): Promise<Response> {
             return badRequest("Invalid query parameters");
         }
 
-        const { league_id, user_id, from, to, limit, offset, order_by, exclude_proxy, proxy_member_id: proxyMemberIdFilter } = parsed.data;
+        const { league_id, user_id, from, to, limit, offset, order_by, exclude_proxy } = parsed.data;
 
         const supabase = await createServerSupabaseClient();
         const { data: { user }, error: authError } = await supabase.auth.getUser();

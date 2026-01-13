@@ -34,11 +34,11 @@ export async function DELETE(request: Request): Promise<Response> {
         const { ids } = parsed.data;
         const adminClient = createAdminClient();
 
-        // Security check: Ensure user owns ALL these submissions OR is admin of the proxy's league
-        // We fetch all submissions to verify ownership/proxy status
+        // Security check: Ensure user owns ALL these submissions
+        // PRD 41: proxy_member_id removed - proxies are now regular users
         const { data: submissions, error: fetchError } = await adminClient
             .from("submissions")
-            .select("id, user_id, proxy_member_id")
+            .select("id, user_id")
             .in("id", ids);
 
         if (fetchError || !submissions) {
@@ -67,28 +67,15 @@ export async function DELETE(request: Request): Promise<Response> {
             .single();
         const isSuperAdmin = userData?.is_superadmin || false;
 
-        // Verify every submission
-        for (const sub of submissions) {
-            const isOwner = sub.user_id === user.id;
-
-            let isProxyAdmin = false;
-            if (sub.proxy_member_id) {
-                // We need to know the league of the proxy member to verify admin status
-                // Optimization: fetch proxy member details for these IDs? 
-                // Or easier: we can't efficiently check all league IDs here without another query.
-                // Let's do a refined query or just fetch league_id in the original select if possible?
-                // Submissions table likely has league_id.
-            }
-
-            // Re-fetch with league_id to be safe
-        }
+        // PRD 41: Simplified permission check - just verify user owns submission
+        // For proxy submissions, the proxy user_id IS the submission owner
 
         // Better Approach: Use RLS-like logic in query or just trust the `user_id` check for self, 
         // and complex check for proxy.
-        // Actually, `submissions` table HAS `league_id`.
+        // Fetch with league_id for admin permission check
         const { data: detailedSubmissions } = await adminClient
             .from("submissions")
-            .select("id, user_id, league_id, proxy_member_id")
+            .select("id, user_id, league_id")
             .in("id", ids);
 
         if (!detailedSubmissions) return serverError("Failed to fetch details");
@@ -96,11 +83,10 @@ export async function DELETE(request: Request): Promise<Response> {
         const invalidAccess = detailedSubmissions.some(sub => {
             if (isSuperAdmin) return false;
             if (sub.user_id === user.id) return false; // Own submission
-
-            if (sub.proxy_member_id && sub.league_id && adminLeagueIds.has(sub.league_id)) {
-                return false; // Admin of proxy's league
+            // PRD 41: Admins can manage submissions in their leagues
+            if (sub.league_id && adminLeagueIds.has(sub.league_id)) {
+                return false; // Admin of the league
             }
-
             return true; // No access
         });
 
@@ -161,9 +147,10 @@ export async function PATCH(request: Request): Promise<Response> {
         const adminClient = createAdminClient();
 
         // 1. Fetch details for permission check
+        // PRD 41: proxy_member_id removed
         const { data: detailedSubmissions } = await adminClient
             .from("submissions")
-            .select("id, user_id, league_id, proxy_member_id, for_date")
+            .select("id, user_id, league_id, for_date")
             .in("id", ids);
 
         if (!detailedSubmissions || detailedSubmissions.length !== ids.length) {
@@ -188,7 +175,8 @@ export async function PATCH(request: Request): Promise<Response> {
         const invalidAccess = detailedSubmissions.some(sub => {
             if (isSuperAdmin) return false;
             if (sub.user_id === user.id) return false;
-            if (sub.proxy_member_id && sub.league_id && adminLeagueIds.has(sub.league_id)) return false;
+            // PRD 41: Admins can manage submissions in their leagues
+            if (sub.league_id && adminLeagueIds.has(sub.league_id)) return false;
             return true;
         });
 

@@ -4,13 +4,13 @@ import { json, badRequest, unauthorized, forbidden, serverError, jsonError } fro
 import { callVerificationFunction } from "@/lib/server/verify";
 import { normalizeExtractedDate } from "@/lib/utils/date";
 
+// PRD 41: proxy_member_id removed. Proxy submissions now use the proxy's user_id directly.
 const batchSchema = z.object({
     league_id: z.string().uuid(),
     proof_path: z.string().min(3),
     steps: z.number().int().positive().optional(),
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     overwrite: z.boolean().default(false),
-    proxy_member_id: z.string().uuid().optional(),
 });
 
 // POST /api/submissions/batch - Create submission (with optional pre-extracted data)
@@ -111,7 +111,7 @@ export async function POST(request: Request): Promise<Response> {
             extracted_km: (verificationData as Record<string, unknown>).extracted_km,
             extracted_calories: (verificationData as Record<string, unknown>).extracted_calories,
             verification_notes: (verificationData as Record<string, unknown>).notes,
-            proxy_member_id: input.proxy_member_id ?? null,
+            // PRD 41: proxy_member_id removed - user_id now points directly to proxy user
         };
 
         let submission;

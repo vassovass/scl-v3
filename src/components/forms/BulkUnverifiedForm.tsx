@@ -104,7 +104,7 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
                     league_id: leagueId,
                     reason: reason.trim(),
                     entries: validEntries,
-                    proxy_member_id: proxyMemberId,
+                    // PRD 41: proxy_member_id removed - handled via AuthProvider activeProfile
                 }),
             });
 

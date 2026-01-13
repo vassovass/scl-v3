@@ -129,21 +129,23 @@ export const GET = withApiHandler({
   // Fetch period B data if comparison mode
   const statsB = rangeB ? await fetchPeriodStats(adminClient, league_id, rangeB, verified) : null;
 
-  // Fetch proxy member stats for period A
-  const proxyStatsA = await fetchProxyMemberStats(adminClient, league_id, rangeA, verified);
+  // PRD 41: Proxy members are now users with is_proxy=true
+  // Fetch proxy member stats for period A - proxies are users with managed_by set
+  const proxyStatsA = await fetchProxyUserStats(adminClient, league_id, rangeA, verified);
 
   // Fetch proxy member stats for period B if comparison mode
-  const proxyStatsB = rangeB ? await fetchProxyMemberStats(adminClient, league_id, rangeB, verified) : null;
+  const proxyStatsB = rangeB ? await fetchProxyUserStats(adminClient, league_id, rangeB, verified) : null;
 
   // Calculate streaks for all users
   const allUserIds = Array.from(new Set([...Array.from(statsA.keys()), ...Array.from(statsB?.keys() || [])]));
 
   // Fetch all submission dates for streak calculation
+  // PRD 41: proxy_member_id removed - filter by users.is_proxy = false instead
   const { data: allSubmissions } = await adminClient
     .from("submissions")
-    .select("user_id, for_date")
+    .select("user_id, for_date, users!inner(is_proxy)")
     .eq("league_id", league_id)
-    .is("proxy_member_id", null) // Only real user submissions for streaks
+    .eq("users.is_proxy", false) // Only real user submissions for streaks
     .order("for_date", { ascending: false });
 
   const userSubmissionDates = new Map<string, string[]>();
@@ -447,32 +449,43 @@ async function fetchPeriodStats(
   return userMap;
 }
 
-// Fetch stats for proxy members (submissions with proxy_member_id set)
-async function fetchProxyMemberStats(
+// PRD 41: Fetch stats for proxy users (users with is_proxy=true)
+// Proxies now use user_id directly, no separate proxy_member_id
+async function fetchProxyUserStats(
   client: ReturnType<typeof createAdminClient>,
   leagueId: string,
   range: { start: string; end: string } | null,
   verified: "all" | "verified" | "unverified"
 ): Promise<Map<string, UserStats>> {
-  // First get all proxy members for this league
-  const { data: proxyMembers } = await client
-    .from("proxy_members")
-    .select("id, display_name")
+  // First get all proxy users that have membership in this league
+  const { data: proxyMemberships } = await client
+    .from("memberships")
+    .select(`
+      user_id,
+      users!inner(id, display_name, nickname, is_proxy, managed_by)
+    `)
     .eq("league_id", leagueId);
 
-  if (!proxyMembers || proxyMembers.length === 0) {
+  // Filter to only proxy users (is_proxy = true)
+  const proxyMembers = (proxyMemberships || [])
+    .filter((m: any) => m.users?.is_proxy === true)
+    .map((m: any) => ({
+      id: m.users.id,
+      display_name: m.users.display_name || m.users.nickname || "Unknown Proxy"
+    }));
+
+  if (proxyMembers.length === 0) {
     return new Map();
   }
 
   const proxyIds = proxyMembers.map((p: any) => p.id);
   const proxyNameMap = new Map(proxyMembers.map((p: any) => [p.id, p.display_name]));
 
-  // Fetch submissions for proxy members
+  // Fetch submissions for proxy users (using user_id, not proxy_member_id)
   let query = client
     .from("submissions")
-    .select("proxy_member_id, steps, verified, for_date")
-    //.eq("league_id", leagueId) // Removed for Global/Agnostic approach
-    .in("proxy_member_id", proxyIds);
+    .select("user_id, steps, verified, for_date")
+    .in("user_id", proxyIds);
 
   if (range) {
     query = query.gte("for_date", range.start).lte("for_date", range.end);
@@ -493,13 +506,9 @@ async function fetchProxyMemberStats(
 
   const proxyMap = new Map<string, UserStats>();
 
-  // Deduplicate proxy submissions? Proxies are usually league-bound anyway in schema (proxy_members has league_id).
-  // But submissions for proxies theoretically could be global if proxies were global users.
-  // For now, proxy_members table ties them to league, so only that league's proxy IDs will match.
-  // We can safely process them. But let's dedup just in case.
   const uniqueProxySubs = new Map<string, typeof submissions[0]>();
   for (const sub of submissions || []) {
-    const key = `${sub.proxy_member_id}_${sub.for_date}`;
+    const key = `${sub.user_id}_${sub.for_date}`;
     const existing = uniqueProxySubs.get(key);
     if (!existing || (sub.steps > existing.steps)) {
       uniqueProxySubs.set(key, sub);
@@ -507,7 +516,7 @@ async function fetchProxyMemberStats(
   }
 
   for (const sub of Array.from(uniqueProxySubs.values())) {
-    const proxyId = sub.proxy_member_id;
+    const proxyId = sub.user_id;
     if (!proxyId) continue;
 
     if (!proxyMap.has(proxyId)) {
