@@ -18,13 +18,17 @@ export type AppSettingKey =
   | "max_batch_uploads"
   | "max_backfill_days"
   | "max_league_members"
+  | "max_proxies_per_user"  // PRD 41: Proxy quota
   // Features
   | "feature_high_fives"
   | "feature_streak_freeze"
   | "feature_analytics_export"
+  | "feature_proxy_system"   // PRD 41: Enable/disable proxy feature
   // Defaults
   | "default_daily_step_goal"
   | "default_stepweek_start"
+  | "proxy_max_claims"       // PRD 41: Claims per proxy
+  | "proxy_activity_decay_days" // PRD 41: Days before auto-archive
   // Display
   | "show_global_leaderboard"
   | "maintenance_mode"

@@ -53,6 +53,19 @@ const limitsSettings: AppSettingDefinition[] = [
     editableBy: ["superadmin"],
     showInLeagueSettings: false,
   },
+  // PRD 41: Proxy quota
+  {
+    key: "max_proxies_per_user",
+    type: "number",
+    label: "Max Proxies Per User",
+    description: "Maximum number of proxy profiles a single user can manage (PRD 41)",
+    default: 50,
+    constraints: { min: 1, max: 500 },
+    category: "limits",
+    visibleTo: ["superadmin"],
+    editableBy: ["superadmin"],
+    showInLeagueSettings: false,
+  },
 ];
 
 // ============================================================================
@@ -90,6 +103,17 @@ const featureSettings: AppSettingDefinition[] = [
     visibleTo: ["superadmin"],
     editableBy: ["superadmin"],
   },
+  // PRD 41: Proxy system feature flag
+  {
+    key: "feature_proxy_system",
+    type: "toggle",
+    label: "Proxy System (Act As)",
+    description: "Allow users to create and manage proxy profiles for family members or friends (PRD 41)",
+    default: true,
+    category: "features",
+    visibleTo: ["superadmin"],
+    editableBy: ["superadmin"],
+  },
 ];
 
 // ============================================================================
@@ -118,6 +142,29 @@ const defaultsSettings: AppSettingDefinition[] = [
       { value: "monday", label: "Monday" },
       { value: "sunday", label: "Sunday" },
     ],
+    category: "defaults",
+    visibleTo: ["superadmin"],
+    editableBy: ["superadmin"],
+  },
+  // PRD 41: Proxy defaults
+  {
+    key: "proxy_max_claims",
+    type: "number",
+    label: "Proxy Max Claims",
+    description: "How many times a proxy profile can be claimed (usually 1)",
+    default: 1,
+    constraints: { min: 1, max: 10 },
+    category: "defaults",
+    visibleTo: ["superadmin"],
+    editableBy: ["superadmin"],
+  },
+  {
+    key: "proxy_activity_decay_days",
+    type: "number",
+    label: "Proxy Activity Decay",
+    description: "Days of inactivity before a proxy is auto-archived (hidden but not deleted)",
+    default: 180,
+    constraints: { min: 30, max: 365 },
     category: "defaults",
     visibleTo: ["superadmin"],
     editableBy: ["superadmin"],

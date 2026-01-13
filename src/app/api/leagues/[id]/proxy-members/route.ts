@@ -1,3 +1,15 @@
+/**
+ * @deprecated PRD 41 - This endpoint is DEPRECATED
+ * 
+ * Use the unified /api/proxies endpoint instead.
+ * This endpoint will be removed in a future release.
+ * 
+ * Migration guide:
+ * - GET /api/leagues/[id]/proxy-members → GET /api/proxies?league_id=[id]
+ * - POST /api/leagues/[id]/proxy-members → POST /api/proxies { league_id: [id] }
+ * - DELETE → DELETE /api/proxies?proxy_id=[id]
+ */
+
 import { z } from "zod";
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
 import { json, badRequest, unauthorized, forbidden, serverError, notFound } from "@/lib/api";
@@ -6,7 +18,18 @@ const createProxySchema = z.object({
     display_name: z.string().min(1).max(100),
 });
 
+/**
+ * Helper to add deprecation headers to response
+ */
+function addDeprecationHeaders(response: Response): Response {
+    response.headers.set("Deprecation", "true");
+    response.headers.set("Sunset", "2026-04-01");
+    response.headers.set("Link", '</api/proxies>; rel="successor-version"');
+    return response;
+}
+
 // GET /api/leagues/[id]/proxy-members - List all proxy members
+// @deprecated Use GET /api/proxies?league_id=[id] instead
 export async function GET(
     request: Request,
     context: { params: Promise<{ id: string }> }
@@ -69,7 +92,13 @@ export async function GET(
             submission_count: submissionCounts[p.id] || 0,
         }));
 
-        return json({ proxy_members: enrichedProxies });
+        // Log deprecation warning
+        console.warn(`[DEPRECATED] GET /api/leagues/${leagueId}/proxy-members called. Use GET /api/proxies?league_id=${leagueId} instead.`);
+
+        return addDeprecationHeaders(json({ 
+            proxy_members: enrichedProxies,
+            _deprecation_notice: "This endpoint is deprecated. Use GET /api/proxies?league_id=[id] instead."
+        }));
 
     } catch (error) {
         return serverError(error instanceof Error ? error.message : "Unknown error");
@@ -135,7 +164,13 @@ export async function POST(
             return serverError(error.message);
         }
 
-        return json({ proxy_member: proxyMember }, { status: 201 });
+        // Log deprecation warning
+        console.warn(`[DEPRECATED] POST /api/leagues/${leagueId}/proxy-members called. Use POST /api/proxies instead.`);
+
+        return addDeprecationHeaders(json({ 
+            proxy_member: proxyMember,
+            _deprecation_notice: "This endpoint is deprecated. Use POST /api/proxies with league_id in body instead."
+        }, { status: 201 }));
 
     } catch (error) {
         return serverError(error instanceof Error ? error.message : "Unknown error");
@@ -143,6 +178,7 @@ export async function POST(
 }
 
 // DELETE /api/leagues/[id]/proxy-members?proxy_id=xxx - Delete a proxy member
+// @deprecated Use DELETE /api/proxies?proxy_id=[id] instead
 export async function DELETE(
     request: Request,
     context: { params: Promise<{ id: string }> }
@@ -218,7 +254,13 @@ export async function DELETE(
             return serverError(error.message);
         }
 
-        return json({ message: "Proxy member deleted" });
+        // Log deprecation warning
+        console.warn(`[DEPRECATED] DELETE /api/leagues/${leagueId}/proxy-members called. Use DELETE /api/proxies?proxy_id=${proxyId} instead.`);
+
+        return addDeprecationHeaders(json({ 
+            message: "Proxy member deleted",
+            _deprecation_notice: "This endpoint is deprecated. Use DELETE /api/proxies?proxy_id=[id] instead."
+        }));
 
     } catch (error) {
         return serverError(error instanceof Error ? error.message : "Unknown error");

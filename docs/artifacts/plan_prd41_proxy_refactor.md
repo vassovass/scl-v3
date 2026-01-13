@@ -2,7 +2,7 @@
 
 > **PRD Reference:** [PRD_41_Proxy_Refactor_Stability.md](../prds/PRD_41_Proxy_Refactor_Stability.md)  
 > **Created:** 2026-01-13  
-> **Status:** Planning
+> **Status:** In Progress (Phase C-D Complete)
 
 ---
 
@@ -29,7 +29,7 @@
 
 This implementation plan details the **completion** of the unified identity model. The core schema migration has **already been partially completed**:
 
-### Current State (Verified 2026-01-13)
+### Current State (Updated 2026-01-13 21:35)
 
 | Component | Status | Notes |
 |-----------|--------|-------|
@@ -38,23 +38,26 @@ This implementation plan details the **completion** of the unified identity mode
 | `invite_code` column in users | ✅ Done | For claim links |
 | `proxy_members` table | ✅ Dropped | No longer in schema |
 | `submissions.proxy_member_id` | ✅ Removed | Uses `user_id` only |
-| `claims_remaining` column | ❌ Missing | Need to add |
-| `is_archived` column | ❌ Missing | Need to add for activity decay |
-| `deleted_at` column | ❌ Missing | Need to add for soft delete |
-| "Act As" AuthProvider | ❌ Missing | Core feature to implement |
-| ProfileSwitcher UI | ❌ Missing | Core feature to implement |
-| RLS policies for proxies | ❌ Missing | Security layer needed |
+| `claims_remaining` column | ✅ Done | Migration `20260113200000` |
+| `is_archived` column | ✅ Done | Migration `20260113200000` |
+| `deleted_at` column | ✅ Done | Migration `20260113200000` |
+| "Act As" AuthProvider | ✅ Done | `switchProfile`, `activeProfile`, `isActingAsProxy` |
+| ProfileSwitcher UI | ✅ Done | Integrated in NavHeader |
+| RLS policies for proxies | ✅ Done | Migration `20260113210000` |
+| `/api/proxies` unified route | ✅ Done | CRUD for proxy management |
+| `/api/proxy-claim` fixed | ✅ Done | Updated to unified model |
+| Settings registry | ✅ Done | `max_proxies_per_user`, `feature_proxy_system`, etc. |
 
 ### Remaining Work
 
-| Phase | Description | Effort |
-|-------|-------------|--------|
-| A | Add missing columns + triggers | Small |
-| B | Implement AuthProvider "Act As" context | Medium |
-| C | Add RLS policies for visibility | Medium |
-| D | Settings & quotas | Small |
-| E | ProfileSwitcher UI + visual indicators | Medium |
-| F | Robustness triggers & cleanup jobs | Small |
+| Phase | Description | Effort | Status |
+|-------|-------------|--------|--------|
+| A | Add missing columns + triggers | Small | ✅ Complete |
+| B | Implement AuthProvider "Act As" context | Medium | ✅ Complete |
+| C | Add RLS policies for visibility | Medium | ✅ Complete |
+| D | Settings & quotas | Small | ✅ Complete |
+| E | ProfileSwitcher UI + visual indicators | Medium | ✅ Complete |
+| F | Robustness triggers & cleanup jobs | Small | 🔲 Pending |
 
 ---
 
@@ -1054,37 +1057,36 @@ gantt
 
 ## File Change Inventory
 
-### New Files
+### New Files (Created)
 
-| Path | Purpose |
-|------|---------|
-| `supabase/migrations/20260113200000_unify_proxy_users.sql` | Schema migration |
-| `supabase/migrations/20260113201000_proxy_rls_policies.sql` | RLS policies |
-| `src/components/auth/ProfileSwitcher.tsx` | Context switcher UI |
-| `src/app/(auth)/claim/[code]/page.tsx` | Claim flow page |
-| `supabase/functions/cleanup-stale-proxies/index.ts` | Decay job |
-| `docs/artifacts/plan_prd41_proxy_refactor.md` | This document |
+| Path | Purpose | Status |
+|------|---------|--------|
+| `supabase/migrations/20260113200000_complete_proxy_columns.sql` | Schema columns + triggers | ✅ Done |
+| `supabase/migrations/20260113210000_proxy_rls_policies.sql` | RLS policies for proxy visibility | ✅ Done |
+| `src/components/auth/ProfileSwitcher.tsx` | Context switcher UI | ✅ Done |
+| `src/app/api/proxies/route.ts` | Unified proxy CRUD API | ✅ Done |
+| `src/app/(auth)/claim/[code]/page.tsx` | Claim flow page | 🔲 Pending |
+| `supabase/functions/cleanup-stale-proxies/index.ts` | Activity decay job | 🔲 Pending (Phase F) |
+| `docs/artifacts/plan_prd41_proxy_refactor.md` | This document | ✅ Done |
 
 ### Modified Files
 
-| Path | Changes |
-|------|---------|
-| `src/components/providers/AuthProvider.tsx` | Add "Act As" context |
-| `src/types/database.ts` | Update User type |
-| `src/lib/api/handler.ts` | Extract acting_as_id |
-| `src/app/(dashboard)/submit-steps/page.tsx` | Respect active profile |
-| `src/lib/settings/registry.ts` | Add proxy settings |
-| `AGENTS.md` | Document "Act As" pattern |
-| `ARCHITECTURE.md` | Add unified model diagram |
+| Path | Changes | Status |
+|------|---------|--------|
+| `src/components/providers/AuthProvider.tsx` | Add "Act As" context | ✅ Done |
+| `src/types/database.ts` | Update User type with proxy fields | ✅ Done |
+| `src/components/navigation/NavHeader.tsx` | Integrate ProfileSwitcher | ✅ Done |
+| `src/app/api/proxy-claim/[code]/route.ts` | Fixed to use unified model | ✅ Done |
+| `src/lib/settings/appSettings.ts` | Add proxy settings | ✅ Done |
+| `src/lib/settings/appSettingsTypes.ts` | Add proxy setting keys | ✅ Done |
+| `AGENTS.md` | Document "Act As" pattern | ✅ Done |
 
-### Deleted Files (Phase F)
+### Pending Cleanup (Phase F)
 
-| Path | Reason |
-|------|--------|
-| `src/components/league/ProxyMemberManagement.tsx` | Replaced by ProfileSwitcher |
-| `src/components/league/ProxyMembersDropdown.tsx` | Replaced by ProfileSwitcher |
-| `src/app/api/leagues/[id]/proxy-members/route.ts` | Replaced by /api/proxies |
-| `supabase/migrations/20240107000000_create_proxy_members.sql` | Table dropped |
+| Path | Reason | Status |
+|------|--------|--------|
+| `src/app/api/leagues/[id]/proxy-members/route.ts` | Deprecate in favor of /api/proxies | 🔲 Pending |
+| Old proxy member components | Audit & remove unused | 🔲 Pending |
 
 ---
 
@@ -1092,6 +1094,8 @@ gantt
 
 | Date | Section | Change |
 |------|---------|--------|
+| 2026-01-13 | Phase C-D | Completed: RLS policies, proxy-claim fix, /api/proxies route, settings registry |
+| 2026-01-13 | Status | Updated status table to reflect completed phases A-E |
 | 2026-01-13 | Initial | Created comprehensive implementation plan |
 | 2026-01-13 | Diagrams | Added Mermaid flow diagrams for all major flows |
 | 2026-01-13 | Schema | Detailed migration SQL with data transfer logic |

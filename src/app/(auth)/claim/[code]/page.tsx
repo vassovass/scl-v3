@@ -7,19 +7,29 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { useToast } from "@/hooks/use-toast";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
+interface LeagueInfo {
+    id: string;
+    name: string;
+    role: string;
+    user_already_member: boolean;
+}
+
 interface ClaimData {
     proxy: {
         id: string;
         display_name: string;
         submission_count: number;
+        created_at: string;
     };
-    league: {
+    leagues: LeagueInfo[];
+    manager: {
         id: string;
-        name: string;
+        display_name: string;
     } | null;
-    user_already_member: boolean;
     can_claim: boolean;
 }
+
+type MergeStrategy = "keep_proxy_profile" | "keep_my_profile";
 
 interface ClaimPageProps {
     params: Promise<{ code: string }>;
@@ -27,7 +37,7 @@ interface ClaimPageProps {
 
 export default function ClaimPage({ params }: ClaimPageProps) {
     const router = useRouter();
-    const { session, loading: authLoading } = useAuth();
+    const { session, user, loading: authLoading } = useAuth();
     const { toast } = useToast();
 
     const [code, setCode] = useState<string>("");
@@ -36,6 +46,7 @@ export default function ClaimPage({ params }: ClaimPageProps) {
     const [error, setError] = useState<string | null>(null);
     const [claiming, setClaiming] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
+    const [mergeStrategy, setMergeStrategy] = useState<MergeStrategy>("keep_proxy_profile");
 
     // Extract code from params
     useEffect(() => {
@@ -81,6 +92,8 @@ export default function ClaimPage({ params }: ClaimPageProps) {
         try {
             const res = await fetch(`/api/proxy-claim/${code}`, {
                 method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ merge_strategy: mergeStrategy }),
             });
             const data = await res.json();
 
@@ -98,9 +111,10 @@ export default function ClaimPage({ params }: ClaimPageProps) {
                 description: `${data.transferred_submissions} submissions transferred to your account.`,
             });
 
-            // Redirect to league
-            if (data.league?.id) {
-                router.push(`/league/${data.league.id}/overview`);
+            // Redirect to first league or dashboard
+            const firstLeague = claimData.leagues?.[0];
+            if (firstLeague?.id) {
+                router.push(`/league/${firstLeague.id}/overview`);
             } else {
                 router.push("/dashboard");
             }
@@ -148,13 +162,16 @@ export default function ClaimPage({ params }: ClaimPageProps) {
         return null;
     }
 
+    const hasConflictingMemberships = claimData.leagues.some(l => l.user_already_member);
+    const leagueCount = claimData.leagues.length;
+
     return (
         <>
             <ConfirmDialog
                 open={showConfirm}
                 onOpenChange={setShowConfirm}
                 title="Claim this profile?"
-                description={`This will transfer ${claimData.proxy.submission_count} submissions to your account and add you to the league.`}
+                description={`This will transfer ${claimData.proxy.submission_count} submissions to your account${leagueCount > 0 ? ` and add you to ${leagueCount} league${leagueCount > 1 ? 's' : ''}` : ''}.`}
                 confirmText="Claim Profile"
                 onConfirm={handleClaim}
                 isLoading={claiming}
@@ -169,23 +186,20 @@ export default function ClaimPage({ params }: ClaimPageProps) {
                             Claim Your Profile
                         </h1>
                         <p className="mt-1 text-sm text-[hsl(var(--info))]/70">
-                            Someone has been tracking steps for you!
+                            {claimData.manager?.display_name 
+                                ? `${claimData.manager.display_name} has been tracking steps for you!`
+                                : "Someone has been tracking steps for you!"}
                         </p>
                     </div>
 
                     {/* Details */}
                     <div className="p-6 space-y-4">
-                        <div className="bg-secondary/50 rounded-lg p-4">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm text-muted-foreground">Proxy Name</span>
+                        {/* Profile Info */}
+                        <div className="bg-secondary/50 rounded-lg p-4 space-y-2">
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm text-muted-foreground">Profile Name</span>
                                 <span className="font-medium text-foreground">
                                     {claimData.proxy.display_name}
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm text-muted-foreground">League</span>
-                                <span className="font-medium text-primary">
-                                    {claimData.league?.name || "Unknown"}
                                 </span>
                             </div>
                             <div className="flex items-center justify-between">
@@ -194,12 +208,72 @@ export default function ClaimPage({ params }: ClaimPageProps) {
                                     {claimData.proxy.submission_count} entries
                                 </span>
                             </div>
+                            {leagueCount > 0 && (
+                                <div className="pt-2 border-t border-border/50">
+                                    <span className="text-sm text-muted-foreground block mb-1">
+                                        League{leagueCount > 1 ? 's' : ''}
+                                    </span>
+                                    <div className="space-y-1">
+                                        {claimData.leagues.map((league) => (
+                                            <div key={league.id} className="flex items-center justify-between text-sm">
+                                                <span className="font-medium text-primary">{league.name}</span>
+                                                {league.user_already_member && (
+                                                    <span className="text-xs text-[hsl(var(--warning))] bg-[hsl(var(--warning)/0.1)] px-2 py-0.5 rounded">
+                                                        Already member
+                                                    </span>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
-                        {claimData.user_already_member && (
+                        {/* Merge Strategy Selection */}
+                        <div className="space-y-2">
+                            <span className="text-sm font-medium text-foreground">Profile Option</span>
+                            <div className="space-y-2">
+                                <label className="flex items-start gap-3 p-3 rounded-lg border border-border/50 cursor-pointer hover:bg-secondary/30 transition">
+                                    <input
+                                        type="radio"
+                                        name="merge_strategy"
+                                        checked={mergeStrategy === "keep_proxy_profile"}
+                                        onChange={() => setMergeStrategy("keep_proxy_profile")}
+                                        className="mt-0.5"
+                                    />
+                                    <div>
+                                        <div className="font-medium text-sm text-foreground">
+                                            Use &ldquo;{claimData.proxy.display_name}&rdquo;
+                                        </div>
+                                        <div className="text-xs text-muted-foreground">
+                                            Keep the proxy&apos;s display name
+                                        </div>
+                                    </div>
+                                </label>
+                                <label className="flex items-start gap-3 p-3 rounded-lg border border-border/50 cursor-pointer hover:bg-secondary/30 transition">
+                                    <input
+                                        type="radio"
+                                        name="merge_strategy"
+                                        checked={mergeStrategy === "keep_my_profile"}
+                                        onChange={() => setMergeStrategy("keep_my_profile")}
+                                        className="mt-0.5"
+                                    />
+                                    <div>
+                                        <div className="font-medium text-sm text-foreground">
+                                            Keep my current profile
+                                        </div>
+                                        <div className="text-xs text-muted-foreground">
+                                            Use your existing name: {user?.display_name || "Your account"}
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        {hasConflictingMemberships && (
                             <div className="bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.3)] rounded-lg p-3 text-sm text-[hsl(var(--warning))]">
-                                <strong>Note:</strong> You&apos;re already a member of this league.
-                                Claiming will transfer the proxy submissions to your existing account.
+                                <strong>Note:</strong> You&apos;re already a member of some leagues.
+                                Claiming will transfer the proxy submissions to your existing memberships.
                             </div>
                         )}
 
