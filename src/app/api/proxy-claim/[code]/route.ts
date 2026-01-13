@@ -77,22 +77,22 @@ export const POST = withApiHandler({
         return { error: "Invalid or expired invite code", status: 404 };
     }
 
-    if (proxy.id === user.id) {
+    if (proxy.id === user!.id) {
         return { error: "You cannot claim yourself", status: 400 };
     }
 
     // Step 1: Transfer submissions
     const { error: submissionError, data: updatedSubmissions } = await adminClient
         .from("submissions")
-        .update({ user_id: user.id })
+        .update({ user_id: user!.id })
         .eq("user_id", proxy.id)
         .select("id");
 
     if (submissionError) {
         throw new AppError({
-            code: ErrorCode.DB_ERROR,
+            code: ErrorCode.DB_UPDATE_FAILED,
             message: "Failed to transfer submissions",
-            originalError: submissionError
+            cause: submissionError
         });
     }
 
@@ -110,7 +110,7 @@ export const POST = withApiHandler({
         const { data: myMemberships } = await adminClient
             .from("memberships")
             .select("league_id")
-            .eq("user_id", user.id);
+            .eq("user_id", user!.id);
 
         const myLeagueIds = new Set(myMemberships?.map(m => m.league_id) || []);
 
@@ -128,7 +128,7 @@ export const POST = withApiHandler({
                 // No conflict: Transfer membership to claimer
                 await adminClient
                     .from("memberships")
-                    .update({ user_id: user.id })
+                    .update({ user_id: user!.id })
                     .eq("user_id", proxy.id)
                     .eq("league_id", pm.league_id);
             }

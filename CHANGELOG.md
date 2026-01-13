@@ -21,6 +21,7 @@ All notable changes to StepLeague v3.
 - **Pagination**: Corrected "Showing X-Y of Z" display logic.
 - **Proxy Permissions**: Hardened permission checks for modifying proxy data.
 - **Proxy API Types**: Fixed TypeScript errors in proxy API route (`user` null check, `ErrorCode` usage).
+- **Proxy Claim API**: Resolved `user` null check and error handling in claim route.
 
 ## [2026-01-12]
 
