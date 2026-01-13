@@ -24,7 +24,10 @@ const querySchema = z.object({
     proxy_member_id: z.string().uuid().optional(),
 });
 
-const submissionSelect = "id, league_id, user_id, for_date, steps, partial, proof_path, verified, tolerance_used, extracted_km, extracted_calories, verification_notes, created_at, proxy_member_id";
+// IMPORTANT:
+// Use "*" to avoid runtime 500s when the DB schema is ahead/behind local code.
+// Selecting non-existent columns causes PostgREST errors which break core UX (e.g., submission status checks).
+const submissionSelect = "*";
 
 // POST /api/submissions - Create a new step submission
 export async function POST(request: Request): Promise<Response> {
