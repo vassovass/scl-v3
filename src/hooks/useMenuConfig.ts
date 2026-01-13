@@ -14,7 +14,6 @@ import {
   resolveMenuHrefs,
   filterByLeagueContext,
 } from '@/lib/menuConfig';
-import { useAuth } from "@/components/providers/AuthProvider";
 import { menuCache, getCacheAge } from '@/lib/cache/menuCache';
 
 /**
@@ -32,7 +31,6 @@ import { menuCache, getCacheAge } from '@/lib/cache/menuCache';
  * const mainMenu = menus.main;
  */
 export function useMenuConfig() {
-  const { user } = useAuth();
   const [data, setData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<any>(null);
@@ -41,35 +39,28 @@ export function useMenuConfig() {
 
   const loadMenus = useCallback(async (skipCache = false) => {
     try {
-      const currentOwnerId = user?.id || 'guest';
-
       // Layer 1-3: Try cache first (unless explicitly skipping)
       let cached = null;
       if (!skipCache) {
         cached = await menuCache.get();
         if (cached) {
-          // Check if cache belongs to current user
-          if (cached.ownerId && cached.ownerId !== currentOwnerId) {
-            console.log(`[Menu Cache] Owner mismatch: ${cached.ownerId} vs ${currentOwnerId} - invalidating cache`);
-            cached = null; // Treat as cache miss
-          } else {
-            setData(cached);
-            setIsStale(menuCache.isStale(cached));
-            setCacheAge(getCacheAge(cached.timestamp));
+          setData(cached);
+          setIsStale(menuCache.isStale(cached));
+          setCacheAge(getCacheAge(cached.timestamp));
 
-            // If cache is not expired, use it and optionally revalidate in background
-            if (!menuCache.isExpired(cached)) {
-              setIsLoading(false);
-              setError(null);
-              // Continue to fetch in background to check version
-            }
+          // If cache is not expired, use it and optionally revalidate in background
+          if (!menuCache.isExpired(cached)) {
+            setIsLoading(false);
+            setError(null);
+            // Continue to fetch in background to check version
+          } else {
+            // Cache is expired, show stale data but fetch fresh in foreground
           }
         }
       }
 
       // Layer 4: Fetch from API
-      if (!cached) setIsLoading(true); // Only show loading if we don't have valid cache
-
+      setIsLoading(cached ? false : true); // Don't show loading if we have cached data
       const res = await fetch('/api/menus');
       const json = await res.json();
 
@@ -79,13 +70,12 @@ export function useMenuConfig() {
         await menuCache.invalidate();
       }
 
-      // Update cache with fresh data and ownerId
+      // Update cache with fresh data
       if (json.menus && json.locations) {
         await menuCache.set({
           menus: json.menus,
           locations: json.locations,
           cacheVersion: json.cacheVersion || new Date().toISOString(),
-          ownerId: currentOwnerId,
         });
       }
 
@@ -102,8 +92,8 @@ export function useMenuConfig() {
     } finally {
       setIsLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadMenus should only run once on mount (or when user changes)
-  }, [user?.id]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- loadMenus should only run once on mount
+  }, []);
 
   useEffect(() => {
     loadMenus();
