@@ -14,11 +14,12 @@ interface ProxyMember {
 }
 
 interface ProxyMemberManagementProps {
-    leagueId: string;
+    // PRD 41: leagueId is optional - proxies are user-level, not league-specific
+    leagueId?: string;
     userRole: string;
 }
 
-export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagementProps) {
+export function ProxyMemberManagement({ userRole }: ProxyMemberManagementProps) {
     const { session } = useAuth();
     const [proxyMembers, setProxyMembers] = useState<ProxyMember[]>([]);
     const [loading, setLoading] = useState(true);
@@ -40,8 +41,9 @@ export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagem
         if (!session) return;
 
         try {
-            // PRD 41: Use unified /api/proxies endpoint
-            const res = await fetch(`/api/proxies?league_id=${leagueId}`);
+            // PRD 41: Proxies are user-level, not league-specific.
+            // Fetch ALL proxies managed by current user.
+            const res = await fetch(`/api/proxies`);
             if (res.ok) {
                 const data = await res.json();
                 setProxyMembers(data.proxies || []);
@@ -54,7 +56,7 @@ export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagem
         } finally {
             setLoading(false);
         }
-    }, [session, leagueId]);
+    }, [session]);
 
     useEffect(() => {
         fetchProxyMembers();
@@ -67,11 +69,11 @@ export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagem
         setError(null);
 
         try {
-            // PRD 41: Use unified /api/proxies endpoint with league_id
+            // PRD 41: Proxies are user-level. No league_id needed.
             const res = await fetch(`/api/proxies`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ display_name: newProxyName.trim(), league_id: leagueId }),
+                body: JSON.stringify({ display_name: newProxyName.trim() }),
             });
 
             if (res.ok) {

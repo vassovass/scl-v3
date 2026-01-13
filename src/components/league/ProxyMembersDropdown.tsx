@@ -10,14 +10,14 @@ interface ProxyMember {
 }
 
 interface ProxyMembersDropdownProps {
-    leagueId: string;
+    // PRD 41: leagueId is optional - proxies are user-level, not league-specific
+    leagueId?: string;
     onSelectProxy: (proxy: ProxyMember | null) => void;
     selectedProxy: ProxyMember | null;
     className?: string;
 }
 
 export function ProxyMembersDropdown({
-    leagueId,
     onSelectProxy,
     selectedProxy,
     className = ""
@@ -46,8 +46,9 @@ export function ProxyMembersDropdown({
     const fetchProxies = useCallback(async () => {
         setLoading(true);
         try {
-            // PRD 41: Use unified /api/proxies endpoint
-            const res = await fetch(`/api/proxies?league_id=${leagueId}`);
+            // PRD 41: Proxies are user-level, not league-specific.
+            // Fetch ALL proxies managed by current user.
+            const res = await fetch(`/api/proxies`);
             if (res.ok) {
                 const data = await res.json();
                 setProxyMembers(data.proxies || []);
@@ -57,24 +58,27 @@ export function ProxyMembersDropdown({
         } finally {
             setLoading(false);
         }
-    }, [leagueId]);
+    }, []);
 
+    // Fetch proxies when dropdown opens (first time or after refresh)
+    const [hasFetched, setHasFetched] = useState(false);
     useEffect(() => {
-        if (isOpen && proxyMembers.length === 0) {
+        if (isOpen && !hasFetched) {
             fetchProxies();
+            setHasFetched(true);
         }
-    }, [isOpen, proxyMembers.length, fetchProxies]);
+    }, [isOpen, hasFetched, fetchProxies]);
 
     const handleCreate = async () => {
         if (!newName.trim()) return;
         setCreating(true);
         setError(null);
         try {
-            // PRD 41: Use unified /api/proxies endpoint with league_id
+            // PRD 41: Proxies are user-level. No league_id needed.
             const res = await fetch(`/api/proxies`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ display_name: newName.trim(), league_id: leagueId }),
+                body: JSON.stringify({ display_name: newName.trim() }),
             });
             if (res.ok) {
                 const data = await res.json();

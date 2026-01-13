@@ -42,12 +42,14 @@ interface ProxySubmissionSectionProps {
 /**
  * ProxySubmissionSection - Collapsible section for submitting steps on behalf of proxy members
  * 
+ * PRD 41: Proxies are user-level, not league-specific.
+ * Flow: 1. Select/Create Proxy → 2. Select League → 3. Consent → 4. Submit
+ * 
  * Only visible to league admins/owners. Includes:
- * - League selection dropdown
- * - Proxy member selection/creation
+ * - Proxy member selection/creation (league-agnostic)
+ * - League selection (for submission context only)
  * - Authorization consent declaration
  * - Submission forms (reuses regular forms with proxyMemberId)
- * - Proxy's submission history
  */
 export function ProxySubmissionSection({
     adminLeagues,
@@ -67,7 +69,7 @@ export function ProxySubmissionSection({
 
     const handleLeagueChange = (leagueId: string) => {
         setSelectedLeagueId(leagueId);
-        setSelectedProxy(null);
+        // PRD 41: Don't reset proxy when league changes - proxies are user-level
         setConsent(false);
     };
 
@@ -104,41 +106,43 @@ export function ProxySubmissionSection({
             {/* Expanded Content */}
             {expanded && (
                 <div className="mt-4 rounded-lg border border-[hsl(var(--warning)/.2)] bg-card/50 p-4 space-y-4">
-                    {/* Step 1: League Selection */}
+                    {/* Step 1: Proxy Member Selection (PRD 41: League-agnostic) */}
                     <div>
                         <label className="text-sm font-medium text-[hsl(var(--warning))] block mb-2">
-                            1. Select League
+                            1. Select or Create Proxy Member
                         </label>
-                        <select
-                            value={selectedLeagueId}
-                            onChange={(e) => handleLeagueChange(e.target.value)}
-                            className="w-full rounded-lg border border-input bg-secondary px-4 py-2.5 text-foreground focus:border-[hsl(var(--warning))] focus:outline-none"
-                        >
-                            <option value="">Choose a league...</option>
-                            {adminLeagues.map((league) => (
-                                <option key={league.id} value={league.id}>
-                                    {league.name} ({league.role})
-                                </option>
-                            ))}
-                        </select>
+                        <ProxyMembersDropdown
+                            selectedProxy={selectedProxy}
+                            onSelectProxy={handleProxySelect}
+                        />
                     </div>
 
-                    {/* Step 2: Proxy Member Selection */}
-                    {selectedLeagueId && (
+                    {/* Step 2: League Selection (only needed for submission context) */}
+                    {selectedProxy && (
                         <div>
                             <label className="text-sm font-medium text-[hsl(var(--warning))] block mb-2">
-                                2. Select or Create Proxy Member
+                                2. Select League
                             </label>
-                            <ProxyMembersDropdown
-                                leagueId={selectedLeagueId}
-                                selectedProxy={selectedProxy}
-                                onSelectProxy={handleProxySelect}
-                            />
+                            <select
+                                value={selectedLeagueId}
+                                onChange={(e) => handleLeagueChange(e.target.value)}
+                                className="w-full rounded-lg border border-input bg-secondary px-4 py-2.5 text-foreground focus:border-[hsl(var(--warning))] focus:outline-none"
+                            >
+                                <option value="">Choose a league...</option>
+                                {adminLeagues.map((league) => (
+                                    <option key={league.id} value={league.id}>
+                                        {league.name} ({league.role})
+                                    </option>
+                                ))}
+                            </select>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                Steps will be submitted to this league for {selectedProxy.display_name}
+                            </p>
                         </div>
                     )}
 
                     {/* Step 3: Consent Declaration */}
-                    {selectedProxy && (
+                    {selectedProxy && selectedLeagueId && (
                         <div>
                             <label className="text-sm font-medium text-[hsl(var(--warning))] block mb-2">
                                 3. Authorization Declaration
@@ -154,12 +158,14 @@ export function ProxySubmissionSection({
                     )}
 
                     {/* Step 4: Submission Forms */}
-                    {selectedProxy && consent && (
+                    {selectedProxy && selectedLeagueId && consent && (
                         <div className="pt-4 border-t border-border">
                             <div className="mb-4 rounded-lg bg-[hsl(var(--warning)/.2)] border border-[hsl(var(--warning)/.4)] p-3">
                                 <p className="text-sm text-[hsl(var(--warning))]">
                                     <span className="font-semibold">Submitting for:</span>{" "}
                                     <span className="text-foreground">{selectedProxy.display_name}</span>
+                                    <span className="text-muted-foreground"> → </span>
+                                    <span className="text-foreground">{adminLeagues.find(l => l.id === selectedLeagueId)?.name}</span>
                                 </p>
                             </div>
 
@@ -189,8 +195,6 @@ export function ProxySubmissionSection({
                             )}
                         </div>
                     )}
-
-
                 </div>
             )}
         </div>
