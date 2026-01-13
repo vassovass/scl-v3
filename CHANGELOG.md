@@ -10,6 +10,7 @@ All notable changes to StepLeague v3.
 ## [2026-01-13]
 
 ### Added
+- **Code Visualization Skill**: New agent skill (`docs/skills/code-visualization`) for high-fidelity architectural analysis using the `graph-it-live` extension.
 - **Bulk Submission Management**: Adjustable pagination (10-100), global "Select All", and bulk actions (Delete, Date Edit, Resubmit).
 - **Proxy Context Switching**: "View As" dropdown for Admins to view and manage proxy member submissions as if they were their own.
 - **Bulk APIs**: Dedicated endpoints for bulk Delete, Patch (date), and AI Re-analysis.
