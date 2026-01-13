@@ -66,7 +66,11 @@ export function useMenuConfig() {
 
       // Check if server version differs from cached version (cache invalidation check)
       if (cached?.cacheVersion && json.cacheVersion && cached.cacheVersion !== json.cacheVersion) {
-        console.log(`[Menu Cache] Version mismatch: ${cached.cacheVersion} vs ${json.cacheVersion} - refreshing cache`);
+        if (process.env.NODE_ENV !== "production") {
+          console.debug(
+            `[Menu Cache] Version mismatch: ${cached.cacheVersion} vs ${json.cacheVersion} - refreshing cache`
+          );
+        }
         await menuCache.invalidate();
       }
 

@@ -4,8 +4,6 @@ import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import {
   GoogleTagManager,
   GoogleTagManagerNoscript,
@@ -23,6 +21,11 @@ const FeedbackWidget = dynamic(
 
 const CookieConsentBanner = dynamic(
   () => import("@/components/analytics/CookieConsent").then((mod) => mod.CookieConsentBanner),
+  { ssr: false }
+);
+
+const VercelAnalyticsGate = dynamic(
+  () => import("@/components/analytics/VercelAnalyticsGate").then((mod) => mod.VercelAnalyticsGate),
   { ssr: false }
 );
 
@@ -113,9 +116,10 @@ export default async function RootLayout({
           <CookieConsentBanner />
         </SafeLazy>
 
-        {/* Vercel Analytics (separate from GA4) */}
-        <Analytics />
-        <SpeedInsights />
+        {/* Vercel Analytics (separate from GA4) - gated by consent + online */}
+        <SafeLazy>
+          <VercelAnalyticsGate />
+        </SafeLazy>
       </body>
     </html>
   );
