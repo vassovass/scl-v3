@@ -130,7 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const value: AuthContextValue = {
+  const value: AuthContextValue = useMemo(() => ({
     user: activeProfile, // This makes most components automatically use the active profile
     realUser: session?.user ?? null, // Access original user if needed
     session,
@@ -138,7 +138,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signOut,
     switchProfile,
     isActingAsProxy: !!(activeProfile && session?.user && activeProfile.id !== session.user.id),
-  };
+  }), [activeProfile, session, loading]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
