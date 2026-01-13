@@ -6,6 +6,7 @@ import { apiRequest, ApiError } from "@/lib/api/client";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { useToast } from "@/hooks/use-toast";
 import { normalizeError, reportErrorClient, ErrorCode } from "@/lib/errors";
+import { useFeedback } from "@/components/feedback/FeedbackContext";
 
 interface BatchSubmissionFormProps {
     leagueId: string;
@@ -89,7 +90,9 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
     // Get max batch uploads from app settings (SuperAdmin configurable)
     const { getNumericSetting } = useAppSettings();
     const maxFiles = getNumericSetting("max_batch_uploads", 7);
+    const maxFiles = getNumericSetting("max_batch_uploads", 7);
     const { toast } = useToast();
+    const { openFeedback } = useFeedback();
 
     const [images, setImages] = useState<ImageFile[]>([]);
     const [processing, setProcessing] = useState(false);
@@ -158,16 +161,21 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
 
     // Reusable extraction logic for both initial extraction and retries
     const performExtraction = async (image: ImageFile): Promise<{ success: boolean; data?: ExtractResponse; error?: any }> => {
+        console.log(`[Batch] Starting extraction for ${image.id} (${image.file.name})`);
         try {
             // Compress
+            console.log(`[Batch] Compressing ${image.file.name}...`);
             const compressedFile = await compressImage(image.file);
+            console.log(`[Batch] Compression complete. Size: ${compressedFile.size}`);
 
             // Upload
+            console.log(`[Batch] Requesting upload URL for ${image.file.name}...`);
             const signed = await apiRequest<SignUploadResponse>("proofs/sign-upload", {
                 method: "POST",
                 body: JSON.stringify({ content_type: compressedFile.type }),
             });
 
+            console.log(`[Batch] Uploading to bucket: ${signed.path}...`);
             await fetch(signed.upload_url, {
                 method: "PUT",
                 headers: {
@@ -176,8 +184,10 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                 },
                 body: compressedFile,
             });
+            console.log(`[Batch] Upload complete.`);
 
             // Extract data only (no submission)
+            console.log(`[Batch] Sending to Gemini for extraction...`);
             const extractResponse = await apiRequest<ExtractResponse>("submissions/extract", {
                 method: "POST",
                 body: JSON.stringify({
@@ -185,7 +195,10 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                     proof_path: signed.path,
                     filename: image.file.name, // Pass original filename for date hints
                 }),
-            });
+            }); // Note: extractResponse is potentially partial
+
+            // Safe parsing of extracting response to ensure fields exist
+            console.log(`[Batch] Extraction received for ${image.id}:`, extractResponse);
 
             return {
                 success: true,
@@ -196,6 +209,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                 } as any
             };
         } catch (err) {
+            console.error(`[Batch] Extraction failed for ${image.id}:`, err);
             return { success: false, error: err };
         }
     };
@@ -310,9 +324,25 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
     }, [images, scheduleAutoRetry, toast]);
 
     // Manual retry for single image
-    const retryImage = useCallback(async (id: string) => {
+    const retryImage = useCallback(async (id: string, forceExtract = false) => {
         const image = images.find(i => i.id === id);
         if (!image || image.status !== "error") return;
+
+        console.log(`[Batch] Retrying image ${id}. ForceExtract: ${forceExtract}. HasData: ${!!image.extractedData}`);
+
+        // OPTIMIZATION: If we already have extracted data and proofPath, just move back to review
+        // unless we strictly want to re-extract (e.g. if the user thinks the data is wrong)
+        if (!forceExtract && image.extractedData && image.proofPath) {
+            console.log(`[Batch] Restoring to review state (skipping re-extraction)`);
+            setImages((prev) =>
+                prev.map((img) =>
+                    img.id === id
+                        ? { ...img, status: "review", error: undefined, errorDetails: undefined, retryCount: 0 }
+                        : img
+                )
+            );
+            return;
+        }
 
         // Reset to extracting
         setImages((prev) =>
@@ -555,11 +585,13 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                 ...img,
                                 status: "error",
                                 error: err instanceof Error ? err.message : "Submission failed",
+                                errorDetails: JSON.stringify(err, Object.getOwnPropertyNames(err), 2)
                             }
                             : img
                     )
                 );
                 errorCount++;
+                console.error(`[Batch] Submission failed for ${image.id}:`, err);
             }
 
             if (i < reviewedImages.length - 1) {
@@ -727,14 +759,13 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                         {/* Confidence indicator */}
                                         {img.extractedData?.confidence && (
                                             <div className="flex items-center gap-2">
-                                                <span className={`text-xs ${
-                                                    img.extractedData.confidence === "high" ? "text-emerald-400" :
+                                                <span className={`text-xs ${img.extractedData.confidence === "high" ? "text-emerald-400" :
                                                     img.extractedData.confidence === "medium" ? "text-amber-400" :
-                                                    "text-rose-400"
-                                                }`}>
+                                                        "text-rose-400"
+                                                    }`}>
                                                     {img.extractedData.confidence === "high" ? "✓ High Confidence" :
-                                                     img.extractedData.confidence === "medium" ? "⚠️ Medium Confidence" :
-                                                     "⚠️ Low Confidence"}
+                                                        img.extractedData.confidence === "medium" ? "⚠️ Medium Confidence" :
+                                                            "⚠️ Low Confidence"}
                                                 </span>
                                             </div>
                                         )}
@@ -837,13 +868,27 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
 
                                         {/* Manual retry button */}
                                         {img.retryable && !img.autoRetrying && (
-                                            <button
-                                                onClick={() => retryImage(img.id)}
-                                                disabled={processing}
-                                                className="w-full text-xs py-1.5 rounded bg-amber-600/20 text-amber-400 border border-amber-600/50 hover:bg-amber-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                                            >
-                                                🔄 Retry Extraction
-                                            </button>
+                                            {/* Manual retry button */ }
+                                        {img.retryable && !img.autoRetrying && (
+                                            <div className="flex gap-2">
+                                                {img.extractedData && img.proofPath ? (
+                                                    <button
+                                                        onClick={() => retryImage(img.id, false)}
+                                                        disabled={processing}
+                                                        className="flex-1 text-xs py-1.5 rounded bg-primary/20 text-primary border border-primary/50 hover:bg-primary/30 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                                                    >
+                                                        ↪ Retry Submit
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => retryImage(img.id, true)}
+                                                        disabled={processing}
+                                                        className="flex-1 text-xs py-1.5 rounded bg-amber-600/20 text-amber-400 border border-amber-600/50 hover:bg-amber-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                                                    >
+                                                        🔄 Retry Extraction
+                                                    </button>
+                                                )}
+                                            </div>
                                         )}
                                     </div>
                                 )}
@@ -878,6 +923,36 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                         className="flex-1 rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         🔄 Retry All Failed ({images.filter(i => i.status === "error" && i.retryable).length})
+                    </button>
+                )}
+
+                {/* Report Issues Button */}
+                {images.some(i => i.status === "error") && (
+                    <button
+                        onClick={() => {
+                            const errors = images
+                                .filter(i => i.status === "error")
+                                .map(i => ({
+                                    file: i.file.name,
+                                    error: i.error,
+                                    details: i.errorDetails ? JSON.parse(i.errorDetails || "{}") : undefined
+                                }));
+
+                            openFeedback({
+                                type: "bug",
+                                subject: "Batch Upload Errors",
+                                description: `I encountered errors while uploading ${errors.length} images.\n\nSee attached metadata per user request.`,
+                                metadata: {
+                                    total_images: images.length,
+                                    failed_count: errors.length,
+                                    errors
+                                }
+                            });
+                        }}
+                        disabled={processing}
+                        className="flex-1 rounded-md bg-rose-600/20 border border-rose-600/50 px-4 py-2 text-sm font-semibold text-rose-400 transition hover:bg-rose-600/30 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        🐞 Report Issues
                     </button>
                 )}
 
