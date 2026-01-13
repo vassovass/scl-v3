@@ -24,6 +24,7 @@ const querySchema = z.object({
     offset: z.coerce.number().int().min(0).default(0),
     order_by: z.enum(["for_date", "created_at"]).default("for_date"),
     exclude_proxy: z.enum(["true", "false"]).default("true").transform(v => v === "true"),
+    proxy_member_id: z.string().uuid().optional(),
 });
 
 const submissionSelect = "id, league_id, user_id, for_date, steps, partial, proof_path, verified, tolerance_used, extracted_km, extracted_calories, verification_notes, created_at";
