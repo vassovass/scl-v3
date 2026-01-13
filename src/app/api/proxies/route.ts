@@ -145,9 +145,13 @@ export const POST = withApiHandler({
 
     // Step 3: Create proxy user
     // Note: is_proxy is auto-set by trigger based on managed_by
+    // Generate UUID for proxy (users table doesn't auto-generate IDs like auth.users)
+    const proxyId = crypto.randomUUID();
+    
     const { data: newProxy, error: createError } = await adminClient
         .from("users")
         .insert({
+            id: proxyId,
             display_name: body.display_name,
             managed_by: user!.id,
             invite_code: inviteCode,
