@@ -216,7 +216,7 @@ export function ProxyMemberManagement() {
                         <input
                             type="text"
                             value={newProxyName}
-                            onChange={(e) => setNewProxyName(e.target.value)}
+                            onChange={(e) => setNewName(e.target.value)}
                             placeholder="Display Name (e.g. John Doe)"
                             className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-slate-100 placeholder-slate-500 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition"
                             autoFocus
