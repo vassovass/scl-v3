@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import dynamic from "next/dynamic";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
-import { FeedbackProvider } from "@/components/feedback/FeedbackContext";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@vercel/analytics/next";
@@ -99,13 +98,11 @@ export default async function RootLayout({
           enableSystem={themeSettings.allowedModes.includes("system")}
         >
           <AuthProvider>
-            <FeedbackProvider>
-              {children}
+            {children}
 
-              <SafeLazy>
-                <FeedbackWidget />
-              </SafeLazy>
-            </FeedbackProvider>
+            <SafeLazy>
+              <FeedbackWidget />
+            </SafeLazy>
 
             <Toaster />
           </AuthProvider>

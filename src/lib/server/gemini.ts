@@ -474,15 +474,10 @@ function parseGeminiText(rawText: string): GeminiExtraction {
             };
         }
         console.warn("Gemini extraction failed schema validation:", result.error);
-        return {
-            notes: `AI Error: Invalid Schema. ${result.error.issues.map(i => i.message).join(', ')}`
-        };
+        return {};
     } catch (e) {
         console.warn("Gemini JSON parse failed:", e);
-        // Return the raw text in notes so the user/dev can see what went wrong
-        return {
-            notes: `AI Error: Invalid JSON. Raw output: ${rawText.substring(0, 100)}...`
-        };
+        return {};
     }
 }
 

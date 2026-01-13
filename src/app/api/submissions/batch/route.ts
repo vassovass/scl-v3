@@ -87,20 +87,13 @@ export async function POST(request: Request): Promise<Response> {
         forDate = forDate || new Date().toISOString().slice(0, 10);
 
         // Check for existing submission
-        let query = adminClient
+        const { data: existing } = await adminClient
             .from("submissions")
             .select("id")
             .eq("league_id", input.league_id)
             .eq("user_id", user.id)
-            .eq("for_date", forDate);
-
-        if (input.proxy_member_id) {
-            query = query.eq("proxy_member_id", input.proxy_member_id);
-        } else {
-            query = query.is("proxy_member_id", null);
-        }
-
-        const { data: existing } = await query.single();
+            .eq("for_date", forDate)
+            .single();
 
         if (existing && !input.overwrite) {
             return jsonError(409, `Submission already exists for ${forDate}`);

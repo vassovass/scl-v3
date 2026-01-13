@@ -114,12 +114,6 @@ export async function POST(request: Request): Promise<Response> {
             query = query.is("league_id", null);
         }
 
-        if (input.proxy_member_id) {
-            query = query.eq("proxy_member_id", input.proxy_member_id);
-        } else {
-            query = query.is("proxy_member_id", null);
-        }
-
         const { data: existingSubmission } = await query.single();
 
         const wantsOverwrite = (body as any).overwrite === true;
