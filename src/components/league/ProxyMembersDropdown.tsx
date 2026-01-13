@@ -44,10 +44,11 @@ export function ProxyMembersDropdown({
     const fetchProxies = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await fetch(`/api/leagues/${leagueId}/proxy-members`);
+            // PRD 41: Use unified /api/proxies endpoint
+            const res = await fetch(`/api/proxies?league_id=${leagueId}`);
             if (res.ok) {
                 const data = await res.json();
-                setProxyMembers(data.proxy_members || []);
+                setProxyMembers(data.proxies || []);
             }
         } catch (err) {
             console.error("Failed to fetch proxies:", err);
@@ -66,15 +67,18 @@ export function ProxyMembersDropdown({
         if (!newName.trim()) return;
         setCreating(true);
         try {
-            const res = await fetch(`/api/leagues/${leagueId}/proxy-members`, {
+            // PRD 41: Use unified /api/proxies endpoint with league_id
+            const res = await fetch(`/api/proxies`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ display_name: newName.trim() }),
+                body: JSON.stringify({ display_name: newName.trim(), league_id: leagueId }),
             });
             if (res.ok) {
                 const data = await res.json();
-                setProxyMembers(prev => [data.proxy_member, ...prev]);
-                onSelectProxy(data.proxy_member);
+                // New API returns { proxy: {...} } instead of { proxy_member: {...} }
+                const newProxy = data.proxy;
+                setProxyMembers(prev => [{ ...newProxy, submission_count: 0 }, ...prev]);
+                onSelectProxy({ ...newProxy, submission_count: 0 });
                 setNewName("");
                 setShowCreateInput(false);
                 setIsOpen(false);
