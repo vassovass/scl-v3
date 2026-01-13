@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from "@/components/providers/AuthProvider";
 import { AppSettingKey } from '@/lib/settings/appSettingsTypes';
 
 interface AppSetting {
@@ -32,17 +33,22 @@ interface AppSettingsResponse {
  * const maxUploads = getNumericSetting('max_batch_uploads', 7);
  */
 export function useAppSettings() {
+  const { session } = useAuth();
   const [data, setData] = useState<AppSettingsResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<any>(null);
 
   const loadSettings = useCallback(async () => {
     try {
-      // Try admin endpoint first (for authenticated users with full settings)
-      let response = await fetch('/api/admin/settings');
+      let response;
 
-      // If unauthorized, fall back to public endpoint (for guests)
-      if (response.status === 401) {
+      // Try admin endpoint only if authenticated
+      if (session) {
+        response = await fetch('/api/admin/settings');
+      }
+
+      // If unauthorized or not logged in, fall back to public endpoint (for guests)
+      if (!response || response.status === 401) {
         response = await fetch('/api/settings/public');
       }
 
@@ -60,7 +66,7 @@ export function useAppSettings() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [session]);
 
   useEffect(() => {
     loadSettings();

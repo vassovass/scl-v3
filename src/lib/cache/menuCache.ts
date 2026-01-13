@@ -21,6 +21,7 @@ interface MenuCacheData {
   cacheVersion: string; // Server-side version for staleness detection
   timestamp: number;
   version: string;
+  ownerId?: string; // ID of the user who owns this cache (or 'guest')
 }
 
 interface MenuCacheDB extends DBSchema {
@@ -125,7 +126,7 @@ class MenuCacheManager {
     return null;
   }
 
-  async set(data: { menus: Record<string, any>; locations: Record<string, any>; cacheVersion: string }): Promise<void> {
+  async set(data: { menus: Record<string, any>; locations: Record<string, any>; cacheVersion: string; ownerId?: string }): Promise<void> {
     if (typeof window === 'undefined') {
       return;
     }
