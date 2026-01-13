@@ -22,6 +22,9 @@ CREATE INDEX IF NOT EXISTS idx_users_deleted_at ON users(deleted_at) WHERE delet
 CREATE INDEX IF NOT EXISTS idx_users_invite_code ON users(invite_code) WHERE invite_code IS NOT NULL;
 
 -- Step 3: Add trigger to sync is_proxy from managed_by
+-- NOTE: Using "INSERT OR UPDATE" (not "UPDATE OF managed_by") to ensure
+-- the trigger fires on ALL inserts and ALL updates for clarity/safety.
+-- The function is simple/fast so performance impact is negligible.
 CREATE OR REPLACE FUNCTION sync_is_proxy()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -32,7 +35,7 @@ $$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS trg_sync_is_proxy ON users;
 CREATE TRIGGER trg_sync_is_proxy
-    BEFORE INSERT OR UPDATE OF managed_by ON users
+    BEFORE INSERT OR UPDATE ON users
     FOR EACH ROW
     EXECUTE FUNCTION sync_is_proxy();
 
