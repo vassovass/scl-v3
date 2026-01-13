@@ -248,10 +248,10 @@ function DropdownItem({
     // Items with href but NO onClick - render as Link
     if (item.href && !item.onClick) {
         return (
-            <DropdownMenuItem className={cn("p-0", className)}>
+            <DropdownMenuItem asChild>
                 <Link
                     href={item.href}
-                    className="w-full flex items-center px-2 py-1.5 gap-2"
+                    className={className}
                     data-module-id={`menu-${item.id}`}
                     data-module-name={item.label}
                     target={item.external ? "_blank" : undefined}
