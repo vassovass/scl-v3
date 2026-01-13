@@ -15,6 +15,7 @@ import { APP_CONFIG } from "@/lib/config";
 import { OfflineIndicator } from "@/components/ui/OfflineIndicator";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { Logo } from "@/components/ui/Logo";
+import { ProfileSwitcher } from "@/components/auth/ProfileSwitcher";
 
 interface NavHeaderProps {
     /** Override auto-detected menu location */
@@ -287,6 +288,9 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                                 className="ml-2"
                             />
                         )}
+
+                        {/* PRD 41: Profile Switcher (Act As) */}
+                        <ProfileSwitcher />
 
                         {/* User Menu */}
                         <div className="ml-2" data-tour="nav-user-menu">

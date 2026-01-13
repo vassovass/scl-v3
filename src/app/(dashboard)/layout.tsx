@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { NavHeader } from "@/components/navigation/NavHeader";
 import { GlobalFooter } from "@/components/layout/GlobalFooter";
 import { OnboardingProvider } from "@/components/providers/OnboardingProvider";
+import { ActingAsBanner } from "@/components/auth/ProfileSwitcher";
 
 export default function DashboardLayout({
     children,
@@ -15,6 +16,8 @@ export default function DashboardLayout({
             <OnboardingProvider>
                 <div className="min-h-screen flex flex-col bg-background">
                     <NavHeader />
+                    {/* PRD 41: Show banner when acting as a proxy */}
+                    <ActingAsBanner />
                     <main className="flex-1">{children}</main>
                     <GlobalFooter />
                 </div>

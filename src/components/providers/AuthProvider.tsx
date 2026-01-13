@@ -1,88 +1,286 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState, useRef } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { Session, User, AuthChangeEvent } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { analytics, identifyUser, clearUser } from "@/lib/analytics";
+import type { ActiveProfile } from "@/types/database";
+
+// ============================================================================
+// Types
+// ============================================================================
 
 interface AuthContextValue {
+  // Core auth
   user: User | null;
   session: Session | null;
   loading: boolean;
   signOut: (redirectTo?: string) => Promise<void>;
+
+  // PRD 41: "Act As" Proxy Context
+  /** Currently active profile (user or proxy) */
+  activeProfile: ActiveProfile | null;
+  /** True if currently acting as a proxy */
+  isActingAsProxy: boolean;
+  /** List of proxies managed by this user */
+  managedProxies: ActiveProfile[];
+  /** Switch to a different profile (proxy or back to self) */
+  switchProfile: (profileId: string | null) => Promise<void>;
+  /** Refresh the list of managed proxies */
+  refreshProxies: () => Promise<void>;
+  /** Loading state for proxies */
+  proxiesLoading: boolean;
 }
 
+// Storage key for persisting active profile
+const ACTIVE_PROFILE_KEY = "stepleague_active_profile_id";
+
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+
+// ============================================================================
+// Provider
+// ============================================================================
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
+  
+  // Core auth state
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // PRD 41: "Act As" state
+  const [userProfile, setUserProfile] = useState<ActiveProfile | null>(null);
+  const [activeProfile, setActiveProfile] = useState<ActiveProfile | null>(null);
+  const [managedProxies, setManagedProxies] = useState<ActiveProfile[]>([]);
+  const [proxiesLoading, setProxiesLoading] = useState(false);
 
   // Track if user was already identified (prevent duplicate events)
   const identifiedUserRef = useRef<string | null>(null);
 
+  // Computed: are we acting as a proxy?
+  const isActingAsProxy = useMemo(() => {
+    if (!activeProfile || !userProfile) return false;
+    return activeProfile.id !== userProfile.id && activeProfile.is_proxy;
+  }, [activeProfile, userProfile]);
+
+  // ============================================================================
+  // Fetch user profile from database
+  // ============================================================================
+  const fetchUserProfile = useCallback(async (userId: string): Promise<ActiveProfile | null> => {
+    const { data, error } = await supabase
+      .from("users")
+      .select("id, display_name, is_proxy, managed_by")
+      .eq("id", userId)
+      .single();
+
+    if (error || !data) {
+      console.error("[AuthProvider] Failed to fetch user profile:", error);
+      return null;
+    }
+
+    return {
+      id: data.id,
+      display_name: data.display_name,
+      is_proxy: data.is_proxy ?? false,
+      managed_by: data.managed_by,
+    };
+  }, [supabase]);
+
+  // ============================================================================
+  // Fetch managed proxies
+  // ============================================================================
+  const refreshProxies = useCallback(async () => {
+    if (!session?.user?.id) {
+      setManagedProxies([]);
+      return;
+    }
+
+    setProxiesLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("users")
+        .select("id, display_name, is_proxy, managed_by")
+        .eq("managed_by", session.user.id)
+        .eq("is_proxy", true)
+        .is("deleted_at", null)
+        .eq("is_archived", false)
+        .order("display_name");
+
+      if (error) {
+        console.error("[AuthProvider] Failed to fetch proxies:", error);
+        setManagedProxies([]);
+        return;
+      }
+
+      const proxies: ActiveProfile[] = (data || []).map((p: any) => ({
+        id: p.id,
+        display_name: p.display_name,
+        is_proxy: p.is_proxy ?? true,
+        managed_by: p.managed_by,
+      }));
+
+      setManagedProxies(proxies);
+    } finally {
+      setProxiesLoading(false);
+    }
+  }, [session?.user?.id, supabase]);
+
+  // ============================================================================
+  // Switch profile (Act As)
+  // ============================================================================
+  const switchProfile = useCallback(async (profileId: string | null) => {
+    // Switch back to self
+    if (profileId === null) {
+      setActiveProfile(userProfile);
+      localStorage.removeItem(ACTIVE_PROFILE_KEY);
+      return;
+    }
+
+    // Validate the proxy belongs to this user
+    const proxy = managedProxies.find(p => p.id === profileId);
+    if (!proxy) {
+      console.error("[AuthProvider] Cannot switch to profile - not a managed proxy:", profileId);
+      return;
+    }
+
+    // Switch to proxy
+    setActiveProfile(proxy);
+    localStorage.setItem(ACTIVE_PROFILE_KEY, profileId);
+  }, [userProfile, managedProxies]);
+
+  // ============================================================================
+  // Restore persisted profile on load
+  // ============================================================================
+  const restoreActiveProfile = useCallback(async (proxies: ActiveProfile[], user: ActiveProfile) => {
+    const savedProfileId = localStorage.getItem(ACTIVE_PROFILE_KEY);
+    
+    if (!savedProfileId) {
+      setActiveProfile(user);
+      return;
+    }
+
+    // Check if saved profile is still a valid proxy
+    const savedProxy = proxies.find(p => p.id === savedProfileId);
+    if (savedProxy) {
+      setActiveProfile(savedProxy);
+    } else {
+      // Invalid/expired - clear and use self
+      localStorage.removeItem(ACTIVE_PROFILE_KEY);
+      setActiveProfile(user);
+    }
+  }, []);
+
+  // ============================================================================
+  // Initialize auth and proxies
+  // ============================================================================
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data }) => {
+    const initAuth = async () => {
+      // Get initial session
+      const { data } = await supabase.auth.getSession();
       const initialSession = data.session ?? null;
       setSession(initialSession);
-      setLoading(false);
 
-      // Identify user if already logged in
-      if (initialSession?.user && identifiedUserRef.current !== initialSession.user.id) {
-        identifyUser(initialSession.user.id, {
-          email: initialSession.user.email || '',
-          created_at: initialSession.user.created_at || '',
-        });
-        identifiedUserRef.current = initialSession.user.id;
+      if (initialSession?.user) {
+        // Fetch user profile
+        const profile = await fetchUserProfile(initialSession.user.id);
+        if (profile) {
+          setUserProfile(profile);
+          
+          // Fetch proxies
+          const { data: proxyData } = await supabase
+            .from("users")
+            .select("id, display_name, is_proxy, managed_by")
+            .eq("managed_by", initialSession.user.id)
+            .eq("is_proxy", true)
+            .is("deleted_at", null)
+            .eq("is_archived", false)
+            .order("display_name");
+
+          const proxies: ActiveProfile[] = (proxyData || []).map((p: any) => ({
+            id: p.id,
+            display_name: p.display_name,
+            is_proxy: p.is_proxy ?? true,
+            managed_by: p.managed_by,
+          }));
+          setManagedProxies(proxies);
+
+          // Restore persisted active profile
+          await restoreActiveProfile(proxies, profile);
+        }
+
+        // Identify for analytics
+        if (identifiedUserRef.current !== initialSession.user.id) {
+          identifyUser(initialSession.user.id, {
+            email: initialSession.user.email || '',
+            created_at: initialSession.user.created_at || '',
+          });
+          identifiedUserRef.current = initialSession.user.id;
+        }
       }
-    });
+
+      setLoading(false);
+    };
+
+    initAuth();
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, newSession) => {
+    } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, newSession) => {
       setSession(newSession);
-
-      // Handle analytics based on auth event
       handleAuthAnalytics(event, newSession);
+
+      // On sign out, clear proxy state
+      if (event === 'SIGNED_OUT') {
+        setUserProfile(null);
+        setActiveProfile(null);
+        setManagedProxies([]);
+        localStorage.removeItem(ACTIVE_PROFILE_KEY);
+      }
+
+      // On sign in, refresh profile and proxies
+      if (event === 'SIGNED_IN' && newSession?.user) {
+        const profile = await fetchUserProfile(newSession.user.id);
+        if (profile) {
+          setUserProfile(profile);
+          setActiveProfile(profile);
+          await refreshProxies();
+        }
+      }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase]);
+  }, [supabase, fetchUserProfile, restoreActiveProfile, refreshProxies]);
 
-  // Handle analytics for different auth events
+  // ============================================================================
+  // Analytics handler
+  // ============================================================================
   const handleAuthAnalytics = (event: AuthChangeEvent, newSession: Session | null) => {
     switch (event) {
       case 'SIGNED_IN':
         if (newSession?.user && identifiedUserRef.current !== newSession.user.id) {
-          // Identify user for per-user tracking across all tools
           identifyUser(newSession.user.id, {
             email: newSession.user.email || '',
             created_at: newSession.user.created_at || '',
           });
           identifiedUserRef.current = newSession.user.id;
 
-          // Track login event
           const provider = newSession.user.app_metadata?.provider;
           analytics.login(provider === 'google' ? 'google' : 'email');
         }
         break;
 
       case 'SIGNED_OUT':
-        // Clear user identity
         clearUser();
         identifiedUserRef.current = null;
         analytics.logout();
         break;
 
       case 'USER_UPDATED':
-        // Re-identify with updated info
         if (newSession?.user) {
           identifyUser(newSession.user.id, {
             email: newSession.user.email || '',
@@ -93,21 +291,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // ============================================================================
+  // Sign out
+  // ============================================================================
   const signOut = async (redirectTo = "/sign-in?signedOut=true") => {
+    // Clear proxy state
+    setUserProfile(null);
+    setActiveProfile(null);
+    setManagedProxies([]);
+    localStorage.removeItem(ACTIVE_PROFILE_KEY);
+    
     await supabase.auth.signOut();
     setSession(null);
     router.push(redirectTo);
   };
 
+  // ============================================================================
+  // Context value
+  // ============================================================================
   const value: AuthContextValue = {
+    // Core auth
     user: session?.user ?? null,
     session,
     loading,
     signOut,
+
+    // PRD 41: "Act As" context
+    activeProfile,
+    isActingAsProxy,
+    managedProxies,
+    switchProfile,
+    refreshProxies,
+    proxiesLoading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
+
+// ============================================================================
+// Hook
+// ============================================================================
 
 export function useAuth(): AuthContextValue {
   const context = useContext(AuthContext);
@@ -116,4 +339,3 @@ export function useAuth(): AuthContextValue {
   }
   return context;
 }
-
