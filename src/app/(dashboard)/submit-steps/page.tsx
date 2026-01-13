@@ -8,7 +8,6 @@ import { normalizeError, reportErrorClient, errorFromResponse, ErrorCode } from 
 import { SubmissionForm } from "@/components/forms/SubmissionForm";
 import { BatchSubmissionForm } from "@/components/forms/BatchSubmissionForm";
 import { BulkUnverifiedForm } from "@/components/forms/BulkUnverifiedForm";
-import { ProxySubmissionSection } from "@/components/forms/ProxySubmissionSection";
 import { SubmissionEditPanel } from "@/components/forms/SubmissionEditPanel";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
 import { SystemBadge } from "@/components/ui/SystemBadge";
@@ -530,12 +529,8 @@ export default function SubmitPage() {
                     </div>
                 </div>
 
-                {/* Proxy Submission Section - For Admins/Owners */}
-                <ProxySubmissionSection
-                    adminLeagues={adminLeagues}
-                    submissionMode={submissionMode}
-                    onSubmitted={handleSubmissionComplete}
-                />
+                {/* Act As / Managed Profiles Section - Use the Profile Switcher in the top nav instead */}
+
 
                 {/* Submit Steps Section */}
                 <ModuleFeedback moduleId="submission-form" moduleName="Step Submission Form">

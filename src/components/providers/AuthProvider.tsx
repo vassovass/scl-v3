@@ -6,11 +6,15 @@ import type { Session, User, AuthChangeEvent } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { analytics, identifyUser, clearUser } from "@/lib/analytics";
 
+
 interface AuthContextValue {
-  user: User | null;
+  user: User | null;         // The currently "acting" user (proxy or real)
+  realUser: User | null;     // The actual authenticated user (always the real login)
   session: Session | null;
   loading: boolean;
   signOut: (redirectTo?: string) => Promise<void>;
+  switchProfile: (profile: User | null) => void;
+  isActingAsProxy: boolean;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -20,6 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = useMemo(() => createClient(), []);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeProfile, setActiveProfile] = useState<User | null>(null);
 
   // Track if user was already identified (prevent duplicate events)
   const identifiedUserRef = useRef<string | null>(null);
@@ -30,6 +35,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const initialSession = data.session ?? null;
       setSession(initialSession);
       setLoading(false);
+      // Default active profile to real user on load
+      if (initialSession?.user) {
+        setActiveProfile(initialSession.user);
+      }
 
       // Identify user if already logged in
       if (initialSession?.user && identifiedUserRef.current !== initialSession.user.id) {
@@ -46,6 +55,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, newSession) => {
       setSession(newSession);
+      // Reset active profile to real user on auth change (login/logout)
+      if (newSession?.user) {
+        setActiveProfile(newSession.user);
+      } else {
+        setActiveProfile(null);
+      }
 
       // Handle analytics based on auth event
       handleAuthAnalytics(event, newSession);
@@ -96,14 +111,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async (redirectTo = "/sign-in?signedOut=true") => {
     await supabase.auth.signOut();
     setSession(null);
+    setActiveProfile(null);
     router.push(redirectTo);
   };
 
+  const switchProfile = (profile: User | null) => {
+    if (!session?.user) return;
+    // If null passed, reset to real user
+    setActiveProfile(profile || session.user);
+
+    // Track the switch
+    if (profile && profile.id !== session.user.id) {
+      analytics.trackEvent("profile_switch", {
+        category: "user",
+        action: "switch",
+        target_profile_id: profile.id
+      });
+    }
+  };
+
   const value: AuthContextValue = {
-    user: session?.user ?? null,
+    user: activeProfile, // This makes most components automatically use the active profile
+    realUser: session?.user ?? null, // Access original user if needed
     session,
     loading,
     signOut,
+    switchProfile,
+    isActingAsProxy: !!(activeProfile && session?.user && activeProfile.id !== session.user.id),
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

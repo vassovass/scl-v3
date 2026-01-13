@@ -4,30 +4,21 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { toast } from "@/hooks/use-toast";
+import { Copy, Plus, Trash2, Users } from "lucide-react";
 
-interface ProxyMember {
+interface ProxyUser {
     id: string;
-    display_name: string;
-    created_by: string;
-    created_at: string;
-    submission_count: number;
-}
-
-interface LeagueMember {
-    user_id: string;
     display_name: string | null;
-    role: string;
+    invite_code: string | null;
+    created_at: string;
+    // We might want to fetch submission count if possible, but the new API might not return it yet.
+    // For now, let's assume we can add it to the API or just skip it.
+    // The previous API had it. Let's see if we can get it.
 }
 
-interface ProxyMemberManagementProps {
-    leagueId: string;
-    userRole: string;
-}
-
-export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagementProps) {
+export function ProxyMemberManagement() {
     const { session } = useAuth();
-    const [proxyMembers, setProxyMembers] = useState<ProxyMember[]>([]);
-    const [leagueMembers, setLeagueMembers] = useState<LeagueMember[]>([]);
+    const [proxies, setProxies] = useState<ProxyUser[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -36,54 +27,31 @@ export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagem
     const [newProxyName, setNewProxyName] = useState("");
     const [creating, setCreating] = useState(false);
 
-    // Link modal state
-    const [linkingProxy, setLinkingProxy] = useState<ProxyMember | null>(null);
-    const [selectedUserId, setSelectedUserId] = useState<string>("");
-    const [linking, setLinking] = useState(false);
-
     // Delete confirmation state
     const [deletingProxyId, setDeletingProxyId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
 
-    const canManage = userRole === "owner" || userRole === "admin";
-
-    const fetchProxyMembers = useCallback(async () => {
+    const fetchProxies = useCallback(async () => {
         if (!session) return;
-
+        setLoading(true);
         try {
-            const res = await fetch(`/api/leagues/${leagueId}/proxy-members`);
+            const res = await fetch(`/api/proxies`);
             if (res.ok) {
                 const data = await res.json();
-                setProxyMembers(data.proxy_members || []);
+                setProxies(data.proxies || []);
             } else {
-                const errData = await res.json();
-                setError(errData.error || "Failed to load proxy members");
+                setError("Failed to load proxies");
             }
         } catch (err) {
-            setError("Failed to load proxy members");
+            setError("Failed to load proxies");
         } finally {
             setLoading(false);
         }
-    }, [session, leagueId]);
-
-    const fetchLeagueMembers = useCallback(async () => {
-        if (!session) return;
-
-        try {
-            const res = await fetch(`/api/leagues/${leagueId}`);
-            if (res.ok) {
-                const data = await res.json();
-                setLeagueMembers(data.members || []);
-            }
-        } catch (err) {
-            console.error("Failed to fetch league members:", err);
-        }
-    }, [session, leagueId]);
+    }, [session]);
 
     useEffect(() => {
-        fetchProxyMembers();
-        fetchLeagueMembers();
-    }, [fetchProxyMembers, fetchLeagueMembers]);
+        fetchProxies();
+    }, [fetchProxies]);
 
     const handleCreate = async () => {
         if (!newProxyName.trim()) return;
@@ -92,7 +60,7 @@ export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagem
         setError(null);
 
         try {
-            const res = await fetch(`/api/leagues/${leagueId}/proxy-members`, {
+            const res = await fetch(`/api/proxies`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ display_name: newProxyName.trim() }),
@@ -101,13 +69,17 @@ export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagem
             if (res.ok) {
                 setNewProxyName("");
                 setShowCreateModal(false);
-                fetchProxyMembers();
+                fetchProxies();
+                toast({
+                    title: "Proxy Created",
+                    description: "You can now act as this user or share their invite code.",
+                });
             } else {
                 const errData = await res.json();
-                setError(errData.error || "Failed to create proxy member");
+                setError(errData.error || "Failed to create proxy");
             }
         } catch (err) {
-            setError("Failed to create proxy member");
+            setError("Failed to create proxy");
         } finally {
             setCreating(false);
         }
@@ -118,87 +90,60 @@ export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagem
 
         setDeleting(true);
         try {
-            const res = await fetch(`/api/leagues/${leagueId}/proxy-members?proxy_id=${deletingProxyId}`, {
+            const res = await fetch(`/api/proxies?id=${deletingProxyId}`, {
                 method: "DELETE",
             });
 
             if (res.ok) {
-                fetchProxyMembers();
+                fetchProxies();
                 toast({
                     title: "Proxy deleted",
-                    description: "Proxy member has been removed.",
+                    description: "Proxy user has been removed.",
                 });
             } else {
                 const errData = await res.json();
-                setError(errData.error || "Failed to delete proxy member");
+                setError(errData.error || "Failed to delete proxy");
             }
         } catch (err) {
-            setError("Failed to delete proxy member");
+            setError("Failed to delete proxy");
         } finally {
             setDeleting(false);
             setDeletingProxyId(null);
         }
     };
 
-    const handleLink = async () => {
-        if (!linkingProxy || !selectedUserId) return;
-
-        setLinking(true);
-        setError(null);
-
-        try {
-            const res = await fetch(`/api/leagues/${leagueId}/proxy-members/${linkingProxy.id}/link`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ target_user_id: selectedUserId }),
-            });
-
-            if (res.ok) {
-                const data = await res.json();
-                toast({
-                    title: "Successfully linked!",
-                    description: `${data.transferred_submissions} submissions transferred.`,
-                });
-                setLinkingProxy(null);
-                setSelectedUserId("");
-                fetchProxyMembers();
-            } else {
-                const errData = await res.json();
-                setError(errData.error || "Failed to link proxy member");
-            }
-        } catch (err) {
-            setError("Failed to link proxy member");
-        } finally {
-            setLinking(false);
-        }
+    const copyInviteCode = (code: string | null) => {
+        if (!code) return;
+        navigator.clipboard.writeText(code);
+        toast({
+            title: "Copied!",
+            description: "Invite code copied to clipboard. Share it with the user to claim this account.",
+        });
     };
 
-    if (!canManage) {
-        return null; // Hide for regular members
-    }
-
-    if (loading) {
+    if (loading && proxies.length === 0) {
         return (
             <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
-                <div className="animate-pulse text-slate-400">Loading proxy members...</div>
+                <div className="animate-pulse text-slate-400">Loading managed profiles...</div>
             </div>
         );
     }
 
     return (
-        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6" data-tour="proxy-members">
+        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6" data-tour="proxy-management">
             <div className="flex items-center justify-between mb-4">
                 <div>
-                    <h3 className="text-lg font-semibold text-slate-100">Proxy Members</h3>
+                    <h3 className="text-lg font-semibold text-slate-100">Managed Profiles</h3>
                     <p className="text-sm text-slate-400">
-                        Create placeholder profiles for people who haven&apos;t signed up yet
+                        Create shadow accounts to manage steps for others until they sign up.
                     </p>
                 </div>
                 <button
                     onClick={() => setShowCreateModal(true)}
-                    className="rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 transition"
+                    className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition"
                 >
-                    + Add Proxy
+                    <Plus className="h-4 w-4" />
+                    <span>Add Profile</span>
                 </button>
             </div>
 
@@ -208,46 +153,51 @@ export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagem
                 </div>
             )}
 
-            {proxyMembers.length === 0 ? (
-                <div className="text-center py-8 text-slate-500">
-                    <p>No proxy members yet.</p>
-                    <p className="text-sm mt-1">Create one to track steps for someone before they join.</p>
+            {proxies.length === 0 ? (
+                <div className="text-center py-8 text-slate-500 border border-dashed border-slate-800 rounded-lg">
+                    <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>No managed profiles yet.</p>
+                    <p className="text-sm mt-1">Create one to get started.</p>
                 </div>
             ) : (
-                <div className="space-y-3">
-                    {proxyMembers.map((proxy) => (
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {proxies.map((proxy) => (
                         <div
                             key={proxy.id}
-                            className="flex items-center justify-between rounded-lg border border-slate-700 bg-slate-800/50 p-4"
+                            className="flex flex-col justify-between rounded-lg border border-slate-700 bg-slate-800/50 p-4 hover:bg-slate-800 transition"
                         >
-                            <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-medium">
-                                    {proxy.display_name.charAt(0).toUpperCase()}
-                                </div>
-                                <div>
-                                    <div className="font-medium text-slate-100">{proxy.display_name}</div>
-                                    <div className="text-xs text-slate-500">
-                                        {proxy.submission_count} submission{proxy.submission_count !== 1 ? "s" : ""}
+                            <div className="flex items-start justify-between mb-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-medium shadow-sm">
+                                        {proxy.display_name?.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div className="overflow-hidden">
+                                        <div className="font-medium text-slate-100 truncate" title={proxy.display_name || ""}>
+                                            {proxy.display_name}
+                                        </div>
+                                        <div className="text-xs text-slate-500">
+                                            {new Date(proxy.created_at).toLocaleDateString()}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => {
-                                        setLinkingProxy(proxy);
-                                        setSelectedUserId("");
-                                    }}
-                                    className="rounded-lg border border-emerald-600 px-3 py-1.5 text-xs font-medium text-emerald-400 hover:bg-emerald-600/20 transition"
-                                >
-                                    🔗 Link to User
-                                </button>
                                 <button
                                     onClick={() => setDeletingProxyId(proxy.id)}
-                                    className="rounded-lg border border-slate-600 px-3 py-1.5 text-xs font-medium text-slate-400 hover:border-rose-500 hover:text-rose-400 transition"
-                                    title={proxy.submission_count > 0 ? "Cannot delete proxy with submissions" : "Delete proxy"}
+                                    className="text-slate-500 hover:text-rose-400 transition p-1"
+                                    title="Delete profile"
                                 >
-                                    🗑️
+                                    <Trash2 className="h-4 w-4" />
+                                </button>
+                            </div>
+
+                            <div className="mt-2 pt-3 border-t border-slate-700/50">
+                                <div className="text-xs text-slate-400 mb-1">Invite Code</div>
+                                <button
+                                    onClick={() => copyInviteCode(proxy.invite_code)}
+                                    className="flex items-center justify-between w-full rounded bg-slate-900/50 px-2 py-1.5 text-xs text-slate-300 hover:bg-slate-900 hover:text-white transition group border border-transparent hover:border-slate-700"
+                                    title="Click to copy"
+                                >
+                                    <span className="font-mono tracking-wider">{proxy.invite_code || "Generating..."}</span>
+                                    <Copy className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </button>
                             </div>
                         </div>
@@ -257,18 +207,21 @@ export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagem
 
             {/* Create Modal */}
             {showCreateModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-                    <div className="w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
-                        <h3 className="text-lg font-semibold text-slate-100 mb-4">Create Proxy Member</h3>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl scale-100 animate-in zoom-in-95 duration-200">
+                        <h3 className="text-lg font-semibold text-slate-100 mb-4">Create Managed Profile</h3>
+                        <p className="text-sm text-slate-400 mb-4">
+                            You will control this profile until the user claims it with their invite code.
+                        </p>
                         <input
                             type="text"
                             value={newProxyName}
-                            onChange={(e) => setNewProxyName(e.target.value)}
-                            placeholder="Enter display name (e.g., Joe Soap)"
-                            className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-slate-100 placeholder-slate-500 focus:border-sky-500 focus:outline-none"
+                            onChange={(e) => setNewName(e.target.value)}
+                            placeholder="Display Name (e.g. John Doe)"
+                            className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-slate-100 placeholder-slate-500 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition"
                             autoFocus
                         />
-                        <div className="mt-4 flex gap-3 justify-end">
+                        <div className="mt-6 flex gap-3 justify-end">
                             <button
                                 onClick={() => {
                                     setShowCreateModal(false);
@@ -281,58 +234,9 @@ export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagem
                             <button
                                 onClick={handleCreate}
                                 disabled={creating || !newProxyName.trim()}
-                                className="rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:opacity-50 transition"
+                                className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition"
                             >
-                                {creating ? "Creating..." : "Create"}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Link Modal */}
-            {linkingProxy && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-                    <div className="w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
-                        <h3 className="text-lg font-semibold text-slate-100 mb-2">
-                            Link &ldquo;{linkingProxy.display_name}&rdquo;
-                        </h3>
-                        <p className="text-sm text-slate-400 mb-4">
-                            Select a league member to transfer {linkingProxy.submission_count} submission{linkingProxy.submission_count !== 1 ? "s" : ""} to.
-                            The proxy will be deleted after linking.
-                        </p>
-
-                        <select
-                            value={selectedUserId}
-                            onChange={(e) => setSelectedUserId(e.target.value)}
-                            className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-slate-100 focus:border-sky-500 focus:outline-none"
-                        >
-                            <option value="">Select a member...</option>
-                            {leagueMembers
-                                .filter((m) => m.role !== "owner") // Optionally exclude owner
-                                .map((member) => (
-                                    <option key={member.user_id} value={member.user_id}>
-                                        {member.display_name || "Unknown"} ({member.role})
-                                    </option>
-                                ))}
-                        </select>
-
-                        <div className="mt-4 flex gap-3 justify-end">
-                            <button
-                                onClick={() => {
-                                    setLinkingProxy(null);
-                                    setSelectedUserId("");
-                                }}
-                                className="rounded-lg border border-slate-600 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 transition"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleLink}
-                                disabled={linking || !selectedUserId}
-                                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-50 transition"
-                            >
-                                {linking ? "Linking..." : "Link & Transfer"}
+                                {creating ? "Creating..." : "Create Profile"}
                             </button>
                         </div>
                     </div>
@@ -345,9 +249,9 @@ export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagem
                 onOpenChange={(open) => {
                     if (!open) setDeletingProxyId(null);
                 }}
-                title="Delete Proxy Member?"
-                description="This will permanently delete this proxy member. This action cannot be undone."
-                confirmText="Delete"
+                title="Delete Profile?"
+                description="This will permanently delete this profile and all its data. This action cannot be undone."
+                confirmText="Delete Profile"
                 variant="destructive"
                 onConfirm={handleDeleteConfirm}
                 isLoading={deleting}
@@ -355,3 +259,4 @@ export function ProxyMemberManagement({ leagueId, userRole }: ProxyMemberManagem
         </div>
     );
 }
+
