@@ -13,8 +13,10 @@ export async function apiRequest<T = unknown>(path: string, init: RequestInit = 
 
     console.log(`[API] ${method} ${path} → Starting...`);
 
+    console.log(`[API] ${method} ${path} → Getting session...`);
     const supabase = createClient();
     const { data } = await supabase.auth.getSession();
+    console.log(`[API] ${method} ${path} → Session obtained, hasToken: ${!!data.session?.access_token}`);
 
     const headers = new Headers(init.headers ?? {});
     if (data.session?.access_token) {
@@ -26,6 +28,7 @@ export async function apiRequest<T = unknown>(path: string, init: RequestInit = 
         headers.set("Content-Type", "application/json");
     }
 
+    console.log(`[API] ${method} ${path} → Calling fetch...`);
     try {
         const response = await fetch(normalizedPath, {
             ...init,
