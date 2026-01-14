@@ -66,6 +66,11 @@ export async function apiRequest<T = unknown>(path: string, options: ApiRequestO
         }
     }
 
+    // TypeScript guard - should never reach here due to throw above, but needed for type safety
+    if (!sessionData) {
+        throw new Error("Failed to get session. Please refresh the page and try again.");
+    }
+
     console.log(`[API] ${method} ${path} → Session obtained, hasToken: ${!!sessionData.session?.access_token}`);
 
     const headers = new Headers(init.headers ?? {});
