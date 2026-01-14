@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 
 // Storage key must match AuthProvider
 const ACTIVE_PROFILE_KEY = "stepleague_active_profile_id";
-const SESSION_TIMEOUT_MS = 8000; // Increased to handle slow auth responses
+const SESSION_TIMEOUT_MS = 10000; // 10s for refreshSession during long operations
 
 /**
  * Options for API requests
@@ -15,14 +15,32 @@ export interface ApiRequestOptions extends RequestInit {
 }
 
 /**
- * Get session with timeout to prevent indefinite hangs.
+ * Get session with timeout and refresh. Uses refreshSession first to ensure 
+ * we have a fresh token, falls back to getSession if that fails.
  */
 async function getSessionWithTimeout(supabase: ReturnType<typeof createClient>) {
-    const sessionPromise = supabase.auth.getSession();
+    const timeoutMs = SESSION_TIMEOUT_MS;
+
+    // First try to refresh the session for a fresh token
+    const refreshPromise = (async () => {
+        try {
+            // Try refreshSession first for fresh token
+            const { data, error } = await supabase.auth.refreshSession();
+            if (data.session) {
+                return { data, error: null };
+            }
+            // If refresh fails, fall back to getSession
+            return await supabase.auth.getSession();
+        } catch {
+            // If refreshSession throws, fall back to getSession
+            return await supabase.auth.getSession();
+        }
+    })();
+
     const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("Session timeout after 5s")), SESSION_TIMEOUT_MS)
+        setTimeout(() => reject(new Error(`Session timeout after ${timeoutMs / 1000}s`)), timeoutMs)
     );
-    return Promise.race([sessionPromise, timeoutPromise]);
+    return Promise.race([refreshPromise, timeoutPromise]);
 }
 
 /**
