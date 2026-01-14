@@ -7,6 +7,14 @@ const ACTIVE_PROFILE_KEY = "stepleague_active_profile_id";
 const SESSION_TIMEOUT_MS = 5000;
 
 /**
+ * Options for API requests
+ */
+export interface ApiRequestOptions extends RequestInit {
+    /** Explicit user ID to act as (overrides localStorage). For proxy submissions. */
+    actingAs?: string;
+}
+
+/**
  * Get session with timeout to prevent indefinite hangs.
  */
 async function getSessionWithTimeout(supabase: ReturnType<typeof createClient>) {
@@ -20,13 +28,17 @@ async function getSessionWithTimeout(supabase: ReturnType<typeof createClient>) 
 /**
  * Make an authenticated API request to our backend.
  * Automatically includes the user's auth token and X-Acting-As header for proxy submissions.
+ * @param path - API path (e.g., "submissions/batch")
+ * @param options - Fetch options plus optional `actingAs` for proxy submissions
  */
-export async function apiRequest<T = unknown>(path: string, init: RequestInit = {}): Promise<T> {
+export async function apiRequest<T = unknown>(path: string, options: ApiRequestOptions = {}): Promise<T> {
+    const { actingAs, ...init } = options;
     const startTime = Date.now();
     const method = init.method || 'GET';
     const normalizedPath = normalizePath(path);
 
     console.log(`[API] ${method} ${path} → Starting...`);
+
 
     console.log(`[API] ${method} ${path} → Getting session...`);
     const supabase = createClient();
@@ -48,9 +60,10 @@ export async function apiRequest<T = unknown>(path: string, init: RequestInit = 
     }
 
     // PRD 41: Include X-Acting-As header if currently acting as a proxy
-    const activeProfileId = typeof window !== "undefined"
-        ? localStorage.getItem(ACTIVE_PROFILE_KEY)
-        : null;
+    // Priority: explicit actingAs param > localStorage > none
+    const activeProfileId = actingAs ?? (
+        typeof window !== "undefined" ? localStorage.getItem(ACTIVE_PROFILE_KEY) : null
+    );
     const currentUserId = sessionData.session?.user?.id;
 
     if (activeProfileId && activeProfileId !== currentUserId) {

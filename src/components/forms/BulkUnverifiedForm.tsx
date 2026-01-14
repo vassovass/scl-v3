@@ -103,11 +103,11 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
         try {
             const response = await apiRequest<BulkResponse>("/api/submissions/bulk-unverified", {
                 method: "POST",
+                actingAs: proxyMemberId, // PRD 41: Pass proxy ID for proxy submissions
                 body: JSON.stringify({
                     league_id: leagueId,
                     reason: reason.trim(),
                     entries: validEntries,
-                    // PRD 41: proxy_member_id removed - handled via AuthProvider activeProfile
                 }),
             });
 

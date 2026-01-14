@@ -178,6 +178,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
             setExtractionStep(`Getting upload URL for ${image.file.name}...`);
             const signed = await apiRequest<SignUploadResponse>("proofs/sign-upload", {
                 method: "POST",
+                actingAs: proxyMemberId,
                 body: JSON.stringify({ content_type: compressedFile.type }),
             });
             console.log(`[BatchUpload] Got upload path: ${signed.path}`);
@@ -214,6 +215,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
 
             const extractResponse = await apiRequest<ExtractResponse>("submissions/extract", {
                 method: "POST",
+                actingAs: proxyMemberId,
                 body: JSON.stringify(extractPayload),
             });
 
@@ -593,13 +595,13 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
             try {
                 const response = await apiRequest<SubmissionResponse>("submissions/batch", {
                     method: "POST",
+                    actingAs: proxyMemberId, // PRD 41: Pass proxy ID for proxy submissions
                     body: JSON.stringify({
                         league_id: leagueId,
                         proof_path: image.proofPath,
                         steps: image.editedSteps,
                         date: image.editedDate,
                         overwrite: true, // Allow overwriting if date already exists
-                        // PRD 41: proxy_member_id removed - handled via AuthProvider activeProfile
                     }),
                 });
 

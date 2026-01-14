@@ -145,6 +145,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
             try {
                 const result = await apiRequest<{ verified: boolean }>("submissions/verify", {
                     method: "POST",
+                    actingAs: proxyMemberId,
                     body: JSON.stringify({
                         submission_id: pendingVerification.submissionId,
                         league_id: pendingVerification.leagueId,
@@ -225,6 +226,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
         try {
             const response = await apiRequest<SubmissionResponse>("submissions", {
                 method: "POST",
+                actingAs: proxyMemberId,
                 body: JSON.stringify({
                     league_id: leagueId,
                     date: conflictData.date,
@@ -340,6 +342,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                 console.log(`[SingleSubmit] Step 1: Getting signed upload URL`);
                 const signed = await apiRequest<SignUploadResponse>("proofs/sign-upload", {
                     method: "POST",
+                    actingAs: proxyMemberId,
                     body: JSON.stringify({ content_type: fileToUpload.type }),
                 });
 
@@ -354,6 +357,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
 
             const response = await apiRequest<SubmissionResponse>("submissions", {
                 method: "POST",
+                actingAs: proxyMemberId,
                 body: JSON.stringify({
                     league_id: leagueId,
                     date,
@@ -452,6 +456,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                             }>;
                         }>("submissions/check-conflict", {
                             method: "POST",
+                            actingAs: proxyMemberId,
                             body: JSON.stringify({
                                 dates: [date],
                                 league_id: leagueId || null,
