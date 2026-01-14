@@ -299,22 +299,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async (redirectTo = "/sign-in?signedOut=true") => {
     console.log('[AuthProvider] signOut called, redirectTo:', redirectTo);
 
-    // Clear proxy state
+    // Clear proxy state first
     console.log('[AuthProvider] Clearing proxy state...');
     setUserProfile(null);
     setActiveProfile(null);
     setManagedProxies([]);
     localStorage.removeItem(ACTIVE_PROFILE_KEY);
 
-    console.log('[AuthProvider] Calling supabase.auth.signOut()...');
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('[AuthProvider] signOut error:', error);
-    } else {
-      console.log('[AuthProvider] supabase.auth.signOut() succeeded');
+    // Clear session state locally first to ensure UI updates
+    setSession(null);
+
+    // Try to sign out from Supabase with a timeout
+    // Sometimes the API call hangs, so we don't want to block the user
+    console.log('[AuthProvider] Calling supabase.auth.signOut() with 5s timeout...');
+    try {
+      const signOutPromise = supabase.auth.signOut();
+      const timeoutPromise = new Promise<{ error: Error }>((_, reject) =>
+        setTimeout(() => reject(new Error('Sign out timed out after 5 seconds')), 5000)
+      );
+
+      const result = await Promise.race([signOutPromise, timeoutPromise]);
+
+      if (result && 'error' in result && result.error) {
+        console.error('[AuthProvider] signOut error:', result.error);
+      } else {
+        console.log('[AuthProvider] supabase.auth.signOut() succeeded');
+      }
+    } catch (error) {
+      console.error('[AuthProvider] signOut failed or timed out:', error);
+      // Continue anyway - we've already cleared local state
     }
 
-    setSession(null);
+    // Always redirect, even if signOut API call failed/timed out
     console.log('[AuthProvider] Redirecting to:', redirectTo);
     router.push(redirectTo);
   };
