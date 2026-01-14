@@ -13,7 +13,7 @@ const nextConfig = {
       },
     ],
   },
-  
+
   // Expose version and commit hash to the client
   env: {
     NEXT_PUBLIC_APP_VERSION: process.env.npm_package_version || '0.0.0',
@@ -37,6 +37,11 @@ const withPWA = nextPwa.default({
   publicExcludes: ['!api/**/*', '!admin/**/*'],
   workboxOptions: {
     runtimeCaching: [
+      // Supabase auth - MUST bypass service worker to prevent session issues
+      { urlPattern: /^https:\/\/.*\.supabase\.co\/auth\//i, handler: "NetworkOnly" },
+      { urlPattern: /^https:\/\/.*\.supabase\.co\/rest\//i, handler: "NetworkOnly" },
+      { urlPattern: /^https:\/\/.*\.supabase\.co\/storage\//i, handler: "NetworkOnly" },
+
       // Third-party analytics (often blocked)
       { urlPattern: /^https:\/\/www\.googletagmanager\.com\/gtm\.js/i, handler: "NetworkOnly" },
       { urlPattern: /^https:\/\/www\.googletagmanager\.com\/gtag\/js/i, handler: "NetworkOnly" },
