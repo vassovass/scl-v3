@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Session, User, AuthChangeEvent } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { analytics, identifyUser, clearUser } from "@/lib/analytics";
+import { setCachedSession, clearCachedSession } from "@/lib/auth/sessionCache";
 import type { ActiveProfile } from "@/types/database";
 
 // ============================================================================
@@ -184,6 +185,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const initialSession = data.session ?? null;
       setSession(initialSession);
 
+      // Update session cache for API client
+      if (initialSession) {
+        setCachedSession(
+          initialSession.access_token,
+          initialSession.user?.id ?? null,
+          initialSession.expires_at ?? null
+        );
+      }
+
       if (initialSession?.user) {
         // Fetch user profile
         const profile = await fetchUserProfile(initialSession.user.id);
@@ -234,12 +244,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(newSession);
       handleAuthAnalytics(event, newSession);
 
+      // Update session cache for API client
+      if (newSession) {
+        setCachedSession(
+          newSession.access_token,
+          newSession.user?.id ?? null,
+          newSession.expires_at ?? null
+        );
+      } else {
+        clearCachedSession();
+      }
+
       // On sign out, clear proxy state
       if (event === 'SIGNED_OUT') {
         setUserProfile(null);
         setActiveProfile(null);
         setManagedProxies([]);
         localStorage.removeItem(ACTIVE_PROFILE_KEY);
+        clearCachedSession();
       }
 
       // On sign in, refresh profile and proxies
@@ -305,6 +327,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setActiveProfile(null);
     setManagedProxies([]);
     localStorage.removeItem(ACTIVE_PROFILE_KEY);
+
+    // Clear session cache for API client
+    clearCachedSession();
 
     // Clear session state locally first to ensure UI updates
     setSession(null);

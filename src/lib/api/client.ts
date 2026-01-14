@@ -1,6 +1,7 @@
 "use client";
 
 import { createClient, resetClient } from "@/lib/supabase/client";
+import { getCachedSession } from "@/lib/auth/sessionCache";
 
 // Storage key must match AuthProvider
 const ACTIVE_PROFILE_KEY = "stepleague_active_profile_id";
@@ -60,22 +61,35 @@ export async function apiRequest<T = unknown>(path: string, options: ApiRequestO
 
     console.log(`[API] ${method} ${path} → Starting...`);
 
-    // Step 1: Try to get token from localStorage first (instant, no network)
-    let accessToken = getStoredAccessToken();
+    // Step 1: Try session cache first (fastest, always in sync with AuthProvider)
+    let accessToken: string | null = null;
     let currentUserId: string | null = null;
 
-    if (accessToken) {
-        console.log(`[API] ${method} ${path} → Found stored token`);
-        // Decode user ID from JWT if possible (simple base64 decode of payload)
-        try {
-            const payload = JSON.parse(atob(accessToken.split('.')[1]));
-            currentUserId = payload.sub ?? null;
-        } catch {
-            // If token decode fails, we'll still try to use it
+    const cachedSession = getCachedSession();
+    if (cachedSession) {
+        accessToken = cachedSession.accessToken;
+        currentUserId = cachedSession.userId;
+        console.log(`[API] ${method} ${path} → Using cached session (userId: ${currentUserId})`);
+    }
+
+    // Step 2: Fallback to localStorage if no cache (app just loaded, before AuthProvider init)
+    if (!accessToken) {
+        accessToken = getStoredAccessToken();
+        if (accessToken) {
+            console.log(`[API] ${method} ${path} → Found stored token`);
+            // Decode user ID from JWT if possible (simple base64 decode of payload)
+            try {
+                const payload = JSON.parse(atob(accessToken.split('.')[1]));
+                currentUserId = payload.sub ?? null;
+            } catch {
+                // If token decode fails, we'll still try to use it
+            }
         }
-    } else {
-        // Step 2: No stored token, must call getUser (with retries)
-        console.log(`[API] ${method} ${path} → No stored token, getting user...`);
+    }
+
+    // Step 3: Last resort - try Supabase getUser (can hang, but we have timeout)
+    if (!accessToken) {
+        console.log(`[API] ${method} ${path} → No cached/stored token, falling back to getUser...`);
 
         let userAttempts = 0;
         const maxAttempts = 2;
