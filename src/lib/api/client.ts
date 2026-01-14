@@ -1,10 +1,10 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
+import { createClient, resetClient } from "@/lib/supabase/client";
 
 // Storage key must match AuthProvider
 const ACTIVE_PROFILE_KEY = "stepleague_active_profile_id";
-const SESSION_TIMEOUT_MS = 10000; // 10s for refreshSession during long operations
+const SESSION_TIMEOUT_MS = 5000; // 5s per attempt, will retry with fresh client
 
 /**
  * Options for API requests
@@ -15,32 +15,14 @@ export interface ApiRequestOptions extends RequestInit {
 }
 
 /**
- * Get session with timeout and refresh. Uses refreshSession first to ensure 
- * we have a fresh token, falls back to getSession if that fails.
+ * Simple session getter with timeout. No refresh - just get cached session.
  */
 async function getSessionWithTimeout(supabase: ReturnType<typeof createClient>) {
-    const timeoutMs = SESSION_TIMEOUT_MS;
-
-    // First try to refresh the session for a fresh token
-    const refreshPromise = (async () => {
-        try {
-            // Try refreshSession first for fresh token
-            const { data, error } = await supabase.auth.refreshSession();
-            if (data.session) {
-                return { data, error: null };
-            }
-            // If refresh fails, fall back to getSession
-            return await supabase.auth.getSession();
-        } catch {
-            // If refreshSession throws, fall back to getSession
-            return await supabase.auth.getSession();
-        }
-    })();
-
+    const sessionPromise = supabase.auth.getSession();
     const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error(`Session timeout after ${timeoutMs / 1000}s`)), timeoutMs)
+        setTimeout(() => reject(new Error(`Session timeout after ${SESSION_TIMEOUT_MS / 1000}s`)), SESSION_TIMEOUT_MS)
     );
-    return Promise.race([refreshPromise, timeoutPromise]);
+    return Promise.race([sessionPromise, timeoutPromise]);
 }
 
 /**
@@ -57,17 +39,22 @@ export async function apiRequest<T = unknown>(path: string, options: ApiRequestO
 
     console.log(`[API] ${method} ${path} → Starting...`);
 
-
     console.log(`[API] ${method} ${path} → Getting session...`);
-    const supabase = createClient();
 
     let sessionData;
     let sessionAttempts = 0;
-    const maxSessionAttempts = 2;
+    const maxSessionAttempts = 3;
 
     while (sessionAttempts < maxSessionAttempts) {
         try {
             sessionAttempts++;
+            // On retry, reset the singleton and create fresh client
+            const forceNew = sessionAttempts > 1;
+            if (forceNew) {
+                console.log(`[API] ${method} ${path} → Resetting client for fresh session...`);
+                resetClient();
+            }
+            const supabase = createClient(forceNew);
             const result = await getSessionWithTimeout(supabase);
             sessionData = result.data;
             break; // Success, exit loop
@@ -78,9 +65,9 @@ export async function apiRequest<T = unknown>(path: string, options: ApiRequestO
                 throw new Error("Failed to get session. Please refresh the page and try again.");
             }
 
-            // Wait briefly before retry
-            await new Promise(r => setTimeout(r, 500));
-            console.log(`[API] ${method} ${path} → Retrying session...`);
+            // Short wait before retry with fresh client
+            await new Promise(r => setTimeout(r, 200));
+            console.log(`[API] ${method} ${path} → Retrying with fresh client...`);
         }
     }
 
