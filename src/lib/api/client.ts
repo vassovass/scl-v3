@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 
 // Storage key must match AuthProvider
 const ACTIVE_PROFILE_KEY = "stepleague_active_profile_id";
-const SESSION_TIMEOUT_MS = 5000;
+const SESSION_TIMEOUT_MS = 8000; // Increased to handle slow auth responses
 
 /**
  * Options for API requests
@@ -44,12 +44,26 @@ export async function apiRequest<T = unknown>(path: string, options: ApiRequestO
     const supabase = createClient();
 
     let sessionData;
-    try {
-        const result = await getSessionWithTimeout(supabase);
-        sessionData = result.data;
-    } catch (err) {
-        console.error(`[API] ${method} ${path} ✗ Session failed:`, err);
-        throw new Error("Failed to get session. Please refresh the page and try again.");
+    let sessionAttempts = 0;
+    const maxSessionAttempts = 2;
+
+    while (sessionAttempts < maxSessionAttempts) {
+        try {
+            sessionAttempts++;
+            const result = await getSessionWithTimeout(supabase);
+            sessionData = result.data;
+            break; // Success, exit loop
+        } catch (err) {
+            console.error(`[API] ${method} ${path} ✗ Session attempt ${sessionAttempts}/${maxSessionAttempts} failed:`, err);
+
+            if (sessionAttempts >= maxSessionAttempts) {
+                throw new Error("Failed to get session. Please refresh the page and try again.");
+            }
+
+            // Wait briefly before retry
+            await new Promise(r => setTimeout(r, 500));
+            console.log(`[API] ${method} ${path} → Retrying session...`);
+        }
     }
 
     console.log(`[API] ${method} ${path} → Session obtained, hasToken: ${!!sessionData.session?.access_token}`);
