@@ -165,20 +165,26 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
         try {
             // Step 1: Compress
             currentStep = "compressing";
+            console.log(`[BatchUpload] Starting extraction for ${image.file.name}`);
+            console.log(`[BatchUpload] Step 1: Compressing ${image.file.name} (${(image.file.size / 1024).toFixed(0)}KB)`);
             setExtractionStep(`Compressing ${image.file.name} (${(image.file.size / 1024).toFixed(0)}KB)...`);
             const compressedFile = await compressImage(image.file);
             const compressedSize = (compressedFile.size / 1024).toFixed(0);
+            console.log(`[BatchUpload] Compressed to ${compressedSize}KB`);
 
             // Step 2: Get signed upload URL
             currentStep = "signing";
+            console.log(`[BatchUpload] Step 2: Getting signed upload URL`);
             setExtractionStep(`Getting upload URL for ${image.file.name}...`);
             const signed = await apiRequest<SignUploadResponse>("proofs/sign-upload", {
                 method: "POST",
                 body: JSON.stringify({ content_type: compressedFile.type }),
             });
+            console.log(`[BatchUpload] Got upload path: ${signed.path}`);
 
             // Step 3: Upload to storage
             currentStep = "uploading";
+            console.log(`[BatchUpload] Step 3: Uploading to storage`);
             setExtractionStep(`Uploading ${image.file.name} (${compressedSize}KB)...`);
             const uploadResponse = await fetch(signed.upload_url, {
                 method: "PUT",
@@ -190,17 +196,21 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
             });
 
             if (!uploadResponse.ok) {
+                const errorText = await uploadResponse.text();
+                console.error(`[BatchUpload] Upload failed:`, { status: uploadResponse.status, statusText: uploadResponse.statusText, body: errorText });
                 throw new Error(`Upload failed: ${uploadResponse.status} ${uploadResponse.statusText}`);
             }
+            console.log(`[BatchUpload] Upload successful`);
 
             // Step 4: AI extraction
             currentStep = "extracting";
-            setExtractionStep(`AI analyzing ${image.file.name}...`);
             const extractPayload = {
                 league_id: leagueId || undefined, // Allow undefined for global
                 proof_path: signed.path,
                 filename: image.file.name,
             };
+            console.log(`[BatchUpload] Step 4: AI extraction`, extractPayload);
+            setExtractionStep(`AI analyzing ${image.file.name}...`);
 
             const extractResponse = await apiRequest<ExtractResponse>("submissions/extract", {
                 method: "POST",
@@ -208,6 +218,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
             });
 
             const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+            console.log(`[BatchUpload] ✓ Extraction complete in ${elapsed}s:`, extractResponse);
             setExtractionStep(`Completed ${image.file.name} in ${elapsed}s`);
 
             return {
@@ -219,6 +230,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
             };
         } catch (err) {
             const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+            console.error(`[BatchUpload] ✗ EXTRACTION FAILED at step "${currentStep}" after ${elapsed}s:`, err);
             setExtractionStep(`Failed at ${currentStep} after ${elapsed}s`);
 
             // Enhanced error info for debugging
@@ -230,14 +242,18 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                 elapsed: `${elapsed}s`,
                 timestamp: new Date().toISOString(),
             };
+            console.error(`[BatchUpload] Error context:`, errorContext);
 
             // If it's an ApiError, preserve the full details
             if (err instanceof ApiError) {
+                console.error(`[BatchUpload] ApiError details:`, { status: err.status, message: err.message, payload: err.payload });
                 return {
                     success: false,
                     error: {
-                        ...err,
-                        context: { ...err.context, ...errorContext }
+                        message: err.message,
+                        status: err.status,
+                        payload: err.payload,
+                        context: errorContext
                     }
                 };
             }
