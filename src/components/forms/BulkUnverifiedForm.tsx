@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { apiRequest, ApiError } from "@/lib/api/client";
 
 interface BulkUnverifiedFormProps {
-    leagueId: string;
+    leagueId?: string;
     proxyMemberId?: string;
     onSubmitted?: () => void;
 }

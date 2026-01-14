@@ -12,7 +12,7 @@ import { WifiOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface SubmissionFormProps {
-    leagueId: string;
+    leagueId?: string;
     proxyMemberId?: string;
     proxyDisplayName?: string;
     onSubmitted?: () => void;
@@ -58,7 +58,7 @@ interface VerificationDetails {
 
 interface PendingVerification {
     submissionId: string;
-    leagueId: string;
+    leagueId?: string;
     steps: number;
     forDate: string;
     proofPath: string;

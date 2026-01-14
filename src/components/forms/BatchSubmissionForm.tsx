@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { normalizeError, reportErrorClient, ErrorCode } from "@/lib/errors";
 
 interface BatchSubmissionFormProps {
-    leagueId: string;
+    leagueId?: string;
     proxyMemberId?: string;
     onSubmitted?: () => void;
 }
@@ -728,8 +728,8 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                         {img.extractedData?.confidence && (
                                             <div className="flex items-center gap-2">
                                                 <span className={`text-xs ${img.extractedData.confidence === "high" ? "text-emerald-400" :
-                                                        img.extractedData.confidence === "medium" ? "text-amber-400" :
-                                                            "text-rose-400"
+                                                    img.extractedData.confidence === "medium" ? "text-amber-400" :
+                                                        "text-rose-400"
                                                     }`}>
                                                     {img.extractedData.confidence === "high" ? "✓ High Confidence" :
                                                         img.extractedData.confidence === "medium" ? "⚠️ Medium Confidence" :

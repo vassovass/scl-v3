@@ -117,18 +117,18 @@ export function ProxySubmissionSection({
                         />
                     </div>
 
-                    {/* Step 2: League Selection (only needed for submission context) */}
+                    {/* Step 2: League Selection (OPTIONAL - for targeted submission) */}
                     {selectedProxy && (
                         <div>
                             <label className="text-sm font-medium text-[hsl(var(--warning))] block mb-2">
-                                2. Select League
+                                2. Select League <span className="text-muted-foreground font-normal">(optional)</span>
                             </label>
                             <select
                                 value={selectedLeagueId}
                                 onChange={(e) => handleLeagueChange(e.target.value)}
                                 className="w-full rounded-lg border border-input bg-secondary px-4 py-2.5 text-foreground focus:border-[hsl(var(--warning))] focus:outline-none"
                             >
-                                <option value="">Choose a league...</option>
+                                <option value="">All Leagues (Global)</option>
                                 {adminLeagues.map((league) => (
                                     <option key={league.id} value={league.id}>
                                         {league.name} ({league.role})
@@ -136,13 +136,16 @@ export function ProxySubmissionSection({
                                 ))}
                             </select>
                             <p className="mt-1 text-xs text-muted-foreground">
-                                Steps will be submitted to this league for {selectedProxy.display_name}
+                                {selectedLeagueId
+                                    ? `Steps will be submitted to ${adminLeagues.find(l => l.id === selectedLeagueId)?.name} for ${selectedProxy.display_name}`
+                                    : `Steps will apply globally to all leagues for ${selectedProxy.display_name}`
+                                }
                             </p>
                         </div>
                     )}
 
-                    {/* Step 3: Consent Declaration */}
-                    {selectedProxy && selectedLeagueId && (
+                    {/* Step 3: Consent Declaration (only requires proxy selection) */}
+                    {selectedProxy && (
                         <div>
                             <label className="text-sm font-medium text-[hsl(var(--warning))] block mb-2">
                                 3. Authorization Declaration
@@ -152,26 +155,33 @@ export function ProxySubmissionSection({
                                 checked={consent}
                                 onCheckedChange={setConsent}
                                 proxyId={selectedProxy.id}
-                                leagueId={selectedLeagueId}
+                                leagueId={selectedLeagueId || undefined}
                             />
                         </div>
                     )}
 
-                    {/* Step 4: Submission Forms */}
-                    {selectedProxy && selectedLeagueId && consent && (
+                    {/* Step 4: Submission Forms (league is now optional) */}
+                    {selectedProxy && consent && (
                         <div className="pt-4 border-t border-border">
                             <div className="mb-4 rounded-lg bg-[hsl(var(--warning)/.2)] border border-[hsl(var(--warning)/.4)] p-3">
                                 <p className="text-sm text-[hsl(var(--warning))]">
                                     <span className="font-semibold">Submitting for:</span>{" "}
                                     <span className="text-foreground">{selectedProxy.display_name}</span>
-                                    <span className="text-muted-foreground"> → </span>
-                                    <span className="text-foreground">{adminLeagues.find(l => l.id === selectedLeagueId)?.name}</span>
+                                    {selectedLeagueId && (
+                                        <>
+                                            <span className="text-muted-foreground"> → </span>
+                                            <span className="text-foreground">{adminLeagues.find(l => l.id === selectedLeagueId)?.name}</span>
+                                        </>
+                                    )}
+                                    {!selectedLeagueId && (
+                                        <span className="text-muted-foreground"> (Global - all leagues)</span>
+                                    )}
                                 </p>
                             </div>
 
                             {submissionMode === "single" ? (
                                 <SubmissionForm
-                                    leagueId={selectedLeagueId}
+                                    leagueId={selectedLeagueId || undefined}
                                     proxyMemberId={selectedProxy.id}
                                     proxyDisplayName={selectedProxy.display_name}
                                     onSubmitted={handleProxySubmissionComplete}
@@ -182,13 +192,13 @@ export function ProxySubmissionSection({
                                 />
                             ) : submissionMode === "batch" ? (
                                 <BatchSubmissionForm
-                                    leagueId={selectedLeagueId}
+                                    leagueId={selectedLeagueId || undefined}
                                     proxyMemberId={selectedProxy.id}
                                     onSubmitted={handleProxySubmissionComplete}
                                 />
                             ) : (
                                 <BulkUnverifiedForm
-                                    leagueId={selectedLeagueId}
+                                    leagueId={selectedLeagueId || undefined}
                                     proxyMemberId={selectedProxy.id}
                                     onSubmitted={handleProxySubmissionComplete}
                                 />
