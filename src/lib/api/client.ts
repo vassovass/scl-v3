@@ -2,9 +2,24 @@
 
 import { createClient } from "@/lib/supabase/client";
 
+// Storage key must match AuthProvider
+const ACTIVE_PROFILE_KEY = "stepleague_active_profile_id";
+const SESSION_TIMEOUT_MS = 5000;
+
+/**
+ * Get session with timeout to prevent indefinite hangs.
+ */
+async function getSessionWithTimeout(supabase: ReturnType<typeof createClient>) {
+    const sessionPromise = supabase.auth.getSession();
+    const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Session timeout after 5s")), SESSION_TIMEOUT_MS)
+    );
+    return Promise.race([sessionPromise, timeoutPromise]);
+}
+
 /**
  * Make an authenticated API request to our backend.
- * Automatically includes the user's auth token.
+ * Automatically includes the user's auth token and X-Acting-As header for proxy submissions.
  */
 export async function apiRequest<T = unknown>(path: string, init: RequestInit = {}): Promise<T> {
     const startTime = Date.now();
@@ -15,12 +30,32 @@ export async function apiRequest<T = unknown>(path: string, init: RequestInit = 
 
     console.log(`[API] ${method} ${path} → Getting session...`);
     const supabase = createClient();
-    const { data } = await supabase.auth.getSession();
-    console.log(`[API] ${method} ${path} → Session obtained, hasToken: ${!!data.session?.access_token}`);
+
+    let sessionData;
+    try {
+        const result = await getSessionWithTimeout(supabase);
+        sessionData = result.data;
+    } catch (err) {
+        console.error(`[API] ${method} ${path} ✗ Session failed:`, err);
+        throw new Error("Failed to get session. Please refresh the page and try again.");
+    }
+
+    console.log(`[API] ${method} ${path} → Session obtained, hasToken: ${!!sessionData.session?.access_token}`);
 
     const headers = new Headers(init.headers ?? {});
-    if (data.session?.access_token) {
-        headers.set("Authorization", `Bearer ${data.session.access_token}`);
+    if (sessionData.session?.access_token) {
+        headers.set("Authorization", `Bearer ${sessionData.session.access_token}`);
+    }
+
+    // PRD 41: Include X-Acting-As header if currently acting as a proxy
+    const activeProfileId = typeof window !== "undefined"
+        ? localStorage.getItem(ACTIVE_PROFILE_KEY)
+        : null;
+    const currentUserId = sessionData.session?.user?.id;
+
+    if (activeProfileId && activeProfileId !== currentUserId) {
+        headers.set("X-Acting-As", activeProfileId);
+        console.log(`[API] ${method} ${path} → Acting as proxy: ${activeProfileId}`);
     }
 
     const isFormData = init.body instanceof FormData;
@@ -55,6 +90,7 @@ export async function apiRequest<T = unknown>(path: string, init: RequestInit = 
         throw err;
     }
 }
+
 
 /**
  * Error class for API request failures.

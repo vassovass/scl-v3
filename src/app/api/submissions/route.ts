@@ -43,6 +43,32 @@ export async function POST(request: Request): Promise<Response> {
         // Get session for access token
         const { data: { session } } = await supabase.auth.getSession();
 
+        // PRD 41: Check X-Acting-As header for proxy submissions
+        const actingAsId = request.headers.get("X-Acting-As");
+        let targetUserId = user.id;
+
+        const adminClient = createAdminClient();
+
+        if (actingAsId && actingAsId !== user.id) {
+            // Validate that actingAsId is a proxy managed by this user
+            const { data: proxy, error: proxyError } = await adminClient
+                .from("users")
+                .select("id, display_name")
+                .eq("id", actingAsId)
+                .eq("managed_by", user.id)
+                .eq("is_proxy", true)
+                .is("deleted_at", null)
+                .single();
+
+            if (proxyError || !proxy) {
+                console.error("[Submissions] Invalid proxy:", actingAsId, proxyError);
+                return forbidden("Invalid proxy user");
+            }
+
+            targetUserId = actingAsId;
+            console.log(`[Submissions] Acting as proxy: ${proxy.display_name} (${actingAsId})`);
+        }
+
         const body = await request.json();
         const parsed = createSchema.safeParse(body);
 
@@ -51,9 +77,9 @@ export async function POST(request: Request): Promise<Response> {
         }
 
         const input = parsed.data;
-        const adminClient = createAdminClient();
 
         let targetLeagueId = input.league_id;
+
 
         // Settings defaults (permissive for leagueless)
         let requirePhoto = false;
@@ -109,7 +135,7 @@ export async function POST(request: Request): Promise<Response> {
         let query = adminClient
             .from("submissions")
             .select("id")
-            .eq("user_id", user.id)
+            .eq("user_id", targetUserId)
             .eq("for_date", input.date);
 
         if (targetLeagueId) {
@@ -130,7 +156,7 @@ export async function POST(request: Request): Promise<Response> {
         // PRD 41: proxy_member_id removed. For proxy submissions, the user_id IS the proxy's ID.
         const submissionData = {
             league_id: input.league_id, // can be null now
-            user_id: user.id,
+            user_id: targetUserId,
             for_date: input.date,
             steps: input.steps,
             partial: input.partial,

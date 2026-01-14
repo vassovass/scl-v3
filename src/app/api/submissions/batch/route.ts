@@ -23,6 +23,32 @@ export async function POST(request: Request): Promise<Response> {
             return unauthorized();
         }
 
+        // PRD 41: Check X-Acting-As header for proxy submissions
+        const actingAsId = request.headers.get("X-Acting-As");
+        let targetUserId = user.id;
+
+        const adminClient = createAdminClient();
+
+        if (actingAsId && actingAsId !== user.id) {
+            // Validate that actingAsId is a proxy managed by this user
+            const { data: proxy, error: proxyError } = await adminClient
+                .from("users")
+                .select("id, display_name")
+                .eq("id", actingAsId)
+                .eq("managed_by", user.id)
+                .eq("is_proxy", true)
+                .is("deleted_at", null)
+                .single();
+
+            if (proxyError || !proxy) {
+                console.error("[BatchSubmissions] Invalid proxy:", actingAsId, proxyError);
+                return forbidden("Invalid proxy user");
+            }
+
+            targetUserId = actingAsId;
+            console.log(`[BatchSubmissions] Acting as proxy: ${proxy.display_name} (${actingAsId})`);
+        }
+
         const body = await request.json();
         const parsed = batchSchema.safeParse(body);
 
@@ -31,7 +57,6 @@ export async function POST(request: Request): Promise<Response> {
         }
 
         const input = parsed.data;
-        const adminClient = createAdminClient();
 
         // Check membership
         const { data: membership } = await adminClient
@@ -44,6 +69,7 @@ export async function POST(request: Request): Promise<Response> {
         if (!membership) {
             return forbidden("You are not a member of this league");
         }
+
 
         let extractedSteps = input.steps;
         let forDate = input.date;
@@ -91,7 +117,7 @@ export async function POST(request: Request): Promise<Response> {
             .from("submissions")
             .select("id")
             .eq("league_id", input.league_id)
-            .eq("user_id", user.id)
+            .eq("user_id", targetUserId)
             .eq("for_date", forDate)
             .single();
 
@@ -101,7 +127,7 @@ export async function POST(request: Request): Promise<Response> {
 
         const submissionData = {
             league_id: input.league_id,
-            user_id: user.id,
+            user_id: targetUserId,
             for_date: forDate,
             steps: extractedSteps,
             partial: false,
