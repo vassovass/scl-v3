@@ -98,7 +98,14 @@ export function ShadcnMenuRenderer({
 
     // Handle item click (actions)
     const handleItemClick = (item: MenuItem) => {
+        console.log('[ShadcnMenuRenderer] Item clicked:', {
+            id: item.id,
+            label: item.label,
+            href: item.href,
+            onClick: item.onClick
+        });
         if (item.onClick && onAction) {
+            console.log('[ShadcnMenuRenderer] Calling onAction with:', item.onClick);
             onAction(item.onClick, item);
         }
         // For Links, we don't need to do anything, Next.js handles it.
@@ -275,6 +282,7 @@ function DropdownItem({
             data-module-name={item.label}
             onPointerDown={(e) => {
                 // Fire immediately on pointer down, before shadcn closes the menu
+                console.log('[DropdownItem] onPointerDown:', { id: item.id, label: item.label, onClick: item.onClick });
                 e.preventDefault();
                 onAction(item);
             }}

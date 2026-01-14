@@ -47,7 +47,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
-  
+
   // Core auth state
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -157,7 +157,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ============================================================================
   const restoreActiveProfile = useCallback(async (proxies: ActiveProfile[], user: ActiveProfile) => {
     const savedProfileId = localStorage.getItem(ACTIVE_PROFILE_KEY);
-    
+
     if (!savedProfileId) {
       setActiveProfile(user);
       return;
@@ -189,7 +189,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const profile = await fetchUserProfile(initialSession.user.id);
         if (profile) {
           setUserProfile(profile);
-          
+
           // Fetch proxies
           const { data: proxyData } = await supabase
             .from("users")
@@ -297,14 +297,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Sign out
   // ============================================================================
   const signOut = async (redirectTo = "/sign-in?signedOut=true") => {
+    console.log('[AuthProvider] signOut called, redirectTo:', redirectTo);
+
     // Clear proxy state
+    console.log('[AuthProvider] Clearing proxy state...');
     setUserProfile(null);
     setActiveProfile(null);
     setManagedProxies([]);
     localStorage.removeItem(ACTIVE_PROFILE_KEY);
-    
-    await supabase.auth.signOut();
+
+    console.log('[AuthProvider] Calling supabase.auth.signOut()...');
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('[AuthProvider] signOut error:', error);
+    } else {
+      console.log('[AuthProvider] supabase.auth.signOut() succeeded');
+    }
+
     setSession(null);
+    console.log('[AuthProvider] Redirecting to:', redirectTo);
     router.push(redirectTo);
   };
 

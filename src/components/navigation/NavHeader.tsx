@@ -77,10 +77,13 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
     }, [pathname]);
 
     const handleSignOut = async () => {
+        console.log('[NavHeader] handleSignOut called');
         setSigningOut(true);
         setOpenDropdown(null);
         setMobileMenuOpen(false);
+        console.log('[NavHeader] Calling signOut from AuthProvider...');
         await signOut();
+        console.log('[NavHeader] signOut completed');
     };
 
     const toggleDropdown = (name: string) => {
@@ -91,7 +94,9 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
 
     // Handle menu actions (tours, sign out, etc.)
     const handleMenuAction = async (actionName: string, item: MenuItem) => {
+        console.log('[NavHeader] handleMenuAction called:', { actionName, itemId: item.id, itemLabel: item.label });
         if (actionName === 'signOut') {
+            console.log('[NavHeader] Sign out action detected, calling handleSignOut...');
             handleSignOut();
             return;
         }
