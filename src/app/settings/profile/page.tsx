@@ -9,6 +9,7 @@ import { toast } from "@/hooks/use-toast";
 const NAV_ITEMS = [
     { label: "Profile", href: "/settings/profile" },
     { label: "Preferences", href: "/settings/preferences" },
+    { label: "Proxies", href: "/settings/proxies" },
 ];
 
 interface ProfileData {

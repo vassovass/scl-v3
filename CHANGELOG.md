@@ -7,6 +7,24 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-01-14]
+
+### Added
+
+- **Proxy Management Settings Page** (`/settings/proxies`) - Dedicated page for managing proxy profiles
+  - Wired up `ProxyMemberManagement` component with claim link functionality
+  - Users can create proxies and copy "Claim Link" to share with others
+  - Added "Proxies" tab to settings navigation across profile and preferences pages
+
+### Changed
+
+- **ProxyMemberManagement Component Refactor** - Theme system compliance
+  - Replaced hardcoded `slate-*` colors with CSS variables (`--foreground`, `--card`, `--border`, `--muted-foreground`, `--destructive`, `--success`, `--warning`)
+  - Migrated to shadcn components (`Button`, `Input`, `Dialog`) for consistency
+  - Now fully supports light/dark mode switching
+
+---
+
 ## [2026-01-13]
 
 ### Added
