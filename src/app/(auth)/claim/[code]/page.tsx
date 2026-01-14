@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useToast } from "@/hooks/use-toast";
@@ -31,18 +31,14 @@ interface ClaimData {
 
 type MergeStrategy = "keep_proxy_profile" | "keep_my_profile";
 
-interface ClaimPageProps {
-    params: Promise<{ code: string }>;
-}
-
-export default function ClaimPage({ params }: ClaimPageProps) {
+export default function ClaimPage() {
     const router = useRouter();
+    const params = useParams();
     const { session, userProfile, loading: authLoading } = useAuth();
     const { toast } = useToast();
 
-    // Use React.use() to unwrap params Promise in Next.js 15
-    const resolvedParams = use(params);
-    const code = resolvedParams.code;
+    // Get code from params (useParams returns string | string[] | undefined)
+    const code = typeof params.code === 'string' ? params.code : params.code?.[0];
 
     const [claimData, setClaimData] = useState<ClaimData | null>(null);
     const [loading, setLoading] = useState(true);
