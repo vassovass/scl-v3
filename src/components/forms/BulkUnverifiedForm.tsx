@@ -95,6 +95,9 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
             return;
         }
 
+        console.log(`[BulkUnverified] Starting bulk submission: ${validEntries.length} entries, league=${leagueId || '(global)'}`);
+        console.log(`[BulkUnverified] Entries:`, validEntries);
+
         setSubmitting(true);
 
         try {
@@ -108,12 +111,14 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
                 }),
             });
 
+            console.log(`[BulkUnverified] ✓ Complete: ${response.inserted} inserted, ${response.skipped} skipped, ${response.conflicts.length} conflicts, ${response.errors.length} errors`);
             setResult(response);
 
             if (response.inserted > 0 && onSubmitted) {
                 onSubmitted();
             }
         } catch (err) {
+            console.error(`[BulkUnverified] ✗ Failed:`, err);
             if (err instanceof ApiError) {
                 setError(err.message);
             } else {

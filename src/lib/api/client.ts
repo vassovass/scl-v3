@@ -7,6 +7,12 @@ import { createClient } from "@/lib/supabase/client";
  * Automatically includes the user's auth token.
  */
 export async function apiRequest<T = unknown>(path: string, init: RequestInit = {}): Promise<T> {
+    const startTime = Date.now();
+    const method = init.method || 'GET';
+    const normalizedPath = normalizePath(path);
+
+    console.log(`[API] ${method} ${path} → Starting...`);
+
     const supabase = createClient();
     const { data } = await supabase.auth.getSession();
 
@@ -20,18 +26,31 @@ export async function apiRequest<T = unknown>(path: string, init: RequestInit = 
         headers.set("Content-Type", "application/json");
     }
 
-    const response = await fetch(normalizePath(path), {
-        ...init,
-        headers,
-        credentials: "include",
-    });
+    try {
+        const response = await fetch(normalizedPath, {
+            ...init,
+            headers,
+            credentials: "include",
+        });
 
-    const payload = await safeJson(response);
-    if (!response.ok) {
-        throw new ApiError(response.status, payload);
+        const elapsed = Date.now() - startTime;
+        const payload = await safeJson(response);
+
+        if (!response.ok) {
+            console.error(`[API] ${method} ${path} ✗ ${response.status} in ${elapsed}ms`, payload);
+            throw new ApiError(response.status, payload);
+        }
+
+        console.log(`[API] ${method} ${path} ✓ ${response.status} in ${elapsed}ms`);
+        return payload as T;
+    } catch (err) {
+        const elapsed = Date.now() - startTime;
+        if (err instanceof ApiError) {
+            throw err; // Already logged above
+        }
+        console.error(`[API] ${method} ${path} ✗ NETWORK ERROR in ${elapsed}ms:`, err);
+        throw err;
     }
-
-    return payload as T;
 }
 
 /**

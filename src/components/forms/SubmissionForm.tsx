@@ -285,15 +285,18 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
         try {
             let fileToUpload = file;
             if (file && file.size > 2 * 1024 * 1024) {
+                console.log(`[SingleSubmit] Compressing ${file.name} (${(file.size / 1024).toFixed(0)}KB)...`);
                 fileToUpload = await imageCompression(file, {
                     maxSizeMB: 2,
                     maxWidthOrHeight: 1920,
                     useWebWorker: true,
                 });
+                console.log(`[SingleSubmit] Compressed to ${(fileToUpload.size / 1024).toFixed(0)}KB`);
             }
 
             // Handle Offline Submission
             if (isOffline) {
+                console.log(`[SingleSubmit] Offline mode - queuing submission`);
                 if (!user) {
                     setError("You must be logged in to save offline.");
                     setSubmitting(false);
@@ -308,6 +311,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                         proofBlob: fileToUpload || undefined, // Store the blob directly
                     });
 
+                    console.log(`[SingleSubmit] ✓ Queued offline: ${stepsNumber} steps for ${date}`);
                     toast({
                         title: "Saved offline",
                         description: "Your submission has been queued and will sync when you are back online.",
@@ -322,6 +326,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                     setSubmitting(false);
                     return; // Exit early, don't try API
                 } catch (err) {
+                    console.error(`[SingleSubmit] ✗ Offline queue failed:`, err);
                     const msg = err instanceof Error ? err.message : "Failed to save offline";
                     setError(msg);
                     setSubmitting(false);
@@ -329,15 +334,23 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                 }
             }
 
+            console.log(`[SingleSubmit] Starting submission: ${stepsNumber} steps for ${date}, league=${leagueId || '(global)'}`);
+
             if (fileToUpload) {
+                console.log(`[SingleSubmit] Step 1: Getting signed upload URL`);
                 const signed = await apiRequest<SignUploadResponse>("proofs/sign-upload", {
                     method: "POST",
                     body: JSON.stringify({ content_type: fileToUpload.type }),
                 });
 
+                console.log(`[SingleSubmit] Step 2: Uploading to storage (${signed.path})`);
                 await uploadToSignedUrl(signed.upload_url, fileToUpload);
                 proofPath = signed.path;
+                console.log(`[SingleSubmit] ✓ Upload complete`);
             }
+
+            console.log(`[SingleSubmit] Step 3: Creating submission record`);
+
 
             const response = await apiRequest<SubmissionResponse>("submissions", {
                 method: "POST",
