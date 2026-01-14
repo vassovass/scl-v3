@@ -67,24 +67,24 @@ export const GET = withApiHandler({
         `)
         .eq("user_id", proxy.id);
 
-    // Get manager info
+    // Get manager info (use maybeSingle to handle deleted/missing managers gracefully)
     const { data: manager } = await adminClient
         .from("users")
         .select("id, display_name")
         .eq("id", proxy.managed_by)
-        .single();
+        .maybeSingle();
 
     // Check if claiming user is already a member of any of the proxy's leagues
     const proxyLeagueIds = memberships?.map((m: any) => m.league_id) || [];
     let userExistingMemberships: string[] = [];
-    
+
     if (proxyLeagueIds.length > 0) {
         const { data: existingMemberships } = await adminClient
             .from("memberships")
             .select("league_id")
             .eq("user_id", user!.id)
             .in("league_id", proxyLeagueIds);
-        
+
         userExistingMemberships = existingMemberships?.map((m: any) => m.league_id) || [];
     }
 
@@ -185,7 +185,7 @@ export const POST = withApiHandler({
         .eq("user_id", proxy.id);
 
     let membershipsTransferred = 0;
-    
+
     if (proxyMemberships && proxyMemberships.length > 0) {
         for (const membership of proxyMemberships) {
             // Check if user already in this league
@@ -256,11 +256,11 @@ export const POST = withApiHandler({
                 },
             });
     } catch (auditError) {
-        console.log("[AUDIT] proxy_claimed:", { 
-            actor: user!.id, 
-            target: proxy.id, 
+        console.log("[AUDIT] proxy_claimed:", {
+            actor: user!.id,
+            target: proxy.id,
             submissions: transferredCount,
-            memberships: membershipsTransferred 
+            memberships: membershipsTransferred
         });
     }
 
