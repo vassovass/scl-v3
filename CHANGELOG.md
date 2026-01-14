@@ -23,7 +23,12 @@ All notable changes to StepLeague v3.
   - Migrated to shadcn components (`Button`, `Input`, `Dialog`) for consistency
   - Now fully supports light/dark mode switching
 
----
+### Fixed
+
+- **Email Confirmation Redirect Stuck on Loading** - Fixed email verification links getting stuck on loading
+  - **Root Cause**: `signUp` call was missing `emailRedirectTo` option, causing Supabase to redirect to root URL instead of auth callback route
+  - **Fix**: Added `emailRedirectTo: \`${window.location.origin}/api/auth/callback?next=/dashboard\`` to the sign-up options
+  - Now email verification properly exchanges the auth code for a session via the callback route
 
 ## [2026-01-13]
 

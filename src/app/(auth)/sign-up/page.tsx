@@ -25,11 +25,15 @@ export default function SignUpPage() {
 
     const supabase = createClient();
 
+    // Build the email redirect URL to the auth callback route
+    const emailRedirectTo = `${window.location.origin}/api/auth/callback?next=/dashboard`;
+
     // Sign up
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
+        emailRedirectTo,
         data: {
           display_name: displayName,
         },
