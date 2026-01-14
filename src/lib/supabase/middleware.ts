@@ -172,7 +172,7 @@ export async function updateSession(request: NextRequest) {
   const isAuthenticated = !!session?.access_token;
 
   // Protected routes - redirect to sign-in if not authenticated
-  const protectedPaths = ["/dashboard", "/league", "/admin"];
+  const protectedPaths = ["/dashboard", "/league", "/admin", "/settings", "/claim"];
   const isProtectedPath = protectedPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );
@@ -180,7 +180,9 @@ export async function updateSession(request: NextRequest) {
   if (isProtectedPath && !isAuthenticated) {
     const url = request.nextUrl.clone();
     url.pathname = "/sign-in";
-    url.searchParams.set("redirect", request.nextUrl.pathname);
+    // Preserve full path including query params for post-login redirect
+    const fullPath = request.nextUrl.pathname + request.nextUrl.search;
+    url.searchParams.set("redirect", fullPath);
     return NextResponse.redirect(url);
   }
 
