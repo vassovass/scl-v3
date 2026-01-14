@@ -313,7 +313,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Sometimes the API call hangs, so we don't want to block the user
     console.log('[AuthProvider] Calling supabase.auth.signOut() with 5s timeout...');
     try {
-      const signOutPromise = supabase.auth.signOut();
+      const signOutPromise = supabase.auth.signOut({ scope: 'global' });
       const timeoutPromise = new Promise<{ error: Error }>((_, reject) =>
         setTimeout(() => reject(new Error('Sign out timed out after 5 seconds')), 5000)
       );
@@ -327,7 +327,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error('[AuthProvider] signOut failed or timed out:', error);
-      // Continue anyway - we've already cleared local state
+      // Manually clear Supabase auth cookies as fallback
+      // This ensures sign-out works even when API fails
+      document.cookie.split(';').forEach(cookie => {
+        const [name] = cookie.trim().split('=');
+        if (name.startsWith('sb-') || name.includes('supabase')) {
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        }
+      });
     }
 
     // Always redirect, even if signOut API call failed/timed out
