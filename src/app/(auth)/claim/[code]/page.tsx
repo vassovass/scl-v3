@@ -32,7 +32,7 @@ interface ClaimData {
 type MergeStrategy = "keep_proxy_profile" | "keep_my_profile";
 
 interface ClaimPageProps {
-    params: Promise<{ code: string }>;
+    params: { code: string };
 }
 
 export default function ClaimPage({ params }: ClaimPageProps) {
@@ -40,18 +40,15 @@ export default function ClaimPage({ params }: ClaimPageProps) {
     const { session, userProfile, loading: authLoading } = useAuth();
     const { toast } = useToast();
 
-    const [code, setCode] = useState<string>("");
+    // Extract code directly from params (not a Promise in client components)
+    const code = params.code;
+
     const [claimData, setClaimData] = useState<ClaimData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [claiming, setClaiming] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const [mergeStrategy, setMergeStrategy] = useState<MergeStrategy>("keep_proxy_profile");
-
-    // Extract code from params
-    useEffect(() => {
-        params.then((p) => setCode(p.code));
-    }, [params]);
 
     // Fetch claim data when authenticated
     useEffect(() => {
@@ -186,7 +183,7 @@ export default function ClaimPage({ params }: ClaimPageProps) {
                             Claim Your Profile
                         </h1>
                         <p className="mt-1 text-sm text-[hsl(var(--info))]/70">
-                            {claimData.manager?.display_name 
+                            {claimData.manager?.display_name
                                 ? `${claimData.manager.display_name} has been tracking steps for you!`
                                 : "Someone has been tracking steps for you!"}
                         </p>
