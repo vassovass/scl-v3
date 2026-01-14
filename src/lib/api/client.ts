@@ -4,7 +4,10 @@ import { createClient, resetClient } from "@/lib/supabase/client";
 
 // Storage key must match AuthProvider
 const ACTIVE_PROFILE_KEY = "stepleague_active_profile_id";
-const SESSION_TIMEOUT_MS = 5000; // 5s per attempt, will retry with fresh client
+const SESSION_TIMEOUT_MS = 5000; // 5s per attempt
+
+// Supabase storage key pattern for @supabase/ssr
+const SUPABASE_STORAGE_KEY = `sb-${process.env.NEXT_PUBLIC_SUPABASE_URL?.replace('https://', '').split('.')[0]}-auth-token`;
 
 /**
  * Options for API requests
@@ -15,14 +18,32 @@ export interface ApiRequestOptions extends RequestInit {
 }
 
 /**
- * Simple session getter with timeout. No refresh - just get cached session.
+ * Try to get access token directly from localStorage (fast, no network).
+ * Supabase stores session in localStorage with a predictable key.
  */
-async function getSessionWithTimeout(supabase: ReturnType<typeof createClient>) {
-    const sessionPromise = supabase.auth.getSession();
+function getStoredAccessToken(): string | null {
+    if (typeof window === 'undefined') return null;
+    try {
+        const stored = localStorage.getItem(SUPABASE_STORAGE_KEY);
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            return parsed?.access_token ?? null;
+        }
+    } catch {
+        // Ignore parse errors
+    }
+    return null;
+}
+
+/**
+ * Get user info with timeout. Uses getUser which is more reliable than getSession.
+ */
+async function getUserWithTimeout(supabase: ReturnType<typeof createClient>) {
+    const userPromise = supabase.auth.getUser();
     const timeoutPromise = new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error(`Session timeout after ${SESSION_TIMEOUT_MS / 1000}s`)), SESSION_TIMEOUT_MS)
     );
-    return Promise.race([sessionPromise, timeoutPromise]);
+    return Promise.race([userPromise, timeoutPromise]);
 }
 
 /**
@@ -39,56 +60,72 @@ export async function apiRequest<T = unknown>(path: string, options: ApiRequestO
 
     console.log(`[API] ${method} ${path} → Starting...`);
 
-    console.log(`[API] ${method} ${path} → Getting session...`);
+    // Step 1: Try to get token from localStorage first (instant, no network)
+    let accessToken = getStoredAccessToken();
+    let currentUserId: string | null = null;
 
-    let sessionData;
-    let sessionAttempts = 0;
-    const maxSessionAttempts = 3;
-
-    while (sessionAttempts < maxSessionAttempts) {
+    if (accessToken) {
+        console.log(`[API] ${method} ${path} → Found stored token`);
+        // Decode user ID from JWT if possible (simple base64 decode of payload)
         try {
-            sessionAttempts++;
-            // On retry, reset the singleton and create fresh client
-            const forceNew = sessionAttempts > 1;
-            if (forceNew) {
-                console.log(`[API] ${method} ${path} → Resetting client for fresh session...`);
-                resetClient();
-            }
-            const supabase = createClient(forceNew);
-            const result = await getSessionWithTimeout(supabase);
-            sessionData = result.data;
-            break; // Success, exit loop
-        } catch (err) {
-            console.error(`[API] ${method} ${path} ✗ Session attempt ${sessionAttempts}/${maxSessionAttempts} failed:`, err);
+            const payload = JSON.parse(atob(accessToken.split('.')[1]));
+            currentUserId = payload.sub ?? null;
+        } catch {
+            // If token decode fails, we'll still try to use it
+        }
+    } else {
+        // Step 2: No stored token, must call getUser (with retries)
+        console.log(`[API] ${method} ${path} → No stored token, getting user...`);
 
-            if (sessionAttempts >= maxSessionAttempts) {
-                throw new Error("Failed to get session. Please refresh the page and try again.");
-            }
+        let userAttempts = 0;
+        const maxAttempts = 2;
 
-            // Short wait before retry with fresh client
-            await new Promise(r => setTimeout(r, 200));
-            console.log(`[API] ${method} ${path} → Retrying with fresh client...`);
+        while (userAttempts < maxAttempts) {
+            try {
+                userAttempts++;
+                const forceNew = userAttempts > 1;
+                if (forceNew) {
+                    console.log(`[API] ${method} ${path} → Resetting client...`);
+                    resetClient();
+                }
+                const supabase = createClient(forceNew);
+                const result = await getUserWithTimeout(supabase);
+
+                if (result.data.user) {
+                    currentUserId = result.data.user.id;
+                    // Get session to extract token
+                    const { data: sessionData } = await supabase.auth.getSession();
+                    accessToken = sessionData.session?.access_token ?? null;
+                    if (accessToken) {
+                        console.log(`[API] ${method} ${path} → Got token from getUser`);
+                    }
+                }
+                break; // Success
+            } catch (err) {
+                console.error(`[API] ${method} ${path} ✗ getUser attempt ${userAttempts}/${maxAttempts} failed:`, err);
+                if (userAttempts >= maxAttempts) {
+                    throw new Error("Failed to get session. Please refresh the page and try again.");
+                }
+                await new Promise(r => setTimeout(r, 200));
+            }
         }
     }
 
-    // TypeScript guard - should never reach here due to throw above, but needed for type safety
-    if (!sessionData) {
-        throw new Error("Failed to get session. Please refresh the page and try again.");
+    if (!accessToken) {
+        console.error(`[API] ${method} ${path} ✗ No access token available`);
+        throw new Error("Not authenticated. Please sign in and try again.");
     }
 
-    console.log(`[API] ${method} ${path} → Session obtained, hasToken: ${!!sessionData.session?.access_token}`);
+    console.log(`[API] ${method} ${path} → Using token, userId: ${currentUserId || '(decoded from token)'}`);
 
     const headers = new Headers(init.headers ?? {});
-    if (sessionData.session?.access_token) {
-        headers.set("Authorization", `Bearer ${sessionData.session.access_token}`);
-    }
+    headers.set("Authorization", `Bearer ${accessToken}`);
 
     // PRD 41: Include X-Acting-As header if currently acting as a proxy
     // Priority: explicit actingAs param > localStorage > none
     const activeProfileId = actingAs ?? (
         typeof window !== "undefined" ? localStorage.getItem(ACTIVE_PROFILE_KEY) : null
     );
-    const currentUserId = sessionData.session?.user?.id;
 
     if (activeProfileId && activeProfileId !== currentUserId) {
         headers.set("X-Acting-As", activeProfileId);
