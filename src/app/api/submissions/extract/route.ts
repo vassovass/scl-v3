@@ -5,7 +5,7 @@ import { callVerificationFunction } from "@/lib/server/verify";
 import { normalizeExtractedDate } from "@/lib/utils/date";
 
 const extractSchema = z.object({
-    league_id: z.string().uuid(),
+    league_id: z.string().uuid().optional(), // Optional for global/league-agnostic extraction
     proof_path: z.string().min(3),
     filename: z.string().optional(), // Original filename for date hints
 });
@@ -33,16 +33,18 @@ export async function POST(request: Request): Promise<Response> {
         const input = parsed.data;
         const adminClient = createAdminClient();
 
-        // Check membership
-        const { data: membership } = await adminClient
-            .from("memberships")
-            .select("role")
-            .eq("league_id", input.league_id)
-            .eq("user_id", user.id)
-            .single();
+        // Check membership only if a specific league is provided
+        if (input.league_id) {
+            const { data: membership } = await adminClient
+                .from("memberships")
+                .select("role")
+                .eq("league_id", input.league_id)
+                .eq("user_id", user.id)
+                .single();
 
-        if (!membership) {
-            return forbidden("You are not a member of this league");
+            if (!membership) {
+                return forbidden("You are not a member of this league");
+            }
         }
 
         // Call verification to extract data from the image (extraction only, no DB write)

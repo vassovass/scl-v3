@@ -94,6 +94,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
     const [images, setImages] = useState<ImageFile[]>([]);
     const [processing, setProcessing] = useState(false);
     const [overallStatus, setOverallStatus] = useState<string | null>(null);
+    const [extractionStep, setExtractionStep] = useState<string | null>(null); // Detailed step for current extraction
     const [previewImage, setPreviewImage] = useState<string | null>(null); // For modal
     const [limitWarning, setLimitWarning] = useState<string | null>(null);
 
@@ -158,17 +159,28 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
 
     // Reusable extraction logic for both initial extraction and retries
     const performExtraction = async (image: ImageFile): Promise<{ success: boolean; data?: ExtractResponse; error?: any }> => {
-        try {
-            // Compress
-            const compressedFile = await compressImage(image.file);
+        const startTime = Date.now();
+        let currentStep = "initializing";
 
-            // Upload
+        try {
+            // Step 1: Compress
+            currentStep = "compressing";
+            setExtractionStep(`Compressing ${image.file.name} (${(image.file.size / 1024).toFixed(0)}KB)...`);
+            const compressedFile = await compressImage(image.file);
+            const compressedSize = (compressedFile.size / 1024).toFixed(0);
+
+            // Step 2: Get signed upload URL
+            currentStep = "signing";
+            setExtractionStep(`Getting upload URL for ${image.file.name}...`);
             const signed = await apiRequest<SignUploadResponse>("proofs/sign-upload", {
                 method: "POST",
                 body: JSON.stringify({ content_type: compressedFile.type }),
             });
 
-            await fetch(signed.upload_url, {
+            // Step 3: Upload to storage
+            currentStep = "uploading";
+            setExtractionStep(`Uploading ${image.file.name} (${compressedSize}KB)...`);
+            const uploadResponse = await fetch(signed.upload_url, {
                 method: "PUT",
                 headers: {
                     "Content-Type": compressedFile.type,
@@ -177,26 +189,66 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                 body: compressedFile,
             });
 
-            // Extract data only (no submission)
+            if (!uploadResponse.ok) {
+                throw new Error(`Upload failed: ${uploadResponse.status} ${uploadResponse.statusText}`);
+            }
+
+            // Step 4: AI extraction
+            currentStep = "extracting";
+            setExtractionStep(`AI analyzing ${image.file.name}...`);
+            const extractPayload = {
+                league_id: leagueId || undefined, // Allow undefined for global
+                proof_path: signed.path,
+                filename: image.file.name,
+            };
+
             const extractResponse = await apiRequest<ExtractResponse>("submissions/extract", {
                 method: "POST",
-                body: JSON.stringify({
-                    league_id: leagueId,
-                    proof_path: signed.path,
-                    filename: image.file.name, // Pass original filename for date hints
-                }),
+                body: JSON.stringify(extractPayload),
             });
+
+            const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+            setExtractionStep(`Completed ${image.file.name} in ${elapsed}s`);
 
             return {
                 success: true,
                 data: {
                     ...extractResponse,
-                    // Store proofPath in the response so we can use it later
                     proofPath: signed.path
                 } as any
             };
         } catch (err) {
-            return { success: false, error: err };
+            const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+            setExtractionStep(`Failed at ${currentStep} after ${elapsed}s`);
+
+            // Enhanced error info for debugging
+            const errorContext = {
+                step: currentStep,
+                filename: image.file.name,
+                fileSize: image.file.size,
+                leagueId: leagueId || "(global)",
+                elapsed: `${elapsed}s`,
+                timestamp: new Date().toISOString(),
+            };
+
+            // If it's an ApiError, preserve the full details
+            if (err instanceof ApiError) {
+                return {
+                    success: false,
+                    error: {
+                        ...err,
+                        context: { ...err.context, ...errorContext }
+                    }
+                };
+            }
+
+            return {
+                success: false,
+                error: {
+                    message: err instanceof Error ? err.message : String(err),
+                    context: errorContext
+                }
+            };
         }
     };
 
@@ -860,9 +912,16 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                 </div>
             )}
 
-            {/* Overall Status */}
-            {overallStatus && (
-                <p className="text-sm text-[hsl(var(--info))]">{overallStatus}</p>
+            {/* Overall Status with detailed step */}
+            {(overallStatus || extractionStep) && (
+                <div className="space-y-1 p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+                    {overallStatus && (
+                        <p className="text-sm text-[hsl(var(--info))] font-medium">{overallStatus}</p>
+                    )}
+                    {extractionStep && (
+                        <p className="text-xs text-slate-400 font-mono">{extractionStep}</p>
+                    )}
+                </div>
             )}
 
             {/* Action Buttons */}

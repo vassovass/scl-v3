@@ -619,6 +619,24 @@ Both dark and light theme values are defined in `globals.css`.
 
 ---
 
+## Reusable Form Components (MANDATORY)
+
+> **⚠️ MUST READ: [Form System Documentation](./docs/FORM_SYSTEM.md)**
+>
+> **ALWAYS use `FormInput`, `FormSelect`, `FormCheckbox`, `FormTextarea`, `FormFileInput`** from `@/components/ui/form-fields` instead of raw HTML form elements.
+>
+> These components auto-generate `id`/`name` attributes and include accessibility features (aria-describedby, aria-invalid).
+>
+> **Quick Example:**
+> ```tsx
+> import { FormInput, FormSelect } from "@/components/ui/form-fields";
+> 
+> <FormInput fieldName="user-email" label="Email" type="email" required />
+> <FormSelect fieldName="league" label="Select League">...</FormSelect>
+> ```
+
+---
+
 ## Common Issues & Fixes
 
 | Issue | Fix |
