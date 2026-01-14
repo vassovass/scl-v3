@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useToast } from "@/hooks/use-toast";
@@ -75,7 +75,11 @@ export default function SubmitPage() {
     const maxBatchUploads = getNumericSetting("max_batch_uploads", 7);
 
     // Compute admin leagues for proxy submission (and viewing permissions)
-    const adminLeagues = leagues.filter(l => l.role === "owner" || l.role === "admin");
+    // Memoize to prevent new array reference each render (which would cause infinite useEffect loops)
+    const adminLeagues = useMemo(() =>
+        leagues.filter(l => l.role === "owner" || l.role === "admin"),
+        [leagues]
+    );
 
     const toggleSelection = (id: string) => {
         const newSelected = new Set(selectedIds);
@@ -350,7 +354,7 @@ export default function SubmitPage() {
         };
 
         fetchLeagues();
-    }, [session, selectedLeagueId, toast]);
+    }, [session, toast]); // Note: selectedLeagueId removed - we use a ref pattern to avoid loop
 
     // Fetch proxy members for admin leagues
     // Load proxies for ALL admin leagues so the View As filter is complete
@@ -373,7 +377,7 @@ export default function SubmitPage() {
             }
         };
         loadProxies();
-    }, [session, adminLeagues]);
+    }, [session, adminLeagues.length]); // Use .length instead of array to avoid reference equality issues
 
     // Fetch submissions
     const fetchSubmissions = useCallback(async (page = 0) => {
