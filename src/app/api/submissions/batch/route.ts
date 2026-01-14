@@ -83,7 +83,7 @@ export async function POST(request: Request): Promise<Response> {
                 steps: 0,
                 for_date: new Date().toISOString().slice(0, 10),
                 proof_path: input.proof_path,
-                league_id: input.league_id,
+                league_id: input.league_id ?? undefined,
                 requester_id: user.id,
             });
 
@@ -115,20 +115,26 @@ export async function POST(request: Request): Promise<Response> {
         forDate = forDate || new Date().toISOString().slice(0, 10);
 
         // Check for existing submission
-        const { data: existing } = await adminClient
+        let existingQuery = adminClient
             .from("submissions")
             .select("id")
-            .eq("league_id", input.league_id)
             .eq("user_id", targetUserId)
-            .eq("for_date", forDate)
-            .single();
+            .eq("for_date", forDate);
+
+        if (input.league_id) {
+            existingQuery = existingQuery.eq("league_id", input.league_id);
+        } else {
+            existingQuery = existingQuery.is("league_id", null);
+        }
+
+        const { data: existing } = await existingQuery.single();
 
         if (existing && !input.overwrite) {
             return jsonError(409, `Submission already exists for ${forDate}`);
         }
 
         const submissionData = {
-            league_id: input.league_id,
+            league_id: input.league_id ?? null, // null for global submissions
             user_id: targetUserId,
             for_date: forDate,
             steps: extractedSteps,
