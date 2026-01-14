@@ -248,6 +248,8 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
                         <div key={entry.id} className="flex items-center gap-3">
                             <span className="w-6 text-center text-sm text-slate-500">{index + 1}.</span>
                             <input
+                                id={`bulk-date-${entry.id}`}
+                                name={`bulk-date-${entry.id}`}
                                 type="date"
                                 value={entry.date}
                                 onChange={(e) => updateEntry(entry.id, "date", e.target.value)}
@@ -255,6 +257,8 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
                                 required
                             />
                             <input
+                                id={`bulk-steps-${entry.id}`}
+                                name={`bulk-steps-${entry.id}`}
                                 type="number"
                                 value={entry.steps}
                                 onChange={(e) => updateEntry(entry.id, "steps", e.target.value)}

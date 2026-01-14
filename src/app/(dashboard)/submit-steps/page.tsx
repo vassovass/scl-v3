@@ -622,6 +622,8 @@ export default function SubmitPage() {
                                     <div className="flex items-center gap-2">
                                         <span className="text-xs text-muted-foreground">Show</span>
                                         <select
+                                            id="items-per-page"
+                                            name="items-per-page"
                                             value={itemsPerPage}
                                             onChange={(e) => setItemsPerPage(Number(e.target.value))}
                                             className="h-8 rounded-md border border-input bg-background px-2 text-xs"
@@ -635,6 +637,8 @@ export default function SubmitPage() {
                                         <div className="flex items-center gap-2 border-l border-border pl-3 ml-1">
                                             <span className="text-xs text-muted-foreground">View as:</span>
                                             <select
+                                                id="view-as-context"
+                                                name="view-as-context"
                                                 value={viewContext === "me" ? "me" : selectedProxyId}
                                                 onChange={(e) => {
                                                     const val = e.target.value;

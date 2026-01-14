@@ -124,6 +124,8 @@ export function ProxySubmissionSection({
                                 2. Select League <span className="text-muted-foreground font-normal">(optional)</span>
                             </label>
                             <select
+                                id="proxy-league-select"
+                                name="proxy-league-select"
                                 value={selectedLeagueId}
                                 onChange={(e) => handleLeagueChange(e.target.value)}
                                 className="w-full rounded-lg border border-input bg-secondary px-4 py-2.5 text-foreground focus:border-[hsl(var(--warning))] focus:outline-none"

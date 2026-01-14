@@ -637,6 +637,8 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
             {/* File Input */}
             <div className="flex flex-col gap-2">
                 <input
+                    id="batch-file-upload"
+                    name="batch-file-upload"
                     type="file"
                     accept="image/png,image/jpeg,image/heic"
                     multiple
@@ -708,6 +710,8 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                         <div className="flex items-center gap-2">
                                             <label className="text-xs text-slate-400 w-12">Date:</label>
                                             <input
+                                                id={`batch-date-${img.id}`}
+                                                name={`batch-date-${img.id}`}
                                                 type="date"
                                                 value={img.editedDate || ""}
                                                 onChange={(e) => updateEditedValue(img.id, "editedDate", e.target.value)}
@@ -717,6 +721,8 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                         <div className="flex items-center gap-2">
                                             <label className="text-xs text-slate-400 w-12">Steps:</label>
                                             <input
+                                                id={`batch-steps-${img.id}`}
+                                                name={`batch-steps-${img.id}`}
                                                 type="number"
                                                 value={img.editedSteps || ""}
                                                 onChange={(e) => updateEditedValue(img.id, "editedSteps", e.target.value)}
@@ -766,6 +772,8 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                             <div className="bg-rose-500/10 border border-rose-500/30 rounded p-2">
                                                 <label className="flex items-start gap-2 cursor-pointer">
                                                     <input
+                                                        id={`batch-confirm-${img.id}`}
+                                                        name={`batch-confirm-${img.id}`}
                                                         type="checkbox"
                                                         checked={img.confirmedByUser || false}
                                                         onChange={(e) => {
