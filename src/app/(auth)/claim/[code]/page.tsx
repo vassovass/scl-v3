@@ -109,13 +109,8 @@ export default function ClaimPage({ params }: ClaimPageProps) {
                 description: `${data.transferred_submissions} submissions transferred to your account.`,
             });
 
-            // Redirect to first league or dashboard
-            const firstLeague = claimData.leagues?.[0];
-            if (firstLeague?.id) {
-                router.push(`/league/${firstLeague.id}/overview`);
-            } else {
-                router.push("/dashboard");
-            }
+            // Redirect to profile settings so user can customize their name
+            router.push("/settings/profile?welcome=claimed");
         } catch (err) {
             toast({
                 title: "Error",
