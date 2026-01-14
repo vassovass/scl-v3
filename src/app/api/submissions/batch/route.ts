@@ -6,7 +6,7 @@ import { normalizeExtractedDate } from "@/lib/utils/date";
 
 // PRD 41: proxy_member_id removed. Proxy submissions now use the proxy's user_id directly.
 const batchSchema = z.object({
-    league_id: z.string().uuid(),
+    league_id: z.string().uuid().nullable().optional(), // Can be null for global submissions
     proof_path: z.string().min(3),
     steps: z.number().int().positive().optional(),
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
@@ -58,16 +58,18 @@ export async function POST(request: Request): Promise<Response> {
 
         const input = parsed.data;
 
-        // Check membership
-        const { data: membership } = await adminClient
-            .from("memberships")
-            .select("role")
-            .eq("league_id", input.league_id)
-            .eq("user_id", user.id)
-            .single();
+        // Check membership (only for league-specific submissions)
+        if (input.league_id) {
+            const { data: membership } = await adminClient
+                .from("memberships")
+                .select("role")
+                .eq("league_id", input.league_id)
+                .eq("user_id", user.id)
+                .single();
 
-        if (!membership) {
-            return forbidden("You are not a member of this league");
+            if (!membership) {
+                return forbidden("You are not a member of this league");
+            }
         }
 
 
