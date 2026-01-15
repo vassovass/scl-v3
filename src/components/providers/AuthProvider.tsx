@@ -228,13 +228,64 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     console.log('[AuthProvider] Setting up onAuthStateChange listener');
     let hasInitialized = false;
 
-    // Fallback timeout: ensure loading=false even if INITIAL_SESSION doesn't fire
-    // This can happen due to Supabase version issues or timing
-    const fallbackTimeout = setTimeout(() => {
+    // Fallback: if INITIAL_SESSION doesn't fire in 2s, try getSession directly
+    // This happens when Supabase client doesn't auto-detect session from cookies
+    const fallbackTimeout = setTimeout(async () => {
       if (!hasInitialized) {
-        console.warn('[AuthProvider] Fallback: INITIAL_SESSION did not fire in 2s, setting loading=false');
-        setLoading(false);
+        console.warn('[AuthProvider] Fallback: INITIAL_SESSION did not fire in 2s, trying getSession...');
         hasInitialized = true;
+
+        try {
+          // Try to get session directly from Supabase
+          const { data: { session: fallbackSession }, error } = await supabase.auth.getSession();
+
+          if (error) {
+            console.error('[AuthProvider] Fallback getSession error:', error);
+          }
+
+          if (fallbackSession) {
+            console.log('[AuthProvider] Fallback: Found session via getSession!', fallbackSession.user.id);
+            setSession(fallbackSession);
+
+            // Update session cache
+            setCachedSession(
+              fallbackSession.access_token,
+              fallbackSession.user?.id ?? null,
+              fallbackSession.expires_at ?? null
+            );
+
+            // Load profile
+            const profile = await fetchUserProfile(fallbackSession.user.id);
+            if (profile) {
+              setUserProfile(profile);
+
+              // Fetch proxies
+              const { data: proxyData } = await supabase
+                .from("users")
+                .select("id, display_name, is_proxy, managed_by")
+                .eq("managed_by", fallbackSession.user.id)
+                .eq("is_proxy", true)
+                .is("deleted_at", null)
+                .eq("is_archived", false)
+                .order("display_name");
+
+              const proxies: ActiveProfile[] = (proxyData || []).map((p: any) => ({
+                id: p.id,
+                display_name: p.display_name,
+                is_proxy: p.is_proxy ?? true,
+                managed_by: p.managed_by,
+              }));
+              setManagedProxies(proxies);
+              await restoreActiveProfile(proxies, profile);
+            }
+          } else {
+            console.log('[AuthProvider] Fallback: No session found via getSession');
+          }
+        } catch (e) {
+          console.error('[AuthProvider] Fallback getSession exception:', e);
+        }
+
+        setLoading(false);
       }
     }, 2000);
 
