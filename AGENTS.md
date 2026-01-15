@@ -411,7 +411,43 @@ await clearAllAppState(); // Clears SW caches, browser caches, localStorage, coo
 ```
 
 
-## Project Structure
+### 8. Supabase Auth Deadlocks & Client-Side Hanging (CRITICAL)
+
+**CRITICAL ISSUE:** The Supabase client SDK (`@supabase/supabase-js`) uses the Web Locks API for session synchronization. This can cause the client to **hang indefinitely** (deadlock) if a lock is held by a stale process or zombie callback.
+
+**Symptoms:**
+- `supabase.auth.getSession()` never returns (await hangs forever).
+- `supabase.auth.getUser()` hangs.
+- `supabase.from(...).select(...)` hangs if it tries to refresh a token.
+
+**MANDATORY Fix Patterns:**
+
+1.  **NEVER use `getSession()` for initial auth checks**:
+    - The `INITIAL_SESSION` event in `onAuthStateChange` is the primary source of truth.
+    - If you need a fallback, **DO NOT call `getSession()`**.
+    - Instead, **parse the `sb-*-auth-token` cookie directly** from `document.cookie`.
+
+2.  **Fallback Safe Pattern**:
+    - If `onAuthStateChange` doesn't fire, read the cookie manually.
+    - Use a **stateless, temporary client** to fetch initial data (e.g., user profile).
+    - **DO NOT** use the singleton `supabase` client for recovery fetches, as it shares the deadlocked lock.
+
+    ```typescript
+    // ✅ CORRECT: Safe fallback pattern
+    import { createClient as createArgsClient } from "@supabase/supabase-js";
+
+    const tempClient = createArgsClient(url, key, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { persistSession: false, autoRefreshToken: false } // No locks!
+    });
+    const { data } = await tempClient.from("users").select("*").single();
+    ```
+
+3.  **Always Validate Expiry**:
+    - When parsing cookies manually, check `expires_at` vs `Date.now() / 1000`.
+    - Do not restore expired sessions.
+
+
 
 ```
 scl-v3/

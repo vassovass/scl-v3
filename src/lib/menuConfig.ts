@@ -205,6 +205,7 @@ export const MAIN_MENU: MenuDefinition = {
             label: 'Actions',
             icon: '⚡',
             children: [
+                { id: 'global-submit', label: 'Submit Steps', href: '/submit-steps', icon: '📝', visibleTo: ['member', 'admin', 'owner', 'superadmin'] },
                 { id: 'create-league', label: 'Create League', href: '/league/create', icon: '➕' },
                 { id: 'join-league', label: 'Join League', href: '/join', icon: '🔗' },
             ]

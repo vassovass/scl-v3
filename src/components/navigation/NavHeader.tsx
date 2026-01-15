@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { createClient } from "@/lib/supabase/client";
 import { ShadcnMenuRenderer } from "./ShadcnMenuRenderer";
 import { MobileMenu } from "./MobileMenu";
 import { ModeToggle } from "@/components/mode-toggle";
@@ -25,7 +24,7 @@ interface NavHeaderProps {
 }
 
 export function NavHeader({ location: locationOverride, variant = 'default' }: NavHeaderProps = {}) {
-    const { user, session, signOut } = useAuth();
+    const { user, session, signOut, userProfile } = useAuth();
 
     // Debug logging for auth state
     useEffect(() => {
@@ -40,7 +39,8 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
     const isTransparent = variant === 'transparent';
     const pathname = usePathname();
     const router = useRouter();
-    const [isSuperadmin, setIsSuperadmin] = useState(false);
+    // Use robust is_superadmin from AuthProvider context instead of risky client-side fetch
+    const isSuperadmin = userProfile?.is_superadmin ?? false;
     const [signingOut, setSigningOut] = useState(false);
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -63,23 +63,6 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
     );
     const locationConfig = locations[menuLocation];
     const isPublicLocation = menuLocation === 'public_header';
-
-    useEffect(() => {
-        if (!user) {
-            setIsSuperadmin(false);
-            return;
-        }
-
-        const supabase = createClient();
-        supabase
-            .from("users")
-            .select("is_superadmin")
-            .eq("id", user.id)
-            .single()
-            .then(({ data }) => {
-                setIsSuperadmin(data?.is_superadmin ?? false);
-            });
-    }, [user]);
 
     // Close mobile menu on route change
     useEffect(() => {

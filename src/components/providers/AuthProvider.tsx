@@ -83,7 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchUserProfile = useCallback(async (userId: string): Promise<ActiveProfile | null> => {
     const { data, error } = await supabase
       .from("users")
-      .select("id, display_name, is_proxy, managed_by")
+      .select("id, display_name, is_proxy, managed_by, is_superadmin")
       .eq("id", userId)
       .single();
 
@@ -97,6 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       display_name: data.display_name,
       is_proxy: data.is_proxy ?? false,
       managed_by: data.managed_by,
+      is_superadmin: data.is_superadmin ?? false,
     };
   }, [supabase]);
 
@@ -328,7 +329,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               // Fetch user profile
               const { data: profileData } = await tempClient
                 .from("users")
-                .select("id, display_name, is_proxy, managed_by")
+                .select("id, display_name, is_proxy, managed_by, is_superadmin")
                 .eq("id", fallbackSession.user.id)
                 .single();
 
@@ -338,6 +339,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   display_name: profileData.display_name,
                   is_proxy: profileData.is_proxy ?? false,
                   managed_by: profileData.managed_by,
+                  is_superadmin: profileData.is_superadmin ?? false,
                 };
                 setUserProfile(profile);
 

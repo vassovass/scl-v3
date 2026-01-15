@@ -475,6 +475,7 @@ export interface ActiveProfile {
   display_name: string | null;
   is_proxy: boolean;
   managed_by: string | null;
+  is_superadmin?: boolean;
 }
 
 /** Payload for creating a new proxy user */
