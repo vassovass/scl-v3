@@ -41,26 +41,44 @@ export default function ResetPage() {
                 sessionStorage.clear();
                 console.log("[Reset] Cleared localStorage & sessionStorage");
 
-                // 4. Clear IndexedDB databases
+                // 4. Clear IndexedDB databases (with timeout - can hang if DB in use)
                 setStatus("Clearing IndexedDB...");
                 if (indexedDB.databases) {
                     try {
                         const dbs = await indexedDB.databases();
+
+                        // Wrap each delete in a timeout to prevent hanging
+                        const deleteWithTimeout = (dbName: string): Promise<void> => {
+                            return new Promise((resolve) => {
+                                const timeout = setTimeout(() => {
+                                    console.warn(`[Reset] IndexedDB ${dbName} delete timed out, skipping`);
+                                    resolve();
+                                }, 2000); // 2 second timeout per database
+
+                                const req = indexedDB.deleteDatabase(dbName);
+                                req.onsuccess = () => {
+                                    clearTimeout(timeout);
+                                    resolve();
+                                };
+                                req.onerror = () => {
+                                    clearTimeout(timeout);
+                                    console.warn(`[Reset] IndexedDB ${dbName} delete error, continuing`);
+                                    resolve();
+                                };
+                                req.onblocked = () => {
+                                    clearTimeout(timeout);
+                                    console.warn(`[Reset] IndexedDB ${dbName} blocked (in use), skipping`);
+                                    resolve();
+                                };
+                            });
+                        };
+
                         await Promise.all(
-                            dbs.map(
-                                (db) =>
-                                    new Promise<void>((resolve, reject) => {
-                                        if (!db.name) {
-                                            resolve();
-                                            return;
-                                        }
-                                        const req = indexedDB.deleteDatabase(db.name);
-                                        req.onsuccess = () => resolve();
-                                        req.onerror = () => reject(req.error);
-                                    })
-                            )
+                            dbs
+                                .filter((db) => db.name)
+                                .map((db) => deleteWithTimeout(db.name!))
                         );
-                        console.log(`[Reset] Deleted ${dbs.length} IndexedDB databases`);
+                        console.log(`[Reset] Processed ${dbs.length} IndexedDB databases`);
                     } catch (e) {
                         console.warn("[Reset] IndexedDB cleanup failed (non-critical):", e);
                     }
