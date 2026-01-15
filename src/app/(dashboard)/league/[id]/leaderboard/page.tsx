@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, Suspense } from "react";
+import React, { useEffect, useState, useCallback, Suspense } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
@@ -120,6 +120,11 @@ function LeaderboardContent() {
   const leagueId = params.id as string;
   const { session } = useAuth();
 
+  // Debug: Track render count
+  const renderCountRef = React.useRef(0);
+  renderCountRef.current++;
+  console.log(`[LEADERBOARD] Render #${renderCountRef.current}`, { leagueId, hasSession: !!session });
+
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [meta, setMeta] = useState<LeaderboardMeta | null>(null);
   const [loading, setLoading] = useState(true);
@@ -132,6 +137,8 @@ function LeaderboardContent() {
     defaults: FILTER_DEFAULTS,
     urlParamKeys: ['period', 'sort_by', 'verified', 'period_b', 'compare'],
   });
+
+  console.log(`[LEADERBOARD] Filters state:`, { isHydrated, filters });
 
   const period = filters.period as PeriodPreset;
   const sortBy = filters.sort_by as SortBy;
@@ -546,7 +553,7 @@ function LeaderboardContent() {
                         )}
                       </td>
                       <td className="px-3 py-3 text-center">
-                        {entry.badges.map(badge => (
+                        {(entry.badges || []).map(badge => (
                           <span key={badge} className={`mr-1 ${BADGE_INFO[badge]?.color || ""}`} title={BADGE_INFO[badge]?.label}>
                             {BADGE_INFO[badge]?.icon || "🏅"}
                           </span>
