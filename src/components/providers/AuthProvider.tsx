@@ -228,61 +228,115 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     console.log('[AuthProvider] Setting up onAuthStateChange listener');
     let hasInitialized = false;
 
-    // Fallback: if INITIAL_SESSION doesn't fire in 2s, try getSession directly
-    // This happens when Supabase client doesn't auto-detect session from cookies
+    // Fallback: if INITIAL_SESSION doesn't fire in 2s, read cookies directly
+    // Supabase SDK getSession() can hang due to Web Locks API deadlock
     const fallbackTimeout = setTimeout(async () => {
       if (!hasInitialized) {
-        console.warn('[AuthProvider] Fallback: INITIAL_SESSION did not fire in 2s, trying getSession...');
+        console.warn('[AuthProvider] Fallback: INITIAL_SESSION did not fire in 2s, parsing cookies directly...');
         hasInitialized = true;
 
         try {
-          // Try to get session directly from Supabase
-          const { data: { session: fallbackSession }, error } = await supabase.auth.getSession();
+          // Parse session directly from cookies (bypasses SDK which can hang)
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+          const baseUrl = new URL(supabaseUrl);
+          const storageKey = `sb-${baseUrl.hostname.split(".")[0]}-auth-token`;
 
-          if (error) {
-            console.error('[AuthProvider] Fallback getSession error:', error);
-          }
+          // Helper to get cookie value
+          const getCookieValue = (name: string): string | undefined => {
+            const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+            return match ? decodeURIComponent(match[2]) : undefined;
+          };
 
-          if (fallbackSession) {
-            console.log('[AuthProvider] Fallback: Found session via getSession!', fallbackSession.user.id);
-            setSession(fallbackSession);
+          // Helper to read chunked cookies
+          const readChunkedCookie = (key: string): string | null => {
+            const direct = getCookieValue(key);
+            const chunk0 = getCookieValue(`${key}.0`);
 
-            // Update session cache
-            setCachedSession(
-              fallbackSession.access_token,
-              fallbackSession.user?.id ?? null,
-              fallbackSession.expires_at ?? null
-            );
+            if (chunk0) {
+              const chunks: string[] = [];
+              for (let i = 0; i < 50; i++) {
+                const part = getCookieValue(`${key}.${i}`);
+                if (!part) break;
+                chunks.push(part);
+              }
+              return chunks.length ? chunks.join("") : null;
+            }
+            return direct ?? null;
+          };
 
-            // Load profile
-            const profile = await fetchUserProfile(fallbackSession.user.id);
-            if (profile) {
-              setUserProfile(profile);
+          // Helper to decode base64url
+          const base64UrlToString = (input: string): string => {
+            let b64 = input.replace(/-/g, "+").replace(/_/g, "/");
+            while (b64.length % 4 !== 0) b64 += "=";
+            return atob(b64);
+          };
 
-              // Fetch proxies
-              const { data: proxyData } = await supabase
-                .from("users")
-                .select("id, display_name, is_proxy, managed_by")
-                .eq("managed_by", fallbackSession.user.id)
-                .eq("is_proxy", true)
-                .is("deleted_at", null)
-                .eq("is_archived", false)
-                .order("display_name");
+          const rawCookie = readChunkedCookie(storageKey);
+          console.log('[AuthProvider] Fallback: Raw cookie found:', !!rawCookie);
 
-              const proxies: ActiveProfile[] = (proxyData || []).map((p: any) => ({
-                id: p.id,
-                display_name: p.display_name,
-                is_proxy: p.is_proxy ?? true,
-                managed_by: p.managed_by,
-              }));
-              setManagedProxies(proxies);
-              await restoreActiveProfile(proxies, profile);
+          if (rawCookie) {
+            // Decode the session
+            const prefix = "base64-";
+            const decoded = rawCookie.startsWith(prefix)
+              ? base64UrlToString(rawCookie.slice(prefix.length))
+              : rawCookie;
+            const sessionData = JSON.parse(decoded);
+
+            console.log('[AuthProvider] Fallback: Parsed session, user:', sessionData?.user?.id);
+
+            if (sessionData?.access_token && sessionData?.user) {
+              // Create a session-like object that matches Supabase Session type
+              const fallbackSession = {
+                access_token: sessionData.access_token,
+                refresh_token: sessionData.refresh_token,
+                expires_at: sessionData.expires_at,
+                expires_in: sessionData.expires_in,
+                token_type: sessionData.token_type || 'bearer',
+                user: sessionData.user,
+              } as Session;
+
+              console.log('[AuthProvider] Fallback: Found session via cookie parsing!', fallbackSession.user.id);
+              setSession(fallbackSession);
+
+              // Update session cache
+              setCachedSession(
+                fallbackSession.access_token,
+                fallbackSession.user?.id ?? null,
+                fallbackSession.expires_at ?? null
+              );
+
+              // Load profile
+              const profile = await fetchUserProfile(fallbackSession.user.id);
+              if (profile) {
+                setUserProfile(profile);
+
+                // Fetch proxies
+                const { data: proxyData } = await supabase
+                  .from("users")
+                  .select("id, display_name, is_proxy, managed_by")
+                  .eq("managed_by", fallbackSession.user.id)
+                  .eq("is_proxy", true)
+                  .is("deleted_at", null)
+                  .eq("is_archived", false)
+                  .order("display_name");
+
+                const proxies: ActiveProfile[] = (proxyData || []).map((p: any) => ({
+                  id: p.id,
+                  display_name: p.display_name,
+                  is_proxy: p.is_proxy ?? true,
+                  managed_by: p.managed_by,
+                }));
+                setManagedProxies(proxies);
+                await restoreActiveProfile(proxies, profile);
+              }
+            } else {
+              console.log('[AuthProvider] Fallback: Cookie parsed but no valid session');
             }
           } else {
-            console.log('[AuthProvider] Fallback: No session found via getSession');
+            console.log('[AuthProvider] Fallback: No auth cookie found');
           }
         } catch (e) {
-          console.error('[AuthProvider] Fallback getSession exception:', e);
+          console.error('[AuthProvider] Fallback cookie parsing exception:', e);
         }
 
         setLoading(false);
