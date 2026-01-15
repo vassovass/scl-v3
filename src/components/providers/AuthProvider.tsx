@@ -20,6 +20,12 @@ interface AuthContextValue {
   loading: boolean;
   signOut: (redirectTo?: string) => Promise<void>;
 
+  // Auth error state (single source of truth for auth errors)
+  /** Current auth error detected from URL or callback */
+  authError: string | null;
+  /** Clear the auth error */
+  clearAuthError: () => void;
+
   // PRD 41: "Act As" Proxy Context
   /** The real user's profile (never a proxy) */
   userProfile: ActiveProfile | null;
@@ -53,6 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Core auth state
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   // PRD 41: "Act As" state
   const [userProfile, setUserProfile] = useState<ActiveProfile | null>(null);
@@ -173,6 +180,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Invalid/expired - clear and use self
       localStorage.removeItem(ACTIVE_PROFILE_KEY);
       setActiveProfile(user);
+    }
+  }, []);
+
+  // ============================================================================
+  // Clear auth error
+  // ============================================================================
+  const clearAuthError = useCallback(() => {
+    setAuthError(null);
+  }, []);
+
+  // ============================================================================
+  // Detect auth error from URL (single source of truth)
+  // ============================================================================
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get('error');
+
+    // Only handle auth-related errors
+    if (error && (error.startsWith('auth_') || error === 'auth_callback_failed')) {
+      console.log('[AuthProvider] Auth error detected from URL:', error);
+      setAuthError(error);
+
+      // Force clean slate - clear stale session that might be causing split state
+      clearAllAppState();
+
+      // Clear session state
+      setSession(null);
+      setUserProfile(null);
+      setActiveProfile(null);
+      setManagedProxies([]);
+      localStorage.removeItem(ACTIVE_PROFILE_KEY);
+
+      // Remove error from URL to prevent re-triggering
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
     }
   }, []);
 
@@ -380,6 +424,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     session,
     loading,
     signOut,
+
+    // Auth error state
+    authError,
+    clearAuthError,
 
     // PRD 41: "Act As" context
     userProfile,

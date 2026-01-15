@@ -17,6 +17,11 @@ All notable changes to StepLeague v3.
   - **`clearAppState.ts` Utility** - Modular functions for clearing app state, used in sign-out flow
   - **Improved Service Worker Config** - Added NetworkOnly exclusions for `/sign-in`, `/sign-up`, `/reset`, `/api/auth/`, `/claim/` routes to prevent stale cache issues
   - **Enhanced Sign-Out Flow** - Now clears service worker caches and browser storage in addition to session
+- **Auth Error Handling (Single Source of Truth)** - Centralized auth error state via AuthProvider
+  - **`AuthProvider.authError`** - Single source of truth for auth errors, detected from URL params
+  - **`AuthErrorAlert` Component** - Shows shadcn Alert in dashboard layout when auth error detected
+  - **Callback Route** - Uses specific error codes (`auth_code_exchange_failed`, `auth_callback_failed`)
+  - **Auto-cleanup** - Clears stale session and caches when auth error detected
 
 ## [2026-01-14]
 

@@ -21,8 +21,13 @@ export async function GET(request: Request) {
       }
       return NextResponse.redirect(`${origin}${next}`);
     }
+
+    // Specific error: code exchange failed (PKCE mismatch - wrong browser)
+    console.error("[Auth Callback] Code exchange failed:", error.message);
+    return NextResponse.redirect(`${origin}/dashboard?error=auth_code_exchange_failed`);
   }
 
-  // URL to redirect to after sign in process completes
-  return NextResponse.redirect(`${origin}/sign-in?error=auth_callback_failed`);
+  // No code provided - generic auth error
+  return NextResponse.redirect(`${origin}/dashboard?error=auth_callback_failed`);
 }
+
