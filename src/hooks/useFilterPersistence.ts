@@ -62,10 +62,6 @@ export function useFilterPersistence<T extends Record<string, string>>(
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
-    const [isHydrated, setIsHydrated] = useState(false);
-
-    // Flag to prevent re-sync when we update URL ourselves (prevents infinite loop)
-    const selfUpdateRef = useRef(false);
 
     // Determine which keys to sync to URL
     const syncKeys = useMemo(
@@ -73,8 +69,18 @@ export function useFilterPersistence<T extends Record<string, string>>(
         [urlParamKeys, defaults]
     );
 
-    // Helper to compute current filters from sources
-    const computeFilters = useCallback(() => {
+    // Optimistic state - initialize with defaults, hydrate once on mount
+    const [filters, setFiltersState] = useState<T>(defaults);
+    const [isHydrated, setIsHydrated] = useState(false);
+
+    // Flag to track if we've done initial hydration
+    const hasHydratedRef = useRef(false);
+
+    // Hydrate filters from URL/Storage ONLY once on mount
+    useEffect(() => {
+        if (hasHydratedRef.current) return;
+        hasHydratedRef.current = true;
+
         const result = { ...defaults };
 
         // Try URL params first (highest priority)
@@ -98,26 +104,12 @@ export function useFilterPersistence<T extends Record<string, string>>(
                 });
             }
         }
-        return result;
-    }, [searchParams, defaults, syncKeys, storageKey, contextId]);
 
-    // Optimistic state
-    const [filters, setFiltersState] = useState<T>(defaults);
-
-    // Sync from URL/Storage on mount and when params change
-    useEffect(() => {
-        // Skip if this is a self-triggered URL update
-        if (selfUpdateRef.current) {
-            selfUpdateRef.current = false;
-            return;
-        }
-        setFiltersState(computeFilters());
-    }, [computeFilters]);
-
-    // Mark as hydrated after first render
-    useEffect(() => {
+        setFiltersState(result);
         setIsHydrated(true);
-    }, []);
+    }, []); // Empty deps - only run once on mount
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally only run on mount
 
     // Update URL and optionally localStorage
     const updateFilters = useCallback(
@@ -137,8 +129,6 @@ export function useFilterPersistence<T extends Record<string, string>>(
             });
 
             // Update URL without scroll
-            // Set flag to prevent sync effect from re-processing this update
-            selfUpdateRef.current = true;
             const newUrl = params.toString()
                 ? `${pathname}?${params.toString()}`
                 : pathname;
