@@ -221,102 +221,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // ============================================================================
-  // Initialize auth and proxies
+  // Initialize auth via onAuthStateChange (primary source of auth state)
+  // onAuthStateChange fires INITIAL_SESSION on page load with session from cookies
   // ============================================================================
   useEffect(() => {
-    const initAuth = async () => {
-      console.log('[AuthProvider] Starting initAuth...');
+    console.log('[AuthProvider] Setting up onAuthStateChange listener');
 
-      // Use getUser() instead of getSession() - makes network call, more reliable
-      // getSession() uses cookies locally and can return stale/null after reset
-      let user = null;
-      let accessToken: string | null = null;
-
-      try {
-        // First try getUser which validates against the server
-        const userResult = await Promise.race([
-          supabase.auth.getUser(),
-          new Promise<{ data: { user: null }, error: Error }>((resolve) =>
-            setTimeout(() => resolve({ data: { user: null }, error: new Error('getUser timeout') }), 5000)
-          )
-        ]);
-
-        user = userResult.data.user;
-
-        if (user) {
-          // If we have a valid user, get the session for the access token
-          const { data: sessionData } = await supabase.auth.getSession();
-          accessToken = sessionData.session?.access_token ?? null;
-
-          // Set session state
-          setSession(sessionData.session);
-          console.log('[AuthProvider] User authenticated:', user.id);
-
-          // Update session cache for API client
-          if (sessionData.session) {
-            setCachedSession(
-              sessionData.session.access_token,
-              user.id,
-              sessionData.session.expires_at ?? null
-            );
-          }
-        } else {
-          console.log('[AuthProvider] No authenticated user found');
-          setSession(null);
-        }
-      } catch (e) {
-        console.error('[AuthProvider] Auth init error:', e);
-        setSession(null);
-      }
-
-      if (user) {
-        // Fetch user profile
-        const profile = await fetchUserProfile(user.id);
-        if (profile) {
-          setUserProfile(profile);
-
-          // Fetch proxies
-          const { data: proxyData } = await supabase
-            .from("users")
-            .select("id, display_name, is_proxy, managed_by")
-            .eq("managed_by", user.id)
-            .eq("is_proxy", true)
-            .is("deleted_at", null)
-            .eq("is_archived", false)
-            .order("display_name");
-
-          const proxies: ActiveProfile[] = (proxyData || []).map((p: any) => ({
-            id: p.id,
-            display_name: p.display_name,
-            is_proxy: p.is_proxy ?? true,
-            managed_by: p.managed_by,
-          }));
-          setManagedProxies(proxies);
-
-          // Restore persisted active profile
-          await restoreActiveProfile(proxies, profile);
-        }
-
-        // Identify for analytics
-        if (identifiedUserRef.current !== user.id) {
-          identifyUser(user.id, {
-            email: user.email || '',
-            created_at: user.created_at || '',
-          });
-          identifiedUserRef.current = user.id;
-        }
-      }
-
-      setLoading(false);
-      console.log('[AuthProvider] Init complete, loading=false');
-    };
-
-    initAuth();
-
-    // Listen for auth changes
+    // Listen for auth changes - this is the PRIMARY source of auth state
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, newSession) => {
+      console.log('[AuthProvider] onAuthStateChange:', event, newSession ? 'session' : 'null');
       setSession(newSession);
       handleAuthAnalytics(event, newSession);
 
@@ -338,6 +253,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setManagedProxies([]);
         localStorage.removeItem(ACTIVE_PROFILE_KEY);
         clearCachedSession();
+        setLoading(false);
+      }
+
+      // INITIAL_SESSION fires on page load with session from cookies
+      // This is critical for OAuth redirects where session is set server-side
+      if (event === 'INITIAL_SESSION') {
+        if (newSession?.user) {
+          console.log('[AuthProvider] INITIAL_SESSION with user:', newSession.user.id);
+          const profile = await fetchUserProfile(newSession.user.id);
+          if (profile) {
+            setUserProfile(profile);
+
+            // Fetch proxies
+            const { data: proxyData } = await supabase
+              .from("users")
+              .select("id, display_name, is_proxy, managed_by")
+              .eq("managed_by", newSession.user.id)
+              .eq("is_proxy", true)
+              .is("deleted_at", null)
+              .eq("is_archived", false)
+              .order("display_name");
+
+            const proxies: ActiveProfile[] = (proxyData || []).map((p: any) => ({
+              id: p.id,
+              display_name: p.display_name,
+              is_proxy: p.is_proxy ?? true,
+              managed_by: p.managed_by,
+            }));
+            setManagedProxies(proxies);
+
+            // Restore persisted active profile
+            await restoreActiveProfile(proxies, profile);
+          }
+
+          // Identify for analytics
+          if (identifiedUserRef.current !== newSession.user.id) {
+            identifyUser(newSession.user.id, {
+              email: newSession.user.email || '',
+              created_at: newSession.user.created_at || '',
+            });
+            identifiedUserRef.current = newSession.user.id;
+          }
+        } else {
+          console.log('[AuthProvider] INITIAL_SESSION with no user');
+        }
+        setLoading(false);
+        console.log('[AuthProvider] INITIAL_SESSION complete, loading=false');
       }
 
       // On sign in, refresh profile and proxies
@@ -348,6 +310,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setActiveProfile(profile);
           await refreshProxies();
         }
+        setLoading(false);
       }
     });
 
