@@ -378,6 +378,37 @@ invalidateCache('branding');
 2. Implement fetcher using `createCachedFetcher`
 3. Add invalidation hooks in relevant Admin Modification API routes
 
+#### 7.7 Auth Recovery System
+
+Users can get stuck on loading screens due to stale service worker cache or corrupted session state. The app includes an automatic recovery system:
+
+**Components:**
+
+| File | Purpose |
+|------|---------|
+| `/reset` page | Nuclear reset - clears all local state (SW, caches, storage, cookies) |
+| `LoadingWatchdog` | Auto-detects stuck auth loading, shows toast after 15s |
+| `clearAppState.ts` | Utility functions for clearing browser state |
+
+**How it works:**
+
+1. `LoadingWatchdog` (in root layout) monitors `AuthProvider.loading` state
+2. If loading exceeds 15 seconds, shows shadcn toast with "Reset App" action
+3. User can click to navigate to `/reset` which clears everything
+4. Sign-out flow also calls `clearAllAppState()` to prevent stale state
+
+**Service Worker Config:**
+
+Auth routes use `NetworkOnly` strategy in `next.config.js`:
+- `/sign-in`, `/sign-up`, `/reset`, `/api/auth/`, `/claim/`
+
+**Usage:**
+
+```typescript
+// In sign-out flow (already integrated in AuthProvider)
+import { clearAllAppState } from "@/lib/utils/clearAppState";
+await clearAllAppState(); // Clears SW caches, browser caches, localStorage, cookies
+```
 
 
 ## Project Structure

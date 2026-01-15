@@ -6,6 +6,7 @@ import type { Session, User, AuthChangeEvent } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { analytics, identifyUser, clearUser } from "@/lib/analytics";
 import { setCachedSession, clearCachedSession } from "@/lib/auth/sessionCache";
+import { clearAllAppState } from "@/lib/utils/clearAppState";
 import type { ActiveProfile } from "@/types/database";
 
 // ============================================================================
@@ -330,6 +331,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Clear session cache for API client
     clearCachedSession();
+
+    // Clear service worker caches and browser storage (non-blocking)
+    clearAllAppState().catch((e) => console.warn('[AuthProvider] clearAllAppState failed:', e));
 
     // Clear session state locally first to ensure UI updates
     setSession(null);

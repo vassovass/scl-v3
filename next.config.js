@@ -37,11 +37,21 @@ const withPWA = nextPwa.default({
   publicExcludes: ['!api/**/*', '!admin/**/*'],
   workboxOptions: {
     runtimeCaching: [
+      // ============ AUTH ROUTES - NEVER CACHE ============
       // Supabase auth - MUST bypass service worker to prevent session issues
       { urlPattern: /^https:\/\/.*\.supabase\.co\/auth\//i, handler: "NetworkOnly" },
       { urlPattern: /^https:\/\/.*\.supabase\.co\/rest\//i, handler: "NetworkOnly" },
       { urlPattern: /^https:\/\/.*\.supabase\.co\/storage\//i, handler: "NetworkOnly" },
 
+      // Local auth routes - sign-in, sign-out, callbacks, reset
+      { urlPattern: /\/sign-in/i, handler: "NetworkOnly" },
+      { urlPattern: /\/sign-up/i, handler: "NetworkOnly" },
+      { urlPattern: /\/sign-out/i, handler: "NetworkOnly" },
+      { urlPattern: /\/reset$/i, handler: "NetworkOnly" },
+      { urlPattern: /\/api\/auth\//i, handler: "NetworkOnly" },
+      { urlPattern: /\/claim\//i, handler: "NetworkOnly" },
+
+      // ============ THIRD-PARTY - NETWORK ONLY ============
       // Third-party analytics (often blocked)
       { urlPattern: /^https:\/\/www\.googletagmanager\.com\/gtm\.js/i, handler: "NetworkOnly" },
       { urlPattern: /^https:\/\/www\.googletagmanager\.com\/gtag\/js/i, handler: "NetworkOnly" },

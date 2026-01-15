@@ -7,6 +7,17 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-01-15]
+
+### Added
+
+- **Auth Recovery System** - Preventative measures and recovery options for stuck loading screens
+  - **`/reset` Page** - Nuclear reset that clears all local state (service workers, caches, localStorage, IndexedDB, cookies) and redirects to sign-in
+  - **`LoadingWatchdog` Provider** - Automatically monitors auth loading state; if stuck for 15+ seconds, shows a floating "Taking too long? Reset App" banner (integrated into root layout)
+  - **`clearAppState.ts` Utility** - Modular functions for clearing app state, used in sign-out flow
+  - **Improved Service Worker Config** - Added NetworkOnly exclusions for `/sign-in`, `/sign-up`, `/reset`, `/api/auth/`, `/claim/` routes to prevent stale cache issues
+  - **Enhanced Sign-Out Flow** - Now clears service worker caches and browser storage in addition to session
+
 ## [2026-01-14]
 
 ### Added
