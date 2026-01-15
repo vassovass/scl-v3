@@ -10,7 +10,7 @@
 
 'use client';
 
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { getStoredFilters, setStoredFilters } from '@/lib/filters/filterStorage';
 
@@ -64,6 +64,9 @@ export function useFilterPersistence<T extends Record<string, string>>(
     const pathname = usePathname();
     const [isHydrated, setIsHydrated] = useState(false);
 
+    // Flag to prevent re-sync when we update URL ourselves (prevents infinite loop)
+    const selfUpdateRef = useRef(false);
+
     // Determine which keys to sync to URL
     const syncKeys = useMemo(
         () => urlParamKeys || (Object.keys(defaults) as (keyof T)[]),
@@ -103,6 +106,11 @@ export function useFilterPersistence<T extends Record<string, string>>(
 
     // Sync from URL/Storage on mount and when params change
     useEffect(() => {
+        // Skip if this is a self-triggered URL update
+        if (selfUpdateRef.current) {
+            selfUpdateRef.current = false;
+            return;
+        }
         setFiltersState(computeFilters());
     }, [computeFilters]);
 
@@ -129,6 +137,8 @@ export function useFilterPersistence<T extends Record<string, string>>(
             });
 
             // Update URL without scroll
+            // Set flag to prevent sync effect from re-processing this update
+            selfUpdateRef.current = true;
             const newUrl = params.toString()
                 ? `${pathname}?${params.toString()}`
                 : pathname;

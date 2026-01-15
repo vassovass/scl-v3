@@ -11,6 +11,10 @@ All notable changes to StepLeague v3.
 
 ### Fixed
 
+- **League Leaderboard Crash (React Error #185)** - Fixed infinite loop causing "Maximum update depth exceeded"
+  - **Root Cause**: `useFilterPersistence` hook triggered a re-sync cycle when `router.push()` changed URL params
+  - **Fix**: Added `selfUpdateRef` flag to skip sync effect when URL update is self-triggered
+  - **Affected Page**: League leaderboard (`/league/[id]/leaderboard`) was crashing on load
 - **Proxy Claim Submission Transfer** - Fixed issue where claimed proxy submissions weren't visible in UI
   - **Root Cause**: Submissions API required `league_id` for permission check, blocking users with no league memberships
   - **Fix**: Made `league_id` optional in GET `/api/submissions`; allows fetching own or managed proxy submissions without league context
