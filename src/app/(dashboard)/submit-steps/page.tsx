@@ -105,11 +105,14 @@ export default function SubmitPage() {
         const limit = 100;
 
         // PRD 41: Proxies are now users with their own user_id. Use user_id for filtering.
+        // league_id is now optional in the API
         if (viewContext === "me") {
             let offset = 0;
             let hasMore = true;
             while (hasMore) {
-                const res = await fetch(`/api/submissions?league_id=${selectedLeagueId}&user_id=${session.user.id}&limit=${limit}&offset=${offset}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
+                let url = `/api/submissions?user_id=${session.user.id}&limit=${limit}&offset=${offset}`;
+                if (selectedLeagueId) url += `&league_id=${selectedLeagueId}`;
+                const res = await fetch(url, { headers: { Authorization: `Bearer ${session.access_token}` } });
                 if (!res.ok) throw new Error("Fetch failed");
                 const data = await res.json();
                 const ids = data.submissions.map((s: any) => s.id);
@@ -122,7 +125,9 @@ export default function SubmitPage() {
             let offset = 0;
             let hasMore = true;
             while (hasMore) {
-                const res = await fetch(`/api/submissions?league_id=${selectedLeagueId}&user_id=${selectedProxyId}&limit=${limit}&offset=${offset}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
+                let url = `/api/submissions?user_id=${selectedProxyId}&limit=${limit}&offset=${offset}`;
+                if (selectedLeagueId) url += `&league_id=${selectedLeagueId}`;
+                const res = await fetch(url, { headers: { Authorization: `Bearer ${session.access_token}` } });
                 if (!res.ok) throw new Error("Fetch failed");
                 const data = await res.json();
                 const ids = data.submissions.map((s: any) => s.id);
@@ -381,11 +386,17 @@ export default function SubmitPage() {
 
     // Fetch submissions
     const fetchSubmissions = useCallback(async (page = 0) => {
-        if (!session || !selectedLeagueId) return;
+        if (!session) return;
 
         try {
             const offset = page * itemsPerPage;
-            let url = `/api/submissions?league_id=${selectedLeagueId}&limit=${itemsPerPage}&offset=${offset}&order_by=created_at`;
+            // Build URL - league_id is now optional
+            let url = `/api/submissions?limit=${itemsPerPage}&offset=${offset}&order_by=created_at`;
+
+            // Add league_id if available (for legacy compatibility)
+            if (selectedLeagueId) {
+                url += `&league_id=${selectedLeagueId}`;
+            }
 
             // PRD 41: Proxies are now users with their own user_id. Use user_id for filtering.
             if (viewContext === "me") {

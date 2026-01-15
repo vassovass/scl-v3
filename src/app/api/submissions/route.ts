@@ -14,7 +14,7 @@ const createSchema = z.object({
 });
 
 const querySchema = z.object({
-    league_id: z.string().uuid(),
+    league_id: z.string().uuid().optional(), // Made optional to support league-agnostic fetching
     user_id: z.string().uuid().optional(),
     from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
@@ -315,16 +315,42 @@ export async function GET(request: Request): Promise<Response> {
 
         const adminClient = createAdminClient();
 
-        // Check membership
-        const { data: membership } = await adminClient
-            .from("memberships")
-            .select("role")
-            .eq("league_id", league_id)
-            .eq("user_id", user.id)
-            .single();
+        // Permission check logic:
+        // - If league_id provided: check user is member of that league
+        // - If no league_id but user_id matches auth user: allow (fetching own submissions)
+        // - If no league_id and user_id is a proxy managed by auth user: allow
+        // - Otherwise: forbidden
 
-        if (!membership) {
-            return forbidden("You are not a member of this league");
+        let hasPermission = false;
+
+        if (league_id) {
+            // Traditional league-scoped access
+            const { data: membership } = await adminClient
+                .from("memberships")
+                .select("role")
+                .eq("league_id", league_id)
+                .eq("user_id", user.id)
+                .single();
+
+            hasPermission = !!membership;
+        } else if (user_id === user.id) {
+            // User fetching their own submissions - always allowed
+            hasPermission = true;
+        } else if (user_id) {
+            // Check if user_id is a proxy managed by the authenticated user
+            const { data: proxy } = await adminClient
+                .from("users")
+                .select("id")
+                .eq("id", user_id)
+                .eq("managed_by", user.id)
+                .eq("is_proxy", true)
+                .maybeSingle();
+
+            hasPermission = !!proxy;
+        }
+
+        if (!hasPermission) {
+            return forbidden("You don't have permission to view these submissions");
         }
 
         // Build query - Agnostic of league_id for the submission itself
@@ -335,19 +361,18 @@ export async function GET(request: Request): Promise<Response> {
         let query = adminClient
             .from("submissions")
             .select(submissionSelect, { count: "exact" })
-            // .eq("league_id", league_id) // Removed to show ALL user submissions
             .order(primaryOrder, { ascending: false })
             .order(secondaryOrder, { ascending: false });
 
-        // PRD 41: Filter by user_id directly. Proxy users have their own user_id.
+        // Filter by user_id if provided
         if (user_id) {
             query = query.eq("user_id", user_id);
-        } else {
-            // If user_id not provided, we must fallback to filtering by league to avoid exposing others' data 
-            // without explicit intent (though usually this endpoint is consumed by the user for themselves).
-            // But the frontend usually passes user_id.
-            // Safety fallback: if no user_id, strict league scope.
+        } else if (league_id) {
+            // If only league_id provided, filter by league to show all league submissions
             query = query.eq("league_id", league_id);
+        } else {
+            // Fallback: show only auth user's submissions
+            query = query.eq("user_id", user.id);
         }
 
         if (from) {

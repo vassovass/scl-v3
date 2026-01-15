@@ -152,6 +152,14 @@ export const POST = withApiHandler({
 
     const managerId = proxy.managed_by;
 
+    console.log("[CLAIM] Starting claim process:", {
+        proxyId: proxy.id,
+        proxyName: proxy.display_name,
+        claimingUserId: user!.id,
+        managerId,
+        mergeStrategy: body.merge_strategy,
+    });
+
     // Get the claiming user's current profile
     const { data: claimingUser } = await adminClient
         .from("users")
@@ -165,6 +173,8 @@ export const POST = withApiHandler({
         : proxy.display_name;
 
     // Step 1: Transfer all submissions from proxy to the claiming user
+    console.log("[CLAIM] Step 1: Transferring submissions from", proxy.id, "to", user!.id);
+
     const { data: transferredSubmissions, error: transferError } = await adminClient
         .from("submissions")
         .update({ user_id: user!.id })
@@ -172,45 +182,69 @@ export const POST = withApiHandler({
         .select("id");
 
     if (transferError) {
-        console.error("Failed to transfer submissions:", transferError);
+        console.error("[CLAIM] Failed to transfer submissions:", transferError);
         return { error: `Failed to transfer submissions: ${transferError.message}`, status: 500 };
     }
 
     const transferredCount = transferredSubmissions?.length || 0;
+    console.log("[CLAIM] Transferred", transferredCount, "submissions");
 
     // Step 2: Transfer league memberships (if user not already a member)
-    const { data: proxyMemberships } = await adminClient
+    console.log("[CLAIM] Step 2: Fetching proxy memberships for", proxy.id);
+
+    const { data: proxyMemberships, error: membershipFetchError } = await adminClient
         .from("memberships")
         .select("league_id, role")
         .eq("user_id", proxy.id);
+
+    if (membershipFetchError) {
+        console.error("[CLAIM] Failed to fetch proxy memberships:", membershipFetchError);
+        // Continue anyway - submissions already transferred
+    }
+
+    console.log("[CLAIM] Found", proxyMemberships?.length || 0, "proxy memberships to process");
 
     let membershipsTransferred = 0;
 
     if (proxyMemberships && proxyMemberships.length > 0) {
         for (const membership of proxyMemberships) {
-            // Check if user already in this league
-            const { data: existing } = await adminClient
-                .from("memberships")
-                .select("league_id")
-                .eq("user_id", user!.id)
-                .eq("league_id", membership.league_id)
-                .maybeSingle();
+            console.log("[CLAIM] Processing membership for league:", membership.league_id);
+            try {
+                // Check if user already in this league
+                const { data: existing } = await adminClient
+                    .from("memberships")
+                    .select("league_id")
+                    .eq("user_id", user!.id)
+                    .eq("league_id", membership.league_id)
+                    .maybeSingle();
 
-            if (!existing) {
-                // Transfer membership
-                await adminClient
-                    .from("memberships")
-                    .update({ user_id: user!.id })
-                    .eq("user_id", proxy.id)
-                    .eq("league_id", membership.league_id);
-                membershipsTransferred++;
-            } else {
-                // Delete proxy's membership (user already has one)
-                await adminClient
-                    .from("memberships")
-                    .delete()
-                    .eq("user_id", proxy.id)
-                    .eq("league_id", membership.league_id);
+                if (!existing) {
+                    // Transfer membership by updating the user_id
+                    const { error: transferError } = await adminClient
+                        .from("memberships")
+                        .update({ user_id: user!.id })
+                        .eq("user_id", proxy.id)
+                        .eq("league_id", membership.league_id);
+
+                    if (transferError) {
+                        console.error(`Failed to transfer membership for league ${membership.league_id}:`, transferError);
+                    } else {
+                        membershipsTransferred++;
+                    }
+                } else {
+                    // Delete proxy's membership (user already has one)
+                    const { error: deleteError } = await adminClient
+                        .from("memberships")
+                        .delete()
+                        .eq("user_id", proxy.id)
+                        .eq("league_id", membership.league_id);
+
+                    if (deleteError) {
+                        console.error(`Failed to delete proxy membership for league ${membership.league_id}:`, deleteError);
+                    }
+                }
+            } catch (err) {
+                console.error(`Membership transfer error for league ${membership.league_id}:`, err);
             }
         }
     }

@@ -9,6 +9,15 @@ All notable changes to StepLeague v3.
 
 ## [2026-01-15]
 
+### Fixed
+
+- **Proxy Claim Submission Transfer** - Fixed issue where claimed proxy submissions weren't visible in UI
+  - **Root Cause**: Submissions API required `league_id` for permission check, blocking users with no league memberships
+  - **Fix**: Made `league_id` optional in GET `/api/submissions`; allows fetching own or managed proxy submissions without league context
+  - **Submit Steps Page**: Updated `fetchSubmissions` and `fetchAllGlobalIds` to work without requiring a selected league
+  - **Claim API**: Added comprehensive debug logging (`[CLAIM]` prefix) for troubleshooting transfer operations
+  - **Error Handling**: Added proper error logging for membership transfer operations in claim process
+
 ### Added
 
 - **Auth Recovery System** - Preventative measures and recovery options for stuck loading screens
