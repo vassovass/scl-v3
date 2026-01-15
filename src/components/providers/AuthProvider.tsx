@@ -225,23 +225,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ============================================================================
   useEffect(() => {
     const initAuth = async () => {
-      // Get initial session
-      const { data } = await supabase.auth.getSession();
-      const initialSession = data.session ?? null;
-      setSession(initialSession);
+      console.log('[AuthProvider] Starting initAuth...');
 
-      // Update session cache for API client
-      if (initialSession) {
-        setCachedSession(
-          initialSession.access_token,
-          initialSession.user?.id ?? null,
-          initialSession.expires_at ?? null
-        );
+      // Use getUser() instead of getSession() - makes network call, more reliable
+      // getSession() uses cookies locally and can return stale/null after reset
+      let user = null;
+      let accessToken: string | null = null;
+
+      try {
+        // First try getUser which validates against the server
+        const userResult = await Promise.race([
+          supabase.auth.getUser(),
+          new Promise<{ data: { user: null }, error: Error }>((resolve) =>
+            setTimeout(() => resolve({ data: { user: null }, error: new Error('getUser timeout') }), 5000)
+          )
+        ]);
+
+        user = userResult.data.user;
+
+        if (user) {
+          // If we have a valid user, get the session for the access token
+          const { data: sessionData } = await supabase.auth.getSession();
+          accessToken = sessionData.session?.access_token ?? null;
+
+          // Set session state
+          setSession(sessionData.session);
+          console.log('[AuthProvider] User authenticated:', user.id);
+
+          // Update session cache for API client
+          if (sessionData.session) {
+            setCachedSession(
+              sessionData.session.access_token,
+              user.id,
+              sessionData.session.expires_at ?? null
+            );
+          }
+        } else {
+          console.log('[AuthProvider] No authenticated user found');
+          setSession(null);
+        }
+      } catch (e) {
+        console.error('[AuthProvider] Auth init error:', e);
+        setSession(null);
       }
 
-      if (initialSession?.user) {
+      if (user) {
         // Fetch user profile
-        const profile = await fetchUserProfile(initialSession.user.id);
+        const profile = await fetchUserProfile(user.id);
         if (profile) {
           setUserProfile(profile);
 
@@ -249,7 +279,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const { data: proxyData } = await supabase
             .from("users")
             .select("id, display_name, is_proxy, managed_by")
-            .eq("managed_by", initialSession.user.id)
+            .eq("managed_by", user.id)
             .eq("is_proxy", true)
             .is("deleted_at", null)
             .eq("is_archived", false)
@@ -268,16 +298,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         // Identify for analytics
-        if (identifiedUserRef.current !== initialSession.user.id) {
-          identifyUser(initialSession.user.id, {
-            email: initialSession.user.email || '',
-            created_at: initialSession.user.created_at || '',
+        if (identifiedUserRef.current !== user.id) {
+          identifyUser(user.id, {
+            email: user.email || '',
+            created_at: user.created_at || '',
           });
-          identifiedUserRef.current = initialSession.user.id;
+          identifiedUserRef.current = user.id;
         }
       }
 
       setLoading(false);
+      console.log('[AuthProvider] Init complete, loading=false');
     };
 
     initAuth();
