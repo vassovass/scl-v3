@@ -26,6 +26,17 @@ interface NavHeaderProps {
 
 export function NavHeader({ location: locationOverride, variant = 'default' }: NavHeaderProps = {}) {
     const { user, session, signOut } = useAuth();
+
+    // Debug logging for auth state
+    useEffect(() => {
+        console.log('[NavHeader] Auth state:', {
+            hasSession: !!session,
+            hasUser: !!user,
+            userId: user?.id ?? 'none',
+            sessionExpiry: session?.expires_at ? new Date(session.expires_at * 1000).toISOString() : 'none'
+        });
+    }, [session, user]);
+
     const isTransparent = variant === 'transparent';
     const pathname = usePathname();
     const router = useRouter();

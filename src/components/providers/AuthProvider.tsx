@@ -226,12 +226,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ============================================================================
   useEffect(() => {
     console.log('[AuthProvider] Setting up onAuthStateChange listener');
+    let hasInitialized = false;
+
+    // Fallback timeout: ensure loading=false even if INITIAL_SESSION doesn't fire
+    // This can happen due to Supabase version issues or timing
+    const fallbackTimeout = setTimeout(() => {
+      if (!hasInitialized) {
+        console.warn('[AuthProvider] Fallback: INITIAL_SESSION did not fire in 2s, setting loading=false');
+        setLoading(false);
+        hasInitialized = true;
+      }
+    }, 2000);
 
     // Listen for auth changes - this is the PRIMARY source of auth state
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, newSession) => {
       console.log('[AuthProvider] onAuthStateChange:', event, newSession ? 'session' : 'null');
+
+      // Mark as initialized on first event
+      if (!hasInitialized && (event === 'INITIAL_SESSION' || event === 'SIGNED_IN')) {
+        hasInitialized = true;
+        clearTimeout(fallbackTimeout);
+      }
+
       setSession(newSession);
       handleAuthAnalytics(event, newSession);
 
@@ -315,6 +333,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => {
+      clearTimeout(fallbackTimeout);
       subscription.unsubscribe();
     };
   }, [supabase, fetchUserProfile, restoreActiveProfile, refreshProxies]);
