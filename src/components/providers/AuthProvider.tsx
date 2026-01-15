@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { Session, User, AuthChangeEvent } from "@supabase/supabase-js";
+import { createClient as createArgsClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { analytics, identifyUser, clearUser } from "@/lib/analytics";
 import { setCachedSession, clearCachedSession } from "@/lib/auth/sessionCache";
@@ -282,6 +283,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               : rawCookie;
             const sessionData = JSON.parse(decoded);
 
+            // Validation: Check expiry
+            const now = Math.floor(Date.now() / 1000);
+            if (sessionData.expires_at && sessionData.expires_at < now) {
+              console.warn('[AuthProvider] Fallback: Session in cookie is expired', sessionData.expires_at, now);
+              setLoading(false);
+              return; // Stop here, clear state?
+            }
+
             console.log('[AuthProvider] Fallback: Parsed session, user:', sessionData?.user?.id);
 
             if (sessionData?.access_token && sessionData?.user) {
@@ -295,7 +304,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 user: sessionData.user,
               } as Session;
 
-              console.log('[AuthProvider] Fallback: Found session via cookie parsing!', fallbackSession.user.id);
+              console.log('[AuthProvider] Fallback: Found valid session via cookie parsing!', fallbackSession.user.id);
               setSession(fallbackSession);
 
               // Update session cache
@@ -305,13 +314,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 fallbackSession.expires_at ?? null
               );
 
-              // Load profile
-              const profile = await fetchUserProfile(fallbackSession.user.id);
-              if (profile) {
+              // Load profile safely using a temporary, stateless client
+              // This avoids using the global `supabase` client which might be deadlocked
+              const tempClient = createArgsClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+                {
+                  global: { headers: { Authorization: `Bearer ${fallbackSession.access_token}` } },
+                  auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+                }
+              );
+
+              // Fetch user profile
+              const { data: profileData } = await tempClient
+                .from("users")
+                .select("id, display_name, is_proxy, managed_by")
+                .eq("id", fallbackSession.user.id)
+                .single();
+
+              if (profileData) {
+                const profile = {
+                  id: profileData.id,
+                  display_name: profileData.display_name,
+                  is_proxy: profileData.is_proxy ?? false,
+                  managed_by: profileData.managed_by,
+                };
                 setUserProfile(profile);
 
                 // Fetch proxies
-                const { data: proxyData } = await supabase
+                const { data: proxyData } = await tempClient
                   .from("users")
                   .select("id, display_name, is_proxy, managed_by")
                   .eq("managed_by", fallbackSession.user.id)
@@ -330,7 +361,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 await restoreActiveProfile(proxies, profile);
               }
             } else {
-              console.log('[AuthProvider] Fallback: Cookie parsed but no valid session');
+              console.log('[AuthProvider] Fallback: Cookie parsed but no valid session struct');
             }
           } else {
             console.log('[AuthProvider] Fallback: No auth cookie found');
