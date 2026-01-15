@@ -11,10 +11,13 @@ All notable changes to StepLeague v3.
 
 ### Fixed
 
-- **League Leaderboard Crash (React Error #185)** - Fixed infinite loop causing "Maximum update depth exceeded"
-  - **Root Cause**: `useFilterPersistence` hook triggered a re-sync cycle when `router.push()` changed URL params
-  - **Fix**: Added `selfUpdateRef` flag to skip sync effect when URL update is self-triggered
-  - **Affected Page**: League leaderboard (`/league/[id]/leaderboard`) was crashing on load
+- **Footer Menu Labels UX** - Decoupled frontend headers from database labels.
+  - **Frontend**: Fixed headers to always display as "Navigation", "Account", "Legal".
+  - **Admin**: Renamed configuration labels to "Footer Column 1", "Footer Column 2", "Footer Column 3" for clarity in the Menu Editor.
+- **League Leaderboard Crash (React Error #185)** - Fixed infinite render loop causing "Maximum update depth exceeded"
+  - **Root Cause**: `useFilterPersistence` hook's `computeFilters` callback depended on `useSearchParams()` which returns a new `URLSearchParams` object on every render, causing endless re-renders (7000+ renders before crash)
+  - **Fix**: Changed to hydrate-once-on-mount pattern using `hasHydratedRef`; filters now sync from URL/localStorage only once on mount, not on every searchParams change
+  - **Affected Page**: League leaderboard (`/league/[id]/leaderboard`) was crashing immediately on load
 - **Proxy Claim Submission Transfer** - Fixed issue where claimed proxy submissions weren't visible in UI
   - **Root Cause**: Submissions API required `league_id` for permission check, blocking users with no league memberships
   - **Fix**: Made `league_id` optional in GET `/api/submissions`; allows fetching own or managed proxy submissions without league context

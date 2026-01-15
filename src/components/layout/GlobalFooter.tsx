@@ -31,7 +31,7 @@ export function GlobalFooter() {
                     {/* Navigation Column */}
                     <div>
                         <h4 className="text-sm font-medium text-foreground mb-3">
-                            {menus.footerNavigation?.label || "Navigation"}
+                            Navigation
                         </h4>
                         <ul className="space-y-2">
                             {navigationItems.map(item => (
@@ -52,7 +52,7 @@ export function GlobalFooter() {
                     {/* Account Column */}
                     <div>
                         <h4 className="text-sm font-medium text-foreground mb-3">
-                            {menus.footerAccount?.label || "Account"}
+                            Account
                         </h4>
                         <ul className="space-y-2">
                             {accountItems.map(item => (
@@ -73,7 +73,7 @@ export function GlobalFooter() {
                     {/* Legal Column */}
                     <div>
                         <h4 className="text-sm font-medium text-foreground mb-3">
-                            {menus.footerLegal?.label || "Legal"}
+                            Legal
                         </h4>
                         <ul className="space-y-2">
                             {legalItems.map(item => (
