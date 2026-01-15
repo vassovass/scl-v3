@@ -3,6 +3,8 @@
  * Used by sign-out flow and /reset page.
  */
 
+import { resetClient } from "@/lib/supabase/client";
+
 /**
  * Clear service worker caches via postMessage.
  * This is non-blocking and best-effort.
@@ -85,4 +87,8 @@ export async function clearAllAppState(): Promise<void> {
     await clearBrowserCaches();
     clearAppStorage();
     clearAuthCookies();
+    // Reset singleton Supabase client to avoid stale session state
+    resetClient();
+    console.log("[clearAppState] Reset Supabase client singleton");
 }
+
