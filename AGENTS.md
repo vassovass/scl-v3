@@ -100,6 +100,7 @@
 | [`testing-patterns`](.agent/skills/testing-patterns/SKILL.md) | **NEW** Adding tests, mocking Supabase, TDD |
 | [`auth-patterns`](.agent/skills/auth-patterns/SKILL.md) | **NEW** getUser vs getSession, deadlocks, sessions |
 | [`middleware-patterns`](.agent/skills/middleware-patterns/SKILL.md) | **NEW** Protected routes, auth redirects, URL handling |
+| [`analytics-tracking`](.agent/skills/analytics-tracking/SKILL.md) | **NEW** Event tracking (GA4+PostHog), adding events, GTM config |
 
 ### Key Principles (from `architecture-philosophy`)
 
@@ -110,6 +111,47 @@
 5. **Outcome-based PRDs** - Define WHAT to achieve, not HOW
 
 ---
+
+## 🤝 Skills & MCPs: The Workflow
+
+**Skills and MCPs work together.**
+
+- **Skills** provide the **instructions and patterns** (the "how-to").
+- **MCP Servers** provide the **tools and access** (the "capabilities").
+
+**Example Workflow:**
+1. **Read Skill**: You read `analytics-tracking` skill to know *how* to name an event and *where* to place the code.
+2. **Use MCP**: You use the **GTM MCP** to actually create the tag in Google Tag Manager.
+
+> **Always check `SKILL.md` files for instructions on which MCP tools to use for a specific task.**
+
+---
+
+## 🔌 MCP Servers (AI Tool Integrations)
+
+**MCP servers extend AI agent capabilities** for analytics, tracking, and product management.
+
+> **See `analytics-tracking` skill for detailed usage instructions.**
+
+| Server | Access | Quick Reference | Use Cases |
+|--------|--------|-----------------|-----------|
+| **GTM MCP** | ✅ Write | Account: `6331302038` | Create/edit tags, triggers, variables, publish versions |
+| **GA4 MCP** | 📊 Read | Property: `517956149` | Query reports, sessions, page views, realtime data |
+| **PostHog MCP** | ✅ Full | API key in `.vscode/mcp.json` | Feature flags, experiments, insights, event analytics |
+| **Perplexity MCP** | 📊 Read | N/A | Web search, research queries |
+
+### Quick Commands
+
+```
+# GTM: List containers
+"List my GTM containers"
+
+# GA4: Get summaries
+"Get my GA4 account summaries"
+
+# PostHog: Feature flags
+"Get all feature flags in the project"
+```
 
 ## Critical Rules
 
