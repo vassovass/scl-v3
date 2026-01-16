@@ -4,18 +4,21 @@
  * Analytics Hub for StepLeague
  * 
  * Architecture:
- * - All tracking goes through GTM dataLayer (single source of truth)
- * - GTM forwards events to GA4, Hotjar, PostHog, GrowthBook, etc.
- * - No direct SDK integrations = no frontend delays
+ * - Events are pushed to BOTH dataLayer (GA4 via GTM) AND PostHog SDK
+ * - dataLayer → GTM → GA4 for Google Analytics
+ * - PostHog SDK → PostHog for session replay, feature flags, funnels
  * - Component-level tracking for granular insights
  * 
- * Future tools (add in GTM, no code changes needed):
- * - Heatmaps: Hotjar, FullStory, Microsoft Clarity
- * - A/B Testing: GrowthBook, PostHog, Optimizely
- * - Session Recording: LogRocket, Sentry
+ * Adding new tracking:
+ * 1. Add event method to `analytics` object below
+ * 2. Events automatically go to both GA4 and PostHog
+ * 3. No GTM changes needed for new events
  * 
  * @see PRD 14: Analytics GTM & GA4
+ * @see PostHogProvider.tsx for PostHog initialization
  */
+
+import { posthogCapture, posthogIdentify, posthogReset } from '@/components/analytics/PostHogProvider';
 
 declare global {
     interface Window {
@@ -45,8 +48,9 @@ export interface TrackEventParams {
 }
 
 /**
- * Push event to dataLayer
- * GTM picks this up and routes to GA4, Hotjar, PostHog, etc.
+ * Push event to BOTH dataLayer (GA4) AND PostHog
+ * - dataLayer → GTM → GA4
+ * - PostHog SDK → PostHog (session replay, funnels, feature flags)
  */
 export function trackEvent(
     eventName: string,
@@ -68,11 +72,15 @@ export function trackEvent(
         ...cleanParams,
     };
 
+    // Push to dataLayer (GA4 via GTM)
     window.dataLayer.push(event);
+
+    // Push to PostHog SDK (session replay, funnels, feature flags)
+    posthogCapture(eventName, cleanParams as Record<string, string | number | boolean | null | undefined>);
 
     // Debug in development
     if (process.env.NODE_ENV === 'development') {
-        console.log('[Analytics]', eventName, cleanParams);
+        console.log('[Analytics] Event sent to GA4 + PostHog:', eventName, cleanParams);
     }
 }
 
@@ -81,29 +89,37 @@ export function trackEvent(
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Set user identity for all analytics tools
+ * Set user identity for all analytics tools (GA4 + PostHog)
  * Call this after login/signup
  */
 export function identifyUser(userId: string, traits?: Record<string, string | number | boolean>) {
     if (typeof window === 'undefined') return;
 
+    // Push to dataLayer for GA4
     window.dataLayer.push({
         event: 'user_identified',
         user_id: userId,
         ...traits,
     });
+
+    // Identify in PostHog
+    posthogIdentify(userId, traits);
 }
 
 /**
- * Clear user identity on logout
+ * Clear user identity on logout (GA4 + PostHog)
  */
 export function clearUser() {
     if (typeof window === 'undefined') return;
 
+    // Push to dataLayer for GA4
     window.dataLayer.push({
         event: 'user_logged_out',
         user_id: null,
     });
+
+    // Reset PostHog user
+    posthogReset();
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
