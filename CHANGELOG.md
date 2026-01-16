@@ -7,6 +7,48 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-01-16]
+
+### Added
+
+- **New Agent Skills** - Added 5 focused skills based on project patterns:
+  - `react-debugging`: Patterns for infinite loops, `useMemo`, and hydration issues
+  - `typescript-debugging`: Common TS errors and Supabase database generic fixes
+  - `testing-patterns`: Vitest/RTL setup and Supabase mocking strategies
+  - `auth-patterns`: Detailed auth deadlock avoidance (getUser vs getSession)
+  - `middleware-patterns`: Protected routes and URL preservation
+- **Design System Reinforcement**
+  - Enhanced `design-system` skill with STRICT light/dark mode requirements
+  - Added WCAG 2.1 AA contrast mandates
+  - Created `find-hardcoded-colors.sh` script to flag violations
+- **Skill Overlap Resolution**
+  - Refactored `supabase-patterns` to delegate auth complexity to `auth-patterns`
+  - Cross-linked related skills for better discovery
+
+### Changed
+
+- **Agent Skills System Enhancement** - Universal Agent Skills standard compliance
+  - **Format Upgrade**: All 8 skills now follow [agentskills.io](https://agentskills.io) specification
+  - **YAML Frontmatter**: Added `compatibility`, `metadata`, and enhanced `description` with trigger keywords
+  - **Cross-IDE Support**: Skills work with Antigravity, Claude Code, and Cursor
+  - **Claude Code Integration**: Added `.claude/skills/` folder (synced from `.agent/skills/`)
+  - **Setup Script**: Created `setup-skills-symlink.bat` for true symlink (run as admin)
+  - **Updated CLAUDE.md**: Added skills reference table for Claude Code agents
+  - **Key Skill Enhancements**:
+    - `prd-creation`: Stronger outcome-based emphasis, AGENTS.md reference requirement, PRD index structure, dependency ordering with Mermaid graphs, marking PRDs as complete workflow
+    - `architecture-philosophy`: Expanded modular/system thinking guidance
+    - `supabase-patterns`: Comprehensive MCP troubleshooting flowchart and fallback patterns
+  - **Research-Based**: Follows Agent Skills progressive disclosure pattern (metadata → instructions → resources)
+  - **Kanban Entry**: Added via MCP (id: 7d7b82e9)
+  - **Skill Gap Analysis**: Reviewed all 1200 lines of AGENTS.md - confirmed skills provide comprehensive coverage
+
+- **`skill-creation` Meta-Skill** - New skill for creating skills
+  - Approval workflow with `status: pending` → `status: active`
+  - References all project context files (AGENTS.md, THEME_SYSTEM.md, etc.)
+  - Step-by-step creation guide with naming rules
+  - Trigger keywords for agent matching
+  - Added to AGENTS.md and CLAUDE.md skills tables
+
 ## [2026-01-15]
 
 ### Fixed

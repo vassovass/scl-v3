@@ -11,6 +11,29 @@ See **[AGENTS.md](./AGENTS.md)** for complete project context including:
 - Database schema
 - Common issues and fixes
 
+## Agent Skills
+
+Skills are available in `.claude/skills/` (synced from `.agent/skills/`).
+
+> **New skills require user approval** — see `skill-creation` skill.
+
+| Skill | Purpose |
+|-------|---------|
+| `api-handler` | API route pattern with `withApiHandler` |
+| `architecture-philosophy` | Modular design, system thinking |
+| `design-system` | CSS variables, theming, UI patterns |
+| `error-handling` | `AppError` class, error codes |
+| `form-components` | Reusable form inputs with accessibility |
+| `prd-creation` | Outcome-based PRD writing |
+| `project-updates` | Updating changelog, roadmap, kanban |
+| `supabase-patterns` | MCP usage, database, RLS |
+| `skill-creation` | **Meta-skill**: Creating new skills, approval workflow |
+| `react-debugging` | **NEW** Infinite loops, useMemo/useCallback |
+| `typescript-debugging` | **NEW** Build errors, tsc failures |
+| `testing-patterns` | **NEW** Testing, mocking Supabase |
+| `auth-patterns` | **NEW** getUser/getSession, deadlocks |
+| `middleware-patterns` | **NEW** Protected routes, redirects |
+
 ## Claude-Specific Notes
 
 1. **Read AGENTS.md first** - it contains all patterns and architecture decisions
@@ -22,3 +45,4 @@ See **[AGENTS.md](./AGENTS.md)** for complete project context including:
 ## Memory Persistence
 
 Claude Code automatically loads this file. For persistent context, add notes here that should survive across sessions. Current context is maintained in AGENTS.md.
+

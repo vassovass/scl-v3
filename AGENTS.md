@@ -77,6 +77,40 @@
 
 ---
 
+## 🧠 Agent Skills
+
+**Skills provide specialized knowledge for AI agents.** Located in `.agent/skills/`, each skill contains focused instructions for specific domains.
+
+> **When a skill is relevant to your task, read its `SKILL.md` before proceeding.**
+> **New skills require user approval** — see `skill-creation` skill for workflow.
+
+| Skill | When to Use |
+|-------|-------------|
+| [`architecture-philosophy`](.agent/skills/architecture-philosophy/SKILL.md) | Designing new features, refactoring, architectural decisions |
+| [`prd-creation`](.agent/skills/prd-creation/SKILL.md) | Writing PRDs, defining requirements (outcome-based) |
+| [`api-handler`](.agent/skills/api-handler/SKILL.md) | Creating or modifying API routes |
+| [`supabase-patterns`](.agent/skills/supabase-patterns/SKILL.md) | Database queries, MCP server usage *(see auth-patterns for auth)* |
+| [`error-handling`](.agent/skills/error-handling/SKILL.md) | Implementing error handling, AppError usage |
+| [`design-system`](.agent/skills/design-system/SKILL.md) | Colors, themes, **light/dark mode**, CSS variables, UI styling |
+| [`form-components`](.agent/skills/form-components/SKILL.md) | Creating forms, input fields, accessibility |
+| [`project-updates`](.agent/skills/project-updates/SKILL.md) | Updating roadmap, changelog, kanban after completion |
+| [`skill-creation`](.agent/skills/skill-creation/SKILL.md) | Creating new skills, skill approval workflow |
+| [`react-debugging`](.agent/skills/react-debugging/SKILL.md) | **NEW** Infinite loops, useMemo/useCallback, dependency arrays |
+| [`typescript-debugging`](.agent/skills/typescript-debugging/SKILL.md) | **NEW** Build errors, tsc failures, type issues |
+| [`testing-patterns`](.agent/skills/testing-patterns/SKILL.md) | **NEW** Adding tests, mocking Supabase, TDD |
+| [`auth-patterns`](.agent/skills/auth-patterns/SKILL.md) | **NEW** getUser vs getSession, deadlocks, sessions |
+| [`middleware-patterns`](.agent/skills/middleware-patterns/SKILL.md) | **NEW** Protected routes, auth redirects, URL handling |
+
+### Key Principles (from `architecture-philosophy`)
+
+1. **Modular over monolithic** - Build systems, not one-off solutions
+2. **Future-thinking** - Use settings over hardcoding
+3. **Defensive programming** - Use AppError, graceful degradation
+4. **Maintenance reduction** - Use shadcn/ui, central configuration
+5. **Outcome-based PRDs** - Define WHAT to achieve, not HOW
+
+---
+
 ## Critical Rules
 
 ### 0. Check Existing Patterns (MANDATORY)
