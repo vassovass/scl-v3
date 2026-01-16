@@ -30,6 +30,12 @@ const VercelAnalyticsGate = dynamic(
   { ssr: false }
 );
 
+// PostHog SDK - async loaded, consent-aware, no SSR blocking
+const PostHogProvider = dynamic(
+  () => import("@/components/analytics/PostHogProvider").then((mod) => mod.PostHogProvider),
+  { ssr: false }
+);
+
 /**
  * Generate dynamic metadata based on brand settings from database.
  * Falls back to defaults if database is unavailable.
@@ -101,17 +107,20 @@ export default async function RootLayout({
           defaultTheme={themeSettings.defaultMode}
           enableSystem={themeSettings.allowedModes.includes("system")}
         >
-          <AuthProvider>
-            <LoadingWatchdog>
-              {children}
+          {/* PostHog: async loaded, consent-aware, session replay + feature flags */}
+          <PostHogProvider>
+            <AuthProvider>
+              <LoadingWatchdog>
+                {children}
 
-              <SafeLazy>
-                <FeedbackWidget />
-              </SafeLazy>
+                <SafeLazy>
+                  <FeedbackWidget />
+                </SafeLazy>
 
-              <Toaster />
-            </LoadingWatchdog>
-          </AuthProvider>
+                <Toaster />
+              </LoadingWatchdog>
+            </AuthProvider>
+          </PostHogProvider>
         </ThemeProvider>
 
         {/* Cookie consent banner (renders at bottom of page) */}
