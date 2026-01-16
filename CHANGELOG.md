@@ -11,6 +11,14 @@ All notable changes to StepLeague v3.
 
 ### Added
 
+- **MCP Server Documentation** - Verified and documented all MCP server integrations
+  - **GTM MCP (Stape)**: Write access to Google Tag Manager - verified account `6331302038` (StepLeague)
+  - **GA4 MCP (Stape)**: Read-only GA4 reports - verified property `517956149` (StepLeague WebApp)
+  - **PostHog MCP**: Full access to PostHog features (flags, experiments, insights)
+  - Updated `analytics-tracking` skill with comprehensive MCP documentation
+  - Added MCP Servers section to `AGENTS.md` with quick reference table
+  - Added "Skills & MCPs: The Workflow" section to `AGENTS.md` to explain the bidirectional relationship
+
 - **New Agent Skills** - Added 5 focused skills based on project patterns:
   - `react-debugging`: Patterns for infinite loops, `useMemo`, and hydration issues
   - `typescript-debugging`: Common TS errors and Supabase database generic fixes
