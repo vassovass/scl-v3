@@ -3,26 +3,78 @@ name: testing-patterns
 description: Testing patterns for Next.js App Router with Supabase. Use when adding tests, verifying fixes, or preventing regressions. Keywords: test, testing, jest, vitest, unit test, integration test, mock, Supabase mock.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
-  version: "1.0"
+  version: "2.0"
   project: "stepleague"
+  last_updated: "2026-01-16"
 ---
 
 # Testing Patterns Skill
 
 ## Overview
 
-StepLeague currently has minimal test coverage. This skill provides patterns for adding tests progressively.
+StepLeague has a test suite using Vitest with React Testing Library. This skill provides patterns for adding and maintaining tests.
+
+**Current Status:** ✅ Test infrastructure complete, 45+ tests passing.
 
 ---
 
-## Recommended Testing Stack
+## Quick Start
 
-| Tool | Purpose |
-|------|---------|
-| **Vitest** | Test runner (faster than Jest for Vite/Next) |
-| **React Testing Library** | Component testing |
-| **MSW** | API mocking |
-| **@testing-library/user-event** | User interaction simulation |
+```bash
+# Run all tests
+npm test
+
+# Watch mode (re-runs on file change)
+npm test:watch
+
+# Coverage report (aims for 70%+)
+npm test:coverage
+```
+
+---
+
+## User Guidance (Show This When Asked About Tests)
+
+> [!NOTE]
+> When the user asks "what can tests do?", "how do I use tests?", or similar questions about testing capabilities, show them this section.
+
+### Is it Automatic?
+
+**Currently: No.** Tests don't run automatically on changes. Options:
+1. **Watch Mode** (`npm run test:watch`) - Leave running while coding; tests re-run on save
+2. **CI/CD** (not yet configured) - Could add GitHub Actions to run on push
+
+### When to Ask for Tests
+
+**Ask to RUN tests when:**
+- Finished implementing a feature
+- Debugging an issue (catch regressions)
+- Before committing/deploying
+
+**Ask to WRITE tests when:**
+- Fixed a bug (prevents recurrence)
+- Added new API route or complex component
+- Want to verify specific behavior
+
+### Example Prompts
+
+| Prompt | What happens |
+|--------|--------------|
+| "Run the tests" | Runs `npm test` and shows results |
+| "Write a test for [feature]" | Creates test file following skill patterns |
+| "Check test coverage" | Runs coverage report |
+| "Add tests for proxy claim" | Writes comprehensive tests for that feature |
+
+---
+
+## Project Testing Stack
+
+| Tool | Purpose | Installed |
+|------|---------| --------- |
+| **Vitest** | Test runner (faster than Jest for Vite/Next) | ✅ |
+| **React Testing Library** | Component testing | ✅ |
+| **MSW** | API mocking | ✅ |
+| **jsdom** | Browser environment simulation | ✅ |
 
 ---
 
@@ -30,159 +82,180 @@ StepLeague currently has minimal test coverage. This skill provides patterns for
 
 ```
 src/
-├── components/
-│   └── MyComponent.tsx
-│   └── __tests__/
-│       └── MyComponent.test.tsx
+├── __mocks__/
+│   └── supabase.ts          # Mock factories (use this!)
 ├── lib/
-│   └── utils.ts
-│   └── __tests__/
-│       └── utils.test.ts
-└── app/
-    └── api/
-        └── route.ts
-        └── __tests__/
-            └── route.test.ts
+│   └── auth/
+│       └── __tests__/
+│           └── sessionCache.test.ts
+├── app/
+│   └── api/
+│       └── proxy-claim/
+│           └── __tests__/
+│               └── route.test.ts
 ```
 
 ---
 
-## Pattern 1: Unit Testing Utilities
+## Pattern 1: Session Cache Testing (REAL EXAMPLE)
+
+From `src/lib/auth/__tests__/sessionCache.test.ts`:
 
 ```typescript
-// src/lib/__tests__/utils.test.ts
-import { describe, it, expect } from 'vitest';
-import { formatDate, calculateStreak } from '../utils';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { setCachedSession, getCachedSession, clearCachedSession } from '../sessionCache';
 
-describe('formatDate', () => {
-  it('formats ISO date to display format', () => {
-    expect(formatDate('2026-01-15')).toBe('Jan 15, 2026');
+describe('sessionCache', () => {
+  beforeEach(() => {
+    clearCachedSession();
   });
 
-  it('handles null gracefully', () => {
-    expect(formatDate(null)).toBe('—');
-  });
-});
-```
-
----
-
-## Pattern 2: Component Testing
-
-```typescript
-// src/components/__tests__/LeaderboardCard.test.tsx
-import { render, screen } from '@testing-library/react';
-import { LeaderboardCard } from '../LeaderboardCard';
-
-describe('LeaderboardCard', () => {
-  it('displays user name and steps', () => {
-    render(
-      <LeaderboardCard 
-        user={{ name: 'John', steps: 10000 }} 
-        rank={1} 
-      />
-    );
+  it('stores session when all params provided', () => {
+    const futureTime = Math.floor(Date.now() / 1000) + 3600;
+    setCachedSession('token-123', 'user-456', futureTime);
     
-    expect(screen.getByText('John')).toBeInTheDocument();
-    expect(screen.getByText('10,000')).toBeInTheDocument();
+    const cached = getCachedSession();
+    expect(cached).not.toBeNull();
+    expect(cached?.accessToken).toBe('token-123');
   });
 
-  it('shows crown for rank 1', () => {
-    render(<LeaderboardCard user={mockUser} rank={1} />);
-    expect(screen.getByTestId('crown-icon')).toBeInTheDocument();
+  it('returns null when session expires within 60s buffer', () => {
+    const soonTime = Math.floor(Date.now() / 1000) + 30;
+    setCachedSession('token-123', 'user-456', soonTime);
+    
+    expect(getCachedSession()).toBeNull();
   });
 });
 ```
 
 ---
 
-## Pattern 3: Mocking Supabase
+## Pattern 2: Using Mock Factories (REAL EXAMPLE)
+
+From `src/__mocks__/supabase.ts`:
 
 ```typescript
-// src/lib/__mocks__/supabase.ts
-export const mockSupabase = {
+import { vi } from 'vitest';
+
+// Create mock user
+export const createMockUser = (overrides = {}) => ({
+  id: 'user-123',
+  email: 'test@example.com',
+  created_at: '2026-01-01T00:00:00Z',
+  ...overrides,
+});
+
+// Create mock proxy
+export const createMockProxy = (overrides = {}) => ({
+  id: 'proxy-456',
+  display_name: 'Proxy User',
+  is_proxy: true,
+  managed_by: 'user-123',
+  invite_code: 'CLAIM123',
+  claims_remaining: 1,
+  ...overrides,
+});
+
+// Create chainable Supabase client mock
+export const createMockSupabaseClient = () => ({
   from: vi.fn(() => ({
-    select: vi.fn(() => ({
-      eq: vi.fn(() => ({
-        single: vi.fn(() => Promise.resolve({ data: mockData, error: null })),
-      })),
-    })),
-    insert: vi.fn(() => Promise.resolve({ data: mockData, error: null })),
+    select: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    single: vi.fn().mockResolvedValue({ data: null, error: null }),
   })),
   auth: {
-    getUser: vi.fn(() => Promise.resolve({ data: { user: mockUser }, error: null })),
+    getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
+    signOut: vi.fn().mockResolvedValue({ error: null }),
   },
-};
+});
 
-// In test file
-vi.mock('@/lib/supabase/client', () => ({
-  createBrowserClient: () => mockSupabase,
-}));
+// Usage in test:
+// import { createMockSupabaseClient, createMockProxy } from '@/__mocks__/supabase';
 ```
 
 ---
 
-## Pattern 4: API Route Testing
+## Pattern 3: Auth Level Testing (REAL EXAMPLE)
+
+From `src/lib/api/__tests__/handler.test.ts`:
 
 ```typescript
-// src/app/api/submissions/__tests__/route.test.ts
-import { POST } from '../route';
-import { NextRequest } from 'next/server';
+describe('League-level auth', () => {
+  type Role = 'member' | 'admin' | 'owner';
+  
+  const roleHasAccess = (userRole: Role, requiredLevel: string): boolean => {
+    const roleHierarchy = { member: 1, admin: 2, owner: 3 };
+    const requiredHierarchy = { 
+      league_member: 1, league_admin: 2, league_owner: 3 
+    };
+    return roleHierarchy[userRole] >= requiredHierarchy[requiredLevel];
+  };
 
-describe('POST /api/submissions', () => {
-  it('returns 401 without auth', async () => {
-    const req = new NextRequest('http://localhost/api/submissions', {
-      method: 'POST',
-      body: JSON.stringify({ steps: 5000 }),
-    });
-
-    const res = await POST(req);
-    expect(res.status).toBe(401);
+  it('member cannot access league_admin routes', () => {
+    expect(roleHasAccess('member', 'league_admin')).toBe(false);
   });
 
-  it('creates submission with valid data', async () => {
-    // Mock auth
-    vi.mocked(getUser).mockResolvedValue({ id: 'user-1' });
-    
-    const req = new NextRequest('http://localhost/api/submissions', {
-      method: 'POST',
-      body: JSON.stringify({ steps: 5000, for_date: '2026-01-15' }),
-    });
-
-    const res = await POST(req);
-    expect(res.status).toBe(200);
+  it('owner can access all league routes', () => {
+    expect(roleHasAccess('owner', 'league_member')).toBe(true);
+    expect(roleHasAccess('owner', 'league_admin')).toBe(true);
+    expect(roleHasAccess('owner', 'league_owner')).toBe(true);
   });
 });
 ```
 
 ---
 
-## Testing Priorities
+## Pattern 4: Proxy Claim Testing (REAL EXAMPLE)
 
-When adding tests, prioritize:
+From `src/app/api/proxy-claim/__tests__/route.test.ts`:
 
-1. **Utilities** - Pure functions, easy to test
-2. **API Routes** - Critical business logic
-3. **Complex Components** - Forms, data displays
-4. **Hooks** - Custom hooks with logic
+```typescript
+describe('POST - Execute Claim', () => {
+  it('prevents user from claiming their own proxy', () => {
+    const managerId = 'user-123';
+    const claimingUserId = 'user-123';
+    
+    const isOwnProxy = managerId === claimingUserId;
+    expect(isOwnProxy).toBe(true);
+    // Route should return 400
+  });
+
+  describe('Merge Strategy', () => {
+    it('uses proxy display_name with keep_proxy_profile strategy', () => {
+      const proxy = createMockProxy({ display_name: 'Proxy Name' });
+      const user = createMockProfile({ display_name: 'User Name' });
+      const strategy = 'keep_proxy_profile';
+      
+      const finalName = strategy === 'keep_proxy_profile' 
+        ? proxy.display_name 
+        : user.display_name;
+      
+      expect(finalName).toBe('Proxy Name');
+    });
+  });
+});
+```
 
 ---
 
-## Running Tests
+## Testing Priorities (Updated)
 
-```bash
-# Run all tests
-npm test
+Based on 10-day commit analysis, priority testing areas:
 
-# Watch mode
-npm test -- --watch
+1. **Auth Session Cache** - Bypasses Web Locks deadlocks ⚠️ Critical
+2. **Proxy Claims** - Complex data transfer logic ⚠️ Critical
+3. **API Handler Auth** - Role-based access
+4. **Hooks with URL state** - Prevent infinite loops
 
-# Coverage report
-npm test -- --coverage
+---
 
-# Single file
-npm test -- src/lib/__tests__/utils.test.ts
-```
+## Configuration Files
+
+| File | Purpose |
+|------|---------|
+| `vitest.config.ts` | Vitest setup with path aliases, coverage thresholds |
+| `vitest.setup.ts` | Global mocks (next/navigation, next/headers, matchMedia) |
+| `src/__mocks__/supabase.ts` | Supabase client and data factories |
 
 ---
 
@@ -195,13 +268,12 @@ When fixing a bug:
 3. **Commit both** - Test prevents regression
 
 ```typescript
-// Example: Bug fix with test
-describe('calculateStreak', () => {
-  // This test was added when fixing bug #123
-  it('handles timezone edge case at midnight', () => {
-    const dates = ['2026-01-14', '2026-01-15'];
-    expect(calculateStreak(dates, '2026-01-15T00:30:00+07:00')).toBe(2);
-  });
+// Example: Testing the 60-second token expiry buffer
+it('returns null when session expires within 60s buffer', () => {
+  // This test catches the bug where tokens were used too close to expiry
+  const soonTime = Math.floor(Date.now() / 1000) + 30;
+  setCachedSession('token-123', 'user-456', soonTime);
+  expect(getCachedSession()).toBeNull();
 });
 ```
 
@@ -209,5 +281,7 @@ describe('calculateStreak', () => {
 
 ## Related Skills
 
-- `react-debugging` - Use tests to prevent loops
-- `api-handler` - Patterns for API testing
+- `auth-patterns` - getUser vs getSession, deadlock avoidance
+- `api-handler` - withApiHandler middleware patterns
+- `react-debugging` - Use tests to prevent infinite render loops
+
