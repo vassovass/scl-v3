@@ -133,7 +133,7 @@ export interface Competitor {
 
 const competitorConfigs: (Omit<Competitor, 'hasFeatures'> & { hasFeatures: string[] })[] = [
     {
-        slug: "fitbit",
+        slug: "stepleague-vs-fitbit",
         name: "Fitbit Challenges",
         shortName: "Fitbit",
         tagline: "Popular fitness tracker with built-in challenges",
@@ -185,7 +185,7 @@ const competitorConfigs: (Omit<Competitor, 'hasFeatures'> & { hasFeatures: strin
         },
     },
     {
-        slug: "strava",
+        slug: "stepleague-vs-strava",
         name: "Strava",
         shortName: "Strava",
         tagline: "Popular app for runners and cyclists",
@@ -237,7 +237,7 @@ const competitorConfigs: (Omit<Competitor, 'hasFeatures'> & { hasFeatures: strin
         },
     },
     {
-        slug: "yumuuv",
+        slug: "stepleague-vs-yumuuv",
         name: "YuMuuv",
         shortName: "YuMuuv",
         tagline: "Corporate wellness platform with step challenges",
@@ -283,7 +283,7 @@ const competitorConfigs: (Omit<Competitor, 'hasFeatures'> & { hasFeatures: strin
         },
     },
     {
-        slug: "garmin",
+        slug: "stepleague-vs-garmin",
         name: "Garmin Connect Challenges",
         shortName: "Garmin",
         tagline: "Premium fitness tracker ecosystem",
@@ -331,7 +331,7 @@ const competitorConfigs: (Omit<Competitor, 'hasFeatures'> & { hasFeatures: strin
         },
     },
     {
-        slug: "apple-fitness",
+        slug: "stepleague-vs-apple-fitness",
         name: "Apple Fitness+ Competitions",
         shortName: "Apple Fitness+",
         tagline: "Apple's subscription fitness service",
@@ -378,7 +378,7 @@ const competitorConfigs: (Omit<Competitor, 'hasFeatures'> & { hasFeatures: strin
         },
     },
     {
-        slug: "stridekick",
+        slug: "stepleague-vs-stridekick",
         name: "Stridekick",
         shortName: "Stridekick",
         tagline: "Established team step challenge platform",

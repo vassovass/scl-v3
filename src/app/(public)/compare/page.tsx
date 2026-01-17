@@ -138,7 +138,7 @@ function CompetitorCard({
 }) {
     return (
         <Link
-            href={`/compare/stepleague-vs-${slug}`}
+            href={`/compare/${slug}`}
             className="group bg-card border border-border rounded-xl p-6 hover:border-primary/50 hover:shadow-lg transition-all"
         >
             <div className="flex items-center gap-3 mb-3">

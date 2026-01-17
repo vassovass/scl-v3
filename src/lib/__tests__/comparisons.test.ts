@@ -104,7 +104,7 @@ describe('Comparison Data Module', () => {
 
     describe('getCompetitorBySlug', () => {
         it('should return competitor for valid slug', () => {
-            const fitbit = getCompetitorBySlug('fitbit');
+            const fitbit = getCompetitorBySlug('stepleague-vs-fitbit');
             expect(fitbit).toBeDefined();
             expect(fitbit?.name).toBe('Fitbit Challenges');
         });
@@ -120,14 +120,14 @@ describe('Comparison Data Module', () => {
             const slugs = getAllCompetitorSlugs();
             expect(Array.isArray(slugs)).toBe(true);
             expect(slugs.length).toBe(competitors.length);
-            expect(slugs).toContain('fitbit');
-            expect(slugs).toContain('strava');
+            expect(slugs).toContain('stepleague-vs-fitbit');
+            expect(slugs).toContain('stepleague-vs-strava');
         });
     });
 
     describe('buildFeatureComparison', () => {
         it('should build comparison for a competitor', () => {
-            const fitbit = getCompetitorBySlug('fitbit')!;
+            const fitbit = getCompetitorBySlug('stepleague-vs-fitbit')!;
             const comparison = buildFeatureComparison(fitbit);
 
             expect(Array.isArray(comparison)).toBe(true);
@@ -143,7 +143,7 @@ describe('Comparison Data Module', () => {
         });
 
         it('should correctly identify StepLeague features', () => {
-            const fitbit = getCompetitorBySlug('fitbit')!;
+            const fitbit = getCompetitorBySlug('stepleague-vs-fitbit')!;
             const comparison = buildFeatureComparison(fitbit);
 
             const aiVerification = comparison.find(f => f.id === 'ai_verification');
@@ -154,7 +154,7 @@ describe('Comparison Data Module', () => {
 
     describe('getFeaturesByCategory', () => {
         it('should group features by category', () => {
-            const fitbit = getCompetitorBySlug('fitbit')!;
+            const fitbit = getCompetitorBySlug('stepleague-vs-fitbit')!;
             const comparison = buildFeatureComparison(fitbit);
             const grouped = getFeaturesByCategory(comparison);
 
@@ -166,7 +166,7 @@ describe('Comparison Data Module', () => {
         });
 
         it('should not lose any features during grouping', () => {
-            const fitbit = getCompetitorBySlug('fitbit')!;
+            const fitbit = getCompetitorBySlug('stepleague-vs-fitbit')!;
             const comparison = buildFeatureComparison(fitbit);
             const grouped = getFeaturesByCategory(comparison);
 
