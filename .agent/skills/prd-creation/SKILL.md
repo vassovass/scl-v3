@@ -63,15 +63,21 @@ Before creating any PRD:
 
 ### Where PRDs Live
 
+**Primary location:** `docs/prds/admin-feedback-system/`
+
 ```
-docs/prds/
-├── PRD_41_Proxy_Refactor_Stability.md
-├── PRD_Modular_Branding_System.md
-├── admin-feedback-system/
-│   └── ... (42 sub-documents)
-└── modular-systems/
-    └── ...
+docs/prds/admin-feedback-system/
+├── PRD_00_Index.md              # Master index with all PRDs
+├── PRD_01_Database_Schema.md
+├── PRD_02_Admin_APIs.md
+├── PRD_03_Filter_Search.md
+├── ...
+├── PRD_41_Proxy_Refactor.md
+├── PRD_42_Test_Coverage_Expansion.md
+└── ... (40+ PRDs)
 ```
+
+> **Note:** All PRDs should be created in `docs/prds/admin-feedback-system/` and indexed in `PRD_00_Index.md`.
 
 ### Naming Convention
 
