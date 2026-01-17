@@ -14,7 +14,7 @@ metadata:
 
 StepLeague has a test suite using Vitest with React Testing Library. This skill provides patterns for adding and maintaining tests.
 
-**Current Status:** ✅ Test infrastructure complete, 276+ tests passing (70% coverage target).
+**Current Status:** ✅ Test infrastructure complete, 296+ tests passing (70% coverage target).
 
 ---
 
@@ -285,6 +285,7 @@ it('returns null when session expires within 60s buffer', () => {
 |-----------|---------|-------|
 | `src/lib/__tests__/analytics.test.ts` | Dual-tracking (GA4+PostHog), events | 632 |
 | `src/lib/__tests__/auth-middleware.test.ts` | Route protection, redirects | 308 |
+| `src/lib/__tests__/comparisons.test.ts` | SEO comparison pages, feature registry | 200 |
 | `src/lib/__tests__/feedback-integration.test.ts` | Feedback lifecycle, Kanban | 355 |
 | `src/lib/auth/__tests__/sessionCache.test.ts` | Token caching, expiry | ~80 |
 | `src/lib/api/__tests__/handler.test.ts` | Auth levels, validation | 204 |

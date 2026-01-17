@@ -7,7 +7,23 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-01-17]
+
+### Added
+
+- **SEO Comparison Pages** (PRD 35) - Optimized pages for "StepLeague vs X" search queries
+  - **Hub page** at `/compare` with grid of 6 competitor cards
+  - **Individual comparison pages** at `/compare/stepleague-vs-{competitor}` (Fitbit, Strava, Garmin, YuMuuv, Apple Fitness+, Stridekick)
+  - **Modular feature registry** - Features defined once, composed per competitor for consistency
+  - **JSON-LD FAQPage schema** - Rich snippet support for search results
+  - **Grouped feature tables** - Device Compatibility, Features, Social & Rankings, Tone & Community, Pricing
+  - **Supportive tone** - Aligned with tone softening docs (High Fives, mindful messaging)
+  - **20 unit tests** for comparison data module in `comparisons.test.ts`
+
+---
+
 ## [2026-01-16]
+
 
 ### Added
 
