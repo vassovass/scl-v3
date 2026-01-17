@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { analytics } from "@/lib/analytics";
 import { ENCOURAGEMENT_CONFIG, ZEN_ANIMATIONS } from "@/lib/encouragement/config";
 import {
     Tooltip,
@@ -73,6 +74,9 @@ export function HighFiveButton({
             }
 
             if (onHighFive) onHighFive(newState);
+
+            // Track high five interaction
+            analytics.highFiveSent(recipientId, newState);
 
         } catch (error) {
             // Revert on error

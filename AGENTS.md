@@ -1119,6 +1119,12 @@ analytics.ai.verificationCompleted('approved', 0.95, 1200, leagueId);
 // Support/Chat
 analytics.support.chatOpened('widget');
 analytics.support.messageSent('question');
+
+// Proxy Events (added Jan 2026)
+analytics.proxyClaimed(proxyId, submissionCount, leagueCount);
+
+// Engagement
+analytics.highFiveSent(recipientId, isToggleOn);
 ```
 
 ### User Identity (CRITICAL for per-user analytics)

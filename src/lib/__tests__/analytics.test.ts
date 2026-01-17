@@ -264,6 +264,74 @@ describe('Analytics Tracking System', () => {
         });
     });
 
+    // ========================================================================
+    // Proxy Events
+    // ========================================================================
+
+    describe('analytics.proxyClaimed()', () => {
+        it('tracks proxy_claimed with all details', () => {
+            analytics.proxyClaimed('proxy-123', 5, 2);
+
+            expect(dataLayerPushes[0]).toMatchObject({
+                event: 'proxy_claimed',
+                proxy_id: 'proxy-123',
+                submission_count: 5,
+                league_count: 2,
+                category: 'conversion',
+                action: 'claim',
+            });
+        });
+
+        it('sends to PostHog', () => {
+            analytics.proxyClaimed('proxy-456', 10, 3);
+
+            expect(mockPosthogCapture).toHaveBeenCalledWith(
+                'proxy_claimed',
+                expect.objectContaining({
+                    proxy_id: 'proxy-456',
+                    submission_count: 10,
+                    league_count: 3,
+                })
+            );
+        });
+    });
+
+    describe('analytics.highFiveSent()', () => {
+        it('tracks high_five_sent when sending', () => {
+            analytics.highFiveSent('user-456', true);
+
+            expect(dataLayerPushes[0]).toMatchObject({
+                event: 'high_five_sent',
+                recipient_id: 'user-456',
+                action: 'send',
+                category: 'engagement',
+            });
+        });
+
+        it('tracks high_five_sent when removing', () => {
+            analytics.highFiveSent('user-789', false);
+
+            expect(dataLayerPushes[0]).toMatchObject({
+                event: 'high_five_sent',
+                recipient_id: 'user-789',
+                action: 'remove',
+            });
+        });
+
+        it('sends to PostHog', () => {
+            analytics.highFiveSent('user-123', true);
+
+            expect(mockPosthogCapture).toHaveBeenCalledWith(
+                'high_five_sent',
+                expect.objectContaining({
+                    recipient_id: 'user-123',
+                    action: 'send',
+                })
+            );
+        });
+    });
+
+
     describe('analytics.share()', () => {
         it('tracks share event with content type and method', () => {
             analytics.share('league', 'league-123', 'whatsapp');

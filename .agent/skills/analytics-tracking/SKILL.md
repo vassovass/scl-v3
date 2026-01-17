@@ -36,6 +36,13 @@ All events are pushed to both systems from a single `trackEvent()` call.
 | `src/components/analytics/GoogleTagManager.tsx` | GTM loading with consent gates |
 | `src/lib/consent/cookieConsent.ts` | Cookie consent helpers |
 
+## Recently Added Events (Jan 2026)
+
+| Event | Purpose | Parameters |
+|-------|---------|------------|
+| `proxy_claimed` | Tracks when a proxy user claims their profile | `proxy_id`, `submission_count`, `league_count` |
+| `high_five_sent` | Tracks high-five engagement interactions | `recipient_id`, `action` (send/remove) |
+
 ## Adding a New Tracking Event
 
 ### Step 1: Add event to `analytics.ts`

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { analytics } from "@/lib/analytics";
 import { useToast } from "@/hooks/use-toast";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
@@ -104,6 +105,13 @@ export default function ClaimPage() {
                 title: "Profile claimed!",
                 description: `${data.transferred_submissions} submissions transferred to your account.`,
             });
+
+            // Track successful claim
+            analytics.proxyClaimed(
+                claimData.proxy.id,
+                data.transferred_submissions,
+                claimData.leagues.length
+            );
 
             // Redirect to profile settings so user can customize their name
             router.push("/settings/profile?welcome=claimed");

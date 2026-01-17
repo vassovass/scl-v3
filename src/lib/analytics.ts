@@ -201,6 +201,28 @@ export const analytics = {
     },
 
     // ─────────────────────────────────────────────────────────────────────────
+    // PROXY EVENTS
+    // ─────────────────────────────────────────────────────────────────────────
+
+    proxyClaimed: (proxyId: string, submissionCount: number, leagueCount: number) => {
+        trackEvent('proxy_claimed', {
+            proxy_id: proxyId,
+            submission_count: submissionCount,
+            league_count: leagueCount,
+            category: 'conversion',
+            action: 'claim',
+        });
+    },
+
+    highFiveSent: (recipientId: string, isToggleOn: boolean) => {
+        trackEvent('high_five_sent', {
+            recipient_id: recipientId,
+            action: isToggleOn ? 'send' : 'remove',
+            category: 'engagement',
+        });
+    },
+
+    // ─────────────────────────────────────────────────────────────────────────
     // MICRO CONVERSIONS
     // ─────────────────────────────────────────────────────────────────────────
 
