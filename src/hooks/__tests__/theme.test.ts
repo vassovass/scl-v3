@@ -55,7 +55,7 @@ describe('Theme - Toggle Behavior', () => {
 
         it('ignores system preference when explicitly set', () => {
             const systemPrefersDark = true;
-            const theme: Theme = 'light'; // Explicitly light
+            const theme = 'light' as Theme; // Explicitly light
 
             const resolvedTheme = theme === 'system'
                 ? (systemPrefersDark ? 'dark' : 'light')

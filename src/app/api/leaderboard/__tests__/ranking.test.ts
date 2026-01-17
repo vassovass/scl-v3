@@ -274,7 +274,7 @@ describe('Leaderboard - Badge Assignment', () => {
     });
 
     it('assigns most_improved to top 3 with positive improvement', () => {
-        const entries = [
+        const entries: LeaderboardEntry[] = [
             { rank: 1, user_id: 'u1', display_name: 'User 1', total_steps: 10000, badges: [], improvement_pct: 50 },
             { rank: 2, user_id: 'u2', display_name: 'User 2', total_steps: 9000, badges: [], improvement_pct: 40 },
             { rank: 3, user_id: 'u3', display_name: 'User 3', total_steps: 8000, badges: [], improvement_pct: 30 },

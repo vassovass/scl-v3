@@ -173,8 +173,8 @@ describe('/api/submissions - Proxy Context', () => {
         // SCENARIO 2: Manager submits for their proxy
         describe('Manager submits for proxy (Act As)', () => {
             it('submission user_id is the proxy ID', () => {
-                const authUserId = 'manager-123';
-                const actingAsId = 'proxy-456'; // Acting as proxy
+                const authUserId: string = 'manager-123';
+                const actingAsId: string | null = 'proxy-456'; // Acting as proxy
 
                 const targetUserId = actingAsId && actingAsId !== authUserId
                     ? actingAsId

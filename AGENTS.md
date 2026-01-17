@@ -1001,7 +1001,7 @@ This ensures documentation stays current for future sessions and developers.
 
 ### 8. Performance & Caching Rules (NEW)
  
-> **Refer to `ARCHITECTURE.md` for the full technical guide.**
+> **Refer to [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the full technical guide.**
  
 #### 8.1 Server vs Client Fetching
  
@@ -1175,6 +1175,27 @@ When adding a new trackable feature:
 ---
 
 ## Recent Features
+
+### 2026-01-16
+
+- ✅ **Agent Skills Expansion** (5 NEW debugging/pattern skills)
+  - `react-debugging` - Infinite loops, useMemo/useCallback, dependency arrays
+  - `typescript-debugging` - Build errors, tsc failures, type issues
+  - `testing-patterns` - Adding tests, mocking Supabase, TDD workflows
+  - `auth-patterns` - getUser vs getSession, deadlock prevention, Web Locks
+  - `middleware-patterns` - Protected routes, auth redirects, URL handling
+
+- ✅ **PostHog SDK Integration**
+  - Dual-tracking architecture: GA4 via GTM + PostHog SDK
+  - `PostHogProvider` component with consent awareness
+  - All events automatically sent to both systems
+  - Feature flags, session replay, and A/B testing ready
+
+- ✅ **Comprehensive Test Suite**
+  - Vitest + React Testing Library setup
+  - 276+ tests covering auth, proxy claims, API handlers, analytics
+  - Mock factories in `src/__mocks__/supabase.ts`
+  - 70% coverage threshold enforced
 
 ### 2026-01-10
 
