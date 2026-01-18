@@ -794,9 +794,15 @@ Both dark and light theme values are defined in `globals.css`.
 ## Commands
 
 ```bash
+# Development
 npm run dev      # Local development server (http://localhost:3000)
 npm run build    # Production build
 npx tsc --noEmit # Type check
+
+# Testing (see testing-patterns skill)
+npm run test              # Vitest unit/integration
+npm run test:e2e          # Playwright E2E (headless)
+npm run test:e2e:headed   # Playwright with visible browser
 ```
 
 ---

@@ -1,9 +1,9 @@
 ---
 name: testing-patterns
-description: Testing patterns for Next.js App Router with Supabase. Use when adding tests, verifying fixes, or preventing regressions. Keywords: test, testing, jest, vitest, unit test, integration test, mock, Supabase mock.
+description: Testing patterns for Next.js App Router with Supabase. Use when adding tests, verifying fixes, or preventing regressions. Keywords: test, testing, jest, vitest, unit test, integration test, mock, Supabase mock, playwright, e2e.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
-  version: "3.0"
+  version: "4.0"
   project: "stepleague"
   last_updated: "2026-01-18"
 ---
@@ -12,23 +12,24 @@ metadata:
 
 ## Overview
 
-StepLeague has a test suite using Vitest with React Testing Library. This skill provides patterns for adding and maintaining tests.
-
-**Current Status:** ✅ Test infrastructure complete, 1,101+ tests passing (PRD 42 Phases A-D complete).
+StepLeague has two test suites:
+- **Vitest** (unit/integration): 1,101+ tests for hooks, components, utilities
+- **Playwright** (E2E): 63 tests for full user flows against live site
 
 ---
 
 ## Quick Start
 
 ```bash
-# Run all tests
-npm test
+# Unit/Integration Tests (Vitest)
+npm run test              # Run all
+npm run test:watch        # Watch mode
+npm run test:coverage     # Coverage report
 
-# Watch mode (re-runs on file change)
-npm test:watch
-
-# Coverage report (aims for 70%+)
-npm test:coverage
+# E2E Tests (Playwright)
+npm run test:e2e          # Run all (headless)
+npm run test:e2e:headed   # Visible browser
+npm run test:e2e:ui       # Playwright UI
 ```
 
 ---
@@ -330,10 +331,68 @@ it('returns null when session expires within 60s buffer', () => {
 
 ---
 
+## Playwright E2E Testing (NEW)
+
+E2E tests run against live `stepleague.app`. Uses credentials from `.env.local`.
+
+### Test Files (9 suites, 63 tests)
+
+| File | Tests | Purpose |
+|------|-------|---------|
+| `e2e/auth.spec.ts` | 6 | Login/logout, protected redirects |
+| `e2e/homepage.spec.ts` | 3 | Public pages load correctly |
+| `e2e/league.spec.ts` | 3 | Create, verify, delete leagues |
+| `e2e/protected-routes.spec.ts` | 13 | Auth gating, reset page |
+| `e2e/navigation.spec.ts` | 6 | Header, footer, dashboard nav |
+| `e2e/form-validation.spec.ts` | 7 | Form validation, maxlength |
+| `e2e/error-handling.spec.ts` | 5 | 404s, console errors |
+| `e2e/ui-interactions.spec.ts` | 8 | Mobile, theme, focus |
+| `e2e/user-flows.spec.ts` | 12 | Session persistence |
+
+### Key Patterns
+
+```typescript
+// e2e/fixtures/auth.ts - Login helper
+import { test as base, expect } from '@playwright/test';
+
+export async function login(page: Page) {
+  await page.goto('/sign-in');
+  await page.fill('#email', process.env.SL_PW_LOGIN_TEST_USERNAME!);
+  await page.fill('#password', process.env.SL_PW_LOGIN_TEST_PASSWORD!);
+  await page.click('button[type="submit"]');
+  await page.waitForURL(/\/dashboard/);
+}
+
+// Using in tests
+import { test, expect, login } from './fixtures/auth';
+
+test('can access dashboard', async ({ page }) => {
+  await login(page);
+  await page.goto('/dashboard');
+  await expect(page.getByRole('heading', { name: /dashboard/i })).toBeVisible();
+});
+```
+
+### Credentials Setup
+
+```bash
+# .env.local (DO NOT COMMIT)
+SL_PW_LOGIN_TEST_USERNAME=your-test-email@example.com
+SL_PW_LOGIN_TEST_PASSWORD=your-test-password
+```
+
+### Configuration
+
+See [playwright.config.ts](file:///d:/Vasso/coding%20projects/SCL%20v3%20AG/scl-v3/playwright.config.ts):
+- `baseURL`: stepleague.app
+- `colorScheme`: dark
+- `retries`: 2 on CI, 0 locally
+
+---
+
 ## Related Skills
 
 - `auth-patterns` - getUser vs getSession, deadlock avoidance
 - `api-handler` - withApiHandler middleware patterns
 - `react-debugging` - Use tests to prevent infinite render loops
 - `analytics-tracking` - Event tracking tests in analytics.test.ts
-
