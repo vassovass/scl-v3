@@ -49,9 +49,10 @@ describe('Admin Settings API - Transformation Logic', () => {
         });
 
         it('handles null settings array', () => {
-            const settingsArray: any[] | null = null;
+            type Setting = { key: string; value: string; category: string };
+            const settingsArray: Setting[] | null = null;
 
-            const settingsMap = (settingsArray || []).reduce((acc: Record<string, any>, setting) => {
+            const settingsMap = (settingsArray || ([] as Setting[])).reduce((acc: Record<string, Setting>, setting) => {
                 acc[setting.key] = setting;
                 return acc;
             }, {});

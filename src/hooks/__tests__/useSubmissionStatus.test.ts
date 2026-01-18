@@ -248,7 +248,7 @@ describe('useSubmissionStatus - Response Handling', () => {
         });
 
         it('sets steps=undefined when no submissions', () => {
-            const data = { submissions: [] };
+            const data: { submissions: Array<{ steps: number }> } = { submissions: [] };
 
             const steps = data.submissions.length > 0 ? data.submissions[0].steps : undefined;
             expect(steps).toBeUndefined();
@@ -275,7 +275,7 @@ describe('useSubmissionStatus - Response Handling', () => {
         });
 
         it('converts non-Error to string', () => {
-            const err = 'Network error';
+            const err: unknown = 'Network error';
             const error = err instanceof Error ? err.message : String(err);
 
             expect(error).toBe('Network error');

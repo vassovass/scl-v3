@@ -312,7 +312,7 @@ describe('Branding API - Field Transformation', () => {
         });
 
         it('only includes provided fields in update', () => {
-            const apiBody = {
+            const apiBody: { themeColorLight: string; logo?: string } = {
                 themeColorLight: '#00ff00',
                 // logo not provided
             };

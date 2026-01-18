@@ -13,12 +13,14 @@
 
 import { describe, it, expect } from 'vitest';
 
+// Type used throughout tests
+type Role = 'member' | 'admin' | 'owner' | null;
+
 // ============================================================================
 // Authorization Tests
 // ============================================================================
 
 describe('Leagues API - Authorization', () => {
-    type Role = 'member' | 'admin' | 'owner' | null;
 
     describe('GET - View League', () => {
         it('requires authentication', () => {
@@ -125,7 +127,7 @@ describe('Leagues API - Authorization', () => {
         });
 
         it('allows superadmins', () => {
-            const membership = null;
+            const membership = null as { role: Role } | null;
             const isSuperAdmin = true;
             const isLeagueAdmin = membership?.role === 'admin' || membership?.role === 'owner';
             const shouldAllow = isSuperAdmin || isLeagueAdmin;
@@ -290,8 +292,8 @@ describe('Leagues API - PUT Field Validation', () => {
 
     describe('Empty updates', () => {
         it('rejects request with no valid fields', () => {
-            const body = { invalid_field: 'value' };
-            const updates: Record<string, any> = {};
+            const body: Record<string, unknown> = { invalid_field: 'value' };
+            const updates: Record<string, unknown> = {};
 
             // Only known fields are processed
             if (typeof body.name === 'string') updates.name = body.name;
@@ -302,8 +304,8 @@ describe('Leagues API - PUT Field Validation', () => {
         });
 
         it('accepts request with at least one valid field', () => {
-            const body = { name: 'Valid Name', invalid_field: 'value' } as any;
-            const updates: Record<string, any> = {};
+            const body: Record<string, unknown> = { name: 'Valid Name', invalid_field: 'value' };
+            const updates: Record<string, unknown> = {};
 
             if (typeof body.name === 'string') updates.name = body.name;
 
@@ -413,7 +415,7 @@ describe('Leagues API - GET Response Format', () => {
         });
 
         it('assigns owner role to superadmins without membership', () => {
-            const membership = null;
+            const membership = null as { role: Role } | null;
             const isSuperAdmin = true;
 
             const leagueWithRole = {

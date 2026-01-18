@@ -101,8 +101,9 @@ describe('useFetch - Data Transformation', () => {
     });
 
     it('returns raw data when no transform provided', () => {
-        const rawData = { items: [1, 2, 3], total: 3 };
-        const transform = undefined;
+        type DataType = { items: number[]; total: number };
+        const rawData: DataType = { items: [1, 2, 3], total: 3 };
+        const transform = undefined as ((data: DataType) => unknown) | undefined;
 
         const result = transform ? transform(rawData) : rawData;
         expect(result).toEqual(rawData);
@@ -145,7 +146,7 @@ describe('useFetch - Data Transformation', () => {
 
 describe('useFetch - Error Handling', () => {
     it('converts string errors to Error objects', () => {
-        const err = 'Something went wrong';
+        const err: unknown = 'Something went wrong';
         const error = err instanceof Error ? err : new Error(String(err));
 
         expect(error).toBeInstanceOf(Error);

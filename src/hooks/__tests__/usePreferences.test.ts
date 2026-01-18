@@ -372,7 +372,7 @@ describe('usePreferences - Refetch', () => {
 
 describe('usePreferences - Error Handling', () => {
     it('converts non-Error to Error', () => {
-        const err = 'Unknown error';
+        const err: unknown = 'Unknown error';
         const error = err instanceof Error ? err : new Error('Unknown error');
 
         expect(error).toBeInstanceOf(Error);
@@ -409,7 +409,7 @@ describe('usePreferences - Error Handling', () => {
             default_league_id: null,
         };
 
-        let preferences = { ...previous, theme: 'dark' as const };
+        let preferences: UserPreferences = { ...previous, theme: 'dark' };
 
         // Simulate update failure - rollback
         try {
@@ -436,7 +436,7 @@ describe('usePreferences - Integration Patterns', () => {
     });
 
     it('pattern: safe access with optional chaining', () => {
-        const preferences: UserPreferences | null = null;
+        const preferences = null as Partial<UserPreferences> | null;
         const theme = preferences?.theme ?? 'system';
 
         expect(theme).toBe('system');

@@ -16,7 +16,7 @@ vi.mock('vanilla-cookieconsent', () => ({
 
 describe('CookieConsentBanner', () => {
   beforeEach(() => {
-    (window as unknown as { gtag?: typeof vi.fn }).gtag = vi.fn();
+    (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag = vi.fn();
   });
 
   it('registers consent handlers and updates gtag', () => {
@@ -26,9 +26,22 @@ describe('CookieConsentBanner', () => {
     expect(runMock).toHaveBeenCalledTimes(1);
 
     const config = runMock.mock.calls[0][0];
-    config.onConsent({ cookie: { categories: ['analytics', 'marketing'] } });
+    if (config?.onConsent) {
+      config.onConsent({
+        cookie: {
+          categories: ['analytics', 'marketing'],
+          revision: 0,
+          data: null,
+          consentId: '',
+          consentTimestamp: '',
+          lastConsentTimestamp: '',
+          services: {},
+          expirationTime: 0
+        }
+      });
+    }
 
-    expect((window as unknown as { gtag: typeof vi.fn }).gtag).toHaveBeenCalledWith(
+    expect((window as unknown as { gtag: (...args: unknown[]) => void }).gtag).toHaveBeenCalledWith(
       'consent',
       'update',
       {

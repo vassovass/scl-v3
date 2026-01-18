@@ -144,7 +144,7 @@ describe('High-Fives API - Business Logic', () => {
         });
 
         it('submission_id defaults to null when not provided', () => {
-            const body = {
+            const body: { recipient_id: string; submission_id?: string } = {
                 recipient_id: 'recipient-456',
                 // submission_id not provided
             };
@@ -160,7 +160,7 @@ describe('High-Fives API - Business Logic', () => {
         });
 
         it('league_id defaults to null when not provided', () => {
-            const body = {
+            const body: { recipient_id: string; league_id?: string } = {
                 recipient_id: 'recipient-456',
                 // league_id not provided
             };
@@ -208,7 +208,7 @@ describe('High-Fives API - Business Logic', () => {
         });
 
         it('filters for NULL submission_id when not provided in body', () => {
-            const body = { recipient_id: 'recipient-456' };
+            const body: { recipient_id: string; submission_id?: string } = { recipient_id: 'recipient-456' };
             // submission_id is undefined
             const filters: string[] = ['sender_id = user-123'];
 
@@ -246,38 +246,38 @@ describe('High-Fives API - Business Logic', () => {
 
 describe('High-Fives API - Authorization', () => {
     it('POST requires authentication (auth: required)', () => {
-        const config = { auth: 'required' };
+        const config = { auth: 'required' as const };
         expect(config.auth).toBe('required');
     });
 
     it('DELETE requires authentication (auth: required)', () => {
-        const config = { auth: 'required' };
+        const config = { auth: 'required' as const };
         expect(config.auth).toBe('required');
     });
 
     it('unauthenticated POST should be denied', () => {
-        const auth = 'required';
+        const auth: string = 'required';
         const user = null;
         const shouldAllow = auth === 'none' || user !== null;
         expect(shouldAllow).toBe(false);
     });
 
     it('unauthenticated DELETE should be denied', () => {
-        const auth = 'required';
+        const auth: string = 'required';
         const user = null;
         const shouldAllow = auth === 'none' || user !== null;
         expect(shouldAllow).toBe(false);
     });
 
     it('authenticated user can POST', () => {
-        const auth = 'required';
+        const auth: string = 'required';
         const user = { id: 'user-123' };
         const shouldAllow = auth === 'none' || user !== null;
         expect(shouldAllow).toBe(true);
     });
 
     it('authenticated user can DELETE', () => {
-        const auth = 'required';
+        const auth: string = 'required';
         const user = { id: 'user-123' };
         const shouldAllow = auth === 'none' || user !== null;
         expect(shouldAllow).toBe(true);

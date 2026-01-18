@@ -2,6 +2,7 @@
  * Tests for SEO Comparison Pages - Modular Feature System
  */
 
+import { describe, it, expect } from 'vitest';
 import {
     competitors,
     getCompetitorBySlug,

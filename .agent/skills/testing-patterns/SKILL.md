@@ -3,9 +3,9 @@ name: testing-patterns
 description: Testing patterns for Next.js App Router with Supabase. Use when adding tests, verifying fixes, or preventing regressions. Keywords: test, testing, jest, vitest, unit test, integration test, mock, Supabase mock.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
-  version: "2.0"
+  version: "3.0"
   project: "stepleague"
-  last_updated: "2026-01-16"
+  last_updated: "2026-01-18"
 ---
 
 # Testing Patterns Skill
@@ -14,7 +14,7 @@ metadata:
 
 StepLeague has a test suite using Vitest with React Testing Library. This skill provides patterns for adding and maintaining tests.
 
-**Current Status:** ✅ Test infrastructure complete, 296+ tests passing (70% coverage target).
+**Current Status:** ✅ Test infrastructure complete, 1,101+ tests passing (PRD 42 Phases A-D complete).
 
 ---
 
@@ -281,17 +281,52 @@ it('returns null when session expires within 60s buffer', () => {
 
 ## Quick Links to Test Files
 
-| Test File | Purpose | Lines |
+### API Route Tests (Phase A)
+| Test File | Purpose | Tests |
 |-----------|---------|-------|
-| `src/lib/__tests__/analytics.test.ts` | Dual-tracking (GA4+PostHog), events | 632 |
-| `src/lib/__tests__/auth-middleware.test.ts` | Route protection, redirects | 308 |
-| `src/lib/__tests__/comparisons.test.ts` | SEO comparison pages, feature registry | 200 |
-| `src/lib/__tests__/feedback-integration.test.ts` | Feedback lifecycle, Kanban | 355 |
-| `src/lib/auth/__tests__/sessionCache.test.ts` | Token caching, expiry | ~80 |
-| `src/lib/api/__tests__/handler.test.ts` | Auth levels, validation | 204 |
-| `src/app/api/proxy-claim/__tests__/route.test.ts` | Claim flow, merge strategies | 194 |
-| `src/app/api/leaderboard/__tests__/ranking.test.ts` | Scoring, badges | 312 |
-| `src/hooks/__tests__/offline-queue.test.ts` | Queue state, sync | 283 |
+| `src/app/api/submissions/__tests__/route.test.ts` | Submissions CRUD, proxy context | 98 |
+| `src/app/api/leagues/[id]/__tests__/route.test.ts` | League CRUD, authorization | 52 |
+| `src/app/api/admin/branding/__tests__/route.test.ts` | Brand customization | 36 |
+| `src/app/api/high-fives/__tests__/route.test.ts` | High-five toggle | 29 |
+| `src/app/api/admin/settings/__tests__/route.test.ts` | Feature flags | 16 |
+
+### Hook Tests (Phase B)
+| Test File | Purpose | Tests |
+|-----------|---------|-------|
+| `src/hooks/__tests__/useExport.test.ts` | CSV export | 47 |
+| `src/hooks/__tests__/useImport.test.ts` | CSV import | 46 |
+| `src/hooks/__tests__/useOfflineSync.test.ts` | Queue sync | 43 |
+| `src/hooks/__tests__/useSubmissionStatus.test.ts` | Status tracking | 41 |
+| `src/hooks/__tests__/useFetch.test.ts` | Data fetching | 38 |
+| `src/hooks/__tests__/useConflictCheck.test.ts` | Duplicate detection | 38 |
+| `src/hooks/__tests__/usePreferences.test.ts` | User settings | 35 |
+| `src/hooks/__tests__/useFeatureFlag.test.ts` | Flag evaluation | 27 |
+
+### Utility Tests (Phase C)
+| Test File | Purpose | Tests |
+|-----------|---------|-------|
+| `src/lib/__tests__/badges.test.ts` | Badge config | 73 |
+| `src/lib/cache/__tests__/serverCache.test.ts` | Cache with circuit breaker | 49 |
+| `src/lib/__tests__/errors.test.ts` | Error handling | 45 |
+| `src/lib/export/__tests__/csvParser.test.ts` | CSV parsing | 41 |
+
+### Component Tests (Phase D)
+| Test File | Purpose |
+|-----------|---------|
+| `src/components/encouragement/__tests__/HighFiveButton.test.tsx` | High-five UI |
+| `src/components/forms/__tests__/SubmissionForm.test.tsx` | Submission form |
+| `src/components/analytics/__tests__/CookieConsent.test.tsx` | Cookie consent |
+| `src/components/auth/__tests__/ProfileSwitcher.test.tsx` | Profile switcher |
+| `src/components/admin/__tests__/KanbanBoard.test.tsx` | Kanban board |
+
+### Original Tests
+| Test File | Purpose | Tests |
+|-----------|---------|-------|
+| `src/lib/__tests__/analytics.test.ts` | Dual-tracking (GA4+PostHog) | 44 |
+| `src/lib/__tests__/auth-middleware.test.ts` | Route protection | 35 |
+| `src/lib/__tests__/comparisons.test.ts` | SEO comparison pages | 20 |
+| `src/lib/auth/__tests__/sessionCache.test.ts` | Token caching | 11 |
+| `src/lib/api/__tests__/handler.test.ts` | Auth levels | 22 |
 
 ---
 
