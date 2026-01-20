@@ -156,8 +156,13 @@ test.describe('Display Name Management', () => {
         const currentValue = await displayNameInput.inputValue();
         console.log(`[Test] Current display name: "${currentValue}"`);
 
-        const timestamp = Date.now().toString().slice(-4);
-        const newDisplayName = `TestUser_${timestamp}`;
+        // Calculate next incremental ID
+        let nextId = 1;
+        const match = currentValue.match(/DisplayNameTest(\d+)/);
+        if (match && match[1]) {
+            nextId = parseInt(match[1], 10) + 1;
+        }
+        const newDisplayName = `DisplayNameTest${String(nextId).padStart(6, '0')}`;
         console.log(`[Test] Attempting to update to: "${newDisplayName}"`);
 
         // Clear and enter new value

@@ -1,7 +1,7 @@
 # PRD 44: Auto-Enroll World League
 
 > **Order:** 44
-> **Status:** 📋 Proposed
+> **Status:** ✅ Completed
 > **Type:** Feature
 > **Dependencies:** PRD 43 (Nickname Identity)
 > **Blocks:** None
@@ -29,7 +29,7 @@ Automatically enroll all new users in the "StepLeague World" league upon signup.
 
 ## 🏗️ Detailed Feature Requirements
 
-### Section A: Auto-Enrollment Logic — 4 Items
+### Section A: Auto-Enrollment Logic — 6 Items
 
 | # | Outcome | Problem Solved | Success Criteria |
 |---|---------|----------------|------------------|
@@ -37,6 +37,8 @@ Automatically enroll all new users in the "StepLeague World" league upon signup.
 | **A-2** | **Enrollment happens on auth callback** | Reliable trigger point | `POST /api/auth/callback` creates membership after user sync |
 | **A-3** | **Idempotent enrollment** | No duplicates if callback fires twice | `ON CONFLICT DO NOTHING` or check-before-insert pattern |
 | **A-4** | **Silent failure on error** | Don't block signup | If enrollment fails, log error but continue signup flow |
+| **A-5** | **Configurable via SuperAdmin setting** | Future flexibility (paid tiers, private deployments) | `feature_auto_enroll_world_league` toggle in Admin Settings |
+| **A-6** | **Proxy users auto-join World League** | Proxies compete globally too | POST `/api/proxies` enrolls new proxies in World League |
 
 ### Section B: User Experience — 3 Items
 

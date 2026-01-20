@@ -7,6 +7,29 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-01-20]
+
+### Added
+
+- **PRD 44: Auto-Enroll World League** - Seamless global competition access
+  - **Auto-Enrollment**: New users are automatically added to "StepLeague World" upon signup
+  - **Proxy Support**: Managed proxy users are also auto-enrolled when created
+  - **Migration**: Existing users backfilled into World League via migration
+  - **Welcome Experience**:
+    - "Welcome to StepLeague World" toast notification on first dashboard visit
+    - Persistent tracking via `has_seen_dashboard_welcome` localStorage key
+  - **Configuration**: Controlled via `feature_auto_enroll_world_league` setting (default: true)
+  - **Analytics**: Added `world_league_enrolled` and `world_league_enroll_failed` events
+
+### Changed
+
+- **Auth Callback Logic** - Enhanced reliability
+  - Integrated World League enrollment into post-signup sync flow
+  - Added "Silent Failure" pattern: signup continues even if enrollment fails (logs error)
+  - Added unit tests for enrollment logic in `autoEnrollment.test.ts`
+
+---
+
 ## [2026-01-17]
 
 ### Added
