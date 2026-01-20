@@ -145,40 +145,61 @@ test.describe('Display Name Management', () => {
         await page.goto('/settings/profile');
         await page.waitForLoadState('domcontentloaded');
 
-        // Find the display name field
-        const displayNameInput = page.locator('input[name="display_name"], input#display_name, input[id*="display"]').first();
-        await expect(displayNameInput).toBeVisible();
+        // Wait for page to fully load
+        await page.waitForTimeout(2000);
+
+        // Find the display name field using label text
+        const displayNameInput = page.getByLabel(/display name/i);
+        await expect(displayNameInput).toBeVisible({ timeout: 10000 });
 
         // Get current value and create incremental update
         const currentValue = await displayNameInput.inputValue();
+        console.log(`[Test] Current display name: "${currentValue}"`);
+
         const timestamp = Date.now().toString().slice(-4);
         const newDisplayName = `TestUser_${timestamp}`;
+        console.log(`[Test] Attempting to update to: "${newDisplayName}"`);
 
         // Clear and enter new value
         await displayNameInput.clear();
         await displayNameInput.fill(newDisplayName);
 
+        // Wait briefly to ensure fill works
+        await page.waitForTimeout(100);
+
         // Submit the form
-        const saveButton = page.getByRole('button', { name: /save|update|submit/i });
+        const saveButton = page.getByRole('button', { name: /save/i });
         await saveButton.click();
 
-        // Wait for success indication (toast or page update)
-        await page.waitForTimeout(1500);
+        // Wait for success toast to appear
+        await expect(page.getByText('Saved', { exact: true })).toBeVisible({ timeout: 10000 });
+        console.log('[Test] Save success toast appeared');
+
+        // Wait for any pending API calls to complete
+        await page.waitForTimeout(1000);
 
         // Refresh and verify persistence
+        console.log('[Test] Reloading page...');
         await page.reload();
         await page.waitForLoadState('domcontentloaded');
+        await page.waitForTimeout(2000);
 
         // Verify the new name persisted
-        const updatedInput = page.locator('input[name="display_name"], input#display_name, input[id*="display"]').first();
-        await expect(updatedInput).toHaveValue(newDisplayName);
+        const updatedInput = page.getByLabel(/display name/i);
+        const actualValue = await updatedInput.inputValue();
+        console.log(`[Test] Value after reload: "${actualValue}"`);
+
+        if (actualValue !== newDisplayName) {
+            console.error(`[Test] MISMATCH! Expected "${newDisplayName}", got "${actualValue}"`);
+        }
+        await expect(updatedInput).toHaveValue(newDisplayName, { timeout: 10000 });
 
         // Restore original value if it existed
         if (currentValue && currentValue !== newDisplayName) {
             await updatedInput.clear();
             await updatedInput.fill(currentValue);
-            await page.getByRole('button', { name: /save|update|submit/i }).click();
-            await page.waitForTimeout(1000);
+            await page.getByRole('button', { name: /save/i }).click();
+            await expect(page.getByText('Saved', { exact: true })).toBeVisible({ timeout: 10000 });
         }
     });
 

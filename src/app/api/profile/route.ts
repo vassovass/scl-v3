@@ -48,9 +48,11 @@ export async function PATCH(request: Request) {
         }
 
         const body = await request.json();
+        console.log("[API] PATCH /api/profile received body:", body);
         const parsed = updateSchema.safeParse(body);
 
         if (!parsed.success) {
+            console.error("[API] Validation failed:", parsed.error);
             return json({ error: "Invalid data" }, { status: 400 });
         }
 
@@ -59,18 +61,22 @@ export async function PATCH(request: Request) {
             updates.display_name = parsed.data.display_name;
         }
 
+        console.log("[API] Updates to apply:", updates);
+
         const adminClient = createAdminClient();
-        const { error } = await adminClient
+        const { error, data: updatedData } = await adminClient // Capture data if possible, though update returning * is needed
             .from("users")
             .update(updates)
-            .eq("id", user.id);
+            .eq("id", user.id)
+            .select(); // Add select to see what happened
 
         if (error) {
             console.error("Profile update error:", error);
             return json({ error: "Failed to update profile" }, { status: 500 });
         }
 
-        return json({ success: true });
+        console.log("[API] Update result data:", updatedData);
+        return json({ success: true, updated: updatedData });
     } catch (error) {
         console.error("Profile error:", error);
         return serverError(error instanceof Error ? error.message : "Unknown error");
