@@ -32,7 +32,7 @@ export default defineConfig({
     // Shared settings for all projects
     use: {
         // Base URL for navigation
-        baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
+        baseURL: process.env.PLAYWRIGHT_BASE_URL || 'https://stepleague.app',
 
         // Force dark mode
         colorScheme: 'dark',
@@ -65,10 +65,10 @@ export default defineConfig({
     ],
 
     // Run local dev server before tests (optional)
-    webServer: {
-        command: 'npm run dev',
-        url: 'http://localhost:3000',
-        reuseExistingServer: !process.env.CI,
-        timeout: 120 * 1000,
-    },
+    // webServer: {
+    //     command: 'npm run dev',
+    //     url: 'http://localhost:3000',
+    //     reuseExistingServer: !process.env.CI,
+    //     timeout: 120 * 1000,
+    // },
 });

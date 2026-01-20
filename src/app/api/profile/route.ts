@@ -2,6 +2,8 @@ import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/se
 import { json, unauthorized, serverError } from "@/lib/api";
 import { z } from "zod";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/profile - Fetch current user's profile
 export async function GET() {
     try {
