@@ -200,6 +200,15 @@ export const analytics = {
         });
     },
 
+    worldLeagueEnrolled: (method: 'auto' | 'manual' | 'proxy') => {
+        trackEvent('world_league_enrolled', {
+            method,
+            category: 'conversion',
+            action: 'enroll',
+        });
+    },
+
+
     // ─────────────────────────────────────────────────────────────────────────
     // PROXY EVENTS
     // ─────────────────────────────────────────────────────────────────────────

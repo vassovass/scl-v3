@@ -13,6 +13,7 @@
 import { z } from "zod";
 import { withApiHandler } from "@/lib/api/handler";
 import { nanoid } from "nanoid";
+import { enrollInWorldLeague } from "@/lib/league/worldLeague";
 
 // =============================================================================
 // Schemas
@@ -72,7 +73,7 @@ export const GET = withApiHandler({
     // Get submission counts for each proxy
     const proxyIds = proxies?.map((p: any) => p.id) || [];
     let submissionCounts: Record<string, number> = {};
-    
+
     if (proxyIds.length > 0) {
         // Get counts grouped by user_id
         const { data: countData } = await adminClient
@@ -125,7 +126,7 @@ export const POST = withApiHandler({
 }, async ({ user, body, adminClient }) => {
     // Step 1: Check quota
     const MAX_PROXIES = 50; // TODO: Get from settings when available
-    
+
     const { count: currentCount } = await adminClient
         .from("users")
         .select("*", { count: "exact", head: true })
@@ -134,9 +135,9 @@ export const POST = withApiHandler({
         .is("deleted_at", null);
 
     if ((currentCount || 0) >= MAX_PROXIES) {
-        return { 
-            error: `Proxy quota exceeded. Maximum ${MAX_PROXIES} proxies allowed.`, 
-            status: 403 
+        return {
+            error: `Proxy quota exceeded. Maximum ${MAX_PROXIES} proxies allowed.`,
+            status: 403
         };
     }
 
@@ -147,7 +148,7 @@ export const POST = withApiHandler({
     // Note: is_proxy is auto-set by trigger based on managed_by
     // Generate UUID for proxy (users table doesn't auto-generate IDs like auth.users)
     const proxyId = crypto.randomUUID();
-    
+
     const { data: newProxy, error: createError } = await adminClient
         .from("users")
         .insert({
@@ -177,6 +178,10 @@ export const POST = withApiHandler({
         console.error("Proxy insert returned no data (RLS or constraint issue?)");
         return { error: "Failed to create proxy: No data returned", status: 500 };
     }
+
+    // PRD 44: Auto-enroll proxy in World League (silent failure)
+    // Proxies should also compete globally - they're still "users" in the step counting sense
+    await enrollInWorldLeague(adminClient, newProxy.id, { method: "proxy" });
 
     // Step 4: If league_id provided, add proxy to league
     if (body.league_id) {

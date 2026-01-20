@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
+import { enrollInWorldLeague } from "@/lib/league/worldLeague";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -18,6 +19,10 @@ export async function GET(request: Request) {
           id: user.id,
           display_name: user.user_metadata?.full_name || user.email?.split("@")[0] || null,
         }, { onConflict: "id", ignoreDuplicates: false });
+
+        // PRD 44: Auto-enroll in World League (silent failure)
+        // This ensures every new user immediately has a global leaderboard
+        await enrollInWorldLeague(adminClient, user.id, { method: "auto" });
       }
       return NextResponse.redirect(`${origin}${next}`);
     }

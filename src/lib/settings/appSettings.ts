@@ -114,6 +114,17 @@ const featureSettings: AppSettingDefinition[] = [
     visibleTo: ["superadmin"],
     editableBy: ["superadmin"],
   },
+  // PRD 44: World League auto-enrollment
+  {
+    key: "feature_auto_enroll_world_league",
+    type: "toggle",
+    label: "Auto-Enroll World League",
+    description: "Automatically add new users and proxies to the World League on signup (PRD 44)",
+    default: true,
+    category: "features",
+    visibleTo: ["superadmin"],
+    editableBy: ["superadmin"],
+  },
 ];
 
 // ============================================================================
