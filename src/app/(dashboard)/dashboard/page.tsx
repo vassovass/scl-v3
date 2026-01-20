@@ -5,6 +5,8 @@ import { GratitudeCard } from "@/components/dashboard/GratitudeCard";
 import { getUserLeagues } from "@/lib/leagues";
 import { redirect } from "next/navigation";
 
+import { DashboardWelcomeToast } from "@/components/dashboard/DashboardWelcomeToast";
+
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -18,6 +20,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <DashboardWelcomeToast />
       <div className="mx-auto max-w-5xl px-6 py-12">
         <ModuleFeedback moduleId="dashboard-header" moduleName="Dashboard Actions">
           <div className="flex items-center justify-between" data-tour="dashboard-header">
