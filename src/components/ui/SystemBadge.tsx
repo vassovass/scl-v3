@@ -65,3 +65,4 @@ export function SystemBadge({
 // Legacy export for backward compatibility
 export { SystemBadge as Badge };
 export default SystemBadge;
+

@@ -117,3 +117,4 @@ export function ConsentDeclaration({
         </div>
     );
 }
+

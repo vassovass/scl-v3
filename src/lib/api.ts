@@ -38,3 +38,4 @@ export function notFound(message = "Not Found"): Response {
 export function serverError(message = "Internal Server Error"): Response {
   return jsonError(500, message);
 }
+

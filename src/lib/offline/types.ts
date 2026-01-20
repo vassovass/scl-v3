@@ -23,3 +23,4 @@ export interface SyncResult {
 }
 
 export type SubmissionInput = Omit<OfflineSubmission, 'id' | 'createdAt' | 'status' | 'retryCount' | 'lastError'>;
+

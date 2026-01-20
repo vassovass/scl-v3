@@ -47,7 +47,7 @@ export interface FeedbackItem {
     completed_at: string | null;
     target_release: string;
     user_id: string | null;
-    users?: { nickname: string } | null;
+    users?: { display_name: string | null } | null;
     screenshot_url: string | null;
 }
 
@@ -309,9 +309,9 @@ export function ExpandableCardModal({
                     </div>
 
                     {/* Submitted by */}
-                    {item.users?.nickname && (
+                    {item.users?.display_name && (
                         <div className="text-xs text-slate-500">
-                            Submitted by: <span className="text-slate-400">{item.users.nickname}</span>
+                            Submitted by: <span className="text-slate-400">{item.users.display_name}</span>
                         </div>
                     )}
                 </div>
@@ -380,3 +380,4 @@ export function ExpandableCardModal({
 }
 
 export default ExpandableCardModal;
+

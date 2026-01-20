@@ -21,7 +21,7 @@ export default async function AdminFeedbackPage() {
     const adminClient = createAdminClient();
     const { data: feedbackItems, error } = await adminClient
         .from("feedback")
-        .select("*, users(nickname)")
+        .select("*, users(display_name)")
         .not("user_id", "is", null) // Only user-submitted feedback
         .order("priority_order", { ascending: true })
         .order("created_at", { ascending: false });
@@ -82,4 +82,5 @@ export default async function AdminFeedbackPage() {
         </PageLayout>
     );
 }
+
 

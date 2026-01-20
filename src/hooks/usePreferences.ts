@@ -165,3 +165,4 @@ export function usePreferences(): UsePreferencesReturn {
         refetch: fetchPreferences,
     };
 }
+

@@ -265,3 +265,4 @@ export const BADGE_INFO: Record<string, { icon: string; label: string; color: st
             { icon: config.icon ?? '', label: config.label, color: config.className },
         ])
     );
+

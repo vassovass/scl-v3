@@ -34,3 +34,4 @@ export function SettingsSection({ title, description, children, danger = false }
         </div>
     );
 }
+

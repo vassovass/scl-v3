@@ -219,3 +219,4 @@ export function posthogFeatureFlagPayload(flagKey: string): unknown {
 
     return posthog.getFeatureFlagPayload(flagKey);
 }
+

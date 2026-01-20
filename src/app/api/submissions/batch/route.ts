@@ -200,3 +200,4 @@ function normalizeDate(dateStr: string | null | undefined): string {
     if (isNaN(d.getTime())) return new Date().toISOString().slice(0, 10);
     return d.toISOString().slice(0, 10);
 }
+

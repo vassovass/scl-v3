@@ -5,6 +5,7 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { SettingsLayout, SettingsSection, SettingsField } from "@/components/settings";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { IDENTITY_LABEL, IDENTITY_PLACEHOLDER, IDENTITY_DESCRIPTION } from "@/lib/identity";
 
 const NAV_ITEMS = [
     { label: "Profile", href: "/settings/profile" },
@@ -14,7 +15,6 @@ const NAV_ITEMS = [
 
 interface ProfileData {
     display_name: string;
-    nickname: string;
     email: string;
 }
 
@@ -25,7 +25,6 @@ export default function ProfileSettingsPage() {
 
     const [profile, setProfile] = useState<ProfileData>({
         display_name: "",
-        nickname: "",
         email: "",
     });
 
@@ -39,7 +38,6 @@ export default function ProfileSettingsPage() {
                     const data = await res.json();
                     setProfile({
                         display_name: data.display_name || "",
-                        nickname: data.nickname || "",
                         email: user.email || "",
                     });
                 }
@@ -62,7 +60,6 @@ export default function ProfileSettingsPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     display_name: profile.display_name,
-                    nickname: profile.nickname,
                 }),
             });
 
@@ -122,20 +119,12 @@ export default function ProfileSettingsPage() {
                         />
 
                         <SettingsField
-                            label="Display Name"
+                            label={IDENTITY_LABEL}
                             value={profile.display_name}
                             onChange={(value) => setProfile({ ...profile, display_name: String(value) })}
-                            placeholder="Your full name"
-                            description="Used as fallback if no nickname is set"
-                        />
-
-                        <SettingsField
-                            label="Nickname"
-                            value={profile.nickname}
-                            onChange={(value) => setProfile({ ...profile, nickname: String(value) })}
+                            placeholder={IDENTITY_PLACEHOLDER}
+                            description={IDENTITY_DESCRIPTION}
                             maxLength={50}
-                            placeholder="e.g., StepMaster, WalkingChamp"
-                            description="This is what other league members will see"
                         />
                     </SettingsSection>
 
@@ -153,3 +142,4 @@ export default function ProfileSettingsPage() {
         </SettingsLayout>
     );
 }
+

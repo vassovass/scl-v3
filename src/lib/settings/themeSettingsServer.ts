@@ -43,3 +43,4 @@ export const getCachedThemeSettings = createCachedFetcher<ThemeSettings>({
   timeoutMs: 3000,
   revalidateSeconds: 3600,
 });
+

@@ -133,3 +133,4 @@ export interface AttachmentDeleteResponse {
     success: boolean;
     deleted: string; // ID of deleted attachment
 }
+

@@ -57,3 +57,4 @@ export { SUPERADMIN_PAGES } from './adminPages';
 // Legacy USER_MENU_SECTIONS for any remaining consumers
 import { MENUS } from './menuConfig';
 export const USER_MENU_SECTIONS = [{ items: MENUS.user.items }];
+

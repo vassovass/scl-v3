@@ -61,3 +61,4 @@ export function LeagueNav({ leagueId, userRole }: LeagueNavProps) {
         </nav>
     );
 }
+

@@ -71,3 +71,4 @@ export default function CompletionMiniChart({ completedItems, weeks = 12 }: Comp
         </div>
     );
 }
+

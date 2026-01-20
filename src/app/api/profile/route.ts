@@ -15,18 +15,17 @@ export async function GET() {
         const adminClient = createAdminClient();
         const { data: profile, error } = await adminClient
             .from("users")
-            .select("display_name, nickname")
+            .select("display_name")
             .eq("id", user.id)
             .single();
 
         if (error) {
             console.error("Profile fetch error:", error);
-            return json({ display_name: null, nickname: null });
+            return json({ display_name: null });
         }
 
         return json({
             display_name: profile?.display_name || null,
-            nickname: profile?.nickname || null,
         });
     } catch (error) {
         console.error("Profile error:", error);
@@ -37,7 +36,6 @@ export async function GET() {
 // PATCH /api/profile - Update current user's profile
 const updateSchema = z.object({
     display_name: z.string().max(100).optional(),
-    nickname: z.string().max(50).optional().nullable(),
 });
 
 export async function PATCH(request: Request) {
@@ -60,9 +58,6 @@ export async function PATCH(request: Request) {
         if (parsed.data.display_name !== undefined) {
             updates.display_name = parsed.data.display_name;
         }
-        if (parsed.data.nickname !== undefined) {
-            updates.nickname = parsed.data.nickname || null;
-        }
 
         const adminClient = createAdminClient();
         const { error } = await adminClient
@@ -81,3 +76,5 @@ export async function PATCH(request: Request) {
         return serverError(error instanceof Error ? error.message : "Unknown error");
     }
 }
+
+

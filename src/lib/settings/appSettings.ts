@@ -457,3 +457,4 @@ export function getLeagueInheritedSettings(): AppSettingDefinition[] {
 export function isFeatureFlag(key: string): boolean {
   return key.startsWith("feature_");
 }
+

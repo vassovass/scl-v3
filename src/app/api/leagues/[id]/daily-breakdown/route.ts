@@ -16,7 +16,6 @@ interface DayData {
 
 interface MemberBreakdown {
     user_id: string;
-    nickname: string | null;
     display_name: string | null;
     total_steps: number;
     days_submitted: number;
@@ -89,7 +88,7 @@ export async function GET(
         // Get all members
         const { data: members } = await adminClient
             .from("memberships")
-            .select("user_id, users:user_id (display_name, nickname)")
+            .select("user_id, users:user_id (display_name)")
             .eq("league_id", leagueId);
 
         // Fetch all submissions in range
@@ -123,10 +122,9 @@ export async function GET(
 
         // Initialize all members
         for (const m of members || []) {
-            const userInfo = m.users as unknown as { display_name: string | null; nickname: string | null } | null;
+            const userInfo = m.users as unknown as { display_name: string | null } | null;
             memberMap.set(m.user_id, {
                 user_id: m.user_id,
-                nickname: userInfo?.nickname || null,
                 display_name: userInfo?.display_name || null,
                 total_steps: 0,
                 days_submitted: 0,
@@ -175,7 +173,7 @@ export async function GET(
                 result.sort((a, b) => b.consistency_pct - a.consistency_pct);
                 break;
             case "name":
-                result.sort((a, b) => (a.nickname || a.display_name || "").localeCompare(b.nickname || b.display_name || ""));
+                result.sort((a, b) => (a.display_name || "").localeCompare(b.display_name || ""));
                 break;
             case "total":
             default:

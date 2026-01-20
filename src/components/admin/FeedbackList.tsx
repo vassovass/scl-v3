@@ -24,7 +24,6 @@ interface FeedbackItem {
     user_id: string | null;
     users?: {
         display_name: string | null;
-        nickname: string | null;
     } | null;
 }
 
@@ -94,7 +93,7 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
             target_release: 'later',
             priority_order: 0,
             completed_at: null,
-            users: item.users ? { nickname: item.users.nickname || item.users.display_name || 'User' } : null,
+            users: item.users ? { display_name: item.users.display_name || 'User' } : null,
         } as unknown as FeedbackItem);
         setShowDetailModal(true);
     }, []);
@@ -365,7 +364,7 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                                         {/* User */}
                                         {item.user_id && item.users && (
                                             <span className="text-xs text-slate-400">
-                                                by {item.users.nickname || item.users.display_name || "User"}
+                                                by {item.users.display_name || "User"}
                                             </span>
                                         )}
                                     </div>

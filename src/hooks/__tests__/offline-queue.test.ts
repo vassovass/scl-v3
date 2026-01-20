@@ -280,3 +280,4 @@ describe('Offline Queue - Edge Cases', () => {
         expect(submission.input.proof_path).toBe('submissions/abc123/proof.webp');
     });
 });
+

@@ -32,7 +32,7 @@ export default async function AdminKanbanPage() {
     // Fetch active items (not archived)
     const { data: activeItems, error: activeError } = await adminClient
         .from("feedback")
-        .select("*, users(nickname)")
+        .select("*, users(display_name)")
         .is("archived_at", null)
         .order("priority_order", { ascending: true })
         .order("created_at", { ascending: false });
@@ -40,7 +40,7 @@ export default async function AdminKanbanPage() {
     // Fetch archived items
     const { data: archivedItems, error: archivedError } = await adminClient
         .from("feedback")
-        .select("*, users(nickname)")
+        .select("*, users(display_name)")
         .not("archived_at", "is", null)
         .order("archived_at", { ascending: false });
 
@@ -124,3 +124,4 @@ export default async function AdminKanbanPage() {
         </PageLayout>
     );
 }
+

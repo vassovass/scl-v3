@@ -132,3 +132,4 @@ export function Logo({
   // Wrap in link
   return <Link href={href}>{content}</Link>;
 }
+

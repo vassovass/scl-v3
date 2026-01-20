@@ -29,3 +29,4 @@ export const APP_CONFIG = {
 export function getAppTitle(suffix?: string): string {
     return suffix ? `${suffix} | ${APP_CONFIG.name}` : APP_CONFIG.name;
 }
+

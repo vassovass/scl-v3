@@ -47,3 +47,4 @@ export function SettingsNav({ items, className }: SettingsNavProps) {
         </nav>
     );
 }
+

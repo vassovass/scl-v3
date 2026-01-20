@@ -63,3 +63,4 @@ export function clearCachedSession(): void {
     cachedSession = null;
     console.log('[SessionCache] Session cleared');
 }
+

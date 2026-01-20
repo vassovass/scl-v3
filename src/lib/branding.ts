@@ -145,3 +145,4 @@ export function validateImageFile(file: File): void {
     throw new Error(`Invalid file type. Allowed: ${ALLOWED_IMAGE_FORMATS.mimeTypes.join(', ')}`);
   }
 }
+

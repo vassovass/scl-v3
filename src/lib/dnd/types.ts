@@ -119,3 +119,4 @@ export interface NestedDragConfig<T extends DraggableItem> extends DragDropConfi
    */
   flattenItems?: (items: T[]) => T[];
 }
+

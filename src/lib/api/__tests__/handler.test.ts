@@ -201,3 +201,4 @@ describe('Error Response Formatting', () => {
         expect(error.status).toBe(500);
     });
 });
+

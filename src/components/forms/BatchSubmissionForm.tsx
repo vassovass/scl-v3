@@ -1009,3 +1009,4 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
         </div>
     );
 }
+

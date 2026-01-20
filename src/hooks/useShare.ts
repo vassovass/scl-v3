@@ -89,3 +89,4 @@ export function useShare(options: UseShareOptions = {}) {
         supportsNativeShare: typeof navigator !== "undefined" && !!navigator.share,
     };
 }
+

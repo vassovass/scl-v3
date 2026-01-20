@@ -82,3 +82,4 @@ export async function DELETE(request: Request) {
         return serverError(error instanceof Error ? error.message : "Unknown error");
     }
 }
+

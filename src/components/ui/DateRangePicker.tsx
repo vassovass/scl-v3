@@ -208,3 +208,4 @@ export function DateRangePicker({ date, onSelect, className = "" }: DateRangePic
     </div>
   );
 }
+

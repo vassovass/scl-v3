@@ -846,3 +846,4 @@ function formatWaitTime(seconds: number): string {
     return `${minutes}m ${remainingSeconds}s`;
 }
 
+

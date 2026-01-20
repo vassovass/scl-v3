@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { APP_CONFIG } from "@/lib/config";
 import { analytics } from "@/lib/analytics";
+import { IDENTITY_LABEL, IDENTITY_PLACEHOLDER, IDENTITY_FIELD } from "@/lib/identity";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -35,7 +36,7 @@ export default function SignUpPage() {
       options: {
         emailRedirectTo,
         data: {
-          display_name: displayName,
+          [IDENTITY_FIELD]: displayName,
         },
       },
     });
@@ -155,7 +156,7 @@ export default function SignUpPage() {
 
           <div>
             <label htmlFor="displayName" className="block text-sm font-medium text-foreground">
-              Display Name
+              {IDENTITY_LABEL}
             </label>
             <input
               id="displayName"
@@ -164,7 +165,7 @@ export default function SignUpPage() {
               onChange={(e) => setDisplayName(e.target.value)}
               required
               className="mt-1 block w-full rounded-lg border border-border bg-card px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              placeholder="Your name"
+              placeholder={IDENTITY_PLACEHOLDER}
             />
           </div>
 
@@ -219,3 +220,4 @@ export default function SignUpPage() {
     </main>
   );
 }
+

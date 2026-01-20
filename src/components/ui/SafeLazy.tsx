@@ -75,3 +75,4 @@ export function SafeLazy({ children, fallback = null, errorFallback = null }: Sa
         </LazyErrorBoundary>
     );
 }
+

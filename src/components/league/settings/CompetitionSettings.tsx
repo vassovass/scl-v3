@@ -90,3 +90,4 @@ export function CompetitionSettings({ league, onChange, disabled }: CompetitionS
         </SettingsSection>
     );
 }
+

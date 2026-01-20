@@ -31,3 +31,4 @@ export async function GET(request: Request) {
   return NextResponse.redirect(`${origin}/dashboard?error=auth_callback_failed`);
 }
 
+

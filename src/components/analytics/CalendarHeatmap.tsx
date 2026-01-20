@@ -184,3 +184,4 @@ export function CalendarHeatmap({ leagueId, onDayClick }: CalendarHeatmapProps) 
         </div>
     );
 }
+

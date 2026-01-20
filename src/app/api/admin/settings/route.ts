@@ -35,3 +35,4 @@ export async function GET() {
 
   return json({ settings: settingsMap });
 }
+

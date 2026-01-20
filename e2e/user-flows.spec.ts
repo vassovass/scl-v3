@@ -135,3 +135,79 @@ test.describe('Session Persistence', () => {
         await expect(page).toHaveURL(/\/dashboard/);
     });
 });
+
+test.describe('Display Name Management', () => {
+
+    test('can update display name from profile settings', async ({ page }) => {
+        await login(page);
+
+        // Navigate to profile settings
+        await page.goto('/settings/profile');
+        await page.waitForLoadState('domcontentloaded');
+
+        // Find the display name field
+        const displayNameInput = page.locator('input[name="display_name"], input#display_name, input[id*="display"]').first();
+        await expect(displayNameInput).toBeVisible();
+
+        // Get current value and create incremental update
+        const currentValue = await displayNameInput.inputValue();
+        const timestamp = Date.now().toString().slice(-4);
+        const newDisplayName = `TestUser_${timestamp}`;
+
+        // Clear and enter new value
+        await displayNameInput.clear();
+        await displayNameInput.fill(newDisplayName);
+
+        // Submit the form
+        const saveButton = page.getByRole('button', { name: /save|update|submit/i });
+        await saveButton.click();
+
+        // Wait for success indication (toast or page update)
+        await page.waitForTimeout(1500);
+
+        // Refresh and verify persistence
+        await page.reload();
+        await page.waitForLoadState('domcontentloaded');
+
+        // Verify the new name persisted
+        const updatedInput = page.locator('input[name="display_name"], input#display_name, input[id*="display"]').first();
+        await expect(updatedInput).toHaveValue(newDisplayName);
+
+        // Restore original value if it existed
+        if (currentValue && currentValue !== newDisplayName) {
+            await updatedInput.clear();
+            await updatedInput.fill(currentValue);
+            await page.getByRole('button', { name: /save|update|submit/i }).click();
+            await page.waitForTimeout(1000);
+        }
+    });
+
+    test('display name appears correctly on leaderboard', async ({ page }) => {
+        await login(page);
+
+        // Navigate to a league leaderboard (assumes test user has a league)
+        await page.goto('/dashboard');
+        await page.waitForLoadState('domcontentloaded');
+
+        // Try to find a league link
+        const leagueLink = page.getByRole('link', { name: /view league|leaderboard/i }).first();
+
+        if (await leagueLink.count() > 0) {
+            await leagueLink.click();
+            await page.waitForLoadState('domcontentloaded');
+
+            // Verify leaderboard shows display names (not "undefined" or empty)
+            const leaderboardEntries = page.locator('[data-testid="leaderboard-entry"], tr, .leaderboard-row');
+            const entryCount = await leaderboardEntries.count();
+
+            if (entryCount > 0) {
+                // Check first entry doesn't show "undefined" or "null"
+                const firstEntry = leaderboardEntries.first();
+                const text = await firstEntry.textContent();
+                expect(text).not.toContain('undefined');
+                expect(text).not.toContain('null');
+            }
+        }
+    });
+});
+

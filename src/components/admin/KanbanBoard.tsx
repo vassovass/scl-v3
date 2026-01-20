@@ -28,7 +28,7 @@ interface FeedbackItem {
     completed_at: string | null;
     target_release: string;
     user_id: string | null;
-    users?: { nickname: string } | null;
+    users?: { display_name: string | null } | null;
     screenshot_url: string | null;
     attachment_count?: number;
 }
@@ -651,3 +651,4 @@ export default function KanbanBoard({ initialItems, archivedItems = [] }: Kanban
         </div>
     );
 }
+

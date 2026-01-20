@@ -17,7 +17,7 @@ export default function PrivacyPolicyPage() {
                         </p>
                         <ul className="mt-2 list-disc list-inside space-y-1">
                             <li>Email address (for authentication)</li>
-                            <li>Display name or nickname (optional)</li>
+                            <li>Display name (optional)</li>
                             <li>Step count data from screenshots you upload</li>
                             <li>League membership and participation data</li>
                         </ul>
@@ -76,3 +76,4 @@ export default function PrivacyPolicyPage() {
         </main>
     );
 }
+

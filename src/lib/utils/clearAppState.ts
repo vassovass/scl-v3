@@ -92,3 +92,4 @@ export async function clearAllAppState(): Promise<void> {
     console.log("[clearAppState] Reset Supabase client singleton");
 }
 
+

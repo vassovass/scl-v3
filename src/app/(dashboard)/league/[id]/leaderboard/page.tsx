@@ -7,12 +7,13 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { DateRangePicker } from "@/components/ui/DateRangePicker";
 import { DateRange } from "react-day-picker";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
-import { ShareAchievementButton, AchievementData } from "@/components/ui/AchievementShareCard";
 import { useUserStats } from "@/hooks/useUserStats";
 import { useFilterPersistence } from "@/hooks/useFilterPersistence";
 import { APP_CONFIG } from "@/lib/config";
 import { BADGE_INFO } from "@/lib/badges";
 import { format } from "date-fns";
+import { ShareAchievementButton, AchievementData } from "@/components/ui/AchievementShareCard";
+import { IDENTITY_LABEL, IDENTITY_FALLBACK } from "@/lib/identity";
 import { HighFiveButton } from "@/components/encouragement/HighFiveButton";
 import { CheerPrompt } from "@/components/encouragement/CheerPrompt";
 
@@ -36,7 +37,6 @@ interface LeaderboardEntry {
   rank: number;
   user_id: string;
   display_name: string | null;
-  nickname: string | null;
   total_steps: number;
   days_submitted: number;
   total_days_in_period: number | null;
@@ -449,7 +449,7 @@ function LeaderboardContent() {
                 <thead className="bg-card">
                   <tr>
                     <th className="px-3 py-3 text-left text-muted-foreground font-medium">#</th>
-                    <th className="px-3 py-3 text-left text-muted-foreground font-medium">Name</th>
+                    <th className="px-3 py-3 text-left text-muted-foreground font-medium">{IDENTITY_LABEL}</th>
                     <th className="px-3 py-3 text-right text-muted-foreground font-medium">Steps</th>
                     <th className="px-3 py-3 text-center text-muted-foreground font-medium">Days</th>
                     {comparisonMode && (
@@ -480,7 +480,7 @@ function LeaderboardContent() {
                         </span>
                       </td>
                       <td className="px-3 py-3">
-                        <span className="text-foreground">{entry.display_name || "Anonymous"}</span>
+                        <span className="text-foreground">{entry.display_name || IDENTITY_FALLBACK}</span>
                         {entry.user_id === session?.user?.id && <span className="ml-1 text-xs text-primary">(You)</span>}
                         {entry.user_id === session?.user?.id && (
                           <ShareAchievementButton

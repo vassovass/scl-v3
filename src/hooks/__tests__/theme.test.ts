@@ -175,3 +175,4 @@ describe('Theme - LocalStorage Persistence', () => {
         expect(theme).toBe('system');
     });
 });
+

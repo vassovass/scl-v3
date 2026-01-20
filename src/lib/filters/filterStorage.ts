@@ -87,3 +87,4 @@ export function clearStoredFilters(
         console.error('Error clearing filter preferences:', error);
     }
 }
+

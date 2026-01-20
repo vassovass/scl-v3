@@ -199,3 +199,4 @@ export function calculateStreak(
 
     return streak;
 }
+

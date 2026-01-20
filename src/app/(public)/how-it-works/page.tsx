@@ -148,3 +148,4 @@ function ModeCard({ icon: Icon, title, subtitle, description, highlight }: any) 
         </div>
     )
 }
+

@@ -44,3 +44,4 @@ describe('HighFiveButton', () => {
     expect(vi.mocked(analytics).highFiveSent).toHaveBeenCalledWith('user-123', true);
   });
 });
+

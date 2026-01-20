@@ -4,3 +4,4 @@ export default function BetaNoticePage() {
     // Redirect to the new stage-info page
     redirect("/stage-info");
 }
+

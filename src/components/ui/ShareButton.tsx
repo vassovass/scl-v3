@@ -122,3 +122,4 @@ export function generateShareMessage(type: string, data: Record<string, unknown>
             return `Check out my step counting progress! ${APP_CONFIG.hashtag}`;
     }
 }
+

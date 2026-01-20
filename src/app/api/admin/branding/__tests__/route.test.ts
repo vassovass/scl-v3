@@ -418,3 +418,4 @@ describe('Branding API - Update Metadata', () => {
         expect(updatedAt).toBeLessThanOrEqual(afterUpdate);
     });
 });
+

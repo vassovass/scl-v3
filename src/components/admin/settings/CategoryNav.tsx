@@ -87,3 +87,4 @@ export function CategoryNav({ categories, activeCategory, onChange }: CategoryNa
     </>
   );
 }
+

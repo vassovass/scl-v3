@@ -24,7 +24,6 @@ const querySchema = z.object({
 interface UserStats {
   user_id: string;
   display_name: string | null;
-  nickname: string | null;
   total_steps: number;
   days_submitted: number;
   verified_days: number;
@@ -39,7 +38,6 @@ interface UserStats {
 interface ComparisonResult {
   user_id: string;
   display_name: string | null;
-  nickname: string | null;
   period_a: UserStats;
   period_b: UserStats | null;
   improvement_pct: number | null;
@@ -221,7 +219,6 @@ export const GET = withApiHandler({
     results.push({
       user_id: userId,
       display_name: a.display_name,
-      nickname: a.nickname,
       period_a: { ...a, streak: periodStreak }, // Keep period streak in stats object for context? Or update?
       period_b: b,
       improvement_pct: improvementPct,
@@ -251,7 +248,6 @@ export const GET = withApiHandler({
     results.push({
       user_id: proxyStats.user_id, // Already prefixed with "proxy:"
       display_name: proxyStats.display_name,
-      nickname: null,
       period_a: { ...proxyStats, streak: 0 },
       period_b: proxyB,
       improvement_pct: improvementPct,
@@ -300,8 +296,7 @@ export const GET = withApiHandler({
     leaderboard: results.slice(offset, offset + limit).map(r => ({
       rank: r.rank,
       user_id: r.user_id,
-      display_name: r.nickname || r.display_name, // Prefer nickname
-      nickname: r.nickname,
+      display_name: r.display_name,
       total_steps: r.period_a.total_steps,
       days_submitted: r.period_a.days_submitted,
       total_days_in_period: totalDaysInPeriod,
@@ -357,7 +352,7 @@ async function fetchPeriodStats(
       steps,
       verified,
       for_date,
-      users:user_id (display_name, nickname)
+      users:user_id (display_name)
     `)
     .in("user_id", memberIds); // Filter by USER, not by league specific rows
 
@@ -410,13 +405,12 @@ async function fetchPeriodStats(
 
   for (const sub of Array.from(uniqueSubmissionsMap.values())) {
     const uid = sub.user_id;
-    const profile = sub.users as unknown as { display_name: string | null; nickname: string | null } | null;
+    const profile = sub.users as unknown as { display_name: string | null } | null;
 
     if (!userMap.has(uid)) {
       userMap.set(uid, {
         user_id: uid,
         display_name: profile?.display_name ?? null,
-        nickname: profile?.nickname ?? null,
         total_steps: 0,
         days_submitted: 0,
         verified_days: 0,
@@ -462,7 +456,7 @@ async function fetchProxyUserStats(
     .from("memberships")
     .select(`
       user_id,
-      users!inner(id, display_name, nickname, is_proxy, managed_by)
+      users!inner(id, display_name, is_proxy, managed_by)
     `)
     .eq("league_id", leagueId);
 
@@ -471,7 +465,7 @@ async function fetchProxyUserStats(
     .filter((m: any) => m.users?.is_proxy === true)
     .map((m: any) => ({
       id: m.users.id,
-      display_name: m.users.display_name || m.users.nickname || "Unknown Proxy"
+      display_name: m.users.display_name || "Unknown Proxy"
     }));
 
   if (proxyMembers.length === 0) {
@@ -523,7 +517,6 @@ async function fetchProxyUserStats(
       proxyMap.set(proxyId, {
         user_id: `proxy:${proxyId}`, // Prefix to distinguish from real users
         display_name: proxyNameMap.get(proxyId) ?? "Unknown Proxy",
-        nickname: null,
         total_steps: 0,
         days_submitted: 0,
         verified_days: 0,
@@ -602,3 +595,4 @@ function calculateDaysBetween(startDate: string, endDate: string): number {
   const diffTime = Math.abs(end.getTime() - start.getTime());
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to be inclusive
 }
+

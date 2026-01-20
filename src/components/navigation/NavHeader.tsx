@@ -384,3 +384,4 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
         </header>
     );
 }
+

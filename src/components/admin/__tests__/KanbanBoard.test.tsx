@@ -118,3 +118,4 @@ describe('KanbanBoard', () => {
     expect(screen.getByText('Fix leaderboard sorting')).toBeInTheDocument();
   });
 });
+

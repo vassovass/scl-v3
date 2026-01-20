@@ -521,3 +521,4 @@ describe('badges - Edge Cases', () => {
         });
     });
 });
+

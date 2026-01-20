@@ -54,3 +54,4 @@ export const getCachedBranding = createCachedFetcher({
     timeoutMs: 3000,
     revalidateSeconds: 3600,
 });
+

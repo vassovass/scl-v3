@@ -167,3 +167,4 @@ export function ProfileIndicator() {
     </div>
   );
 }
+

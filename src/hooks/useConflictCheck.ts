@@ -206,3 +206,4 @@ export function getRecommendationMessage(
 
     return "Consider submitting a screenshot for better accuracy.";
 }
+

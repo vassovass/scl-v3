@@ -55,3 +55,4 @@ export function GratitudeCard({ count, className }: GratitudeCardProps) {
         </div>
     );
 }
+

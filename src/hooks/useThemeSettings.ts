@@ -27,3 +27,4 @@ export function useThemeSettings(): UseThemeSettingsResult {
     isLoading,
   };
 }
+

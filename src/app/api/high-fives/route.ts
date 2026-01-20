@@ -72,3 +72,4 @@ export const DELETE = withApiHandler({
 
     return { success: true };
 });
+

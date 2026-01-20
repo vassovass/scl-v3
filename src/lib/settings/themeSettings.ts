@@ -79,3 +79,4 @@ export function getThemeSettingsFromValues(values: {
     defaultMode: resolveDefaultThemeMode(values.defaultMode, allowedModes),
   };
 }
+

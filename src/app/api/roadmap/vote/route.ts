@@ -60,3 +60,4 @@ export async function POST(request: NextRequest) {
         return badRequest(error.message || "Unknown error");
     }
 }
+

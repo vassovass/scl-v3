@@ -92,3 +92,4 @@ export function DangerZone({ league, disabled }: DangerZoneProps) {
         </>
     );
 }
+

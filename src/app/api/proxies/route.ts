@@ -331,3 +331,4 @@ export const DELETE = withApiHandler({
         message: `Proxy "${proxy.display_name}" deleted`,
     };
 });
+

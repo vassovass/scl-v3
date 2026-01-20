@@ -83,3 +83,4 @@ describe('ProfileSwitcher', () => {
     expect(switchProfile).toHaveBeenCalledWith('proxy-1');
   });
 });
+

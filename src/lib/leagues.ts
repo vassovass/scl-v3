@@ -137,3 +137,4 @@ export async function getUserLeagues(userId: string): Promise<League[]> {
         throw appError;
     }
 }
+

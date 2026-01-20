@@ -162,3 +162,4 @@ export function getUserPreferenceSetting(key: string): SettingDefinition | undef
     }
     return undefined;
 }
+

@@ -246,3 +246,4 @@ export function PresetsManager({ onApplied }: PresetsManagerProps) {
     </div>
   );
 }
+

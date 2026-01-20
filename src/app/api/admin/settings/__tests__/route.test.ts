@@ -250,3 +250,4 @@ describe('Admin Settings API - Edge Cases', () => {
         expect(parsed.primary).toBe('#ff0000');
     });
 });
+

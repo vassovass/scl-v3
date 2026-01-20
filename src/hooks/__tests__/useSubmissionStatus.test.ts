@@ -520,3 +520,4 @@ describe('useSubmissionStatus - Edge Cases', () => {
         expect(status.targetDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     });
 });
+

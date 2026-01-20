@@ -81,7 +81,7 @@ export function useExport<T>({
             // Build data rows
             const rows = items.map(item => {
                 return columns.map(col => {
-                    // Get raw value (supports dot notation like 'users.nickname')
+                    // Get raw value (supports dot notation like 'users.display_name')
                     const rawValue = getNestedValue(item, col.key as string);
 
                     // Apply format function if defined
@@ -218,3 +218,4 @@ export function useExport<T>({
         isExporting,
     };
 }
+

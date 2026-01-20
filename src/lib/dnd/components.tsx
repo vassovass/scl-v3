@@ -224,3 +224,4 @@ export function EmptyDropZone({
 }: EmptyDropZoneProps) {
   return <div className={className}>{text}</div>;
 }
+

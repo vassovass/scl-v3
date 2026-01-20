@@ -78,3 +78,4 @@ export function InstallPrompt({ className }: InstallPromptProps = {}) {
         </Button>
     );
 }
+

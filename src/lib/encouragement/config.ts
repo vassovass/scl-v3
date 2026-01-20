@@ -68,3 +68,4 @@ export const ZEN_ANIMATIONS = {
     glow: "animate-ping opacity-75",
     entrance: "animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out",
 };
+

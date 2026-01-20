@@ -134,3 +134,4 @@ function updateGoogleConsent(categories: string[]) {
 }
 
 // gtag type declaration is in src/lib/analytics.ts
+

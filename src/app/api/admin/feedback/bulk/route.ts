@@ -76,3 +76,4 @@ export const PATCH = withApiHandler({
         updated: data?.length ?? 0,
     };
 });
+

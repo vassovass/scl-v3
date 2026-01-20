@@ -86,7 +86,7 @@ export const GET = withApiHandler({
     // Build query
     let query = adminClient
         .from("feedback")
-        .select("*, users(nickname)", { count: "exact" });
+        .select("*, users(display_name)", { count: "exact" });
 
     // Apply filters
     if (type) query = query.eq("type", type);
@@ -184,3 +184,4 @@ export const DELETE = withApiHandler({
         return { success: true, archived: true, id: data?.id };
     }
 });
+

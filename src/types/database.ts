@@ -16,7 +16,6 @@ export type Database = {
         Row: {
           id: string;
           display_name: string | null;
-          nickname: string | null;
           units: "metric" | "imperial";
           is_superadmin: boolean;
           created_at: string;

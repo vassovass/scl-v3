@@ -11,3 +11,4 @@ export type { HandlerConfig, HandlerContext } from './handler';
 
 // Response helpers (from existing api.ts)
 export { json, jsonError, badRequest, unauthorized, forbidden, notFound, serverError } from '../api';
+

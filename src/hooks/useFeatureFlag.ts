@@ -57,3 +57,4 @@ export function useFeatureFlags<K extends AppSettingKey>(
     return acc;
   }, {} as Record<K, boolean>);
 }
+

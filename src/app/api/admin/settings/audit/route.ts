@@ -62,3 +62,4 @@ export async function GET(request: Request) {
 
   return json({ entries: entries || [] });
 }
+

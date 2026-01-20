@@ -91,3 +91,4 @@ export function logError(message: string, context?: Record<string, unknown>) {
 export function getRecentLogs(limit: number = 50): LogEntry[] {
     return logBuffer.slice(-limit);
 }
+

@@ -297,3 +297,4 @@ async function persistVerification({
         console.log(`Verification persisted for submission ${submissionId} in league ${leagueId}`);
     }
 }
+

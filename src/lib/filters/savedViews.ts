@@ -190,3 +190,4 @@ export function clearAllUserViews(): void {
         console.error('Error clearing views:', error);
     }
 }
+

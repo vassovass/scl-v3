@@ -309,3 +309,4 @@ describe('Leaderboard - Date Range Helpers', () => {
         expect(calculateDaysBetween('2026-01-01', '2026-01-31')).toBe(31);
     });
 });
+

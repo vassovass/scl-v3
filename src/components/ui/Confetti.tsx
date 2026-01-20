@@ -340,3 +340,4 @@ export function useConfetti(opts: UseConfettiOptions = {}) {
 }
 
 export default { triggerConfetti, triggerConfettiOnce, useConfetti };
+

@@ -20,3 +20,4 @@ export function createClient(forceNew = false) {
 export function resetClient() {
   supabaseInstance = null;
 }
+

@@ -267,3 +267,4 @@ export function ImagePasteZone({
 }
 
 export default ImagePasteZone;
+

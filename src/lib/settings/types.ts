@@ -76,3 +76,4 @@ export type UserPreferenceKey =
     | "email_daily_reminder"
     | "email_weekly_digest"
     | "push_enabled";
+

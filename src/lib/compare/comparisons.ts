@@ -500,3 +500,4 @@ export function getCategoryDisplayName(category: FeatureCategory): string {
     };
     return names[category];
 }
+

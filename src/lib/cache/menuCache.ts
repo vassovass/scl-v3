@@ -238,3 +238,4 @@ export function getCacheAge(timestamp: number): string {
   const ageHours = Math.floor(ageMinutes / 60);
   return `${ageHours}h ago`;
 }
+

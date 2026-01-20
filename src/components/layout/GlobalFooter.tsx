@@ -149,3 +149,4 @@ function FooterBottomBar({ currentYear }: { currentYear: number }) {
         </div>
     );
 }
+

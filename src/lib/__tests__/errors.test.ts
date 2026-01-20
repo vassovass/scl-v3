@@ -451,3 +451,4 @@ describe('errors - Edge Cases', () => {
         expect((top.cause as AppError).cause).toBe(root);
     });
 });
+

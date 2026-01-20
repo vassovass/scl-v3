@@ -127,3 +127,4 @@ export function LeagueInviteControl({ inviteCode, leagueName, className = "" }: 
         </div>
     );
 }
+

@@ -7,8 +7,10 @@
  * @see PRD 16: Import/Export System
  */
 
+import { IDENTITY_FIELD, IDENTITY_LABEL } from "@/lib/identity";
+
 export interface ExportColumn<T = any> {
-    /** Key path to access the value (supports dot notation like 'users.nickname') */
+    /** Key path to access the value (supports dot notation like 'users.display_name') */
     key: keyof T | string;
     /** Header label in CSV */
     header: string;
@@ -24,7 +26,7 @@ export interface ExportColumn<T = any> {
 
 /**
  * Get nested value from object using dot notation
- * e.g., getNestedValue(item, 'users.nickname') → item.users?.nickname
+ * e.g., getNestedValue(item, 'users.display_name') → item.users?.display_name
  */
 export function getNestedValue(obj: any, path: string): any {
     return path.split('.').reduce((current, key) => current?.[key], obj);
@@ -112,7 +114,7 @@ export const KANBAN_COLUMNS: ExportColumn[] = [
     { key: 'updated_at', header: 'Updated At', readonly: true, format: formatDate },
     { key: 'status_changed_at', header: 'Status Changed At', readonly: true, format: formatDate },
     { key: 'user_id', header: 'User ID', readonly: true },
-    { key: 'users.nickname', header: 'Submitter', readonly: true },
+    { key: `users.${IDENTITY_FIELD}`, header: IDENTITY_LABEL, readonly: true },
     { key: 'screenshot_url', header: 'Screenshot URL', readonly: true },
 ];
 
@@ -198,3 +200,4 @@ export function fuzzyMatchColumn(header: string): string | null {
     }
     return null;
 }
+

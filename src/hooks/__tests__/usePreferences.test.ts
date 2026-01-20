@@ -521,3 +521,4 @@ describe('usePreferences - Edge Cases', () => {
         expect(preferences.default_league_id).toBeNull();
     });
 });
+

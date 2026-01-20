@@ -26,7 +26,7 @@ interface FeedbackItem {
     completed_at: string | null;
     target_release: string;
     user_id: string | null;
-    users?: { nickname: string } | null;
+    users?: { display_name: string | null } | null;
     screenshot_url: string | null;
 }
 
@@ -112,3 +112,4 @@ export default function AdminFeedbackClient({ initialItems }: AdminFeedbackClien
         </div>
     );
 }
+

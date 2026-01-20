@@ -75,3 +75,4 @@ export function RulesSettings({ league, onChange, disabled }: RulesSettingsProps
         </SettingsSection>
     );
 }
+

@@ -20,3 +20,4 @@ export const SuperAdminEmails = {
     patterns: ["vasso", "vaseo", "v.p.vass"],
     description: "Email addresses containing 'vasso' or 'vaseo' are SuperAdmins",
 };
+

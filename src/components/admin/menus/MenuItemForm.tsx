@@ -291,3 +291,4 @@ export function MenuItemForm({ open, onOpenChange, item, onSave, mode }: MenuIte
     </Dialog>
   );
 }
+

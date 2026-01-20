@@ -278,3 +278,4 @@ export async function DELETE(request: Request): Promise<Response> {
         return Response.json({ error: appError.message }, { status: 500 });
     }
 }
+

@@ -45,3 +45,4 @@ export const CacheConfig = {
         revalidate: CacheTTL.MINUTE * 1, // 1 minute for active league dashboards
     }),
 };
+

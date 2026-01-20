@@ -77,3 +77,4 @@ export function GeneralSettings({ league, onChange, disabled }: GeneralSettingsP
         </SettingsSection>
     );
 }
+

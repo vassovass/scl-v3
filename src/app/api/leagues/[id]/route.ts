@@ -56,13 +56,13 @@ export async function GET(
         // Fetch all members for admin tools (proxy linking dropdown)
         const { data: members } = await adminClient
             .from("memberships")
-            .select("user_id, role, users:user_id (display_name, nickname)")
+            .select("user_id, role, users:user_id (display_name)")
             .eq("league_id", id);
 
         const membersList = (members || []).map((m: any) => ({
             user_id: m.user_id,
             role: m.role,
-            display_name: m.users?.nickname || m.users?.display_name || null,
+            display_name: m.users?.display_name || null,
         }));
 
         return json({

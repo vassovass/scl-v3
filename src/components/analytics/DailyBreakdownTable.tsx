@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { IDENTITY_LABEL, IDENTITY_FALLBACK } from "@/lib/identity";
 
 interface DayData {
     steps: number;
@@ -9,7 +10,6 @@ interface DayData {
 
 interface MemberBreakdown {
     user_id: string;
-    nickname: string | null;
     display_name: string | null;
     total_steps: number;
     days_submitted: number;
@@ -54,7 +54,7 @@ function getStepsColor(steps: number | null): string {
 
 function formatSteps(steps: number | null): string {
     if (steps === null) return "--";
-    if (steps >= 1000) return `${Math.round(steps / 1000)}k`;
+    if (steps >= 1000) return `${Math.round(steps / 1000)} k`;
     return String(steps);
 }
 
@@ -64,7 +64,7 @@ function formatDateLabel(dateStr: string): string {
         const [start, end] = dateStr.split("~");
         const s = new Date(start + "T00:00:00");
         const e = new Date(end + "T00:00:00");
-        return `${s.getDate()}-${e.getDate()}`;
+        return `${s.getDate()} -${e.getDate()} `;
     }
     // Single date
     return String(new Date(dateStr + "T00:00:00").getDate());
@@ -87,9 +87,9 @@ export function DailyBreakdownTable({
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth();
-    const defaultStart = startDate || `${year}-${String(month + 1).padStart(2, "0")}-01`;
+    const defaultStart = startDate || `${year} -${String(month + 1).padStart(2, "0")}-01`;
     const lastDay = new Date(year, month + 1, 0).getDate();
-    const defaultEnd = endDate || `${year}-${String(month + 1).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+    const defaultEnd = endDate || `${year} -${String(month + 1).padStart(2, "0")} -${String(lastDay).padStart(2, "0")} `;
 
     useEffect(() => {
         const fetchData = async () => {
@@ -102,7 +102,7 @@ export function DailyBreakdownTable({
                     group_by: groupBy,
                     sort_by: sortBy,
                 });
-                const res = await fetch(`/api/leagues/${leagueId}/daily-breakdown?${params}`);
+                const res = await fetch(`/ api / leagues / ${leagueId}/daily-breakdown?${params}`);
                 if (!res.ok) throw new Error("Failed to fetch breakdown");
                 const json = await res.json();
                 setData(json);
@@ -152,8 +152,8 @@ export function DailyBreakdownTable({
                                 key={opt.value}
                                 onClick={() => setGroupBy(opt.value as typeof groupBy)}
                                 className={`px-2 py-1 text-xs rounded transition ${groupBy === opt.value
-                                        ? "bg-primary text-primary-foreground"
-                                        : "bg-secondary text-muted-foreground hover:text-foreground"
+                                    ? "bg-primary text-primary-foreground"
+                                    : "bg-secondary text-muted-foreground hover:text-foreground"
                                     }`}
                             >
                                 {opt.label}
@@ -183,8 +183,8 @@ export function DailyBreakdownTable({
                 <table className="w-full text-xs">
                     <thead className="bg-card sticky top-0">
                         <tr>
-                            <th className="sticky left-0 z-10 bg-card px-3 py-2 text-left text-muted-foreground font-medium min-w-[120px]">
-                                Member
+                            <th className="px-3 py-3 text-left font-medium sticky left-0 z-20 bg-card min-w-[120px]">
+                                {IDENTITY_LABEL}
                             </th>
                             {data.dates.map((dateStr) => (
                                 <th key={dateStr} className="px-1 py-2 text-center text-muted-foreground font-medium min-w-[40px]">
@@ -210,7 +210,7 @@ export function DailyBreakdownTable({
                                     <div className="flex items-center gap-2">
                                         <span className="text-muted-foreground w-4">{idx + 1}.</span>
                                         <span className="text-foreground truncate max-w-[100px]">
-                                            {member.nickname || member.display_name || "Anonymous"}
+                                            {member.display_name || IDENTITY_FALLBACK}
                                         </span>
                                     </div>
                                 </td>

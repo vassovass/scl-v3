@@ -21,3 +21,4 @@ export const POST = withApiHandler({
     message: 'Menu cache invalidated for all clients',
   };
 });
+

@@ -14,7 +14,7 @@ interface FeedbackItem {
     completed_at: string | null;
     target_release: string;
     user_id: string | null;
-    users?: { nickname: string } | null;
+    users?: { display_name: string | null } | null;
     screenshot_url: string | null;
     attachment_count?: number;
 }
@@ -208,9 +208,9 @@ const KanbanCard = memo(function KanbanCard({
                                 </a>
                             )}
                         </div>
-                        {item.users?.nickname && (
+                        {item.users?.display_name && (
                             <span className="text-slate-400">
-                                👤 {item.users.nickname}
+                                👤 {item.users.display_name}
                             </span>
                         )}
                     </div>
@@ -221,3 +221,4 @@ const KanbanCard = memo(function KanbanCard({
 });
 
 export default KanbanCard;
+
