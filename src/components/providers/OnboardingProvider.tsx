@@ -107,6 +107,12 @@ const leaderboardTour: OnboardingStep[] = [
         disableBeacon: true,
     },
     {
+        target: "body",
+        content: "🌍 GLOBAL vs LEAGUE: This is your league's leaderboard. Your steps also count on the Global Leaderboard (found in main navigation) where ALL StepLeague users compete worldwide. Your nickname is visible to everyone!",
+        placement: "center",
+        disableBeacon: false,
+    },
+    {
         target: '[data-tour="leaderboard-filters"]',
         content: "📅 TIME PERIOD: Filter by today, this week, last 30 days, or pick custom dates for any range.",
         placement: "bottom",

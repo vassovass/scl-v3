@@ -31,6 +31,14 @@ All notable changes to StepLeague v3.
   - Documentation updates verified (CHANGELOG, PRD Index)
   - Sprint 1 Gate: ✅ New user → signup → see nickname on World League → understand why uploading matters
 
+### Changed
+
+- **PRD 49 Should Have Items** - Completed Sprint 1 "Should Have" requirements
+  - Updated leaderboard onboarding tour to explain global vs league rankings
+  - Added "Why Upload" link to footer Navigation column for value proposition discoverability
+  - Verified PRD 47 head-to-head league design documentation complete
+  - All Sprint 1 Should Have items (9-12) now marked complete
+
 ---
 
 ## [2026-01-20]

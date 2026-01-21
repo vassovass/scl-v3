@@ -35,10 +35,10 @@ Track all requirements and tasks needed before inviting friends and family to al
 
 | # | Requirement | PRD | Status | Notes |
 |---|-------------|-----|--------|-------|
-| 9 | Welcome toast for World League enrollment | PRD 44 | ✅ | Implemented |
-| 10 | Onboarding mentions global leaderboard | PRD 43 | ⬜ | Update tour content |
-| 11 | Footer links to "Why Upload" page | PRD 45 | ⬜ | Discoverability |
-| 12 | Head-to-head league design documented | PRD 47 | ⬜ | Future feature preview |
+| 9 | Welcome toast for World League enrollment | PRD 44 | ✅ | Verified working |
+| 10 | Onboarding mentions global leaderboard | PRD 43 | ✅ | Tour step added |
+| 11 | Footer links to "Why Upload" page | PRD 45 | ✅ | Navigation column |
+| 12 | Head-to-head league design documented | PRD 47 | ✅ | Complete design doc |
 
 ### Nice to Have (Can launch without)
 

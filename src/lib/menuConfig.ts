@@ -311,6 +311,7 @@ export const FOOTER_NAVIGATION: MenuDefinition = {
     items: [
         { id: 'footer-dashboard', label: 'Dashboard', href: '/dashboard' },
         { id: 'footer-how-it-works', label: 'How It Works', href: '/how-it-works' },
+        { id: 'footer-why-upload', label: 'Why Upload', href: '/why-upload' },
         { id: 'footer-pricing', label: 'Pricing', href: '/pricing' },
         { id: 'footer-create', label: 'Create League', href: '/league/create' },
         { id: 'footer-join', label: 'Join League', href: '/join' },
@@ -456,7 +457,7 @@ export function detectMenuLocation(pathname: string): MenuLocation {
     }
 
     // Public/marketing pages
-    const publicPages = ['/', '/pricing', '/how-it-works', '/privacy', '/terms', '/security', '/stage-info', '/beta', '/roadmap', '/feedback'];
+    const publicPages = ['/', '/pricing', '/how-it-works', '/why-upload', '/privacy', '/terms', '/security', '/stage-info', '/beta', '/roadmap', '/feedback'];
     if (publicPages.includes(pathname) || publicPages.some(p => pathname === p)) {
         return 'public_header';
     }
