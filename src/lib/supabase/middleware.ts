@@ -163,6 +163,19 @@ export async function updateSession(request: NextRequest) {
         // Refresh failed -> clear cookies to avoid redirect loops with invalid session
         clearAuthCookies();
         session = null;
+
+        // FIX: Redirect immediately on refresh failure for protected paths
+        // This prevents expired sessions from reaching the dashboard
+        const pathname = request.nextUrl.pathname;
+        const isProtectedPath = pathname.startsWith('/dashboard') ||
+                                pathname.startsWith('/league') ||
+                                pathname.startsWith('/settings') ||
+                                pathname.startsWith('/submissions');
+
+        if (isProtectedPath) {
+          console.log('[Middleware] Session refresh failed, redirecting to sign-in');
+          return NextResponse.redirect(new URL('/sign-in?redirect=' + pathname, request.url));
+        }
       }
     } catch {
       // Network or parsing error - keep existing cookie as-is
