@@ -24,7 +24,7 @@ interface NavHeaderProps {
 }
 
 export function NavHeader({ location: locationOverride, variant = 'default' }: NavHeaderProps = {}) {
-    const { user, session, signOut, userProfile } = useAuth();
+    const { user, session, signOut, userProfile, loading } = useAuth();
 
     // Debug logging for auth state
     useEffect(() => {
@@ -326,8 +326,13 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                     </div>
                 )}
 
-                {/* Sign in button */}
-                {!session && locationConfig.showSignIn && (
+                {/* Loading skeleton during auth initialization */}
+                {loading && locationConfig.showSignIn && (
+                    <div className="h-10 w-20 animate-pulse bg-gray-200 dark:bg-gray-700 rounded-lg" />
+                )}
+
+                {/* Sign in button - only show after loading completes */}
+                {!loading && !session && locationConfig.showSignIn && (
                     <Link
                         href="/sign-in"
                         className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 shadow-lg shadow-primary/20"
@@ -353,7 +358,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
             )}
 
             {/* Mobile Menu Drawer - for public pages (non-authenticated) */}
-            {!session && isPublicLocation && mobileMenuOpen && (
+            {!loading && !session && isPublicLocation && mobileMenuOpen && (
                 <div className="md:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-md border-b border-border animate-fade-in">
                     <nav className="px-4 py-4 space-y-1">
                         {menus.public?.items.map((item) => (
@@ -371,13 +376,22 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                             <span className="text-base font-medium text-muted-foreground">Theme</span>
                             <ModeToggle />
                         </div>
-                        <Link
-                            href="/sign-in"
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="block mt-4 px-4 py-3 text-center text-base font-semibold text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg transition-colors"
-                        >
-                            Sign in
-                        </Link>
+
+                        {/* Loading skeleton during auth initialization */}
+                        {loading && (
+                            <div className="mt-4 h-12 animate-pulse bg-gray-200 dark:bg-gray-700 rounded-lg mx-4" />
+                        )}
+
+                        {/* Sign in button - only show after loading completes */}
+                        {!loading && (
+                            <Link
+                                href="/sign-in"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="block mt-4 px-4 py-3 text-center text-base font-semibold text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg transition-colors"
+                            >
+                                Sign in
+                            </Link>
+                        )}
                     </nav>
                 </div>
             )}
