@@ -19,29 +19,16 @@ export default function ResetPage() {
     useEffect(() => {
         const performReset = async () => {
             try {
-                // 1. Unregister all service workers
-                setStatus("Unregistering service workers...");
-                if ("serviceWorker" in navigator) {
-                    const registrations = await navigator.serviceWorker.getRegistrations();
-                    await Promise.all(registrations.map((r) => r.unregister()));
-                    console.log(`[Reset] Unregistered ${registrations.length} service workers`);
-                }
+                // CRITICAL FIX: Clear storage FIRST to prevent Supabase SSR from syncing cookies back!
+                // Order matters: localStorage → IndexedDB → Cookies → Caches → Service Workers
 
-                // 2. Clear all caches
-                setStatus("Clearing caches...");
-                if ("caches" in window) {
-                    const cacheNames = await caches.keys();
-                    await Promise.all(cacheNames.map((c) => caches.delete(c)));
-                    console.log(`[Reset] Deleted ${cacheNames.length} caches`);
-                }
-
-                // 3. Clear localStorage & sessionStorage
+                // 1. Clear localStorage & sessionStorage IMMEDIATELY
                 setStatus("Clearing local storage...");
                 localStorage.clear();
                 sessionStorage.clear();
                 console.log("[Reset] Cleared localStorage & sessionStorage");
 
-                // 4. Clear IndexedDB databases (with timeout - can hang if DB in use)
+                // 2. Clear IndexedDB databases (Supabase may store sessions here too)
                 setStatus("Clearing IndexedDB...");
                 if (indexedDB.databases) {
                     try {
@@ -84,7 +71,7 @@ export default function ResetPage() {
                     }
                 }
 
-                // 5. Clear all cookies
+                // 3. NOW clear cookies (storage already gone, can't sync back)
                 setStatus("Clearing cookies...");
                 document.cookie.split(";").forEach((c) => {
                     const name = c.split("=")[0].trim();
@@ -96,6 +83,22 @@ export default function ResetPage() {
                     document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${domain}`;
                 });
                 console.log("[Reset] Cleared cookies");
+
+                // 4. Clear all caches
+                setStatus("Clearing caches...");
+                if ("caches" in window) {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(cacheNames.map((c) => caches.delete(c)));
+                    console.log(`[Reset] Deleted ${cacheNames.length} caches`);
+                }
+
+                // 5. Unregister all service workers LAST
+                setStatus("Unregistering service workers...");
+                if ("serviceWorker" in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(registrations.map((r) => r.unregister()));
+                    console.log(`[Reset] Unregistered ${registrations.length} service workers`);
+                }
 
                 // 6. Success - redirect to sign-in
                 setStatus("Reset complete! Redirecting...");

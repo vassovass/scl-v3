@@ -252,6 +252,82 @@ try {
 
 ---
 
+## Pattern 7: Cookie Sync-Back Prevention
+
+### The Problem
+
+Supabase SSR (`@supabase/ssr`) automatically syncs auth cookies from localStorage:
+
+```
+User deletes cookie
+↓
+Supabase detects missing cookie
+↓
+Reads session from localStorage
+↓
+Restores cookie automatically
+↓
+Result: Cookie reappears ❌
+```
+
+### The Fix: Atomic Storage + Cookie Clear
+
+When clearing auth state, **ALWAYS** clear localStorage BEFORE clearing cookies:
+
+```typescript
+// ❌ WRONG ORDER
+document.cookie = 'sb-xxx=; expires=Thu, 01 Jan 1970...';  // Clear cookie first
+localStorage.clear();  // Too late! Cookie already synced back
+
+// ✅ CORRECT ORDER
+localStorage.clear();  // Clear storage FIRST
+sessionStorage.clear();
+// THEN clear cookies
+document.cookie = 'sb-xxx=; expires=Thu, 01 Jan 1970...';
+```
+
+### Usage in /reset Page
+
+```typescript
+// src/app/reset/page.tsx
+const performReset = async () => {
+  // 1. Storage FIRST (prevents sync-back)
+  localStorage.clear();
+  sessionStorage.clear();
+
+  // 2. IndexedDB (Supabase may store here too)
+  const dbs = await indexedDB.databases();
+  await Promise.all(dbs.map(db => indexedDB.deleteDatabase(db.name)));
+
+  // 3. Cookies (storage already gone, can't sync)
+  document.cookie.split(";").forEach(c => {
+    const name = c.split("=")[0].trim();
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+  });
+
+  // 4. Caches last
+  const cacheNames = await caches.keys();
+  await Promise.all(cacheNames.map(c => caches.delete(c)));
+
+  // 5. Hard redirect (bypass client router)
+  window.location.href = "/sign-in?reset=true";
+};
+```
+
+### Why This Matters
+
+- Manual cookie deletion won't work if localStorage has session
+- `/reset` page must clear in correct order
+- Sign-out flows must clear both storage + cookies atomically
+- Chrome DevTools cookie deletion triggers sync-back if localStorage exists
+
+### Related Patterns
+
+- Pattern 4: Background Tasks (cookie parsing)
+- Pattern 5: Token Expiry Validation
+
+---
+
 ## Related Skills
 
 - `supabase-patterns` - Database operations, MCP usage, RLS *(auth section references this skill)*
