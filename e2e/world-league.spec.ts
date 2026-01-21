@@ -48,25 +48,26 @@ test.describe('World League', () => {
         await expect(page).toHaveURL(/\/league\/00000000-0000-0000-0000-000000000001/);
     });
 
-    // TODO: Investigate why welcome toast doesn't appear in E2E test
-    // The toast may require specific conditions (first visit detection, localStorage state)
-    // or may have timing issues. The component implementation should be verified manually.
-    test.skip('welcome toast appears on first dashboard visit', async ({ page }) => {
+    test('welcome toast appears on first dashboard visit', async ({ page }) => {
         await login(page);
 
         // Clear localStorage to force "first visit" logic
-        // We do this by injecting script before navigation
+        // FIXED: Use correct localStorage key
         await page.addInitScript(() => {
-            window.localStorage.removeItem('has_seen_dashboard_welcome');
+            window.localStorage.removeItem('scl_visited_dashboard_welcome');
         });
 
         await page.goto('/dashboard');
         await page.waitForLoadState('domcontentloaded');
 
-        // Look for toast content - Title contains "StepLeague World" not "World League"
-        // Title: "Welcome to StepLeague World! 🌍"
-        await expect(page.getByText('Welcome to StepLeague World!')).toBeVisible({ timeout: 10000 });
-        // Description: "You've been added to the global leaderboard..."
+        // Wait for toast to appear (1000ms delay + rendering time)
+        await expect(page.getByText('Welcome to StepLeague World!')).toBeVisible({ timeout: 3000 });
+
+        // Verify description is also visible
         await expect(page.getByText("You've been added to the global leaderboard")).toBeVisible();
+
+        // Verify localStorage key was set
+        const storageKey = await page.evaluate(() => localStorage.getItem('scl_visited_dashboard_welcome'));
+        expect(storageKey).toBe('true');
     });
 });

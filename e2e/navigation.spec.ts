@@ -47,6 +47,17 @@ test.describe('Navigation - Footer Links', () => {
         await page.getByRole('link', { name: /privacy policy/i }).click();
         await expect(page).toHaveURL(/\/privacy/);
     });
+
+    test('why upload link works', async ({ page }) => {
+        await page.goto('/');
+        await page.waitForLoadState('domcontentloaded');
+
+        await page.getByRole('link', { name: /why upload/i }).click();
+        await expect(page).toHaveURL(/\/why-upload/);
+
+        // Verify page content loads
+        await expect(page.getByRole('heading', { name: /every step counts/i })).toBeVisible();
+    });
 });
 
 test.describe('Navigation - Authenticated Dashboard', () => {
