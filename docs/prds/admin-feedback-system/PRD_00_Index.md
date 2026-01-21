@@ -86,9 +86,9 @@
 ### Alpha Launch (PRDs 43-49) 🚀
 | # | PRD Title | Outcome | Status |
 |---|-----------|---------|--------|
-| 43 | [Nickname Primary Identity](./PRD_43_Nickname_Primary_Identity.md) | Repurpose display_name for leaderboards | 📋 Proposed |
-| 44 | [Auto-Enroll World League](./PRD_44_Auto_Enroll_World_League.md) | New users auto-join global league | 📋 Proposed |
-| 45 | [Why Upload Daily](./PRD_45_Why_Upload_Daily.md) | Public value proposition page | 📋 Proposed |
+| 43 | [Nickname Primary Identity](./PRD_43_Nickname_Primary_Identity.md) | Repurpose display_name for leaderboards | ✅ Complete |
+| 44 | [Auto-Enroll World League](./PRD_44_Auto_Enroll_World_League.md) | New users auto-join global league | ✅ Complete |
+| 45 | [Why Upload Daily](./PRD_45_Why_Upload_Daily.md) | Public value proposition page | ✅ Complete |
 | 46 | [Points Scoring System](./PRD_46_Points_Scoring_System.md) | Comprehensive points-based ranking (Design) | 📋 Proposed |
 | 47 | [Head-to-Head Leagues](./PRD_47_Head_To_Head_Leagues.md) | FPL-style weekly matchups (Design) | 📋 Proposed |
 | 48 | [Universal Health Measurement](./PRD_48_Universal_Health_Measurement.md) | Multi-activity SLP conversion (Vision) | 📋 Proposed |
@@ -154,8 +154,8 @@
 
 | Category | Count |
 |----------|-------|
-| ✅ Complete | 35 PRDs |
-| 📋 Proposed | 14 PRDs |
+| ✅ Complete | 38 PRDs |
+| 📋 Proposed | 11 PRDs |
 | 🔄 Ongoing | 1 PRD |
 
 ---

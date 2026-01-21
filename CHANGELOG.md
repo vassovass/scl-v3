@@ -7,6 +7,19 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-01-21]
+
+### Added
+
+- **PRD 45: Why Upload Daily** - Public marketing page explaining the value proposition
+  - Hero section with "Every Step Counts — Globally" headline
+  - Four value sections: Compete Globally, Track Progress, Build Streaks, Private Leagues
+  - Multiple CTAs: Start Uploading, View Leaderboard, Create a League
+  - SEO-optimized metadata and OpenGraph tags
+  - Accessible at `/why-upload`
+
+---
+
 ## [2026-01-20]
 
 ### Added
