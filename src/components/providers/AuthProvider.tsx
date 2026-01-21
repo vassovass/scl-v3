@@ -20,6 +20,8 @@ interface AuthContextValue {
   session: Session | null;
   loading: boolean;
   signOut: (redirectTo?: string) => Promise<void>;
+  /** True when sign-out is in progress (prevents data leakage) */
+  isSigningOut: boolean;
 
   // Auth error state (single source of truth for auth errors)
   /** Current auth error detected from URL or callback */
@@ -53,14 +55,44 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 // Provider
 // ============================================================================
 
+/**
+ * Parse initial session from cookie (same source as middleware uses).
+ * This eliminates the race condition where NavHeader renders before onAuthStateChange fires.
+ */
+function getInitialSessionFromCookie(): Session | null {
+  if (typeof window === 'undefined') return null; // SSR guard
+
+  try {
+    // Match the cookie name pattern used by Supabase SSR
+    const cookieName = `sb-${process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0]}-auth-token`;
+    const cookieValue = document.cookie
+      .split('; ')
+      .find(row => row.startsWith(cookieName))
+      ?.split('=')[1];
+
+    if (!cookieValue) return null;
+
+    const decoded = JSON.parse(decodeURIComponent(cookieValue));
+    if (decoded?.access_token && decoded?.user) {
+      console.log('[AuthProvider] Initialized session from cookie:', decoded.user.id);
+      return decoded as Session;
+    }
+  } catch (error) {
+    console.error('[AuthProvider] Failed to parse initial session from cookie:', error);
+  }
+
+  return null;
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
 
-  // Core auth state
-  const [session, setSession] = useState<Session | null>(null);
+  // Core auth state - initialize session from cookie to avoid race condition
+  const [session, setSession] = useState<Session | null>(getInitialSessionFromCookie());
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   // PRD 41: "Act As" state
   const [userProfile, setUserProfile] = useState<ActiveProfile | null>(null);
@@ -417,6 +449,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (event === 'INITIAL_SESSION') {
         if (newSession?.user) {
           console.log('[AuthProvider] INITIAL_SESSION with user:', newSession.user.id);
+
+          // VALIDATION: Check if token has expired
+          const expiresAt = newSession.expires_at || 0;
+          const nowSeconds = Math.floor(Date.now() / 1000);
+
+          if (expiresAt > 0 && nowSeconds >= expiresAt) {
+            console.warn('[AuthProvider] Session token expired, clearing');
+            clearCachedSession();
+            setSession(null); // This also clears user since user is derived from session
+            setLoading(false);
+            return;
+          }
           const profile = await fetchUserProfile(newSession.user.id);
           if (profile) {
             setUserProfile(profile);
@@ -517,7 +561,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async (redirectTo = "/sign-in?signedOut=true") => {
     console.log('[AuthProvider] signOut called, redirectTo:', redirectTo);
 
-    // Clear proxy state first
+    // CRITICAL: Set signing-out state FIRST to prevent data leakage
+    setIsSigningOut(true);
+
+    // Clear session state IMMEDIATELY (before async operations)
+    // Note: user is derived from session, so clearing session clears user too
+    setSession(null);
+
+    // Clear proxy state
     console.log('[AuthProvider] Clearing proxy state...');
     setUserProfile(null);
     setActiveProfile(null);
@@ -529,9 +580,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Clear service worker caches and browser storage (non-blocking)
     clearAllAppState().catch((e) => console.warn('[AuthProvider] clearAllAppState failed:', e));
-
-    // Clear session state locally first to ensure UI updates
-    setSession(null);
 
     // Try to sign out from Supabase with a timeout
     // Sometimes the API call hangs, so we don't want to block the user
@@ -563,7 +611,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Always redirect, even if signOut API call failed/timed out
     console.log('[AuthProvider] Redirecting to:', redirectTo);
-    router.push(redirectTo);
+    // Use window.location.href for hard navigation (clears all React state)
+    window.location.href = redirectTo;
   };
 
   // ============================================================================
@@ -575,6 +624,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     session,
     loading,
     signOut,
+    isSigningOut,
 
     // Auth error state
     authError,
