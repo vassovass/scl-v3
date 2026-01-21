@@ -18,6 +18,13 @@ All notable changes to StepLeague v3.
   - SEO-optimized metadata and OpenGraph tags
   - Accessible at `/why-upload`
 
+- **PRD 46: Points Scoring System (Design Only)** - Comprehensive points-based ranking design
+  - 18 mechanics documented covering base points, improvement bonuses, streaks, and engagement
+  - Formula specifications for all point calculations with example scenarios
+  - Database schema draft for `user_points` table and `user_records` extensions
+  - Edge case handling documented (multi-submissions, backdating, streak breaks)
+  - Implementation plan reference for future development phases
+
 ---
 
 ## [2026-01-20]

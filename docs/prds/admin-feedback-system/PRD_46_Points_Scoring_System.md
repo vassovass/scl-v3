@@ -1,7 +1,7 @@
 # PRD 46: Points-Based Scoring System
 
 > **Order:** 46
-> **Status:** 📋 Proposed (Design Only)
+> **Status:** ✅ Complete (Design Only)
 > **Type:** Feature
 > **Dependencies:** PRD 44 (Auto-Enroll World League)
 > **Blocks:** PRD 47 (Head-to-Head)
