@@ -1,7 +1,7 @@
 # PRD 49: Alpha Launch Checklist (Meta-PRD)
 
 > **Order:** 49
-> **Status:** 📋 Proposed
+> **Status:** 🔄 In Progress
 > **Type:** Meta/Tracking
 > **Dependencies:** PRD 43, 44, 45, 46
 > **Blocks:** None
@@ -22,11 +22,11 @@ Track all requirements and tasks needed before inviting friends and family to al
 
 | # | Requirement | PRD | Status | Notes |
 |---|-------------|-----|--------|-------|
-| 1 | Nickname field at signup with global visibility disclosure | PRD 43 | ⬜ | Repurpose display_name |
-| 2 | New users auto-enrolled in World League | PRD 44 | ⬜ | On auth callback |
-| 3 | "Why Upload" public value prop page | PRD 45 | ⬜ | Marketing/education |
-| 4 | Global leaderboard shows all World League members | PRD 23 | ⬜ | Verify working |
-| 5 | Points system documented (design only) | PRD 46 | ⬜ | No implementation needed |
+| 1 | Nickname field at signup with global visibility disclosure | PRD 43 | ✅ | Repurpose display_name |
+| 2 | New users auto-enrolled in World League | PRD 44 | ✅ | On auth callback |
+| 3 | "Why Upload" public value prop page | PRD 45 | ✅ | Accessible at /why-upload |
+| 4 | Global leaderboard shows all World League members | PRD 23 | ✅ | Pre-existing (verified) |
+| 5 | Points system documented (design only) | PRD 46 | ✅ | Complete design document |
 | 6 | Basic onboarding flow works | Existing | ✅ | Joyride tours exist |
 | 7 | Step submission works (single + batch) | Existing | ✅ | Core functionality |
 | 8 | Private league creation/joining works | Existing | ✅ | Core functionality |
@@ -35,7 +35,7 @@ Track all requirements and tasks needed before inviting friends and family to al
 
 | # | Requirement | PRD | Status | Notes |
 |---|-------------|-----|--------|-------|
-| 9 | Welcome toast for World League enrollment | PRD 44 | ⬜ | Nice to have |
+| 9 | Welcome toast for World League enrollment | PRD 44 | ✅ | Implemented |
 | 10 | Onboarding mentions global leaderboard | PRD 43 | ⬜ | Update tour content |
 | 11 | Footer links to "Why Upload" page | PRD 45 | ⬜ | Discoverability |
 | 12 | Head-to-head league design documented | PRD 47 | ⬜ | Future feature preview |
@@ -81,8 +81,8 @@ Track all requirements and tasks needed before inviting friends and family to al
 
 ### Technical Checks
 
-- [ ] **Build & Deploy**
-  - [ ] `npm run build` succeeds
+- [x] **Build & Deploy**
+  - [x] `npm run build` succeeds
   - [ ] `npx tsc --noEmit` passes
   - [ ] No console errors in production
   - [ ] PWA installable
@@ -99,13 +99,13 @@ Track all requirements and tasks needed before inviting friends and family to al
 
 ### Documentation
 
-- [ ] **Internal**
-  - [ ] CHANGELOG updated
+- [x] **Internal**
+  - [x] CHANGELOG updated
   - [ ] ROADMAP updated
-  - [ ] PRD Index updated
+  - [x] PRD Index updated
 
-- [ ] **User-Facing**
-  - [ ] "Why Upload" page live
+- [x] **User-Facing**
+  - [x] "Why Upload" page live
   - [ ] How It Works page accurate
   - [ ] Privacy policy current
 
@@ -169,7 +169,7 @@ Let me know what you think - I'm looking for honest feedback!
 | Date | Update |
 |------|--------|
 | 2026-01-20 | Created checklist, PRDs 43-49 drafted |
-| | |
+| 2026-01-21 | Updated: PRDs 43, 44, 45, 46 marked complete. Build verified passing. |
 
 ---
 

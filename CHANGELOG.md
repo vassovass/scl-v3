@@ -25,6 +25,12 @@ All notable changes to StepLeague v3.
   - Edge case handling documented (multi-submissions, backdating, streak breaks)
   - Implementation plan reference for future development phases
 
+- **PRD 49: Alpha Launch Checklist** - Sprint 1 gate verification complete
+  - All 8 "Must Have" items verified and marked complete (PRDs 43, 44, 45, 46 + existing features)
+  - Build verification passed (`npm run build` exits 0)
+  - Documentation updates verified (CHANGELOG, PRD Index)
+  - Sprint 1 Gate: ✅ New user → signup → see nickname on World League → understand why uploading matters
+
 ---
 
 ## [2026-01-20]
