@@ -447,6 +447,32 @@ export function TourProvider({
     ]);
 
     // ─────────────────────────────────────────────────────────────────────────
+    // Filtered Tour Steps (must come before Tour Actions)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    const featureFlagKeys = useMemo(() => {
+        if (!activeTour) return [];
+        const keys = activeTour.steps
+            .map((step) => step.featureFlag)
+            .filter((flag): flag is string => !!flag);
+        return Array.from(new Set(keys));
+    }, [activeTour]);
+
+    const featureFlags = useFeatureFlags(featureFlagKeys as AppSettingKey[]);
+
+    const filteredTourSteps = useMemo(() => {
+        if (!activeTour) return [];
+        return filterTourSteps(
+            activeTour.steps,
+            isMobile,
+            userRole,
+            featureFlags,
+            activeVariant,
+            activeTour.mobile
+        );
+    }, [activeTour, isMobile, userRole, featureFlags, activeVariant]);
+
+    // ─────────────────────────────────────────────────────────────────────────
     // Tour Actions
     // ─────────────────────────────────────────────────────────────────────────
 
@@ -715,28 +741,6 @@ export function TourProvider({
     // ─────────────────────────────────────────────────────────────────────────
     // Joyride Steps
     // ─────────────────────────────────────────────────────────────────────────
-
-    const featureFlagKeys = useMemo(() => {
-        if (!activeTour) return [];
-        const keys = activeTour.steps
-            .map((step) => step.featureFlag)
-            .filter((flag): flag is string => !!flag);
-        return Array.from(new Set(keys));
-    }, [activeTour]);
-
-    const featureFlags = useFeatureFlags(featureFlagKeys as AppSettingKey[]);
-
-    const filteredTourSteps = useMemo(() => {
-        if (!activeTour) return [];
-        return filterTourSteps(
-            activeTour.steps,
-            isMobile,
-            userRole,
-            featureFlags,
-            activeVariant,
-            activeTour.mobile
-        );
-    }, [activeTour, isMobile, userRole, featureFlags, activeVariant]);
 
     const joyrideSteps = useMemo(() => {
         if (!activeTour || !i18nReady) return [];

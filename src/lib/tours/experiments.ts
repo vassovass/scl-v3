@@ -71,7 +71,7 @@ export function getTourExperimentVariant(
  */
 export function shouldShowExperiment(experimentId: string): boolean {
     if (typeof window !== 'undefined' && posthog.__loaded) {
-        return posthog.isFeatureEnabled(experimentId);
+        return posthog.isFeatureEnabled(experimentId) ?? false;
     }
 
     return process.env.NODE_ENV === 'development';
