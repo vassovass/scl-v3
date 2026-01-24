@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import { NavHeader } from "@/components/navigation/NavHeader";
 import { GlobalFooter } from "@/components/layout/GlobalFooter";
-import { OnboardingProvider } from "@/components/providers/OnboardingProvider";
+import { TourProvider } from "@/components/tours/TourProvider";
 import { ActingAsBanner } from "@/components/auth/ProfileSwitcher";
 import { AuthErrorAlert } from "@/components/auth/AuthErrorAlert";
 import { useAuth } from "@/components/providers/AuthProvider";
@@ -13,7 +13,7 @@ export default function DashboardLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const { isSigningOut, loading } = useAuth();
+    const { isSigningOut, loading, user, activeProfile } = useAuth();
 
     // Show loading spinner during sign-out to prevent data leakage
     if (isSigningOut) {
@@ -36,9 +36,15 @@ export default function DashboardLayout({
         );
     }
 
+    // Determine user role for tour visibility
+    const isAdmin = activeProfile?.is_superadmin === true;
+
     return (
         <Suspense fallback={null}>
-            <OnboardingProvider>
+            <TourProvider
+                userId={user?.id}
+                userRole={isAdmin ? 'admin' : 'member'}
+            >
                 <div className="min-h-screen flex flex-col bg-background">
                     <NavHeader />
                     {/* Auth error alert - single source of truth from AuthProvider */}
@@ -48,7 +54,7 @@ export default function DashboardLayout({
                     <main className="flex-1">{children}</main>
                     <GlobalFooter />
                 </div>
-            </OnboardingProvider>
+            </TourProvider>
         </Suspense>
     );
 }

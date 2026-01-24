@@ -7,6 +7,56 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-01-24]
+
+### Added
+
+- **PRD 50: Modular Onboarding Tour System v2.0** - Ground-up rebuild of tour infrastructure
+  - **Core Infrastructure** (`src/lib/tours/`)
+    - `types.ts` - Extended `TourPlacement` type for custom placements
+    - `registry.ts` - Central tour registry with lazy loading
+    - `i18n.ts` - Translation loader with plural support
+    - `experiments.ts` - PostHog A/B testing integration
+    - `validation.ts` - Interactive step validation (clicks, inputs)
+    - `migrations.ts` - Version migration system with automatic upgrades
+    - `gtm-integration.ts` - Google Tag Manager event forwarding
+    - `supabase-sync.ts` - Cloud persistence of tour progress
+    - `unified-analytics.ts` - Facade for PostHog + GTM + Supabase analytics
+  - **Components** (`src/components/tours/`)
+    - `TourProvider.tsx` - High-performance provider (INP < 150ms target)
+    - `TourFeedbackDialog.tsx` - Post-tour feedback collection
+    - `TourTrigger.tsx` - Manual tour launcher button
+    - `TourProgress.tsx` - Visual progress indicator
+    - `useTour.ts` - Hook for tour state and actions
+  - **Tour Definitions** (`src/lib/tours/definitions/`)
+    - 7 modular tours: Dashboard (11 steps), League (5), Submit (7), Leaderboard (5), Analytics (4), Settings (5), Admin (5)
+    - Mobile-responsive overrides per step
+    - Role-based visibility (admin tours hidden from regular users)
+  - **Database Tables** (via Supabase MCP)
+    - `tour_completions` - Track completed tours per user
+    - `tour_step_interactions` - Detailed step-level analytics
+    - `tour_feedback` - User feedback with emoji ratings
+    - RLS policies for user-scoped access
+  - **Admin Analytics Dashboard** (`src/app/admin/analytics/`)
+    - Modular analytics hub with extensible tab navigation
+    - Tour analytics page with completion rates, step drop-off funnel, feedback summary
+    - Reusable components: `KPICard`, `AnalyticsNav`, `TourCompletionChart`, `TourFeedbackSummary`, `StepDropoffFunnel`
+    - API endpoint `/api/admin/analytics/tours` with superadmin authorization
+    - Architecture prepared for PRD 32 (full admin analytics)
+  - **Translations** (`src/locales/en/tours.json`) - English tour strings
+
+### Changed
+
+- **Layout Integration** - Replaced `OnboardingProvider` with `TourProvider` in all 5 layouts
+  - Dashboard, Settings, Admin, Roadmap, Feedback layouts updated
+  - Passing `userId`, `userRole` props for role-based tours
+
+### Removed
+
+- **OnboardingProvider.tsx** - Deleted monolithic legacy provider (replaced by modular system)
+
+---
+
 ## [2026-01-21]
 
 ### Added

@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import { NavHeader } from "@/components/navigation/NavHeader";
 import { GlobalFooter } from "@/components/layout/GlobalFooter";
-import { OnboardingProvider } from "@/components/providers/OnboardingProvider";
+import { TourProvider } from "@/components/tours/TourProvider";
 
 export default function SettingsLayout({
     children,
@@ -12,13 +12,13 @@ export default function SettingsLayout({
 }) {
     return (
         <Suspense fallback={null}>
-            <OnboardingProvider>
+            <TourProvider>
                 <div className="min-h-screen flex flex-col">
                     <NavHeader />
                     <main className="flex-1">{children}</main>
                     <GlobalFooter />
                 </div>
-            </OnboardingProvider>
+            </TourProvider>
         </Suspense>
     );
 }
