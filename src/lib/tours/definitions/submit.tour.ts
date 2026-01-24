@@ -19,7 +19,7 @@ export const submitTour: TourDefinition = {
     icon: '📝',
     estimatedDuration: 120, // 2 minutes
 
-    requiredPath: '/submit',
+    requiredPath: '/submit-steps',
 
     autoStart: {
         onFirstVisit: true,
@@ -45,55 +45,42 @@ export const submitTour: TourDefinition = {
             },
         },
         {
-            id: 'apple-health',
-            target: '[data-tour="apple-health-connect"]',
-            titleKey: 'submit.steps.appleHealth.title',
-            contentKey: 'submit.steps.appleHealth.content',
+            id: 'date-picker',
+            target: '[data-tour="date-picker"]',
+            titleKey: 'submit.steps.datePicker.title',
+            contentKey: 'submit.steps.datePicker.content',
             placement: 'right',
             spotlightClicks: true,
             mobile: {
-                contentKey: 'submit.steps.appleHealth.mobile.content',
+                contentKey: 'submit.steps.datePicker.mobile.content',
                 placement: 'bottom',
             },
         },
         {
-            id: 'google-fit',
-            target: '[data-tour="google-fit-connect"]',
-            titleKey: 'submit.steps.googleFit.title',
-            contentKey: 'submit.steps.googleFit.content',
+            id: 'steps-input',
+            target: '[data-tour="steps-input"]',
+            titleKey: 'submit.steps.stepsInput.title',
+            contentKey: 'submit.steps.stepsInput.content',
             placement: 'right',
             spotlightClicks: true,
             mobile: {
-                contentKey: 'submit.steps.googleFit.mobile.content',
+                contentKey: 'submit.steps.stepsInput.mobile.content',
                 placement: 'bottom',
             },
         },
         {
-            id: 'manual-entry',
-            target: '[data-tour="manual-step-input"]',
-            titleKey: 'submit.steps.manualEntry.title',
-            contentKey: 'submit.steps.manualEntry.content',
-            placement: 'right',
-            spotlightClicks: true,
-            mobile: {
-                contentKey: 'submit.steps.manualEntry.mobile.content',
-                placement: 'bottom',
-            },
-        },
-        {
-            id: 'photo-proof',
-            target: '[data-tour="photo-upload"]',
-            titleKey: 'submit.steps.photoProof.title',
-            contentKey: 'submit.steps.photoProof.content',
+            id: 'screenshot-upload',
+            target: '[data-tour="screenshot-upload"]',
+            titleKey: 'submit.steps.screenshotUpload.title',
+            contentKey: 'submit.steps.screenshotUpload.content',
             placement: 'top',
             mobile: {
-                contentKey: 'submit.steps.photoProof.mobile.content',
+                contentKey: 'submit.steps.screenshotUpload.mobile.content',
             },
-            hideOnMobile: true, // Skip on mobile
         },
         {
             id: 'submit-button',
-            target: '[data-tour="submit-confirm-button"]',
+            target: '[data-tour="submit-button"]',
             titleKey: 'submit.steps.submitButton.title',
             contentKey: 'submit.steps.submitButton.content',
             placement: 'top',
@@ -113,10 +100,10 @@ export const submitTour: TourDefinition = {
         },
         {
             id: 'confirmation',
-            target: '[data-tour="submission-success"]',
+            target: '[data-tour="recent-submissions"]',
             titleKey: 'submit.steps.confirmation.title',
             contentKey: 'submit.steps.confirmation.content',
-            placement: 'auto',
+            placement: 'top',
             mobile: {
                 contentKey: 'submit.steps.confirmation.mobile.content',
             },

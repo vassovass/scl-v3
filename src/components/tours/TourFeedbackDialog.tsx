@@ -19,8 +19,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { FormTextarea } from '@/components/ui/form-fields';
 import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { tourAnalytics } from '@/lib/tours/unified-analytics';
@@ -94,7 +94,7 @@ export function TourFeedbackDialog({
                         <DialogHeader>
                             <DialogTitle>{t('common.feedback.title')}</DialogTitle>
                             <DialogDescription>
-                                Your feedback helps us improve the tour experience.
+                                {t('common.feedback.description')}
                             </DialogDescription>
                         </DialogHeader>
 
@@ -116,11 +116,11 @@ export function TourFeedbackDialog({
                                             )}
                                             aria-label={`Rate ${star} out of 5`}
                                         >
-                                            <Star
-                                                className={cn(
-                                                    'w-8 h-8 transition-colors',
-                                                    star <= (hoveredRating || rating)
-                                                        ? 'fill-yellow-400 text-yellow-400'
+                                        <Star
+                                            className={cn(
+                                                'w-8 h-8 transition-colors',
+                                                star <= (hoveredRating || rating)
+                                                        ? 'fill-[hsl(var(--warning))] text-[hsl(var(--warning))]'
                                                         : 'text-muted-foreground'
                                                 )}
                                             />
@@ -131,12 +131,10 @@ export function TourFeedbackDialog({
 
                             {/* Comment */}
                             <div className="space-y-2">
-                                <Label htmlFor="feedback-comment">
-                                    {t('common.feedback.comment')}
-                                </Label>
-                                <Textarea
-                                    id="feedback-comment"
-                                    placeholder="What could be improved?"
+                                <FormTextarea
+                                    fieldName="tour-feedback-comment"
+                                    label={t('common.feedback.comment')}
+                                    placeholder={t('common.feedback.placeholder')}
                                     value={comment}
                                     onChange={(e) => setComment(e.target.value)}
                                     rows={3}
@@ -152,14 +150,14 @@ export function TourFeedbackDialog({
                                 onClick={handleSkip}
                                 disabled={isSubmitting}
                             >
-                                Skip
+                                {t('common.feedback.skip')}
                             </Button>
                             <Button
                                 type="button"
                                 onClick={handleSubmit}
                                 disabled={isSubmitting}
                             >
-                                {isSubmitting ? 'Submitting...' : t('common.feedback.submit')}
+                                {isSubmitting ? t('common.feedback.submitting') : t('common.feedback.submit')}
                             </Button>
                         </DialogFooter>
                     </>

@@ -494,7 +494,7 @@ export default function SubmitPage() {
             {/* Page Title */}
             <div className="border-b border-border bg-card/30">
                 <div className="mx-auto max-w-3xl px-6 py-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between" data-tour="submit-page-header">
                         <h1 className="text-xl font-bold text-foreground">Submit Steps</h1>
                         <Link
                             href="/dashboard"
@@ -610,7 +610,7 @@ export default function SubmitPage() {
 
                 {/* Your Recent Submissions */}
                 <ModuleFeedback moduleId="recent-submissions" moduleName="Recent Submissions">
-                    <section className="mt-12">
+                    <section className="mt-12" data-tour="recent-submissions">
                         <div className="flex items-center justify-between">
                             <div>
                                 <h2 className="text-xl font-semibold text-foreground">Your Recent Submissions</h2>
@@ -963,4 +963,3 @@ export default function SubmitPage() {
         </div>
     );
 }
-

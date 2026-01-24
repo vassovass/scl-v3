@@ -17,17 +17,12 @@ interface TourFeedbackSummaryProps {
     loading?: boolean;
 }
 
-const emojiLabels: Record<string, string> = {
-    "😍": "Loved it",
-    "😊": "Good",
-    "😐": "Okay",
-    "😕": "Meh",
-    "😢": "Bad",
-    "great": "Great",
-    "good": "Good",
-    "ok": "Okay",
-    "bad": "Bad",
-    "terrible": "Terrible",
+const ratingLabels: Record<string, string> = {
+    "5": "Excellent",
+    "4": "Good",
+    "3": "Okay",
+    "2": "Needs work",
+    "1": "Poor",
 };
 
 export function TourFeedbackSummary({ data, loading }: TourFeedbackSummaryProps) {
@@ -80,19 +75,20 @@ export function TourFeedbackSummary({ data, loading }: TourFeedbackSummaryProps)
             <div className="space-y-2">
                 {sortedRatings.map(([rating, count]) => {
                     const percentage = (count / total) * 100;
-                    const label = emojiLabels[rating] || rating;
+                    const label = ratingLabels[rating] || rating;
 
                     return (
                         <div key={rating} className="flex items-center gap-2 text-sm">
-                            <span className="w-8 text-center text-lg">{rating}</span>
+                            <span className="w-8 text-center text-lg">{rating}★</span>
                             <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                                 <div
                                     className="h-full bg-primary/70 rounded-full"
                                     style={{ width: `${percentage}%` }}
                                 />
                             </div>
-                            <span className="w-8 text-right text-muted-foreground">
-                                {count}
+                            <span className="w-8 text-right text-muted-foreground">{count}</span>
+                            <span className="hidden md:inline text-xs text-muted-foreground">
+                                {label}
                             </span>
                         </div>
                     );

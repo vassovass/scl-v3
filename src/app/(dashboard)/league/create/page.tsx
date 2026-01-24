@@ -85,7 +85,7 @@ export default function CreateLeaguePage() {
             {/* Main */}
             <ModuleFeedback moduleId="create-league-form" moduleName="Create League Form">
                 <div className="mx-auto max-w-lg px-6 py-12">
-                    <div className="text-center">
+                    <div className="text-center" data-tour="league-create-header">
                         <h1 className="text-2xl font-bold text-foreground">Create a New League</h1>
                         <p className="mt-2 text-muted-foreground">
                             Set up your step competition and invite friends
@@ -118,6 +118,7 @@ export default function CreateLeaguePage() {
                                 className="mt-2 block w-full rounded-lg border border-input bg-secondary px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition"
                                 disabled={loading}
                                 autoFocus
+                                data-tour="league-name-input"
                             />
                             {nameError && (
                                 <p className="mt-2 text-sm text-destructive">{nameError}</p>
@@ -128,7 +129,7 @@ export default function CreateLeaguePage() {
                         </div>
 
                         {/* Week Start Day */}
-                        <div>
+                        <div data-tour="league-week-start">
                             <label className="block text-sm font-medium text-foreground">
                                 Week Starts On
                             </label>
@@ -193,12 +194,13 @@ export default function CreateLeaguePage() {
                             type="submit"
                             disabled={!isValid || loading}
                             className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary"
+                            data-tour="league-create-submit"
                         >
                             {loading && <Spinner size="sm" />}
                             {loading ? "Creating League..." : "Create League"}
                         </button>
 
-                        <p className="text-center text-xs text-muted-foreground">
+                        <p className="text-center text-xs text-muted-foreground" data-tour="league-invite-info">
                             Once created, you&apos;ll get an invite code to share with friends
                         </p>
                     </form>
@@ -207,4 +209,3 @@ export default function CreateLeaguePage() {
         </div>
     );
 }
-

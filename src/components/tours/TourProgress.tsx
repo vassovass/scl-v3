@@ -59,7 +59,7 @@ export function TourProgress({
     return (
         <div className={cn('space-y-2', className)}>
             <div className="flex justify-between items-center text-sm">
-                <span className="font-medium">{activeTour.nameKey}</span>
+                <span className="font-medium">{t(activeTour.nameKey)}</span>
                 {showNumbers && (
                     <span className="text-muted-foreground">
                         {t('common.progress.step', {

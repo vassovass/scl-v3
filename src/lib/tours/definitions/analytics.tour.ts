@@ -19,7 +19,7 @@ export const analyticsTour: TourDefinition = {
     icon: '📈',
     estimatedDuration: 45, // 45 seconds
 
-    requiredPath: '/analytics',
+    requiredPath: /^\/league\/[^/]+\/analytics/,
 
     autoStart: {
         onFirstVisit: true,
@@ -54,23 +54,23 @@ export const analyticsTour: TourDefinition = {
             },
         },
         {
-            id: 'trends',
-            target: '[data-tour="analytics-trends-chart"]',
-            titleKey: 'analytics.steps.trends.title',
-            contentKey: 'analytics.steps.trends.content',
+            id: 'breakdown',
+            target: '[data-tour="analytics-breakdown"]',
+            titleKey: 'analytics.steps.breakdown.title',
+            contentKey: 'analytics.steps.breakdown.content',
             placement: 'top',
             mobile: {
-                contentKey: 'analytics.steps.trends.mobile.content',
+                contentKey: 'analytics.steps.breakdown.mobile.content',
             },
         },
         {
-            id: 'personal-best',
-            target: '[data-tour="analytics-personal-bests"]',
-            titleKey: 'analytics.steps.personalBest.title',
-            contentKey: 'analytics.steps.personalBest.content',
+            id: 'personal-stats',
+            target: '[data-tour="analytics-personal-stats"]',
+            titleKey: 'analytics.steps.personalStats.title',
+            contentKey: 'analytics.steps.personalStats.content',
             placement: 'left',
             mobile: {
-                contentKey: 'analytics.steps.personalBest.mobile.content',
+                contentKey: 'analytics.steps.personalStats.mobile.content',
                 placement: 'top',
             },
         },

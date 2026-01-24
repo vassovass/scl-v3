@@ -19,7 +19,7 @@ export const leaderboardTour: TourDefinition = {
     icon: '📊',
     estimatedDuration: 60, // 1 minute
 
-    requiredPath: '/leaderboard',
+    requiredPath: /^\/league\/[^/]+\/leaderboard/,
 
     autoStart: {
         onFirstVisit: true,
@@ -45,7 +45,7 @@ export const leaderboardTour: TourDefinition = {
         },
         {
             id: 'time-filters',
-            target: '[data-tour="leaderboard-time-filter"]',
+            target: '[data-tour="leaderboard-period"]',
             titleKey: 'leaderboard.steps.timeFilters.title',
             contentKey: 'leaderboard.steps.timeFilters.content',
             placement: 'bottom',
@@ -56,15 +56,15 @@ export const leaderboardTour: TourDefinition = {
             },
         },
         {
-            id: 'league-filter',
-            target: '[data-tour="leaderboard-league-filter"]',
-            titleKey: 'leaderboard.steps.leagueFilter.title',
-            contentKey: 'leaderboard.steps.leagueFilter.content',
+            id: 'filters',
+            target: '[data-tour="leaderboard-filters"]',
+            titleKey: 'leaderboard.steps.filters.title',
+            contentKey: 'leaderboard.steps.filters.content',
             placement: 'bottom',
             spotlightClicks: true,
             disableOverlay: true,
             mobile: {
-                contentKey: 'leaderboard.steps.leagueFilter.mobile.content',
+                contentKey: 'leaderboard.steps.filters.mobile.content',
             },
         },
         {

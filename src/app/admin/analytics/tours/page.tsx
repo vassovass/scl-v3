@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { KPICard, TourCompletionChart, TourFeedbackSummary, StepDropoffFunnel } from "@/components/admin/analytics";
+import { FormSelect } from "@/components/ui/form-fields";
 import { BarChart3, CheckCircle, XCircle, MessageSquare } from "lucide-react";
 
 /**
@@ -88,7 +89,7 @@ export default function TourAnalyticsPage() {
     return (
         <div className="space-y-6">
             {/* KPI Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4" data-tour="admin-analytics-kpis">
                 <KPICard
                     label="Total Starts"
                     value={loading ? "—" : (data?.totalStarts || 0)}
@@ -126,16 +127,20 @@ export default function TourAnalyticsPage() {
             {/* Charts Grid */}
             <div className="grid md:grid-cols-2 gap-6">
                 {/* Tour Completion Rates */}
-                <TourCompletionChart
-                    data={data?.tourStats || []}
-                    loading={loading}
-                />
+                <div data-tour="admin-analytics-completion">
+                    <TourCompletionChart
+                        data={data?.tourStats || []}
+                        loading={loading}
+                    />
+                </div>
 
                 {/* Feedback Summary */}
-                <TourFeedbackSummary
-                    data={data?.feedbackSummary || null}
-                    loading={loading}
-                />
+                <div data-tour="admin-analytics-feedback">
+                    <TourFeedbackSummary
+                        data={data?.feedbackSummary || null}
+                        loading={loading}
+                    />
+                </div>
             </div>
 
             {/* Step Drop-off Section */}
@@ -143,7 +148,8 @@ export default function TourAnalyticsPage() {
                 <div>
                     <div className="flex items-center gap-4 mb-4">
                         <h3 className="font-medium">Step Drop-off Analysis</h3>
-                        <select
+                        <FormSelect
+                            fieldName="tour-selection"
                             value={selectedTour || ""}
                             onChange={(e) => setSelectedTour(e.target.value)}
                             className="text-sm border rounded px-2 py-1 bg-background"
@@ -153,15 +159,17 @@ export default function TourAnalyticsPage() {
                                     {tour.tourId}
                                 </option>
                             ))}
-                        </select>
+                        </FormSelect>
                     </div>
 
                     {selectedTour && (
-                        <StepDropoffFunnel
-                            data={data.stepDropoff}
-                            tourId={selectedTour}
-                            loading={loading}
-                        />
+                        <div data-tour="admin-analytics-dropoff">
+                            <StepDropoffFunnel
+                                data={data.stepDropoff}
+                                tourId={selectedTour}
+                                loading={loading}
+                            />
+                        </div>
                     )}
                 </div>
             )}

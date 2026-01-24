@@ -233,11 +233,13 @@ export const HELP_MENU: MenuDefinition = {
             label: 'Guided Tours',
             icon: '🎓',
             children: [
-                { id: 'tour-navigation', label: 'Navigation & Menus', href: '#tour-navigation', icon: '🧭', description: '~30s', onClick: 'startTour' },
-                { id: 'tour-new-user', label: 'Dashboard Basics', href: '#tour-new-user', icon: '🏠', description: '~30s', onClick: 'startTour' },
-                { id: 'tour-member', label: 'How to Submit Steps', href: '#tour-member', icon: '📝', description: '~1m', onClick: 'startTour' },
-                { id: 'tour-leaderboard', label: 'Leaderboard & Filters', href: '#tour-leaderboard', icon: '🏆', description: '~30s', onClick: 'startTour', requiresLeague: true },
-                { id: 'tour-admin', label: 'League Owner Guide', href: '#tour-admin', icon: '👑', description: '~30s', onClick: 'startTour', visibleTo: ['admin', 'owner', 'superadmin'], requiresLeague: true },
+                { id: 'tour-dashboard', label: 'Dashboard Tour', href: '#tour-dashboard-v1', icon: '🏠', description: '~2m', onClick: 'startTour' },
+                { id: 'tour-league-create', label: 'Create a League', href: '#tour-league-v1', icon: '🏆', description: '~1m', onClick: 'startTour' },
+                { id: 'tour-submit-steps', label: 'Submit Steps', href: '#tour-submit-steps-v1', icon: '📝', description: '~2m', onClick: 'startTour' },
+                { id: 'tour-leaderboard', label: 'Leaderboard Tour', href: '#tour-leaderboard-v1', icon: '📊', description: '~1m', onClick: 'startTour', requiresLeague: true },
+                { id: 'tour-analytics', label: 'Analytics Tour', href: '#tour-analytics-v1', icon: '📈', description: '~1m', onClick: 'startTour', requiresLeague: true },
+                { id: 'tour-settings', label: 'Settings Tour', href: '#tour-settings-v1', icon: '⚙️', description: '~1m', onClick: 'startTour' },
+                { id: 'tour-admin', label: 'Admin Analytics Tour', href: '#tour-admin-v1', icon: '🛡️', description: '~1m', onClick: 'startTour', visibleTo: ['admin', 'owner', 'superadmin'] },
             ]
         },
         { id: 'feedback', label: 'Send Feedback', href: '/feedback', icon: '💬' },
@@ -481,5 +483,4 @@ export function getMenuConfig(location: MenuLocation): MenuLocationConfig {
 export const LEAGUE_MENU_ITEMS = MAIN_MENU.items.find(i => i.id === 'league')?.children ?? [];
 export const ACTIONS_MENU_ITEMS = MAIN_MENU.items.find(i => i.id === 'actions')?.children ?? [];
 export const FOOTER_LINKS = [...FOOTER_LEGAL.items, { id: 'roadmap', label: 'Roadmap', href: '/roadmap', icon: '🗺️' }];
-
 

@@ -99,6 +99,7 @@
 ## Completed
 *Recently shipped features*
 
+- [x] PRD 50 tour system hardening (aligned targets, analytics fixes, admin analytics updates, feedback dialog polish)
 - [x] PRD 42 component test coverage for key UI (High Five, Submission Form, Cookie Consent, Profile Switcher, Kanban)
 - [x] SuperAdmin theme mode controls (default + allowed modes)
 - [x] Theme toggle shows "coming soon" hints for disabled modes
@@ -126,4 +127,4 @@
 
 ---
 
-*Last updated: 2026-01-18*
+*Last updated: 2026-01-24*

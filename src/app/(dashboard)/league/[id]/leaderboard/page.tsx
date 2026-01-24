@@ -271,7 +271,7 @@ function LeaderboardContent() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="border-b border-border bg-card/30">
+      <div className="border-b border-border bg-card/30" data-tour="leaderboard-header">
         <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
           <h1 className="text-xl font-bold text-foreground">Leaderboard</h1>
           <Link href={`/league/${leagueId}`} className="text-sm text-muted-foreground hover:text-foreground">
@@ -282,7 +282,7 @@ function LeaderboardContent() {
 
       {/* Period Selection */}
       <ModuleFeedback moduleId="leaderboard-period" moduleName="Period Selector" className="w-full">
-        <div className="border-b border-border bg-card/20">
+        <div className="border-b border-border bg-card/20" data-tour="leaderboard-period">
           <div className="mx-auto max-w-3xl px-6 py-4">
             <div className="flex flex-wrap items-center gap-3">
               <label className="text-sm text-muted-foreground">Period:</label>
@@ -469,6 +469,7 @@ function LeaderboardContent() {
                     <tr
                       key={entry.user_id}
                       className={`hover:bg-card/50 ${entry.user_id === session?.user?.id ? "bg-primary/10" : ""}`}
+                      data-tour={entry.user_id === session?.user?.id ? "leaderboard-current-user" : undefined}
                     >
                       <td className="px-3 py-3">
                         <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${entry.rank === 1 ? "bg-[hsl(var(--warning)/0.2)] text-[hsl(var(--warning))]" :
@@ -542,7 +543,7 @@ function LeaderboardContent() {
                       </td>
                       <td className="px-3 py-3 text-center">
                         {entry.user_id !== session?.user?.id && (
-                          <div className="flex justify-center">
+                          <div className="flex justify-center" data-tour="high-five-button">
                             <HighFiveButton
                               recipientId={entry.user_id}
                               initialCount={entry.high_five_count || 0}

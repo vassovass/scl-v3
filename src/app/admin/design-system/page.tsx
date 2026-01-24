@@ -782,9 +782,9 @@ export default function DesignSystemPage() {
                                     <p className="text-xs text-slate-600 mt-1">providers/AuthProvider.tsx</p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <code className="text-primary">OnboardingProvider</code>
-                                    <p className="text-xs text-slate-500 mt-1">Guided tour system with role-based steps</p>
-                                    <p className="text-xs text-slate-600 mt-1">providers/OnboardingProvider.tsx</p>
+                                    <code className="text-primary">TourProvider</code>
+                                    <p className="text-xs text-slate-500 mt-1">Modular guided tour system with analytics</p>
+                                    <p className="text-xs text-slate-600 mt-1">components/tours/TourProvider.tsx</p>
                                 </div>
                             </div>
                         </div>
@@ -1135,4 +1135,3 @@ toast({ title: "Warning", description: "Check input", variant: "destructive" });
         </main >
     );
 }
-

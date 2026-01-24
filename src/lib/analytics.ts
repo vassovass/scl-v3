@@ -19,6 +19,7 @@
  */
 
 import { posthogCapture, posthogIdentify, posthogReset } from '@/components/analytics/PostHogProvider';
+import { dispatchValidationEvent } from '@/lib/tours/validation';
 
 declare global {
     interface Window {
@@ -77,6 +78,9 @@ export function trackEvent(
 
     // Push to PostHog SDK (session replay, funnels, feature flags)
     posthogCapture(eventName, cleanParams as Record<string, string | number | boolean | null | undefined>);
+
+    // Notify tour validation listeners (used for interactive steps)
+    dispatchValidationEvent(eventName);
 
     // Debug in development
     if (process.env.NODE_ENV === 'development') {
@@ -657,4 +661,3 @@ export const analytics = {
         },
     },
 };
-

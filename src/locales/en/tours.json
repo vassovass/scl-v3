@@ -33,6 +33,13 @@
                     "content": "Active leagues and standings."
                 }
             },
+            "joinLeague": {
+                "title": "Join a League",
+                "content": "Join an existing league using an invite code from a friend or coworker.",
+                "mobile": {
+                    "content": "Join with an invite code."
+                }
+            },
             "submitButton": {
                 "title": "Submit Steps",
                 "content": "Click here to submit your daily steps. You can connect Apple Health, Google Fit, or enter manually.",
@@ -59,6 +66,13 @@
                 "content": "Start your own league to compete with friends, family, or coworkers. You can make it public or invite-only.",
                 "mobile": {
                     "content": "Start a private competition."
+                }
+            },
+            "actionsMenu": {
+                "title": "Quick Actions",
+                "content": "Use the Actions menu to submit steps, create leagues, or join competitions from anywhere.",
+                "mobile": {
+                    "content": "Quick actions live here."
                 }
             },
             "helpMenu": {
@@ -111,6 +125,13 @@
                     "content": "Public or invite-only?"
                 }
             },
+            "weekStart": {
+                "title": "Week Start",
+                "content": "Choose when weekly leaderboards reset (Monday is recommended for consistency).",
+                "mobile": {
+                    "content": "Choose the reset day."
+                }
+            },
             "inviteMembers": {
                 "title": "Invite Members",
                 "content": "Share the invite link with friends. They can join with one click!",
@@ -135,9 +156,30 @@
         "steps": {
             "intro": {
                 "title": "Submitting Your Steps",
-                "content": "There are three easy ways to submit your daily steps. Let's explore them!",
+                "content": "Let's walk through the step submission form so you can log your activity quickly.",
                 "mobile": {
-                    "content": "Three ways to submit steps."
+                    "content": "Quick submission walkthrough."
+                }
+            },
+            "datePicker": {
+                "title": "Pick a Date",
+                "content": "Choose which day you're submitting steps for, including past dates if needed.",
+                "mobile": {
+                    "content": "Select the submission date."
+                }
+            },
+            "stepsInput": {
+                "title": "Enter Steps",
+                "content": "Type the number of steps shown on your tracker or screenshot.",
+                "mobile": {
+                    "content": "Enter your step count."
+                }
+            },
+            "screenshotUpload": {
+                "title": "Upload Proof",
+                "content": "Add a screenshot for verification so your steps count toward verified rankings.",
+                "mobile": {
+                    "content": "Upload a screenshot."
                 }
             },
             "appleHealth": {
@@ -204,11 +246,11 @@
                     "content": "Filter by time period."
                 }
             },
-            "leagueFilter": {
-                "title": "League Filter",
-                "content": "Filter by specific league to see just that competition's standings.",
+            "filters": {
+                "title": "Sort & Verify Filters",
+                "content": "Sort by steps or streaks and filter verified vs unverified entries for clearer rankings.",
                 "mobile": {
-                    "content": "View by league."
+                    "content": "Sort and filter results."
                 }
             },
             "yourPosition": {
@@ -247,18 +289,18 @@
                     "content": "Visual activity patterns."
                 }
             },
-            "trends": {
-                "title": "Trend Charts",
-                "content": "Track your progress over time with weekly and monthly trend lines.",
+            "breakdown": {
+                "title": "Daily Breakdown",
+                "content": "Review detailed daily submissions to spot gaps and plan future goals.",
                 "mobile": {
-                    "content": "Progress over time."
+                    "content": "Daily submission details."
                 }
             },
-            "personalBest": {
-                "title": "Personal Bests",
-                "content": "Celebrate your achievements! See your highest step days and longest streaks.",
+            "personalStats": {
+                "title": "Personal Records",
+                "content": "Track your best streaks and personal highs to stay motivated.",
                 "mobile": {
-                    "content": "Your top achievements."
+                    "content": "Your personal records."
                 }
             }
         }
@@ -276,32 +318,25 @@
                     "content": "Customize your identity."
                 }
             },
-            "fitnessConnect": {
-                "title": "Fitness Connections",
-                "content": "Connect Apple Health, Google Fit, or other fitness platforms for automatic syncing.",
+            "displayName": {
+                "title": "Display Name",
+                "content": "Your display name shows up on leaderboards and league cards.",
                 "mobile": {
-                    "content": "Connect trackers."
+                    "content": "Set how others see you."
                 }
             },
-            "notifications": {
-                "title": "Notifications",
-                "content": "Choose when to receive reminders and updates about your leagues.",
+            "navigation": {
+                "title": "Settings Tabs",
+                "content": "Use these tabs to switch between profile, preferences, and proxy settings.",
                 "mobile": {
-                    "content": "Manage alerts."
+                    "content": "Switch settings tabs."
                 }
             },
-            "privacy": {
-                "title": "Privacy Settings",
-                "content": "Control who can see your step data and league memberships.",
+            "save": {
+                "title": "Save Changes",
+                "content": "Save updates to keep your profile information current.",
                 "mobile": {
-                    "content": "Control visibility."
-                }
-            },
-            "preferences": {
-                "title": "Preferences",
-                "content": "Set your timezone, units (miles/km), and theme preferences.",
-                "mobile": {
-                    "content": "Units and display."
+                    "content": "Save your updates."
                 }
             }
         }
@@ -313,38 +348,38 @@
         },
         "steps": {
             "intro": {
-                "title": "Admin Dashboard",
-                "content": "Manage your leagues, members, and settings from this central hub.",
+                "title": "Admin Analytics",
+                "content": "Review how tours perform across the platform from this dashboard.",
                 "mobile": {
-                    "content": "League management hub."
+                    "content": "Tour analytics hub."
                 }
             },
-            "members": {
-                "title": "Member Management",
-                "content": "View, approve, or remove members from your leagues.",
+            "kpis": {
+                "title": "Tour KPIs",
+                "content": "Track starts, completions, and feedback volume to gauge tour performance.",
                 "mobile": {
-                    "content": "Manage members."
+                    "content": "Key tour metrics."
                 }
             },
-            "moderation": {
-                "title": "Moderation Tools",
-                "content": "Review flagged submissions and maintain fair competition.",
+            "completion": {
+                "title": "Completion Rates",
+                "content": "Identify which tours users complete most often and which need improvement.",
                 "mobile": {
-                    "content": "Review submissions."
+                    "content": "Completion insights."
                 }
             },
-            "leagueSettings": {
-                "title": "League Settings",
-                "content": "Update league rules, privacy, and competition parameters.",
+            "feedback": {
+                "title": "Feedback Summary",
+                "content": "Review ratings to understand which tours feel helpful or confusing.",
                 "mobile": {
-                    "content": "Edit league rules."
+                    "content": "Feedback trends."
                 }
             },
-            "analytics": {
-                "title": "League Analytics",
-                "content": "See engagement metrics and participation trends for your leagues.",
+            "dropoff": {
+                "title": "Drop-off Funnel",
+                "content": "See where users abandon tours so you can refine specific steps.",
                 "mobile": {
-                    "content": "Engagement stats."
+                    "content": "Drop-off points."
                 }
             }
         }
@@ -354,8 +389,12 @@
             "next": "Next",
             "previous": "Back",
             "skip": "Skip Tour",
+            "takeTour": "Take Tour",
             "finish": "Finish",
             "close": "Close"
+        },
+        "labels": {
+            "completed": "✓ Completed"
         },
         "progress": {
             "step": "Step {{current}} of {{total}}",
@@ -363,8 +402,12 @@
         },
         "feedback": {
             "title": "How was this tour?",
+            "description": "Your feedback helps us improve the tour experience.",
             "rating": "Rate your experience",
             "comment": "Any suggestions?",
+            "placeholder": "What could be improved?",
+            "skip": "Skip",
+            "submitting": "Submitting...",
             "submit": "Submit Feedback",
             "thankYou": "Thank you for your feedback!"
         }

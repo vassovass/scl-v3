@@ -89,13 +89,7 @@ CREATE POLICY "Users can view own tour completions" ON tour_completions
 
 CREATE POLICY "Admins can view all tour completions" ON tour_completions
     FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM profiles 
-            WHERE profiles.id = auth.uid() 
-            AND profiles.role = 'admin'
-        )
-    );
+    USING (is_superadmin() = true);
 
 -- Tour Step Interactions: Same pattern
 CREATE POLICY "Users can insert own step interactions" ON tour_step_interactions
@@ -108,13 +102,7 @@ CREATE POLICY "Users can view own step interactions" ON tour_step_interactions
 
 CREATE POLICY "Admins can view all step interactions" ON tour_step_interactions
     FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM profiles 
-            WHERE profiles.id = auth.uid() 
-            AND profiles.role = 'admin'
-        )
-    );
+    USING (is_superadmin() = true);
 
 -- Tour Feedback: Same pattern
 CREATE POLICY "Users can insert own feedback" ON tour_feedback
@@ -127,13 +115,7 @@ CREATE POLICY "Users can view own feedback" ON tour_feedback
 
 CREATE POLICY "Admins can view all feedback" ON tour_feedback
     FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM profiles 
-            WHERE profiles.id = auth.uid() 
-            AND profiles.role = 'admin'
-        )
-    );
+    USING (is_superadmin() = true);
 
 -- ─────────────────────────────────────────────
 -- Comments for documentation

@@ -28,7 +28,10 @@ export default function LeagueAnalyticsPage() {
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
-            <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-20">
+            <header
+                className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-20"
+                data-tour="analytics-header"
+            >
                 <ModuleFeedback moduleId="analytics-header" moduleName="Page Filters">
                     <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6 sm:py-4">
                         {/* Mobile: Stack vertically, Desktop: Single row */}
@@ -82,7 +85,7 @@ export default function LeagueAnalyticsPage() {
 
                 {/* Personal Stats */}
                 <ModuleFeedback moduleId="personal-stats" moduleName="Personal Records">
-                    <section className="mb-8">
+                    <section className="mb-8" data-tour="analytics-personal-stats">
                         <h2 className="text-sm font-medium text-muted-foreground mb-3">🏆 Your Records</h2>
                         <PersonalStatsCard />
                     </section>
@@ -90,7 +93,7 @@ export default function LeagueAnalyticsPage() {
                 {/* Calendar View */}
                 {(viewMode === "both" || viewMode === "calendar") && (
                     <ModuleFeedback moduleId="analytics-calendar" moduleName="Calendar Heatmap">
-                        <section className="mb-6">
+                        <section className="mb-6" data-tour="analytics-heatmap">
                             <h2 className="text-sm font-medium text-muted-foreground mb-3">📅 Submission Calendar</h2>
                             <CalendarHeatmap
                                 leagueId={leagueId}
@@ -161,7 +164,7 @@ export default function LeagueAnalyticsPage() {
                 {/* Daily Breakdown Table */}
                 {(viewMode === "both" || viewMode === "table") && (
                     <ModuleFeedback moduleId="analytics-breakdown" moduleName="Daily Breakdown Table">
-                        <section>
+                        <section data-tour="analytics-breakdown">
                             <h2 className="text-sm font-medium text-muted-foreground mb-3">📋 Daily Breakdown</h2>
                             <DailyBreakdownTable leagueId={leagueId} />
                         </section>

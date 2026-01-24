@@ -23,7 +23,7 @@ export default function AnalyticsLayout({
     return (
         <div className="container mx-auto py-6 px-4 space-y-6">
             <div className="flex flex-col gap-4">
-                <div>
+                <div data-tour="admin-analytics-header">
                     <h1 className="text-2xl font-bold">Analytics Dashboard</h1>
                     <p className="text-muted-foreground text-sm">
                         Monitor platform performance, user engagement, and tour effectiveness
