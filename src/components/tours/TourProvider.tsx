@@ -271,6 +271,7 @@ export function TourProvider({
     const stepStartTime = useRef<number>(0);
     const tourStateRef = useRef<TourState>(DEFAULT_TOUR_STATE);
     const trackedTourStartRef = useRef<string | null>(null);
+    const startTourRef = useRef<((tourId: string) => void) | null>(null);
 
     // ─────────────────────────────────────────────────────────────────────────
     // Initialization
@@ -313,8 +314,8 @@ export function TourProvider({
             const hash = window.location.hash;
             if (hash.startsWith('#tour-')) {
                 const tour = getTourByHash(hash);
-                if (tour) {
-                    startTour(tour.id);
+                if (tour && startTourRef.current) {
+                    startTourRef.current(tour.id);
                     // Remove hash after starting
                     window.history.replaceState(
                         null,
@@ -534,6 +535,11 @@ export function TourProvider({
         },
         [userRole, userId, pathname]
     );
+
+    // Keep ref in sync with latest startTour function
+    useEffect(() => {
+        startTourRef.current = startTour;
+    }, [startTour]);
 
     const startContextualTour = useCallback(() => {
         const pathTours = getToursForPath(pathname);

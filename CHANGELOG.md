@@ -57,7 +57,7 @@ All notable changes to StepLeague v3.
 - **Tour Analytics Pipeline** - Integrated PostHog event capture, corrected GA4 payload fields, and fixed admin analytics aggregation to match Supabase schema.
 - **Admin Analytics Security** - Switched tour analytics API to `withApiHandler` + admin client and updated RLS policies to use `is_superadmin()`.
 - **Tour UX Quality** - Added mobile content constraints, feature flag filtering, feedback dialog i18n, and reliable hash-based tour launches via the Help menu.
-- **Tour Path Validation** - Added `requiredPath` validation to `startTour()` function in TourProvider to prevent tours from starting on incorrect pages when launched via hash from help menu. Tours now correctly validate they're on the required page before starting, preventing silent failures and misaligned tooltips.
+- **Tour Path Validation & Stale Closure Fix** - Fixed critical tour launching issues: (1) Added `requiredPath` validation to `startTour()` function to prevent tours from starting on incorrect pages, (2) Fixed stale closure bug in hash handler by using a ref to always call the latest `startTour` function. Tours now correctly validate they're on the required page and properly start when launched via hash from help menu, preventing silent failures and misaligned tooltips.
 
 ### Removed
 
