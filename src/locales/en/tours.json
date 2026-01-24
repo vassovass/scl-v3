@@ -1,0 +1,372 @@
+{
+    "dashboard": {
+        "meta": {
+            "name": "Dashboard Tour",
+            "description": "Learn your way around StepLeague"
+        },
+        "steps": {
+            "welcome": {
+                "title": "Welcome to StepLeague! 🎉",
+                "content": "Let's take a quick tour to help you get started with tracking steps and competing with friends.",
+                "mobile": {
+                    "content": "Quick tour to get you started!"
+                }
+            },
+            "stepCounter": {
+                "title": "Your Step Counter",
+                "content": "This shows your current daily steps. It updates in real-time when you sync your fitness tracker.",
+                "mobile": {
+                    "content": "Your daily steps, updated live."
+                }
+            },
+            "streak": {
+                "title": "Daily Streak 🔥",
+                "content": "Keep your streak alive by submitting steps every day. The longer your streak, the more bragging rights!",
+                "mobile": {
+                    "content": "Submit daily to keep your streak!"
+                }
+            },
+            "leagues": {
+                "title": "Your Leagues",
+                "content": "See all the leagues you're part of. You're automatically enrolled in the World League where everyone competes!",
+                "mobile": {
+                    "content": "Active leagues and standings."
+                }
+            },
+            "submitButton": {
+                "title": "Submit Steps",
+                "content": "Click here to submit your daily steps. You can connect Apple Health, Google Fit, or enter manually.",
+                "mobile": {
+                    "content": "Submit steps here."
+                }
+            },
+            "leaderboard": {
+                "title": "Leaderboard",
+                "content": "Check how you rank against others. Filter by day, week, or month to see different competitions.",
+                "mobile": {
+                    "content": "See standings and rankings."
+                }
+            },
+            "analytics": {
+                "title": "Your Analytics",
+                "content": "Track your progress with detailed charts and heatmaps. See patterns in your step activity.",
+                "mobile": {
+                    "content": "Charts and progress tracking."
+                }
+            },
+            "createLeague": {
+                "title": "Create a League",
+                "content": "Start your own league to compete with friends, family, or coworkers. You can make it public or invite-only.",
+                "mobile": {
+                    "content": "Start a private competition."
+                }
+            },
+            "helpMenu": {
+                "title": "Need Help?",
+                "content": "You can restart any tour from the Help menu. We also have support and FAQ available.",
+                "mobile": {
+                    "content": "Tours and support here."
+                }
+            },
+            "settings": {
+                "title": "Settings",
+                "content": "Customize your profile, connect fitness trackers, and manage notifications.",
+                "mobile": {
+                    "content": "Profile and preferences."
+                }
+            },
+            "complete": {
+                "title": "You're All Set! 🚀",
+                "content": "You're ready to start your step journey. Good luck, and may your step count be high!",
+                "mobile": {
+                    "content": "Ready to start!"
+                }
+            }
+        }
+    },
+    "league": {
+        "meta": {
+            "name": "Create a League",
+            "description": "Set up your first league"
+        },
+        "steps": {
+            "intro": {
+                "title": "Create Your First League",
+                "content": "Leagues are where the competition happens! Let's set up your first league.",
+                "mobile": {
+                    "content": "Create your first competition."
+                }
+            },
+            "nameField": {
+                "title": "League Name",
+                "content": "Choose a memorable name for your league. This is how others will find it.",
+                "mobile": {
+                    "content": "Give your league a name."
+                }
+            },
+            "privacySetting": {
+                "title": "Privacy Settings",
+                "content": "Public leagues can be joined by anyone. Private leagues require an invite code.",
+                "mobile": {
+                    "content": "Public or invite-only?"
+                }
+            },
+            "inviteMembers": {
+                "title": "Invite Members",
+                "content": "Share the invite link with friends. They can join with one click!",
+                "mobile": {
+                    "content": "Share link to invite."
+                }
+            },
+            "createButton": {
+                "title": "Create League",
+                "content": "Click here when you're ready to create your league and start competing!",
+                "mobile": {
+                    "content": "Click to create!"
+                }
+            }
+        }
+    },
+    "submit": {
+        "meta": {
+            "name": "Submit Steps",
+            "description": "Learn the three ways to submit"
+        },
+        "steps": {
+            "intro": {
+                "title": "Submitting Your Steps",
+                "content": "There are three easy ways to submit your daily steps. Let's explore them!",
+                "mobile": {
+                    "content": "Three ways to submit steps."
+                }
+            },
+            "appleHealth": {
+                "title": "Apple Health",
+                "content": "Connect Apple Health for automatic syncing. Your steps will be imported directly from your iPhone or Apple Watch.",
+                "mobile": {
+                    "content": "Auto-sync from iPhone/Watch."
+                }
+            },
+            "googleFit": {
+                "title": "Google Fit",
+                "content": "Connect Google Fit to sync steps from Android devices or Wear OS watches.",
+                "mobile": {
+                    "content": "Auto-sync from Android."
+                }
+            },
+            "manualEntry": {
+                "title": "Manual Entry",
+                "content": "No fitness tracker? No problem! Enter your steps manually from any source.",
+                "mobile": {
+                    "content": "Type steps manually."
+                }
+            },
+            "photoProof": {
+                "title": "Photo Verification",
+                "content": "For accuracy, you can upload a screenshot of your step count as proof.",
+                "mobile": {
+                    "content": "Optional photo proof."
+                }
+            },
+            "submitButton": {
+                "title": "Submit Now",
+                "content": "After entering your steps, click Submit to record them for today!",
+                "mobile": {
+                    "content": "Submit your entry."
+                }
+            },
+            "confirmation": {
+                "title": "Submission Confirmed!",
+                "content": "Your steps are now recorded. Check the leaderboard to see where you rank!",
+                "mobile": {
+                    "content": "Steps recorded!"
+                }
+            }
+        }
+    },
+    "leaderboard": {
+        "meta": {
+            "name": "Leaderboard",
+            "description": "Understanding rankings"
+        },
+        "steps": {
+            "intro": {
+                "title": "The Leaderboard",
+                "content": "This is where you see how you stack up against the competition!",
+                "mobile": {
+                    "content": "See your rankings."
+                }
+            },
+            "timeFilters": {
+                "title": "Time Filters",
+                "content": "Switch between daily, weekly, and monthly views to see different competition periods.",
+                "mobile": {
+                    "content": "Filter by time period."
+                }
+            },
+            "leagueFilter": {
+                "title": "League Filter",
+                "content": "Filter by specific league to see just that competition's standings.",
+                "mobile": {
+                    "content": "View by league."
+                }
+            },
+            "yourPosition": {
+                "title": "Your Position",
+                "content": "Your row is highlighted so you can quickly find yourself in the rankings.",
+                "mobile": {
+                    "content": "Find yourself quickly."
+                }
+            },
+            "highFive": {
+                "title": "High Fives 👋",
+                "content": "Give high fives to motivate other participants. Spread the encouragement!",
+                "mobile": {
+                    "content": "Encourage others!"
+                }
+            }
+        }
+    },
+    "analytics": {
+        "meta": {
+            "name": "Analytics",
+            "description": "Your personal stats"
+        },
+        "steps": {
+            "intro": {
+                "title": "Your Analytics Dashboard",
+                "content": "Dive deep into your step data with charts, trends, and insights.",
+                "mobile": {
+                    "content": "Charts and insights."
+                }
+            },
+            "heatmap": {
+                "title": "Activity Heatmap",
+                "content": "See your activity patterns at a glance. Darker colors mean more steps on that day.",
+                "mobile": {
+                    "content": "Visual activity patterns."
+                }
+            },
+            "trends": {
+                "title": "Trend Charts",
+                "content": "Track your progress over time with weekly and monthly trend lines.",
+                "mobile": {
+                    "content": "Progress over time."
+                }
+            },
+            "personalBest": {
+                "title": "Personal Bests",
+                "content": "Celebrate your achievements! See your highest step days and longest streaks.",
+                "mobile": {
+                    "content": "Your top achievements."
+                }
+            }
+        }
+    },
+    "settings": {
+        "meta": {
+            "name": "Settings",
+            "description": "Customize your experience"
+        },
+        "steps": {
+            "profile": {
+                "title": "Your Profile",
+                "content": "Set your display name, avatar, and bio. This is how others see you.",
+                "mobile": {
+                    "content": "Customize your identity."
+                }
+            },
+            "fitnessConnect": {
+                "title": "Fitness Connections",
+                "content": "Connect Apple Health, Google Fit, or other fitness platforms for automatic syncing.",
+                "mobile": {
+                    "content": "Connect trackers."
+                }
+            },
+            "notifications": {
+                "title": "Notifications",
+                "content": "Choose when to receive reminders and updates about your leagues.",
+                "mobile": {
+                    "content": "Manage alerts."
+                }
+            },
+            "privacy": {
+                "title": "Privacy Settings",
+                "content": "Control who can see your step data and league memberships.",
+                "mobile": {
+                    "content": "Control visibility."
+                }
+            },
+            "preferences": {
+                "title": "Preferences",
+                "content": "Set your timezone, units (miles/km), and theme preferences.",
+                "mobile": {
+                    "content": "Units and display."
+                }
+            }
+        }
+    },
+    "admin": {
+        "meta": {
+            "name": "Admin Panel",
+            "description": "League management tools"
+        },
+        "steps": {
+            "intro": {
+                "title": "Admin Dashboard",
+                "content": "Manage your leagues, members, and settings from this central hub.",
+                "mobile": {
+                    "content": "League management hub."
+                }
+            },
+            "members": {
+                "title": "Member Management",
+                "content": "View, approve, or remove members from your leagues.",
+                "mobile": {
+                    "content": "Manage members."
+                }
+            },
+            "moderation": {
+                "title": "Moderation Tools",
+                "content": "Review flagged submissions and maintain fair competition.",
+                "mobile": {
+                    "content": "Review submissions."
+                }
+            },
+            "leagueSettings": {
+                "title": "League Settings",
+                "content": "Update league rules, privacy, and competition parameters.",
+                "mobile": {
+                    "content": "Edit league rules."
+                }
+            },
+            "analytics": {
+                "title": "League Analytics",
+                "content": "See engagement metrics and participation trends for your leagues.",
+                "mobile": {
+                    "content": "Engagement stats."
+                }
+            }
+        }
+    },
+    "common": {
+        "buttons": {
+            "next": "Next",
+            "previous": "Back",
+            "skip": "Skip Tour",
+            "finish": "Finish",
+            "close": "Close"
+        },
+        "progress": {
+            "step": "Step {{current}} of {{total}}",
+            "estimatedTime": "About {{minutes}} min"
+        },
+        "feedback": {
+            "title": "How was this tour?",
+            "rating": "Rate your experience",
+            "comment": "Any suggestions?",
+            "submit": "Submit Feedback",
+            "thankYou": "Thank you for your feedback!"
+        }
+    }
+}
