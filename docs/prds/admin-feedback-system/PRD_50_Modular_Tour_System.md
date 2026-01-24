@@ -18,7 +18,9 @@ Complete **ground-up rebuild** of StepLeague's onboarding tour system with:
 - 🧪 **A/B testing** ready with PostHog integration
 - 🌐 **i18n support** with react-i18next
 - 🎨 **Interactive tours** - users can explore while learning
-- 📊 **12 proactive future-proofing items**
+- 📊 **Comprehensive analytics** - PostHog MCP, GTM MCP, Supabase MCP (automatic tracking)
+- 🔍 **Retention analysis** - conversion rates, cohort comparison, drop-off heatmaps
+- 📈 **12 proactive future-proofing items**
 
 This PRD follows StepLeague's architecture philosophy: **modular over monolithic, future-thinking, defensive programming**.
 
@@ -2958,11 +2960,21 @@ const generateTourFromComponent = async (componentPath: string) => {
    - [ ] POST to `/api/feedback/module` with `tour-${tourId}`
    - [ ] Validate: Works in both light AND dark mode
 
-4. **Implement analytics tracking hooks**
-   - [ ] File: `src/lib/tours/analytics.ts`
-   - [ ] Track: tour_started, tour_completed, tour_skipped, step_completed
-   - [ ] Integrate with PostHog: `posthog.capture('tour_started', { tour_id, variant })`
-   - [ ] Validate: Events appear in PostHog dashboard
+4. **Implement comprehensive analytics tracking (ALL 3 MCPs)**
+   - [ ] File: `src/lib/tours/analytics.ts` (PostHog MCP - PRIMARY)
+     - [ ] Track 10 events: tour_started, step_viewed, step_completed, tour_completed, tour_skipped, tour_drop_off, validation_success, validation_failure, feedback_submitted, menu_interaction
+     - [ ] Set user properties: tours_completed, total_tours_completed, completion_rate, favorite_category
+     - [ ] Create retention cohorts: completed_all_tours, completed_dashboard, skipped_all
+   - [ ] File: `src/lib/tours/gtm-integration.ts` (Google Tag Manager MCP - SECONDARY)
+     - [ ] Push to dataLayer: tour_interaction, conversion, engagement_time
+     - [ ] Configure GA4 custom dimensions: tour_id, tour_category, experiment_variant
+   - [ ] File: `src/lib/tours/supabase-sync.ts` (Supabase MCP - PERSISTENCE)
+     - [ ] Create migration for tour_completions, tour_step_interactions, tour_feedback tables
+     - [ ] Implement saveTourCompletion, saveStepInteraction, saveFeedback methods
+   - [ ] File: `src/lib/tours/unified-analytics.ts` (UNIFIED FACADE)
+     - [ ] Create UnifiedTourAnalytics class that syncs to all 3 systems
+     - [ ] Implement trackTourStart, trackTourComplete, trackStepInteraction
+   - [ ] Validate: Events appear in PostHog dashboard, GA4, and Supabase tables
 
 5. **Add CSS GPU optimizations**
    - [ ] File: `src/app/globals.css` (lines 865-868)
@@ -3564,49 +3576,57 @@ VALUES
 
 ## Files Summary
 
-### Created (20+ files)
+### Created (30+ files)
 
 **Core Infrastructure:**
 1. `src/lib/tours/types.ts` - Type definitions (TourStep, TourDefinition, TourState)
 2. `src/lib/tours/registry.ts` - Tour manifest and helper functions
-3. `src/lib/tours/analytics.ts` - PostHog analytics tracking
-4. `src/lib/tours/i18n.ts` - i18n configuration with react-i18next
-5. `src/lib/tours/migrations.ts` - Version migration logic
-6. `src/lib/tours/experiments.ts` - PostHog A/B testing integration
-7. `src/lib/tours/validation.ts` - Interactive step validation
+3. `src/lib/tours/analytics.ts` - PostHog MCP analytics tracking (10 events, user properties, cohorts)
+4. `src/lib/tours/gtm-integration.ts` - Google Tag Manager MCP integration (GA4 events)
+5. `src/lib/tours/supabase-sync.ts` - Supabase MCP persistence (completions, interactions, feedback)
+6. `src/lib/tours/unified-analytics.ts` - Unified analytics facade (syncs all 3 MCPs)
+7. `src/lib/tours/i18n.ts` - i18n configuration with react-i18next
+8. `src/lib/tours/migrations.ts` - Version migration logic
+9. `src/lib/tours/experiments.ts` - PostHog A/B testing integration
+10. `src/lib/tours/validation.ts` - Interactive step validation
 
 **Tour Definitions (7 files):**
-8. `src/lib/tours/definitions/dashboard.tour.ts` - Dashboard tour (11 steps)
-9. `src/lib/tours/definitions/league.tour.ts` - League creation (5 steps)
-10. `src/lib/tours/definitions/submit.tour.ts` - Submit steps (7 steps)
-11. `src/lib/tours/definitions/leaderboard.tour.ts` - Leaderboard (5 steps)
-12. `src/lib/tours/definitions/analytics.tour.ts` - Analytics (4 steps)
-13. `src/lib/tours/definitions/settings.tour.ts` - Settings (5 steps)
-14. `src/lib/tours/definitions/admin.tour.ts` - Admin (5 steps)
+11. `src/lib/tours/definitions/dashboard.tour.ts` - Dashboard tour (11 steps)
+12. `src/lib/tours/definitions/league.tour.ts` - League creation (5 steps)
+13. `src/lib/tours/definitions/submit.tour.ts` - Submit steps (7 steps)
+14. `src/lib/tours/definitions/leaderboard.tour.ts` - Leaderboard (5 steps)
+15. `src/lib/tours/definitions/analytics.tour.ts` - Analytics (4 steps)
+16. `src/lib/tours/definitions/settings.tour.ts` - Settings (5 steps)
+17. `src/lib/tours/definitions/admin.tour.ts` - Admin (5 steps)
 
 **Components:**
-15. `src/components/tours/TourProvider.tsx` - Optimized provider
-16. `src/components/tours/TourFeedbackDialog.tsx` - shadcn Dialog
-17. `src/components/tours/TourTrigger.tsx` - Reusable trigger button
-18. `src/components/tours/TourProgress.tsx` - Progress indicator
-19. `src/components/tours/ResponsiveTourStep.tsx` - Mobile wrapper
+18. `src/components/tours/TourProvider.tsx` - Optimized provider
+19. `src/components/tours/TourFeedbackDialog.tsx` - shadcn Dialog
+20. `src/components/tours/TourTrigger.tsx` - Reusable trigger button
+21. `src/components/tours/TourProgress.tsx` - Progress indicator
+22. `src/components/tours/ResponsiveTourStep.tsx` - Mobile wrapper
 
 **Hooks:**
-20. `src/hooks/useTour.ts` - Tour hook with analytics, i18n, experiments
+23. `src/hooks/useTour.ts` - Tour hook with analytics, i18n, experiments
 
 **Translations:**
-21. `src/locales/en/tours.json` - English translations
-22. `src/locales/es/tours.json` - Spanish translations (future)
-23. `src/locales/index.ts` - i18n setup
+24. `src/locales/en/tours.json` - English translations
+25. `src/locales/es/tours.json` - Spanish translations (future)
+26. `src/locales/index.ts` - i18n setup
+
+**Database Migrations:**
+27. `supabase/migrations/YYYYMMDD_tour_analytics_tables.sql` - tour_completions, tour_step_interactions, tour_feedback tables
 
 **Admin:**
-24. `src/app/admin/tours/page.tsx` - Analytics dashboard
+28. `src/app/admin/tours/page.tsx` - Analytics dashboard (PostHog, Supabase, GTM visualizations)
 
 **Tests:**
-25. `src/components/tours/__tests__/TourProvider.test.tsx` - Unit tests
-26. `src/components/tours/__tests__/TourFeedbackDialog.test.tsx` - Unit tests
-27. `tests/e2e/tours.spec.ts` - E2E tests (20+ test cases)
-28. `tests/visual/tours.spec.ts` - Visual regression (optional)
+29. `src/components/tours/__tests__/TourProvider.test.tsx` - Unit tests
+30. `src/components/tours/__tests__/TourFeedbackDialog.test.tsx` - Unit tests
+31. `src/lib/tours/__tests__/unified-analytics.test.tsx` - Analytics integration tests
+32. `tests/e2e/tours.spec.ts` - E2E tests (20+ test cases)
+33. `tests/e2e/tours-analytics.spec.ts` - Analytics E2E tests (verify PostHog, GA4, Supabase)
+34. `tests/visual/tours.spec.ts` - Visual regression (optional)
 
 ### Modified (6 files)
 
