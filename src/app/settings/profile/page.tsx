@@ -105,34 +105,39 @@ export default function ProfileSettingsPage() {
                 <div className="text-center py-12 text-muted-foreground">Loading...</div>
             ) : (
                 <>
-                    <SettingsSection
-                        title="Personal Information"
-                        description="Your basic profile information"
-                    >
-                        <SettingsField
-                            label="Email"
-                            type="email"
-                            value={profile.email}
-                            onChange={() => { }}
-                            disabled={true}
-                            description="Email cannot be changed"
-                        />
+                    <div data-tour="settings-profile-section">
+                        <SettingsSection
+                            title="Personal Information"
+                            description="Your basic profile information"
+                        >
+                            <SettingsField
+                                label="Email"
+                                type="email"
+                                value={profile.email}
+                                onChange={() => { }}
+                                disabled={true}
+                                description="Email cannot be changed"
+                            />
 
-                        <SettingsField
-                            label={IDENTITY_LABEL}
-                            value={profile.display_name}
-                            onChange={(value) => setProfile({ ...profile, display_name: String(value) })}
-                            placeholder={IDENTITY_PLACEHOLDER}
-                            description={IDENTITY_DESCRIPTION}
-                            maxLength={50}
-                        />
-                    </SettingsSection>
+                            <div data-tour="settings-display-name">
+                                <SettingsField
+                                    label={IDENTITY_LABEL}
+                                    value={profile.display_name}
+                                    onChange={(value) => setProfile({ ...profile, display_name: String(value) })}
+                                    placeholder={IDENTITY_PLACEHOLDER}
+                                    description={IDENTITY_DESCRIPTION}
+                                    maxLength={50}
+                                />
+                            </div>
+                        </SettingsSection>
+                    </div>
 
                     <div className="flex justify-end">
                         <Button
                             onClick={handleSave}
                             disabled={saving}
                             size="lg"
+                            data-tour="settings-save-button"
                         >
                             {saving ? "Saving..." : "Save Changes"}
                         </Button>
@@ -142,4 +147,3 @@ export default function ProfileSettingsPage() {
         </SettingsLayout>
     );
 }
-

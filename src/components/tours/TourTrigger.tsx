@@ -13,6 +13,7 @@ import { Button, type ButtonProps } from '@/components/ui/button';
 import { HelpCircle, PlayCircle } from 'lucide-react';
 import { useTour } from '@/hooks/useTour';
 import { cn } from '@/lib/utils';
+import { t } from '@/lib/tours/i18n';
 
 interface TourTriggerProps extends Omit<ButtonProps, 'onClick'> {
     /** Tour ID to launch */
@@ -27,7 +28,7 @@ interface TourTriggerProps extends Omit<ButtonProps, 'onClick'> {
 
 export function TourTrigger({
     tourId,
-    label = 'Take Tour',
+    label,
     showIcon = true,
     icon = 'play',
     className,
@@ -44,6 +45,7 @@ export function TourTrigger({
     };
 
     const Icon = icon === 'help' ? HelpCircle : PlayCircle;
+    const resolvedLabel = label ?? t('common.buttons.takeTour');
 
     return (
         <Button
@@ -55,7 +57,7 @@ export function TourTrigger({
             {...props}
         >
             {showIcon && <Icon className="w-4 h-4" />}
-            {label}
+            {resolvedLabel}
         </Button>
     );
 }
@@ -107,7 +109,7 @@ export function TourMenuItem({
                 <div className="flex items-center gap-2">
                     <span className="font-medium text-sm">{label}</span>
                     {isCompleted && (
-                        <span className="text-xs text-muted-foreground">✓ Completed</span>
+                        <span className="text-xs text-muted-foreground">{t('common.labels.completed')}</span>
                     )}
                 </div>
                 {description && (

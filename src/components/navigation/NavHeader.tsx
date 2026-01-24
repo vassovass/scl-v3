@@ -99,26 +99,22 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
             const tourId = item.href.replace('#tour-', '');
             setOpenDropdown(null);
 
-            // Map tour IDs to required paths
-            // NOTE: member tour uses /submit-steps which is league-agnostic (AGENTS.md 7.1)
             const tourPaths: Record<string, string> = {
-                "navigation": pathname, // Can run from anywhere
-                "new-user": "/dashboard",
-                "member": "/submit-steps", // League-agnostic step submission page
-                "leaderboard": currentLeagueId ? `/league/${currentLeagueId}/leaderboard` : "",
-                "admin": currentLeagueId ? `/league/${currentLeagueId}` : ""
+                "dashboard-v1": "/dashboard",
+                "league-v1": "/league/create",
+                "submit-steps-v1": "/submit-steps",
+                "leaderboard-v1": currentLeagueId ? `/league/${currentLeagueId}/leaderboard` : "",
+                "analytics-v1": currentLeagueId ? `/league/${currentLeagueId}/analytics` : "",
+                "settings-v1": "/settings/profile",
+                "admin-v1": "/admin/analytics/tours",
             };
 
             const targetPath = tourPaths[tourId];
-
-            const startTour = () => {
-                window.dispatchEvent(new CustomEvent('start-onboarding-tour', { detail: { tour: tourId } }));
-            };
+            const hash = `#tour-${tourId}`;
 
             // Validate target path - prevent navigation to malformed URLs
             if (!targetPath || targetPath.includes('undefined') || targetPath === '') {
-                // Tours requiring league context but no league is selected
-                if (tourId === 'leaderboard' || tourId === 'admin') {
+                if (tourId === 'leaderboard-v1' || tourId === 'analytics-v1') {
                     const { toast } = await import("@/hooks/use-toast");
                     toast({
                         title: "Navigate to a league first",
@@ -130,17 +126,15 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
             }
 
             if (targetPath) {
-                // Check if already on the target page or a subpage
                 const isOnTargetPage = pathname === targetPath || pathname.startsWith(targetPath + '/');
 
                 if (!isOnTargetPage) {
-                    const separator = targetPath.includes("?") ? "&" : "?";
-                    router.push(`${targetPath}${separator}start_tour=${tourId}`);
+                    router.push(`${targetPath}${hash}`);
                 } else {
-                    startTour();
+                    window.location.hash = hash;
                 }
             } else {
-                startTour();
+                window.location.hash = hash;
             }
         }
     };
@@ -241,19 +235,21 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                         </div>
 
                         {/* Help Menu (with onboarding tours) */}
-                        <ShadcnMenuRenderer
-                            menuId="help"
-                            menus={menus}
-                            variant="dropdown"
-                            userRole={userRole}
-                            leagueId={currentLeagueId}
-                            label="Help"
-                            isOpen={openDropdown === 'help'}
-                            onToggle={() => toggleDropdown('help')}
-                            onClose={() => setOpenDropdown(null)}
-                            onAction={handleMenuAction}
-                            currentPath={pathname}
-                        />
+                        <div data-tour="help-menu">
+                            <ShadcnMenuRenderer
+                                menuId="help"
+                                menus={menus}
+                                variant="dropdown"
+                                userRole={userRole}
+                                leagueId={currentLeagueId}
+                                label="Help"
+                                isOpen={openDropdown === 'help'}
+                                onToggle={() => toggleDropdown('help')}
+                                onClose={() => setOpenDropdown(null)}
+                                onAction={handleMenuAction}
+                                currentPath={pathname}
+                            />
+                        </div>
 
                         {/* SuperAdmin Menu */}
                         {isSuperadmin && (
@@ -398,4 +394,3 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
         </header>
     );
 }
-

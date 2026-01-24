@@ -1,38 +1,34 @@
-import { NextResponse } from "next/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { withApiHandler } from "@/lib/api/handler";
 
 /**
  * Tour Analytics API
- * 
+ *
  * Returns aggregated data from:
  * - tour_completions
  * - tour_step_interactions
  * - tour_feedback
- * 
+ *
  * Part of PRD 50 Phase 5 (Admin Analytics)
  */
 
 export const dynamic = "force-dynamic";
 
-interface TourCompletion {
+interface TourCompletionRow {
     tour_id: string;
-    completed: boolean;
-    completion_time_ms: number | null;
-    created_at: string;
-}
-
-interface StepInteraction {
-    tour_id: string;
-    step_index: number;
-    step_id: string;
-    action: string;
+    completion_type: "completed" | "skipped";
     duration_ms: number | null;
 }
 
-interface TourFeedback {
+interface StepInteractionRow {
     tour_id: string;
-    rating: string | null;
-    comment: string | null;
+    step_index: number;
+    step_id: string;
+    action: "viewed" | "completed" | "skipped";
+}
+
+interface TourFeedbackRow {
+    tour_id: string;
+    rating: number | null;
 }
 
 interface TourStats {
@@ -57,84 +53,90 @@ interface FeedbackSummary {
     averageRating: number;
 }
 
-export async function GET() {
-    const supabase = await createServerSupabaseClient();
-
-    // Verify superadmin
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { data: profile } = await supabase
-        .from("users")
-        .select("is_superadmin")
-        .eq("id", user.id)
-        .single();
-
-    if (!profile?.is_superadmin) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    try {
-        // Get tour completions aggregated by tour
-        const { data: completions, error: completionsError } = await supabase
+export const GET = withApiHandler(
+    {
+        auth: "superadmin",
+    },
+    async ({ adminClient }) => {
+        const { data: completions, error: completionsError } = await adminClient
             .from("tour_completions")
-            .select("tour_id, completed, completion_time_ms, created_at");
+            .select("tour_id, completion_type, duration_ms");
 
-        if (completionsError) throw completionsError;
+        if (completionsError) {
+            throw completionsError;
+        }
 
-        // Get step interactions
-        const { data: steps, error: stepsError } = await supabase
+        const { data: steps, error: stepsError } = await adminClient
             .from("tour_step_interactions")
-            .select("tour_id, step_index, step_id, action, duration_ms");
+            .select("tour_id, step_index, step_id, action");
 
-        if (stepsError) throw stepsError;
+        if (stepsError) {
+            throw stepsError;
+        }
 
-        // Get feedback
-        const { data: feedback, error: feedbackError } = await supabase
+        const { data: feedback, error: feedbackError } = await adminClient
             .from("tour_feedback")
-            .select("tour_id, rating, comment");
+            .select("tour_id, rating");
 
-        if (feedbackError) throw feedbackError;
+        if (feedbackError) {
+            throw feedbackError;
+        }
 
-        // Aggregate tour stats
-        const tourStatsMap = new Map<string, { starts: number; completions: number; durations: number[] }>();
+        const completionRows = (completions || []) as TourCompletionRow[];
+        const stepRows = (steps || []) as StepInteractionRow[];
+        const feedbackRows = (feedback || []) as TourFeedbackRow[];
 
-        ((completions || []) as TourCompletion[]).forEach((c) => {
-            const existing = tourStatsMap.get(c.tour_id) || { starts: 0, completions: 0, durations: [] };
-            existing.starts++;
-            if (c.completed) {
-                existing.completions++;
-                if (c.completion_time_ms) {
-                    existing.durations.push(c.completion_time_ms);
+        const startsByTour = new Map<string, number>();
+        stepRows
+            .filter((row) => row.action === "viewed" && row.step_index === 0)
+            .forEach((row) => {
+                startsByTour.set(row.tour_id, (startsByTour.get(row.tour_id) || 0) + 1);
+            });
+
+        const completionStats = new Map<string, { completions: number; durations: number[] }>();
+        completionRows.forEach((row) => {
+            const existing = completionStats.get(row.tour_id) || { completions: 0, durations: [] };
+            if (row.completion_type === "completed") {
+                existing.completions += 1;
+                if (row.duration_ms) {
+                    existing.durations.push(row.duration_ms);
                 }
             }
-            tourStatsMap.set(c.tour_id, existing);
+            completionStats.set(row.tour_id, existing);
         });
 
-        const tourStats: TourStats[] = Array.from(tourStatsMap.entries()).map(([tourId, stats]) => ({
-            tourId,
-            totalStarts: stats.starts,
-            totalCompletions: stats.completions,
-            completionRate: stats.starts > 0 ? (stats.completions / stats.starts) * 100 : 0,
-            avgDuration: stats.durations.length > 0
-                ? stats.durations.reduce((a, b) => a + b, 0) / stats.durations.length
-                : null,
-        }));
+        const tourIds = new Set<string>([
+            ...startsByTour.keys(),
+            ...completionStats.keys(),
+        ]);
 
-        // Aggregate step drop-off
+        const tourStats: TourStats[] = Array.from(tourIds).map((tourId) => {
+            const totalStarts = startsByTour.get(tourId) || 0;
+            const stats = completionStats.get(tourId) || { completions: 0, durations: [] };
+            const avgDuration =
+                stats.durations.length > 0
+                    ? stats.durations.reduce((sum, duration) => sum + duration, 0) / stats.durations.length
+                    : null;
+
+            return {
+                tourId,
+                totalStarts,
+                totalCompletions: stats.completions,
+                completionRate: totalStarts > 0 ? (stats.completions / totalStarts) * 100 : 0,
+                avgDuration,
+            };
+        });
+
         const stepViewsMap = new Map<string, Map<number, { stepId: string; views: number }>>();
-
-        ((steps || []) as StepInteraction[]).forEach((s) => {
-            if (s.action === "view") {
-                const tourSteps = stepViewsMap.get(s.tour_id) || new Map();
-                const existing = tourSteps.get(s.step_index) || { stepId: s.step_id, views: 0 };
-                existing.views++;
-                tourSteps.set(s.step_index, existing);
-                stepViewsMap.set(s.tour_id, tourSteps);
-            }
-        });
+        stepRows
+            .filter((row) => row.action === "viewed")
+            .forEach((row) => {
+                const tourSteps = stepViewsMap.get(row.tour_id) || new Map();
+                const existing = tourSteps.get(row.step_index) || { stepId: row.step_id, views: 0 };
+                existing.views += 1;
+                tourSteps.set(row.step_index, existing);
+                stepViewsMap.set(row.tour_id, tourSteps);
+            });
 
         const stepDropoff: StepDropoff[] = [];
         stepViewsMap.forEach((stepsMap, tourId) => {
@@ -142,11 +144,12 @@ export async function GET() {
             Array.from(stepsMap.entries())
                 .sort(([a], [b]) => a - b)
                 .forEach(([stepIndex, data], idx) => {
-                    const dropoffRate = idx === 0
-                        ? 0
-                        : prevViews > 0
-                            ? ((prevViews - data.views) / prevViews) * 100
-                            : 0;
+                    const dropoffRate =
+                        idx === 0
+                            ? 0
+                            : prevViews > 0
+                                ? ((prevViews - data.views) / prevViews) * 100
+                                : 0;
 
                     stepDropoff.push({
                         tourId,
@@ -160,47 +163,34 @@ export async function GET() {
                 });
         });
 
-        // Aggregate feedback
         const ratingCounts: Record<string, number> = {};
         let totalRatingValue = 0;
 
-        ((feedback || []) as TourFeedback[]).forEach((f) => {
-            const r = f.rating || "unknown";
-            ratingCounts[r] = (ratingCounts[r] || 0) + 1;
-            // Convert emoji to numeric for average
-            const numericRatings: Record<string, number> = {
-                "😍": 5, "😊": 4, "😐": 3, "😕": 2, "😢": 1,
-                "great": 5, "good": 4, "ok": 3, "bad": 2, "terrible": 1,
-            };
-            totalRatingValue += numericRatings[r] || 3;
+        feedbackRows.forEach((row) => {
+            const rating = row.rating ?? 0;
+            if (rating > 0) {
+                ratingCounts[String(rating)] = (ratingCounts[String(rating)] || 0) + 1;
+                totalRatingValue += rating;
+            }
         });
 
+        const totalFeedback = feedbackRows.filter((row) => row.rating != null).length;
         const feedbackSummary: FeedbackSummary = {
-            totalFeedback: feedback?.length || 0,
+            totalFeedback,
             ratings: ratingCounts,
-            averageRating: feedback && feedback.length > 0
-                ? totalRatingValue / feedback.length
-                : 0,
+            averageRating: totalFeedback > 0 ? totalRatingValue / totalFeedback : 0,
         };
 
-        const typedCompletions = (completions || []) as TourCompletion[];
+        const totalStarts = tourStats.reduce((sum, stat) => sum + stat.totalStarts, 0);
+        const totalCompletions = tourStats.reduce((sum, stat) => sum + stat.totalCompletions, 0);
 
-        return NextResponse.json({
+        return {
             tourStats,
             stepDropoff,
             feedbackSummary,
-            totalCompletions: typedCompletions.filter(c => c.completed).length,
-            totalStarts: typedCompletions.length,
-            overallCompletionRate: typedCompletions.length > 0
-                ? (typedCompletions.filter(c => c.completed).length / typedCompletions.length) * 100
-                : 0,
-        });
-
-    } catch (error) {
-        console.error("[Analytics/Tours] Error:", error);
-        return NextResponse.json(
-            { error: "Failed to fetch tour analytics" },
-            { status: 500 }
-        );
+            totalCompletions,
+            totalStarts,
+            overallCompletionRate: totalStarts > 0 ? (totalCompletions / totalStarts) * 100 : 0,
+        };
     }
-}
+);

@@ -23,7 +23,7 @@ export function SettingsNav({ items, className }: SettingsNavProps) {
     const pathname = usePathname();
 
     return (
-        <nav className={cn("border-b border-border", className)}>
+        <nav className={cn("border-b border-border", className)} data-tour="settings-nav">
             <div className="flex gap-2 overflow-x-auto pb-px">
                 {items.map((item) => {
                     const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
@@ -47,4 +47,3 @@ export function SettingsNav({ items, className }: SettingsNavProps) {
         </nav>
     );
 }
-

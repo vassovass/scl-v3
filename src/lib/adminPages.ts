@@ -45,6 +45,11 @@ export const SUPERADMIN_PAGES: AdminPage[] = [
         label: "⚙️ App Settings",
         description: "Configure app-wide settings and development stage",
     },
+    {
+        href: "/admin/analytics/tours",
+        label: "📈 Tour Analytics",
+        description: "Completion rates, drop-off analysis, and feedback summary",
+    },
     // Add more superadmin pages here:
     // {
     //     href: "/admin/users",
@@ -57,4 +62,3 @@ export const SUPERADMIN_PAGES: AdminPage[] = [
     //     description: "App-wide usage statistics",
     // },
 ];
-

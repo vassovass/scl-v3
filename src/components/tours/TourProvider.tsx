@@ -28,6 +28,7 @@ import { usePathname } from 'next/navigation';
 import { ACTIONS, EVENTS, STATUS } from 'react-joyride';
 import type { CallBackProps, Step, Placement } from 'react-joyride';
 
+import { useFeatureFlags } from '@/hooks/useFeatureFlag';
 import type {
     TourContextType,
     TourDefinition,
@@ -48,13 +49,26 @@ import {
 } from '@/lib/tours/registry';
 import {
     migrateFromOldSchema,
-    needsMigration,
     isMajorUpgrade,
 } from '@/lib/tours/migrations';
-import { getVariantTour } from '@/lib/tours/experiments';
+import {
+    getTourExperimentVariant,
+    getVariantTour,
+    trackExperimentConversion,
+    trackExperimentEnrollment,
+} from '@/lib/tours/experiments';
 import { tourAnalytics } from '@/lib/tours/unified-analytics';
-import { initTourI18n, loadTourTranslations, t } from '@/lib/tours/i18n';
-import { cancelAllValidations } from '@/lib/tours/validation';
+import {
+    getCurrentLanguage,
+    initTourI18n,
+    isRTL,
+    loadTourTranslations,
+    t,
+} from '@/lib/tours/i18n';
+import { cancelAllValidations, validateStep } from '@/lib/tours/validation';
+import { createClient } from '@/lib/supabase/client';
+import { TourFeedbackDialog } from '@/components/tours/TourFeedbackDialog';
+import type { AppSettingKey } from '@/lib/settings/appSettingsTypes';
 
 // Dynamically import Joyride to reduce initial bundle
 const Joyride = dynamic(() => import('react-joyride'), {
@@ -139,41 +153,89 @@ function mapToJoyridePlacement(placement: TourPlacement | undefined): Placement 
 // JOYRIDE STEP TRANSFORMER
 // ═══════════════════════════════════════════════════════════════════════════
 
+function clampText(text: string, maxChars: number, maxLines: number): string {
+    if (!text) return text;
+    const trimmed = text.trim();
+    const truncated =
+        trimmed.length > maxChars ? `${trimmed.slice(0, Math.max(maxChars - 1, 0))}…` : trimmed;
+    const lines = truncated.split('\n').slice(0, maxLines).join('\n');
+    return lines;
+}
+
+function filterTourSteps(
+    steps: TourStep[],
+    isMobile: boolean,
+    userRole: 'admin' | 'member' | undefined,
+    featureFlags: Record<string, boolean>,
+    activeVariant: string | null,
+    mobileConfig?: TourDefinition['mobile']
+): TourStep[] {
+    let filtered = steps.filter((step) => !(isMobile && step.hideOnMobile));
+
+    if (userRole) {
+        filtered = filtered.filter((step) => !step.requiresRole || step.requiresRole === userRole);
+    }
+
+    filtered = filtered.filter((step) => {
+        if (!step.featureFlag) return true;
+        return !!featureFlags[step.featureFlag];
+    });
+
+    if (activeVariant) {
+        filtered = filtered.filter((step) => !step.experimentVariant || step.experimentVariant === activeVariant);
+    }
+
+    if (isMobile && mobileConfig?.maxSteps) {
+        filtered = filtered.slice(0, mobileConfig.maxSteps);
+    }
+
+    return filtered;
+}
+
 function transformSteps(
     steps: TourStep[],
-    isMobile: boolean
+    isMobile: boolean,
+    mobileConfig?: TourDefinition['mobile']
 ): Step[] {
-    return steps
-        .filter((step) => !(isMobile && step.hideOnMobile))
-        .map((step) => {
-            // Get content - use mobile override if available and on mobile
-            const contentKey =
-                isMobile && step.mobile?.contentKey
-                    ? step.mobile.contentKey
-                    : step.contentKey;
+    return steps.map((step) => {
+        // Get content - use mobile override if available and on mobile
+        const contentKey =
+            isMobile && step.mobile?.contentKey
+                ? step.mobile.contentKey
+                : step.contentKey;
 
-            const titleKey =
-                isMobile && step.mobile?.titleKey
-                    ? step.mobile.titleKey
-                    : step.titleKey;
+        const titleKey =
+            isMobile && step.mobile?.titleKey
+                ? step.mobile.titleKey
+                : step.titleKey;
 
-            const rawPlacement =
-                isMobile && step.mobile?.placement
-                    ? step.mobile.placement
-                    : step.placement;
+        const rawPlacement =
+            isMobile && step.mobile?.placement
+                ? step.mobile.placement
+                : step.placement;
 
-            const placement = mapToJoyridePlacement(rawPlacement);
+        const placement = mapToJoyridePlacement(rawPlacement);
 
-            return {
-                target: step.target,
-                content: t(contentKey),
-                title: titleKey ? t(titleKey) : undefined,
-                placement,
-                disableBeacon: step.disableBeacon ?? false,
-                spotlightClicks: step.spotlightClicks ?? false,
-                disableOverlay: step.disableOverlay ?? false,
-            };
-        });
+        let content = t(contentKey);
+        let title = titleKey ? t(titleKey) : undefined;
+
+        if (isMobile && mobileConfig) {
+            content = clampText(content, mobileConfig.maxContentChars, mobileConfig.maxLines);
+            if (title && mobileConfig.maxTitleChars) {
+                title = clampText(title, mobileConfig.maxTitleChars, mobileConfig.maxLines);
+            }
+        }
+
+        return {
+            target: step.target,
+            content,
+            title,
+            placement,
+            disableBeacon: step.disableBeacon ?? false,
+            spotlightClicks: step.spotlightClicks ?? false,
+            disableOverlay: step.disableOverlay ?? false,
+        };
+    });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -198,9 +260,17 @@ export function TourProvider({
     const [isRunning, setIsRunning] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [i18nReady, setI18nReady] = useState(false);
+    const [stateLoaded, setStateLoaded] = useState(false);
+    const [hasLeagues, setHasLeagues] = useState<boolean | null>(null);
+    const [hasSubmissions, setHasSubmissions] = useState<boolean | null>(null);
+    const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
+    const [lastCompletedTourId, setLastCompletedTourId] = useState<string | null>(null);
+    const [activeVariant, setActiveVariant] = useState<string | null>(null);
 
     const tourStartTime = useRef<number>(0);
     const stepStartTime = useRef<number>(0);
+    const tourStateRef = useRef<TourState>(DEFAULT_TOUR_STATE);
+    const trackedTourStartRef = useRef<string | null>(null);
 
     // ─────────────────────────────────────────────────────────────────────────
     // Initialization
@@ -210,18 +280,17 @@ export function TourProvider({
         // Load saved state
         const state = loadTourState();
         setTourState(state);
+        setStateLoaded(true);
 
         // Initialize i18n
-        initTourI18n().then(() => {
-            loadTourTranslations('en').then(() => {
-                setI18nReady(true);
-            });
+        initTourI18n().then(async () => {
+            const language = getCurrentLanguage();
+            await loadTourTranslations(language);
+            if (typeof document !== 'undefined') {
+                document.documentElement.dir = isRTL(language) ? 'rtl' : 'ltr';
+            }
+            setI18nReady(true);
         });
-
-        // Set user ID for analytics
-        if (userId) {
-            tourAnalytics.setUserId(userId);
-        }
 
         // Check mobile
         const checkMobile = () => {
@@ -234,7 +303,7 @@ export function TourProvider({
         const handleUnload = () => {
             if (activeTour && isRunning) {
                 // Synchronous save on unload
-                localStorage.setItem(TOUR_STORAGE_KEY, JSON.stringify(tourState));
+                localStorage.setItem(TOUR_STORAGE_KEY, JSON.stringify(tourStateRef.current));
             }
         };
         window.addEventListener('beforeunload', handleUnload);
@@ -247,7 +316,11 @@ export function TourProvider({
                 if (tour) {
                     startTour(tour.id);
                     // Remove hash after starting
-                    window.history.replaceState(null, '', pathname);
+                    window.history.replaceState(
+                        null,
+                        '',
+                        `${window.location.pathname}${window.location.search}`
+                    );
                 }
             }
         };
@@ -261,12 +334,63 @@ export function TourProvider({
         };
     }, []);
 
+    useEffect(() => {
+        tourAnalytics.setUserId(userId ?? null);
+    }, [userId]);
+
+    useEffect(() => {
+        tourStateRef.current = tourState;
+    }, [tourState]);
+
+    useEffect(() => {
+        if (!userId) {
+            setHasLeagues(null);
+            setHasSubmissions(null);
+            return;
+        }
+
+        let isMounted = true;
+        const supabase = createClient();
+
+        const loadUserState = async () => {
+            try {
+                const { count: leagueCount, error: leagueError } = await supabase
+                    .from('memberships')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('user_id', userId);
+
+                if (!leagueError && isMounted) {
+                    setHasLeagues((leagueCount ?? 0) > 0);
+                }
+
+                const { count: submissionCount, error: submissionError } = await supabase
+                    .from('submissions')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('user_id', userId);
+
+                if (!submissionError && isMounted) {
+                    setHasSubmissions((submissionCount ?? 0) > 0);
+                }
+            } catch (err) {
+                if (process.env.NODE_ENV === 'development') {
+                    console.warn('[TourProvider] Failed to load user state:', err);
+                }
+            }
+        };
+
+        loadUserState();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [userId]);
+
     // ─────────────────────────────────────────────────────────────────────────
     // Auto-Start Logic
     // ─────────────────────────────────────────────────────────────────────────
 
     useEffect(() => {
-        if (!i18nReady || isRunning) return;
+        if (!i18nReady || !stateLoaded || isRunning) return;
 
         // Get path-based tours
         const pathTours = getToursForPath(pathname);
@@ -284,7 +408,13 @@ export function TourProvider({
             }
 
             // Check auto-start conditions
-            if (!tour.autoStart?.onFirstVisit) continue;
+            if (tourState.skippedTours[tour.id]) {
+                continue;
+            }
+
+            if (tour.autoStart?.noLeagues === true && hasLeagues !== false) continue;
+            if (tour.autoStart?.noSubmissions === true && hasSubmissions !== false) continue;
+            if (tour.autoStart?.custom && !tour.autoStart.custom()) continue;
 
             // Check role requirement
             if (tour.requiredRole && tour.requiredRole !== userRole) continue;
@@ -304,7 +434,17 @@ export function TourProvider({
             });
             break;
         }
-    }, [pathname, i18nReady, isRunning, tourState.completedTours, userRole]);
+    }, [
+        pathname,
+        i18nReady,
+        stateLoaded,
+        isRunning,
+        tourState.completedTours,
+        tourState.skippedTours,
+        userRole,
+        hasLeagues,
+        hasSubmissions,
+    ]);
 
     // ─────────────────────────────────────────────────────────────────────────
     // Tour Actions
@@ -318,8 +458,17 @@ export function TourProvider({
                 return;
             }
 
+            let selectedVariant: string | null = null;
+            if (baseTour.experiment) {
+                const experiment = getTourExperimentVariant(baseTour.experiment);
+                selectedVariant = experiment.variant;
+                if (experiment.isEligible) {
+                    trackExperimentEnrollment(experiment.experimentId, experiment.variant);
+                }
+            }
+
             // Apply experiment variant if applicable
-            const tour = getVariantTour(baseTour);
+            const tour = getVariantTour(baseTour, selectedVariant || undefined);
 
             // Check role requirement
             if (tour.requiredRole && tour.requiredRole !== userRole) {
@@ -335,20 +484,12 @@ export function TourProvider({
                 setActiveTour(tour);
                 setStepIndex(0);
                 setIsRunning(true);
+                setActiveVariant(selectedVariant);
             });
 
-            // Track analytics
+            // Track analytics timestamps (actual tracking in effect)
             tourStartTime.current = Date.now();
             stepStartTime.current = Date.now();
-
-            tourAnalytics.trackTourStart({
-                tourId: tour.id,
-                tourVersion: tour.version,
-                tourCategory: tour.category,
-                totalSteps: tour.steps.length,
-                variant: tour.experiment?.defaultVariant,
-                userId,
-            });
         },
         [userRole, userId]
     );
@@ -372,7 +513,7 @@ export function TourProvider({
             tourVersion: activeTour.version,
             completionType: 'skipped',
             stepsCompleted: stepIndex,
-            totalSteps: activeTour.steps.length,
+            totalSteps: filteredTourSteps.length || activeTour.steps.length,
             durationMs: Date.now() - tourStartTime.current,
             userId,
         });
@@ -395,8 +536,10 @@ export function TourProvider({
             setStepIndex(0);
         });
 
+        setActiveVariant(null);
+        trackedTourStartRef.current = null;
         document.body.classList.remove('joyride-active');
-    }, [activeTour, stepIndex, userId]);
+    }, [activeTour, stepIndex, userId, filteredTourSteps.length]);
 
     const completeTour = useCallback(() => {
         if (!activeTour) return;
@@ -409,11 +552,15 @@ export function TourProvider({
             tourId: activeTour.id,
             tourVersion: activeTour.version,
             completionType: 'completed',
-            stepsCompleted: activeTour.steps.length,
-            totalSteps: activeTour.steps.length,
+            stepsCompleted: filteredTourSteps.length || activeTour.steps.length,
+            totalSteps: filteredTourSteps.length || activeTour.steps.length,
             durationMs: Date.now() - tourStartTime.current,
             userId,
         });
+
+        if (activeTour.experiment && activeVariant) {
+            trackExperimentConversion(activeTour.experiment.experimentId, activeVariant);
+        }
 
         // Update state
         startTransition(() => {
@@ -433,8 +580,12 @@ export function TourProvider({
             setStepIndex(0);
         });
 
+        setActiveVariant(null);
+        trackedTourStartRef.current = null;
+        setLastCompletedTourId(activeTour.id);
+        setShowFeedbackDialog(true);
         document.body.classList.remove('joyride-active');
-    }, [activeTour, userId]);
+    }, [activeTour, userId, filteredTourSteps.length]);
 
     const resetAllTours = useCallback(() => {
         startTransition(() => {
@@ -444,6 +595,8 @@ export function TourProvider({
             setIsRunning(false);
             setStepIndex(0);
         });
+        setActiveVariant(null);
+        trackedTourStartRef.current = null;
         document.body.classList.remove('joyride-active');
     }, []);
 
@@ -482,11 +635,27 @@ export function TourProvider({
                 return;
             }
 
+            if (action === ACTIONS.CLOSE && activeTour) {
+                const step = filteredTourSteps[stepIndex];
+                if (step) {
+                    tourAnalytics.trackTourDropOff({
+                        tourId: activeTour.id,
+                        stepId: step.id,
+                        stepIndex,
+                        totalSteps: filteredTourSteps.length || activeTour.steps.length,
+                        durationMs: Date.now() - tourStartTime.current,
+                        reason: 'close',
+                    });
+                }
+                skipTour();
+                return;
+            }
+
             // Step navigation
             if (type === EVENTS.STEP_AFTER && activeTour) {
                 // Track step completion
-                const step = activeTour.steps[index];
-                if (step) {
+                const step = filteredTourSteps[index];
+                if (step && action === ACTIONS.NEXT) {
                     tourAnalytics.trackStepCompleted({
                         tourId: activeTour.id,
                         stepId: step.id,
@@ -511,7 +680,7 @@ export function TourProvider({
                 stepStartTime.current = Date.now();
             }
         },
-        [activeTour, completeTour, skipTour, userId]
+        [activeTour, completeTour, skipTour, userId, filteredTourSteps, stepIndex]
     );
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -547,10 +716,92 @@ export function TourProvider({
     // Joyride Steps
     // ─────────────────────────────────────────────────────────────────────────
 
+    const featureFlagKeys = useMemo(() => {
+        if (!activeTour) return [];
+        const keys = activeTour.steps
+            .map((step) => step.featureFlag)
+            .filter((flag): flag is string => !!flag);
+        return Array.from(new Set(keys));
+    }, [activeTour]);
+
+    const featureFlags = useFeatureFlags(featureFlagKeys as AppSettingKey[]);
+
+    const filteredTourSteps = useMemo(() => {
+        if (!activeTour) return [];
+        return filterTourSteps(
+            activeTour.steps,
+            isMobile,
+            userRole,
+            featureFlags,
+            activeVariant,
+            activeTour.mobile
+        );
+    }, [activeTour, isMobile, userRole, featureFlags, activeVariant]);
+
     const joyrideSteps = useMemo(() => {
         if (!activeTour || !i18nReady) return [];
-        return transformSteps(activeTour.steps, isMobile);
-    }, [activeTour, isMobile, i18nReady]);
+        return transformSteps(filteredTourSteps, isMobile, activeTour.mobile);
+    }, [activeTour, filteredTourSteps, i18nReady, isMobile]);
+
+    useEffect(() => {
+        if (!activeTour || !isRunning || !i18nReady) return;
+        if (trackedTourStartRef.current === activeTour.id) return;
+        trackedTourStartRef.current = activeTour.id;
+        tourAnalytics.trackTourStart({
+            tourId: activeTour.id,
+            tourVersion: activeTour.version,
+            tourCategory: activeTour.category,
+            totalSteps: filteredTourSteps.length || activeTour.steps.length,
+            variant: activeVariant || activeTour.experiment?.defaultVariant,
+            userId,
+        });
+    }, [activeTour, isRunning, i18nReady, filteredTourSteps.length, activeVariant, userId]);
+
+    useEffect(() => {
+        if (!activeTour || !isRunning) return;
+        const step = filteredTourSteps[stepIndex];
+        if (!step) return;
+        tourAnalytics.trackStepViewed({
+            tourId: activeTour.id,
+            stepId: step.id,
+            stepIndex,
+            totalSteps: filteredTourSteps.length || activeTour.steps.length,
+        });
+    }, [activeTour, isRunning, stepIndex, filteredTourSteps, filteredTourSteps.length]);
+
+    useEffect(() => {
+        if (!activeTour || !isRunning) return;
+        const step = filteredTourSteps[stepIndex];
+        if (!step?.interactive?.enabled) return;
+
+        let isCancelled = false;
+
+        const runValidation = async () => {
+            const result = await validateStep(step.interactive!.validation);
+            if (isCancelled) return;
+
+            tourAnalytics.trackValidationResult({
+                tourId: activeTour.id,
+                stepId: step.id,
+                result: result.success ? 'success' : result.reason === 'timeout' ? 'timeout' : 'cancelled',
+                userId,
+            });
+
+            if (result.success) {
+                startTransition(() => {
+                    setStepIndex((prev) => Math.min(prev + 1, filteredTourSteps.length - 1));
+                });
+            } else {
+                step.interactive?.onValidationFail?.();
+            }
+        };
+
+        runValidation();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [activeTour, isRunning, stepIndex, filteredTourSteps, userId]);
 
     // ─────────────────────────────────────────────────────────────────────────
     // Render
@@ -619,6 +870,14 @@ export function TourProvider({
                             borderRadius: 'var(--radius)',
                         },
                     }}
+                />
+            )}
+
+            {lastCompletedTourId && (
+                <TourFeedbackDialog
+                    open={showFeedbackDialog}
+                    onOpenChange={setShowFeedbackDialog}
+                    tourId={lastCompletedTourId}
                 />
             )}
         </TourContext.Provider>

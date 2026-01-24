@@ -19,7 +19,7 @@ export const leagueTour: TourDefinition = {
     icon: '🏆',
     estimatedDuration: 90, // 1.5 minutes
 
-    requiredPath: /^\/(leagues|dashboard)/,
+    requiredPath: '/league/create',
 
     autoStart: {
         noLeagues: true,
@@ -34,7 +34,7 @@ export const leagueTour: TourDefinition = {
     steps: [
         {
             id: 'intro',
-            target: '[data-tour="create-league-button"]',
+            target: '[data-tour="league-create-header"]',
             titleKey: 'league.steps.intro.title',
             contentKey: 'league.steps.intro.content',
             placement: 'bottom',
@@ -58,19 +58,19 @@ export const leagueTour: TourDefinition = {
         },
         {
             id: 'privacy-setting',
-            target: '[data-tour="league-privacy-toggle"]',
-            titleKey: 'league.steps.privacySetting.title',
-            contentKey: 'league.steps.privacySetting.content',
+            target: '[data-tour="league-week-start"]',
+            titleKey: 'league.steps.weekStart.title',
+            contentKey: 'league.steps.weekStart.content',
             placement: 'right',
             spotlightClicks: true,
             mobile: {
-                contentKey: 'league.steps.privacySetting.mobile.content',
+                contentKey: 'league.steps.weekStart.mobile.content',
                 placement: 'bottom',
             },
         },
         {
             id: 'invite-members',
-            target: '[data-tour="league-invite-section"]',
+            target: '[data-tour="league-invite-info"]',
             titleKey: 'league.steps.inviteMembers.title',
             contentKey: 'league.steps.inviteMembers.content',
             placement: 'left',

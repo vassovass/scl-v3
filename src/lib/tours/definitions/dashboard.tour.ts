@@ -19,7 +19,7 @@ export const dashboardTour: TourDefinition = {
     icon: '🏠',
     estimatedDuration: 180, // 3 minutes
 
-    requiredPath: '/',
+    requiredPath: '/dashboard',
 
     autoStart: {
         onFirstVisit: true,
@@ -35,34 +35,13 @@ export const dashboardTour: TourDefinition = {
     steps: [
         {
             id: 'welcome',
-            target: '[data-tour="hero-section"]',
+            target: '[data-tour="dashboard-header"]',
             titleKey: 'dashboard.steps.welcome.title',
             contentKey: 'dashboard.steps.welcome.content',
             placement: 'auto',
             disableBeacon: true,
             mobile: {
                 contentKey: 'dashboard.steps.welcome.mobile.content',
-            },
-        },
-        {
-            id: 'step-counter',
-            target: '[data-tour="step-counter"]',
-            titleKey: 'dashboard.steps.stepCounter.title',
-            contentKey: 'dashboard.steps.stepCounter.content',
-            placement: 'bottom',
-            mobile: {
-                contentKey: 'dashboard.steps.stepCounter.mobile.content',
-                placement: 'bottom',
-            },
-        },
-        {
-            id: 'streak',
-            target: '[data-tour="streak-counter"]',
-            titleKey: 'dashboard.steps.streak.title',
-            contentKey: 'dashboard.steps.streak.content',
-            placement: 'bottom',
-            mobile: {
-                contentKey: 'dashboard.steps.streak.mobile.content',
             },
         },
         {
@@ -76,54 +55,37 @@ export const dashboardTour: TourDefinition = {
             },
         },
         {
-            id: 'submit-button',
-            target: '[data-tour="submit-steps-button"]',
-            titleKey: 'dashboard.steps.submitButton.title',
-            contentKey: 'dashboard.steps.submitButton.content',
-            placement: 'left',
-            spotlightClicks: true,
-            mobile: {
-                contentKey: 'dashboard.steps.submitButton.mobile.content',
-                placement: 'top',
-            },
-        },
-        {
-            id: 'leaderboard',
-            target: '[data-tour="nav-leaderboard"]',
-            titleKey: 'dashboard.steps.leaderboard.title',
-            contentKey: 'dashboard.steps.leaderboard.content',
+            id: 'join-league',
+            target: '[data-tour="join-league"]',
+            titleKey: 'dashboard.steps.joinLeague.title',
+            contentKey: 'dashboard.steps.joinLeague.content',
             placement: 'bottom',
-            disableOverlay: true,
-            spotlightClicks: true,
             mobile: {
-                contentKey: 'dashboard.steps.leaderboard.mobile.content',
+                contentKey: 'dashboard.steps.joinLeague.mobile.content',
             },
-        },
-        {
-            id: 'analytics',
-            target: '[data-tour="nav-analytics"]',
-            titleKey: 'dashboard.steps.analytics.title',
-            contentKey: 'dashboard.steps.analytics.content',
-            placement: 'bottom',
-            disableOverlay: true,
-            spotlightClicks: true,
-            mobile: {
-                contentKey: 'dashboard.steps.analytics.mobile.content',
-            },
-            hideOnMobile: true, // Skip on mobile to keep tour short
         },
         {
             id: 'create-league',
-            target: '[data-tour="create-league-button"]',
+            target: '[data-tour="create-league"]',
             titleKey: 'dashboard.steps.createLeague.title',
             contentKey: 'dashboard.steps.createLeague.content',
-            placement: 'left',
+            placement: 'bottom',
             spotlightClicks: true,
             mobile: {
                 contentKey: 'dashboard.steps.createLeague.mobile.content',
-                placement: 'top',
             },
-            hideOnMobile: true,
+        },
+        {
+            id: 'actions-menu',
+            target: '[data-tour="nav-actions-menu"]',
+            titleKey: 'dashboard.steps.actionsMenu.title',
+            contentKey: 'dashboard.steps.actionsMenu.content',
+            placement: 'bottom',
+            disableOverlay: true,
+            spotlightClicks: true,
+            mobile: {
+                contentKey: 'dashboard.steps.actionsMenu.mobile.content',
+            },
         },
         {
             id: 'help-menu',
@@ -139,7 +101,7 @@ export const dashboardTour: TourDefinition = {
         },
         {
             id: 'settings',
-            target: '[data-tour="user-menu"]',
+            target: '[data-tour="nav-user-menu"]',
             titleKey: 'dashboard.steps.settings.title',
             contentKey: 'dashboard.steps.settings.content',
             placement: 'bottom-end',
@@ -148,11 +110,10 @@ export const dashboardTour: TourDefinition = {
             mobile: {
                 contentKey: 'dashboard.steps.settings.mobile.content',
             },
-            hideOnMobile: true,
         },
         {
             id: 'complete',
-            target: '[data-tour="hero-section"]',
+            target: '[data-tour="dashboard-header"]',
             titleKey: 'dashboard.steps.complete.title',
             contentKey: 'dashboard.steps.complete.content',
             placement: 'auto',

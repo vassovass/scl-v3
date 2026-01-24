@@ -601,6 +601,7 @@ A "proxy" is simply a `users` row where `managed_by IS NOT NULL`:
 - ✅ **Modular menu system** (role-based, unlimited nesting, feedback integration)
 - ✅ Mobile-responsive navigation (hamburger menu, accordion submenus)
 - ✅ Guided onboarding system (Joyride)
+- ✅ Tour analytics dashboard (completion funnel + feedback insights)
 - ✅ Footer with legal links
 - ✅ Internal Kanban board (`/admin/kanban`)
 - ✅ Public roadmap with voting (`/roadmap`)

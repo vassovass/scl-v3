@@ -23,7 +23,7 @@ export default async function DashboardPage() {
     <DashboardClientWrapper>
       <div className="min-h-screen bg-background">
         <DashboardWelcomeToast />
-      <div className="mx-auto max-w-5xl px-6 py-12">
+        <div className="mx-auto max-w-5xl px-6 py-12">
         <ModuleFeedback moduleId="dashboard-header" moduleName="Dashboard Actions">
           <div className="flex items-center justify-between" data-tour="dashboard-header">
             <h1 className="text-2xl font-bold text-foreground">Your Leagues</h1>
@@ -59,7 +59,7 @@ export default async function DashboardPage() {
         </div>
 
         {leagues.length === 0 ? (
-          <div className="mt-12 rounded-xl border border-border bg-card/50 p-12 text-center">
+          <div className="mt-12 rounded-xl border border-border bg-card/50 p-12 text-center" data-tour="leagues-section">
             <p className="text-lg text-muted-foreground">You haven&apos;t joined any leagues yet.</p>
             <p className="mt-2 text-sm text-muted-foreground/70">
               Create a new league or join one with an invite code.
@@ -67,7 +67,7 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <ModuleFeedback moduleId="dashboard-leagues" moduleName="Your Leagues Grid">
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-tour="leagues-section">
               {leagues.map((league) => (
                 <Link
                   key={league.id}
@@ -104,10 +104,8 @@ export default async function DashboardPage() {
             </div>
           </ModuleFeedback>
         )}
-      </div>
+        </div>
     </div>
     </DashboardClientWrapper>
   );
 }
-
-

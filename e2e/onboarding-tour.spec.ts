@@ -10,7 +10,7 @@ import { test, expect, login } from './fixtures/auth';
 
 test.describe('Onboarding Tour - Leaderboard', () => {
 
-    test('leaderboard tour includes global leaderboard explanation', async ({ page }) => {
+    test('leaderboard tour shows filters and ranking guidance', async ({ page }) => {
         await login(page);
 
         // Clear tour completion from localStorage to force tour to appear
@@ -42,20 +42,17 @@ test.describe('Onboarding Tour - Leaderboard', () => {
         }
 
         // Wait for first tour step to appear
-        // Step 1: "See how you rank against your league!"
-        const firstStep = page.getByText(/see how you rank/i);
+        const firstStep = page.getByText(/The Leaderboard/i);
         await expect(firstStep).toBeVisible({ timeout: 5000 });
 
-        // Click next to advance to step 2 (global vs league explanation)
+        // Click next to advance to step 2 (time filters)
         const nextButton = page.getByRole('button', { name: /next/i });
         await nextButton.click();
 
-        // Verify global leaderboard step content (Step 2)
-        // Content: "🌍 GLOBAL vs LEAGUE: This is your league's leaderboard..."
-        await expect(page.getByText(/GLOBAL vs LEAGUE/i)).toBeVisible({ timeout: 3000 });
-        await expect(page.getByText(/nickname is visible to everyone/i)).toBeVisible();
+        await expect(page.getByText(/Time Filters/i)).toBeVisible({ timeout: 3000 });
 
-        // Verify it mentions the Global Leaderboard location
-        await expect(page.getByText(/found in main navigation/i)).toBeVisible();
+        // Advance to sort/verification filters
+        await nextButton.click();
+        await expect(page.getByText(/Sort & Verify Filters/i)).toBeVisible({ timeout: 3000 });
     });
 });

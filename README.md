@@ -128,6 +128,7 @@ scl-v3/
 - ✅ Social sharing (Web Share API)
 - ✅ Mobile-responsive navigation
 - ✅ Guided onboarding tours
+- ✅ Tour analytics (completion funnel + feedback)
 - ✅ Footer with legal links
 - ✅ SuperAdmin theme mode controls (default and allowed modes)
 - ✅ Theme toggle shows "coming soon" hints for disabled modes

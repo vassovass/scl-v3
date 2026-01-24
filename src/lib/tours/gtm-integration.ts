@@ -23,6 +23,10 @@ export interface TourEventData {
     completion_type?: 'completed' | 'skipped';
     duration_ms?: number;
     validation_result?: 'success' | 'timeout' | 'cancelled';
+    steps_completed?: number;
+    rating?: number;
+    has_comment?: boolean;
+    drop_off_reason?: string;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -126,7 +130,7 @@ export const tourGTM = {
             tour_id: data.tourId,
             tour_version: data.tourVersion,
             completion_type: data.completionType,
-            step_index: data.stepsCompleted,
+            steps_completed: data.stepsCompleted,
             total_steps: data.totalSteps,
             duration_ms: data.durationMs,
             experiment_variant: data.variant,
@@ -142,6 +146,7 @@ export const tourGTM = {
         stepIndex: number;
         totalSteps: number;
         durationMs: number;
+        reason?: string;
     }) => {
         pushToDataLayer('tour_drop_off', {
             tour_id: data.tourId,
@@ -149,6 +154,7 @@ export const tourGTM = {
             step_index: data.stepIndex,
             total_steps: data.totalSteps,
             duration_ms: data.durationMs,
+            drop_off_reason: data.reason,
         });
     },
 
@@ -177,8 +183,8 @@ export const tourGTM = {
     }) => {
         pushToDataLayer('tour_feedback_submitted', {
             tour_id: data.tourId,
-            step_index: data.rating, // Reusing step_index for rating
-            total_steps: data.hasComment ? 1 : 0, // Hack to indicate comment presence
+            rating: data.rating,
+            has_comment: data.hasComment,
         });
     },
 

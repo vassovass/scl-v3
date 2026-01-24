@@ -51,6 +51,13 @@ All notable changes to StepLeague v3.
   - Dashboard, Settings, Admin, Roadmap, Feedback layouts updated
   - Passing `userId`, `userRole` props for role-based tours
 
+### Fixed
+
+- **PRD 50 Tour Coverage & Targets** - Aligned tour definitions with actual page elements, updated data-tour hooks, and refreshed translations for dashboard, league creation, submit steps, leaderboard, analytics, settings, and admin analytics tours.
+- **Tour Analytics Pipeline** - Integrated PostHog event capture, corrected GA4 payload fields, and fixed admin analytics aggregation to match Supabase schema.
+- **Admin Analytics Security** - Switched tour analytics API to `withApiHandler` + admin client and updated RLS policies to use `is_superadmin()`.
+- **Tour UX Quality** - Added mobile content constraints, feature flag filtering, feedback dialog i18n, and reliable hash-based tour launches via the Help menu.
+
 ### Removed
 
 - **OnboardingProvider.tsx** - Deleted monolithic legacy provider (replaced by modular system)

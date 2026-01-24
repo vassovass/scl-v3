@@ -22,13 +22,13 @@ interface TourCompletionChartProps {
 
 // Friendly tour names mapping
 const tourNames: Record<string, string> = {
-    "dashboard-tour": "Dashboard",
-    "league-tour": "League",
-    "submit-steps-tour": "Submit Steps",
-    "leaderboard-tour": "Leaderboard",
-    "analytics-tour": "Analytics",
-    "settings-tour": "Settings",
-    "admin-tour": "Admin",
+    "dashboard-v1": "Dashboard",
+    "league-v1": "League",
+    "submit-steps-v1": "Submit Steps",
+    "leaderboard-v1": "Leaderboard",
+    "analytics-v1": "Analytics",
+    "settings-v1": "Settings",
+    "admin-v1": "Admin Analytics",
 };
 
 export function TourCompletionChart({ data, loading }: TourCompletionChartProps) {
