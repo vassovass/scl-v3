@@ -502,6 +502,21 @@ export function TourProvider({
                 return;
             }
 
+            // Check path requirement
+            if (tour.requiredPath) {
+                const isValidPath = tour.requiredPath instanceof RegExp
+                    ? tour.requiredPath.test(pathname)
+                    : pathname === tour.requiredPath;
+
+                if (!isValidPath) {
+                    console.warn(
+                        `[TourProvider] Cannot start tour "${tourId}" - not on required path. ` +
+                        `Current: ${pathname}, Required: ${tour.requiredPath}`
+                    );
+                    return;
+                }
+            }
+
             // Add body class for CSS targeting
             document.body.classList.add('joyride-active');
 
@@ -517,7 +532,7 @@ export function TourProvider({
             tourStartTime.current = Date.now();
             stepStartTime.current = Date.now();
         },
-        [userRole, userId]
+        [userRole, userId, pathname]
     );
 
     const startContextualTour = useCallback(() => {
