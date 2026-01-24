@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=nwhvkhydryulgxobqioi",
+      "description": "Supabase database access for AI agents"
+    },
+    "posthog": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "mcp-remote@latest", "https://mcp.posthog.com/sse"],
+      "description": "PostHog analytics - OAuth via browser"
+    },
+    "gtm-mcp-server": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "mcp-remote@latest", "https://gtm-mcp.stape.ai/mcp"],
+      "description": "Google Tag Manager - OAuth via browser"
+    },
+    "google-analytics-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "mcp-remote@0.1.30", "https://mcp-ga.stape.ai/mcp"],
+      "description": "Google Analytics 4 - OAuth via browser"
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@executeautomation/playwright-mcp-server"],
+      "description": "Browser automation with device emulation"
+    }
+  }
+}
