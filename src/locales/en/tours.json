@@ -151,77 +151,70 @@
     "submit": {
         "meta": {
             "name": "Submit Steps",
-            "description": "Learn the three ways to submit"
+            "description": "Learn how to upload your step data efficiently using batch mode"
         },
         "steps": {
             "intro": {
-                "title": "Submitting Your Steps",
-                "content": "Let's walk through the step submission form so you can log your activity quickly.",
+                "title": "Welcome to Step Submission!",
+                "content": "Let's walk through how to upload your daily step counts. We'll use batch mode to upload multiple days at once.",
                 "mobile": {
-                    "content": "Quick submission walkthrough."
+                    "content": "Let's learn how to upload your step data using batch mode."
                 }
             },
-            "datePicker": {
-                "title": "Pick a Date",
-                "content": "Choose which day you're submitting steps for, including past dates if needed.",
+            "batchToggle": {
+                "title": "Switch to Batch Mode",
+                "content": "Click here to switch to batch mode. This lets you upload multiple days of screenshots at once using AI extraction.",
                 "mobile": {
-                    "content": "Select the submission date."
+                    "content": "Switch to batch mode to upload multiple days."
                 }
             },
-            "stepsInput": {
-                "title": "Enter Steps",
-                "content": "Type the number of steps shown on your tracker or screenshot.",
+            "fileUpload": {
+                "title": "Select Your Screenshots",
+                "content": "Click here to select screenshot images from your phone. You can upload multiple screenshots at once (up to 50).",
                 "mobile": {
-                    "content": "Enter your step count."
+                    "content": "Select your step count screenshots here."
                 }
             },
-            "screenshotUpload": {
-                "title": "Upload Proof",
-                "content": "Add a screenshot for verification so your steps count toward verified rankings.",
+            "extractButton": {
+                "title": "Extract Step Data",
+                "content": "After uploading, click this button to use AI to automatically extract dates and step counts from your screenshots.",
                 "mobile": {
-                    "content": "Upload a screenshot."
+                    "content": "Click to extract data using AI."
                 }
             },
-            "appleHealth": {
-                "title": "Apple Health",
-                "content": "Connect Apple Health for automatic syncing. Your steps will be imported directly from your iPhone or Apple Watch.",
+            "reviewGrid": {
+                "title": "Review Extracted Data",
+                "content": "Here you'll see all your uploaded images with the extracted date and step count. Review and edit any incorrect values.",
                 "mobile": {
-                    "content": "Auto-sync from iPhone/Watch."
+                    "content": "Review and edit the extracted data."
                 }
             },
-            "googleFit": {
-                "title": "Google Fit",
-                "content": "Connect Google Fit to sync steps from Android devices or Wear OS watches.",
+            "dateEdit": {
+                "title": "Edit Dates",
+                "content": "Click any date field to manually correct it if the AI extraction was wrong. Dates must be within the current league period.",
                 "mobile": {
-                    "content": "Auto-sync from Android."
+                    "content": "Click to edit dates if needed."
                 }
             },
-            "manualEntry": {
-                "title": "Manual Entry",
-                "content": "No fitness tracker? No problem! Enter your steps manually from any source.",
+            "stepsEdit": {
+                "title": "Edit Step Counts",
+                "content": "Click any steps field to manually correct it if the AI extraction was wrong. Step counts should match your screenshots.",
                 "mobile": {
-                    "content": "Type steps manually."
-                }
-            },
-            "photoProof": {
-                "title": "Photo Verification",
-                "content": "For accuracy, you can upload a screenshot of your step count as proof.",
-                "mobile": {
-                    "content": "Optional photo proof."
+                    "content": "Click to edit step counts if needed."
                 }
             },
             "submitButton": {
-                "title": "Submit Now",
-                "content": "After entering your steps, click Submit to record them for today!",
+                "title": "Submit Your Data",
+                "content": "Once you've reviewed all entries, click here to submit them all at once. High-confidence entries are submitted automatically!",
                 "mobile": {
-                    "content": "Submit your entry."
+                    "content": "Click to submit all reviewed entries."
                 }
             },
             "confirmation": {
-                "title": "Submission Confirmed!",
-                "content": "Your steps are now recorded. Check the leaderboard to see where you rank!",
+                "title": "Success!",
+                "content": "Your submissions appear here in the recent activity feed. You can see all your uploaded days and their status.",
                 "mobile": {
-                    "content": "Steps recorded!"
+                    "content": "See your submissions in the activity feed."
                 }
             }
         }

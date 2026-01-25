@@ -714,6 +714,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                     multiple
                     onChange={handleFilesSelected}
                     disabled={processing || images.length >= maxFiles}
+                    data-tour="batch-file-upload"
                     className="text-sm text-slate-300 file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90 disabled:opacity-50"
                 />
                 <p className="text-xs text-slate-500">
@@ -728,8 +729,8 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
 
             {/* Image Grid */}
             {images.length > 0 && (
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {images.map((img) => (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" data-tour="batch-review-grid">
+                    {images.map((img, index) => (
                         <div
                             key={img.id}
                             className={`relative rounded-lg border-2 overflow-hidden ${getStatusColor(img.status)}`}
@@ -785,6 +786,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                                 type="date"
                                                 value={img.editedDate || ""}
                                                 onChange={(e) => updateEditedValue(img.id, "editedDate", e.target.value)}
+                                                data-tour={index === 0 ? "batch-date-input" : undefined}
                                                 className="flex-1 rounded border border-slate-600 bg-slate-900 px-2 py-1 text-xs text-slate-200"
                                             />
                                         </div>
@@ -796,6 +798,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                                 type="number"
                                                 value={img.editedSteps || ""}
                                                 onChange={(e) => updateEditedValue(img.id, "editedSteps", e.target.value)}
+                                                data-tour={index === 0 ? "batch-steps-input" : undefined}
                                                 className="flex-1 rounded border border-slate-600 bg-slate-900 px-2 py-1 text-xs text-slate-200"
                                             />
                                         </div>
@@ -932,7 +935,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
 
             {/* Overall Status with detailed step */}
             {(overallStatus || extractionStep) && (
-                <div className="space-y-1 p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+                <div className="space-y-1 p-3 bg-slate-800/50 rounded-lg border border-slate-700" data-tour="batch-status-display">
                     {overallStatus && (
                         <p className="text-sm text-[hsl(var(--info))] font-medium">{overallStatus}</p>
                     )}
@@ -948,6 +951,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                     <button
                         onClick={handleExtractAll}
                         disabled={processing}
+                        data-tour="batch-extract-button"
                         className="flex-1 rounded-md bg-[hsl(var(--warning))] px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-[hsl(var(--warning)/0.9)] disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         {processing ? "Extracting..." : `Extract Data (${pendingCount} image${pendingCount !== 1 ? "s" : ""})`}
@@ -969,6 +973,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                     <button
                         onClick={handleSubmitReviewed}
                         disabled={processing}
+                        data-tour="batch-submit-button"
                         className="flex-1 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         {processing ? "Submitting..." : `Submit (${reviewCount} image${reviewCount !== 1 ? "s" : ""})`}

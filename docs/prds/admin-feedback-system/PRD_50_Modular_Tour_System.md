@@ -3767,6 +3767,65 @@ VALUES
 
 ---
 
+## Recent Improvements (January 2026)
+
+### Universal Tour State Management
+
+**Status**: ✅ Completed (commit e6298af)
+
+**Problem Solved**:
+1. Race condition where tours wouldn't start after completing another tour
+2. Silent blocking when trying to start a tour while one is running
+
+**Implementation**:
+- Moved feedback dialog opening to effect-based timing (eliminates race condition)
+- Added user-friendly confirmation dialog for tour switching
+- Both fixes are universal and automatic for all tours
+
+**Architecture Benefits**:
+- Zero tour-specific code
+- Future-proof (applies to all new tours automatically)
+- Modular and maintainable
+
+**Files Modified**:
+- `src/components/tours/TourProvider.tsx` - Core state management
+- `src/lib/tours/types.ts` - Context type updates
+
+### Submit Steps Tour Migration to Batch Mode
+
+**Status**: ✅ Completed (current session)
+
+**Problem Solved**:
+- Tour was targeting single-entry mode (being deprecated)
+- Batch upload is the PRIMARY submission method
+- Mode-switching logic added complexity (~80 lines of tour-specific code)
+
+**Implementation**:
+- Added data-tour attributes to BatchSubmissionForm component
+- Updated submit.tour.ts to target batch workflow steps
+- Updated tour translations to reflect AI extraction workflow
+- Removed submit-steps mode switching from TourProvider (simplified architecture)
+
+**Architecture Benefits**:
+- Removed ~80 lines of tour-specific code from TourProvider
+- Aligns tour with primary user workflow (batch > single-entry)
+- More universal tour system (one less special case)
+
+**Files Modified**:
+- `src/components/forms/BatchSubmissionForm.tsx` - Added 7 data-tour attributes
+- `src/lib/tours/definitions/submit.tour.ts` - Updated to batch workflow
+- `src/locales/en/tours.json` - Updated translations
+- `src/components/tours/TourProvider.tsx` - Removed mode switching logic
+
+### Known Considerations
+
+**Batch Upload Priority**:
+- Batch upload is the PRIMARY submission method (AI extraction from screenshots)
+- Single-entry method is legacy and may be deprecated
+- All tour content prioritizes batch workflow
+
+---
+
 ## Conclusion
 
 This PRD provides a comprehensive, research-backed blueprint for rebuilding StepLeague's tour system. The implementation agent should:

@@ -1,10 +1,10 @@
 /**
  * Submit Steps Tour Definition
- * 
- * Explains the three submission methods.
+ *
+ * Explains the batch submission workflow with AI extraction.
  * Auto-starts on first visit to submit page.
- * 7 steps covering Apple Health, Google Fit, and manual entry.
- * 
+ * 9 steps covering batch upload, extraction, review, and submission.
+ *
  * @see PRD 50: Modular Tour System v2.0
  */
 
@@ -26,7 +26,7 @@ export const submitTour: TourDefinition = {
     },
 
     mobile: {
-        maxSteps: 5,
+        maxSteps: 6,
         maxContentChars: 130,
         maxTitleChars: 60,
         maxLines: 3,
@@ -45,57 +45,80 @@ export const submitTour: TourDefinition = {
             },
         },
         {
-            id: 'date-picker',
-            target: '[data-tour="date-picker"]',
-            titleKey: 'submit.steps.datePicker.title',
-            contentKey: 'submit.steps.datePicker.content',
-            placement: 'right',
+            id: 'batch-toggle',
+            target: '[data-tour="batch-toggle"]',
+            titleKey: 'submit.steps.batchToggle.title',
+            contentKey: 'submit.steps.batchToggle.content',
+            placement: 'bottom',
             spotlightClicks: true,
             mobile: {
-                contentKey: 'submit.steps.datePicker.mobile.content',
+                contentKey: 'submit.steps.batchToggle.mobile.content',
+            },
+        },
+        {
+            id: 'file-upload',
+            target: '[data-tour="batch-file-upload"]',
+            titleKey: 'submit.steps.fileUpload.title',
+            contentKey: 'submit.steps.fileUpload.content',
+            placement: 'right',
+            mobile: {
+                contentKey: 'submit.steps.fileUpload.mobile.content',
                 placement: 'bottom',
             },
         },
         {
-            id: 'steps-input',
-            target: '[data-tour="steps-input"]',
-            titleKey: 'submit.steps.stepsInput.title',
-            contentKey: 'submit.steps.stepsInput.content',
-            placement: 'right',
-            spotlightClicks: true,
-            mobile: {
-                contentKey: 'submit.steps.stepsInput.mobile.content',
-                placement: 'bottom',
-            },
-        },
-        {
-            id: 'screenshot-upload',
-            target: '[data-tour="screenshot-upload"]',
-            titleKey: 'submit.steps.screenshotUpload.title',
-            contentKey: 'submit.steps.screenshotUpload.content',
+            id: 'extract-button',
+            target: '[data-tour="batch-extract-button"]',
+            titleKey: 'submit.steps.extractButton.title',
+            contentKey: 'submit.steps.extractButton.content',
             placement: 'top',
             mobile: {
-                contentKey: 'submit.steps.screenshotUpload.mobile.content',
+                contentKey: 'submit.steps.extractButton.mobile.content',
+            },
+        },
+        {
+            id: 'review-grid',
+            target: '[data-tour="batch-review-grid"]',
+            titleKey: 'submit.steps.reviewGrid.title',
+            contentKey: 'submit.steps.reviewGrid.content',
+            placement: 'top',
+            mobile: {
+                contentKey: 'submit.steps.reviewGrid.mobile.content',
+            },
+        },
+        {
+            id: 'date-edit',
+            target: '[data-tour="batch-date-input"]',
+            titleKey: 'submit.steps.dateEdit.title',
+            contentKey: 'submit.steps.dateEdit.content',
+            placement: 'right',
+            spotlightClicks: true,
+            mobile: {
+                contentKey: 'submit.steps.dateEdit.mobile.content',
+                placement: 'bottom',
+            },
+        },
+        {
+            id: 'steps-edit',
+            target: '[data-tour="batch-steps-input"]',
+            titleKey: 'submit.steps.stepsEdit.title',
+            contentKey: 'submit.steps.stepsEdit.content',
+            placement: 'right',
+            spotlightClicks: true,
+            mobile: {
+                contentKey: 'submit.steps.stepsEdit.mobile.content',
+                placement: 'bottom',
             },
         },
         {
             id: 'submit-button',
-            target: '[data-tour="submit-button"]',
+            target: '[data-tour="batch-submit-button"]',
             titleKey: 'submit.steps.submitButton.title',
             contentKey: 'submit.steps.submitButton.content',
             placement: 'top',
             spotlightClicks: true,
             mobile: {
                 contentKey: 'submit.steps.submitButton.mobile.content',
-            },
-            // Interactive: Wait for steps_submitted event
-            interactive: {
-                enabled: true,
-                validation: {
-                    type: 'event',
-                    event: 'steps_submitted',
-                    timeout: 120000, // 2 minutes
-                },
             },
         },
         {

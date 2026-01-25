@@ -746,6 +746,75 @@ Joyride tour styling uses CSS variables for theme-aware colors:
 
 Both dark and light theme values are defined in `globals.css`.
 
+## Tour System Architecture
+
+### Universal Tour State Management
+
+The tour system uses a centralized state management approach in `TourProvider.tsx` that ensures reliable, consistent behavior across all tours.
+
+#### Key Features
+
+**1. Tour Completion is Immediate**
+- Tours complete the moment the last step is finished
+- Feedback dialog is shown via effect AFTER state settles
+- `isRunning` becomes `false` immediately on completion
+- Users can start new tours even if feedback dialog is still open
+
+**2. User-Friendly Tour Switching**
+- Attempting to start a tour while another is running shows a confirmation dialog
+- User chooses: "Switch to [new tour]" or "Continue Current Tour"
+- No silent failures - clear user communication
+- Works automatically for any tour combination
+
+**3. Universal Application**
+- All fixes apply to ALL tours automatically (no tour-specific code)
+- Future tours added to registry inherit these behaviors
+- Zero maintenance required when adding new tours
+
+#### Implementation Details
+
+**Race Condition Fix:**
+```typescript
+// Feedback dialog shown via effect (not synchronously)
+useEffect(() => {
+    if (lastCompletedTourId && !isRunning && !activeTour && !showFeedbackDialog) {
+        setShowFeedbackDialog(true);
+    }
+}, [lastCompletedTourId, isRunning, activeTour, showFeedbackDialog]);
+```
+
+**Tour Switch Confirmation:**
+```typescript
+// Universal confirmation logic in hash handler
+if (isRunning && activeTour) {
+    setPendingTourSwitch({
+        fromTourId: activeTour.id,
+        fromTourName: t(activeTour.nameKey),
+        toTourId: tour.id,
+        toTourName: t(tour.nameKey)
+    });
+    return; // Shows confirmation dialog
+}
+```
+
+#### Important Notes
+
+- Feedback is NEVER part of the tour itself (for any tour)
+- Tour switching uses i18n-translated tour names automatically
+- All state management is in TourProvider.tsx only
+- No changes to individual tour definitions or pages
+
+### Submission Methods Priority
+
+**Batch Upload**: Primary submission method (most important)
+- Users can upload multiple days of step data at once using AI extraction from screenshots
+- Main workflow for regular usage
+- Tour content prioritizes this method
+
+**Single Entry**: Legacy method (being deprecated)
+- Individual day submission
+- May be removed in future versions
+
 ### When to Use shadcn vs Existing Components
 
 > **Decision Record (PRD 21 Part C)**: We are migrating the navigation system to shadcn `DropdownMenu` to ensure accessibility, consistent behavior, and eliminate INP blocking issues found in the custom implementation.

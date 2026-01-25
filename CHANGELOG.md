@@ -71,6 +71,13 @@ All notable changes to StepLeague v3.
   - **Issue 1 - Race Condition Fix**: After completing ANY tour, starting another tour would fail with "Tour already running" due to `startTransition` timing. Feedback dialog opened synchronously while `setIsRunning(false)` was deferred, causing hash handler to see stale `isRunning = true`. **Solution**: Moved feedback dialog opening to a universal effect that waits for state to settle. Feedback is now clearly separate from the tour itself - tours complete immediately when steps finish, not when feedback closes. Works automatically for all 7 existing tours and any future tours.
   - **Issue 2 - Silent Blocking Replaced**: When trying to start a new tour while one is running, system silently blocked with console warning. **Solution**: Added universal tour switch confirmation dialog asking user to choose: "Switch to [new tour]" or "Continue Current Tour". Uses i18n-translated tour names dynamically, works for ANY tour combination with zero tour-specific logic.
   - **Architecture**: Both fixes implemented entirely in `TourProvider.tsx` core state management - zero changes to individual tours, definitions, or pages. Modular, automatic, and requires no maintenance when adding new tours to the registry.
+- **Submit Steps Tour Migration to Batch Mode** - Updated submit-steps tour to target batch workflow (primary submission method) instead of single-entry mode (being deprecated). Simplified tour system architecture by removing ~80 lines of tour-specific mode-switching code from TourProvider:
+  - **BatchSubmissionForm**: Added 7 data-tour attributes for tour targeting (file upload, review grid, date/steps inputs, extract/submit buttons, status display)
+  - **submit.tour.ts**: Updated all 9 steps to batch workflow (file upload → AI extraction → review → submit) instead of single-entry
+  - **tours.json**: Updated translations to reflect AI extraction workflow and batch upload process
+  - **TourProvider**: Removed `originalSubmissionMode` state and entire submit-steps mode-switching block (simplified architecture)
+  - **submit-steps page**: Event listener for mode switching already removed (no longer needed)
+  - **Rationale**: Batch upload is the PRIMARY method users should learn, single-entry is legacy. Aligns tour with actual user workflow and removes complexity.
 
 ### Removed
 

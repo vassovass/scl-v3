@@ -127,7 +127,7 @@ scl-v3/
 - ✅ Module feedback system
 - ✅ Social sharing (Web Share API)
 - ✅ Mobile-responsive navigation
-- ✅ Guided onboarding tours
+- ✅ Guided onboarding tours with universal state management (reliable tour switching, immediate completion)
 - ✅ Tour analytics (completion funnel + feedback)
 - ✅ Footer with legal links
 - ✅ SuperAdmin theme mode controls (default and allowed modes)
