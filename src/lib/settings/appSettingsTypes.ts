@@ -25,6 +25,7 @@ export type AppSettingKey =
   | "feature_analytics_export"
   | "feature_proxy_system"   // PRD 41: Enable/disable proxy feature
   | "feature_auto_enroll_world_league"  // PRD 44: Auto-enroll new users in World League
+  | "feature_user_tracking"  // PRD 14: Enable/disable user activity tracking
   // Defaults
   | "default_daily_step_goal"
   | "default_stepweek_start"

@@ -34,6 +34,34 @@ if (typeof window !== 'undefined') {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// MASTER TRACKING TOGGLE
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Master tracking toggle controlled by SuperAdmin feature flag.
+ * When false, ALL analytics are disabled regardless of user consent.
+ * This is set by the AnalyticsGate component based on feature_user_tracking setting.
+ */
+let _trackingEnabled = true;
+
+/**
+ * Set the master tracking toggle. Called by AnalyticsGate on mount/update.
+ */
+export function setTrackingEnabled(enabled: boolean) {
+    _trackingEnabled = enabled;
+    if (process.env.NODE_ENV === 'development') {
+        console.log('[Analytics] Master tracking toggle:', enabled ? 'ENABLED' : 'DISABLED');
+    }
+}
+
+/**
+ * Check if tracking is currently enabled (for external use).
+ */
+export function isTrackingEnabled(): boolean {
+    return _trackingEnabled;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // CORE TRACKING FUNCTION
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -52,12 +80,26 @@ export interface TrackEventParams {
  * Push event to BOTH dataLayer (GA4) AND PostHog
  * - dataLayer → GTM → GA4
  * - PostHog SDK → PostHog (session replay, funnels, feature flags)
+ * 
+ * Note: Events are only sent if master tracking toggle is enabled (feature_user_tracking).
+ * Tour validation events are still dispatched regardless of tracking state.
  */
 export function trackEvent(
     eventName: string,
     params?: TrackEventParams
 ) {
     if (typeof window === 'undefined') return;
+
+    // Always dispatch tour validation events (for interactive tours to work)
+    dispatchValidationEvent(eventName);
+
+    // Master toggle check - if tracking disabled, skip analytics
+    if (!_trackingEnabled) {
+        if (process.env.NODE_ENV === 'development') {
+            console.log('[Analytics] Event BLOCKED (tracking disabled):', eventName);
+        }
+        return;
+    }
 
     // Filter out undefined/null values
     const cleanParams = params
@@ -78,9 +120,6 @@ export function trackEvent(
 
     // Push to PostHog SDK (session replay, funnels, feature flags)
     posthogCapture(eventName, cleanParams as Record<string, string | number | boolean | null | undefined>);
-
-    // Notify tour validation listeners (used for interactive steps)
-    dispatchValidationEvent(eventName);
 
     // Debug in development
     if (process.env.NODE_ENV === 'development') {

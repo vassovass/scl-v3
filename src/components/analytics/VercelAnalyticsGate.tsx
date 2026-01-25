@@ -4,20 +4,36 @@ import { useEffect, useState } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { hasAnalyticsConsent } from "@/lib/consent/cookieConsent";
+import { useFeatureFlag } from "@/hooks/useFeatureFlag";
+import { setTrackingEnabled } from "@/lib/analytics";
 
 /**
  * Gates Vercel Analytics + SpeedInsights behind:
+ * - SuperAdmin feature flag (feature_user_tracking) - master toggle
  * - user analytics consent (cookie consent banner)
  * - online status (avoid noisy failed POSTs when offline or blocked)
+ * 
+ * The feature flag acts as a master switch:
+ * - When OFF: no tracking regardless of consent
+ * - When ON: consent-based tracking is in effect
  */
 export function VercelAnalyticsGate() {
   const [enabled, setEnabled] = useState(false);
+  const featureEnabled = useFeatureFlag("feature_user_tracking");
 
   useEffect(() => {
     const compute = () => {
       const consented = hasAnalyticsConsent();
       const online = typeof navigator !== "undefined" ? navigator.onLine : true;
-      setEnabled(consented && online);
+
+      // Master toggle: feature flag must be ON for any tracking
+      // When feature is ON, consent determines if tracking happens
+      const shouldEnable = featureEnabled && consented && online;
+
+      setEnabled(shouldEnable);
+
+      // Sync the master toggle to analytics.ts for trackEvent() calls
+      setTrackingEnabled(featureEnabled);
     };
 
     compute();
@@ -46,7 +62,7 @@ export function VercelAnalyticsGate() {
       window.clearInterval(poll);
       window.clearTimeout(stopPoll);
     };
-  }, []);
+  }, [featureEnabled]);
 
   if (!enabled) return null;
 
@@ -57,5 +73,3 @@ export function VercelAnalyticsGate() {
     </>
   );
 }
-
-

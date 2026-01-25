@@ -125,6 +125,17 @@ const featureSettings: AppSettingDefinition[] = [
     visibleTo: ["superadmin"],
     editableBy: ["superadmin"],
   },
+  // PRD 14: User activity tracking toggle
+  {
+    key: "feature_user_tracking",
+    type: "toggle",
+    label: "User Activity Tracking",
+    description: "Enable anonymous user activity tracking via GA4 and PostHog. When disabled, no analytics events are sent. Users who haven't consented are never tracked regardless of this setting.",
+    default: true,
+    category: "features",
+    visibleTo: ["superadmin"],
+    editableBy: ["superadmin"],
+  },
 ];
 
 // ============================================================================

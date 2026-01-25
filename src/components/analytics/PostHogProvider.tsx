@@ -39,30 +39,30 @@ function initPostHog() {
 
     posthog.init(POSTHOG_KEY, {
         api_host: POSTHOG_HOST,
-        
+
         // Session Replay - MUST HAVE
         session_recording: {
             recordCrossOriginIframes: true,
         },
-        
+
         // Auto-capture clicks, pageviews, etc.
         autocapture: true,
         capture_pageview: true,
         capture_pageleave: true,
-        
+
         // Feature Flags
         bootstrap: {},
-        
+
         // Performance
         loaded: (ph) => {
             if (DEBUG) {
                 console.log('[PostHog] Initialized with session replay');
             }
         },
-        
+
         // Debug mode in development
         debug: DEBUG,
-        
+
         // Respect Do Not Track browser setting initially
         // But we override with explicit consent below
         respect_dnt: false,
@@ -72,9 +72,19 @@ function initPostHog() {
 /**
  * PostHog Provider Component
  * 
- * Wraps the app and manages PostHog lifecycle based on consent.
+ * Wraps the app and manages PostHog lifecycle based on:
+ * - SuperAdmin feature flag (feature_user_tracking) - master toggle
+ * - User consent (cookie consent banner)
+ * 
+ * @param featureEnabled - Master toggle from feature_user_tracking setting
  */
-export function PostHogProvider({ children }: { children: React.ReactNode }) {
+export function PostHogProvider({
+    children,
+    featureEnabled = true
+}: {
+    children: React.ReactNode;
+    featureEnabled?: boolean;
+}) {
     const [isReady, setIsReady] = useState(false);
     const [hasConsent, setHasConsent] = useState(false);
 
@@ -84,17 +94,20 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
         const checkConsent = () => {
             const consented = hasAnalyticsConsent();
             const online = navigator.onLine;
-            
-            if (consented && online && !isReady) {
+
+            // Master toggle: feature must be enabled for any tracking
+            const shouldTrack = featureEnabled && consented && online;
+
+            if (shouldTrack && !isReady) {
                 initPostHog();
                 setIsReady(true);
                 setHasConsent(true);
-            } else if (!consented && isReady) {
-                // User revoked consent - opt out
+            } else if (!shouldTrack && isReady) {
+                // Feature disabled or user revoked consent - opt out
                 posthog.opt_out_capturing();
                 setHasConsent(false);
-            } else if (consented && isReady && !hasConsent) {
-                // User granted consent after previously revoking
+            } else if (shouldTrack && isReady && !hasConsent) {
+                // Feature enabled AND user granted consent after previously revoking
                 posthog.opt_in_capturing();
                 setHasConsent(true);
             }
@@ -125,7 +138,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
             window.clearInterval(poll);
             window.clearTimeout(stopPoll);
         };
-    }, [isReady, hasConsent]);
+    }, [isReady, hasConsent, featureEnabled]);
 
     // If PostHog isn't ready yet (no consent or no key), just render children
     if (!isReady || !POSTHOG_KEY) {
@@ -155,7 +168,7 @@ export function posthogIdentify(
     if (!posthog.__loaded) return;
 
     posthog.identify(userId, traits);
-    
+
     if (DEBUG) {
         console.log('[PostHog] User identified:', userId, traits);
     }
@@ -169,7 +182,7 @@ export function posthogReset() {
     if (!posthog.__loaded) return;
 
     posthog.reset();
-    
+
     if (DEBUG) {
         console.log('[PostHog] User reset (logout)');
     }
@@ -194,7 +207,7 @@ export function posthogCapture(
         : {};
 
     posthog.capture(eventName, cleanProps);
-    
+
     if (DEBUG) {
         console.log('[PostHog] Event captured:', eventName, cleanProps);
     }

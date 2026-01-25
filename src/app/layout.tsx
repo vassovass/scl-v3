@@ -30,9 +30,9 @@ const VercelAnalyticsGate = dynamic(
   { ssr: false }
 );
 
-// PostHog SDK - async loaded, consent-aware, no SSR blocking
-const PostHogProvider = dynamic(
-  () => import("@/components/analytics/PostHogProvider").then((mod) => mod.PostHogProvider),
+// Analytics Gate: handles feature flag + PostHog - async loaded, no SSR blocking
+const AnalyticsGateProvider = dynamic(
+  () => import("@/components/analytics/AnalyticsGateProvider").then((mod) => mod.AnalyticsGateProvider),
   { ssr: false }
 );
 
@@ -107,8 +107,8 @@ export default async function RootLayout({
           defaultTheme={themeSettings.defaultMode}
           enableSystem={themeSettings.allowedModes.includes("system")}
         >
-          {/* PostHog: async loaded, consent-aware, session replay + feature flags */}
-          <PostHogProvider>
+          {/* Analytics Gate: manages feature flag + PostHog (consent-aware, session replay) */}
+          <AnalyticsGateProvider>
             <AuthProvider>
               <LoadingWatchdog>
                 {children}
@@ -120,7 +120,7 @@ export default async function RootLayout({
                 <Toaster />
               </LoadingWatchdog>
             </AuthProvider>
-          </PostHogProvider>
+          </AnalyticsGateProvider>
         </ThemeProvider>
 
         {/* Cookie consent banner (renders at bottom of page) */}
