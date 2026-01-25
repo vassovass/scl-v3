@@ -268,6 +268,12 @@ export function TourProvider({
     const [activeVariant, setActiveVariant] = useState<string | null>(null);
     const [originalSubmissionMode, setOriginalSubmissionMode] = useState<string | null>(null);
     const [originalViewMode, setOriginalViewMode] = useState<string | null>(null);
+    const [pendingTourSwitch, setPendingTourSwitch] = useState<{
+        fromTourId: string;
+        fromTourName: string;
+        toTourId: string;
+        toTourName: string;
+    } | null>(null);
 
     const tourStartTime = useRef<number>(0);
     const stepStartTime = useRef<number>(0);
@@ -638,9 +644,30 @@ export function TourProvider({
                         hash
                     });
 
-                    // Edge case: Don't restart if tour is already running
-                    if (isRunning) {
-                        console.warn('[TourProvider] Tour already running, ignoring hash');
+                    // Universal tour switching logic - works for ALL tour combinations
+                    // If ANY tour is running and user wants to start ANY other tour, ask them
+                    if (isRunning && activeTour) {
+                        // Get translated tour names using i18n - works for all tours automatically
+                        const fromTourName = activeTour.nameKey ? t(activeTour.nameKey) : activeTour.id;
+                        const toTourName = tour.nameKey ? t(tour.nameKey) : tour.id;
+
+                        console.log('[TourProvider] Tour already running, asking user if they want to switch:', {
+                            from: activeTour.id,
+                            to: tour.id
+                        });
+
+                        // Set pending switch state - will trigger universal confirmation dialog
+                        setPendingTourSwitch({
+                            fromTourId: activeTour.id,
+                            fromTourName,
+                            toTourId: tour.id,
+                            toTourName
+                        });
+
+                        // Clear hash so back button works correctly
+                        window.history.replaceState(null, '',
+                            `${window.location.pathname}${window.location.search}`
+                        );
                         return;
                     }
 
@@ -675,6 +702,24 @@ export function TourProvider({
             window.removeEventListener('hashchange', handleHashChange);
         };
     }, [i18nReady, stateLoaded, isRunning]); // Dependencies: wait for readiness
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Feedback dialog - show after ANY tour completes and state settles
+    // Universal effect - applies to all tours automatically
+    // ─────────────────────────────────────────────────────────────────────────
+
+    useEffect(() => {
+        // This effect runs for ALL tours - no tour-specific logic
+        // Only show dialog when:
+        // 1. There's a completed tour ID (any tour)
+        // 2. Tour is NOT running (state has settled for any tour)
+        // 3. No active tour (universal state)
+        // 4. Dialog is not already showing
+        if (lastCompletedTourId && !isRunning && !activeTour && !showFeedbackDialog) {
+            console.log('[TourProvider] Opening feedback dialog for completed tour:', lastCompletedTourId);
+            setShowFeedbackDialog(true);
+        }
+    }, [lastCompletedTourId, isRunning, activeTour, showFeedbackDialog]);
 
     const startContextualTour = useCallback(() => {
         const pathTours = getToursForPath(pathname);
@@ -801,7 +846,7 @@ export function TourProvider({
         setActiveVariant(null);
         trackedTourStartRef.current = null;
         setLastCompletedTourId(activeTour.id);
-        setShowFeedbackDialog(true);
+        // Note: Feedback dialog is shown via effect (after state settles) - not synchronously
         document.body.classList.remove('joyride-active');
     }, [activeTour, userId, filteredTourSteps.length, activeVariant, originalSubmissionMode, originalViewMode]);
 
@@ -949,6 +994,7 @@ export function TourProvider({
             currentStepIndex: stepIndex,
             hasCompletedTour,
             getCompletionStatus,
+            pendingTourSwitch: !!pendingTourSwitch, // Flag to indicate tour switch confirmation is showing
         }),
         [
             startTour,
@@ -960,6 +1006,7 @@ export function TourProvider({
             stepIndex,
             hasCompletedTour,
             getCompletionStatus,
+            pendingTourSwitch,
         ]
     );
 
@@ -1102,10 +1149,63 @@ export function TourProvider({
                 />
             )}
 
+            {/* Tour switch confirmation dialog - universal for all tours */}
+            {pendingTourSwitch && (
+                <div
+                    className="fixed inset-0 bg-black/50 flex items-center justify-center z-[10001]"
+                    onClick={() => setPendingTourSwitch(null)}
+                >
+                    <div
+                        className="bg-card border border-border rounded-lg p-6 max-w-md mx-4 shadow-xl"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h3 className="text-lg font-semibold mb-2">
+                            Switch Tours?
+                        </h3>
+                        <p className="text-sm text-muted-foreground mb-4">
+                            You're currently in the <strong>{pendingTourSwitch.fromTourName}</strong> tour.
+                            Would you like to switch to the <strong>{pendingTourSwitch.toTourName}</strong> tour,
+                            or complete your current tour first?
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => {
+                                    // Switch to new tour
+                                    console.log('[TourProvider] User chose to switch tours');
+                                    skipTour(); // End current tour without feedback
+                                    setTimeout(() => {
+                                        startTour(pendingTourSwitch.toTourId);
+                                        setPendingTourSwitch(null);
+                                    }, 100); // Brief delay for state to settle
+                                }}
+                                className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition"
+                            >
+                                Switch to {pendingTourSwitch.toTourName}
+                            </button>
+                            <button
+                                onClick={() => {
+                                    // Stay in current tour
+                                    console.log('[TourProvider] User chose to stay in current tour');
+                                    setPendingTourSwitch(null);
+                                }}
+                                className="flex-1 px-4 py-2 border border-border rounded-md hover:bg-accent transition"
+                            >
+                                Continue Current Tour
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {lastCompletedTourId && (
                 <TourFeedbackDialog
                     open={showFeedbackDialog}
-                    onOpenChange={setShowFeedbackDialog}
+                    onOpenChange={(open) => {
+                        setShowFeedbackDialog(open);
+                        if (!open) {
+                            setLastCompletedTourId(null); // Clear trigger when dialog closes
+                        }
+                    }}
                     tourId={lastCompletedTourId}
                 />
             )}

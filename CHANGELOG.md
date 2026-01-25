@@ -67,6 +67,10 @@ All notable changes to StepLeague v3.
   - **Pages**: Added event listeners in `submit-steps/page.tsx` and `league/[id]/analytics/page.tsx` to handle mode switch events, added data attributes (`data-submission-mode`, `data-view-mode`) for mode detection
   - **Error Handling**: Added STATUS.ERROR handling in Joyride callback to auto-advance to next step instead of closing tour when target not found, tracking drop-off reason as 'error' in analytics
   - **Edge Cases**: Validates user hasn't navigated away during 200ms mode switch delay, prevents tour restart if already running
+- **Universal Tour State Management - Race Condition + User-Friendly Tour Switching** - Fixed two critical system-wide bugs affecting ALL tours (not tour-specific):
+  - **Issue 1 - Race Condition Fix**: After completing ANY tour, starting another tour would fail with "Tour already running" due to `startTransition` timing. Feedback dialog opened synchronously while `setIsRunning(false)` was deferred, causing hash handler to see stale `isRunning = true`. **Solution**: Moved feedback dialog opening to a universal effect that waits for state to settle. Feedback is now clearly separate from the tour itself - tours complete immediately when steps finish, not when feedback closes. Works automatically for all 7 existing tours and any future tours.
+  - **Issue 2 - Silent Blocking Replaced**: When trying to start a new tour while one is running, system silently blocked with console warning. **Solution**: Added universal tour switch confirmation dialog asking user to choose: "Switch to [new tour]" or "Continue Current Tour". Uses i18n-translated tour names dynamically, works for ANY tour combination with zero tour-specific logic.
+  - **Architecture**: Both fixes implemented entirely in `TourProvider.tsx` core state management - zero changes to individual tours, definitions, or pages. Modular, automatic, and requires no maintenance when adding new tours to the registry.
 
 ### Removed
 

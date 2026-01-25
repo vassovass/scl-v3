@@ -372,6 +372,8 @@ export interface TourContextType {
     hasCompletedTour: (tourId: string) => boolean;
     /** Get completion status for all tours */
     getCompletionStatus: () => Record<string, boolean>;
+    /** Flag to indicate tour switch confirmation is showing */
+    pendingTourSwitch?: boolean;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
