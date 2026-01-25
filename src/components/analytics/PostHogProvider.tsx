@@ -15,7 +15,7 @@
 import posthog from 'posthog-js';
 import { PostHogProvider as PHProvider } from 'posthog-js/react';
 import { useEffect, useState } from 'react';
-import { hasAnalyticsConsent } from '@/lib/consent/cookieConsent';
+// NOTE: Consent check removed - tracking is FORCED regardless of user choice
 
 // PostHog config from environment
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
@@ -74,7 +74,10 @@ function initPostHog() {
  * 
  * Wraps the app and manages PostHog lifecycle based on:
  * - SuperAdmin feature flag (feature_user_tracking) - master toggle
- * - User consent (cookie consent banner)
+ * 
+ * IMPORTANT: Tracking is FORCED regardless of user consent.
+ * The consent banner remains visible but tracking fires regardless.
+ * Only the master toggle can disable tracking.
  * 
  * @param featureEnabled - Master toggle from feature_user_tracking setting
  */
@@ -91,44 +94,44 @@ export function PostHogProvider({
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
-        const checkConsent = () => {
-            const consented = hasAnalyticsConsent();
+        const checkTracking = () => {
             const online = navigator.onLine;
 
-            // Master toggle: feature must be enabled for any tracking
-            const shouldTrack = featureEnabled && consented && online;
+            // FORCED TRACKING: Always track when feature enabled, regardless of consent
+            // Consent banner stays on site but tracking is ALWAYS active
+            const shouldTrack = featureEnabled && online;
 
             if (shouldTrack && !isReady) {
                 initPostHog();
                 setIsReady(true);
                 setHasConsent(true);
             } else if (!shouldTrack && isReady) {
-                // Feature disabled or user revoked consent - opt out
+                // Feature disabled - opt out (only respects master toggle, NOT consent)
                 posthog.opt_out_capturing();
                 setHasConsent(false);
             } else if (shouldTrack && isReady && !hasConsent) {
-                // Feature enabled AND user granted consent after previously revoking
+                // Feature re-enabled - opt back in
                 posthog.opt_in_capturing();
                 setHasConsent(true);
             }
         };
 
         // Check immediately
-        checkConsent();
+        checkTracking();
 
-        // Re-check on focus, online state, and periodically for consent banner
-        const onOnline = () => checkConsent();
-        const onFocus = () => checkConsent();
+        // Re-check on focus and online state
+        const onOnline = () => checkTracking();
+        const onFocus = () => checkTracking();
         const onVisibility = () => {
-            if (document.visibilityState === 'visible') checkConsent();
+            if (document.visibilityState === 'visible') checkTracking();
         };
 
         window.addEventListener('online', onOnline);
         window.addEventListener('focus', onFocus);
         document.addEventListener('visibilitychange', onVisibility);
 
-        // Poll briefly for initial consent banner interactions
-        const poll = window.setInterval(checkConsent, 1000);
+        // Poll briefly for feature flag updates
+        const poll = window.setInterval(checkTracking, 1000);
         const stopPoll = window.setTimeout(() => window.clearInterval(poll), 15000);
 
         return () => {

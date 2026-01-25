@@ -9,9 +9,9 @@
  * 2. Calls setTrackingEnabled() to gate analytics.ts events
  * 3. Passes featureEnabled to PostHogProvider
  * 
- * The feature flag acts as a master switch:
- * - When OFF: no tracking regardless of user consent
- * - When ON: consent-based tracking is in effect
+ * IMPORTANT: Tracking is FORCED regardless of user consent.
+ * The consent banner remains visible but tracking fires regardless.
+ * Only the master toggle can disable tracking.
  */
 
 import { useEffect } from "react";
