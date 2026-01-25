@@ -309,29 +309,9 @@ export function TourProvider({
         };
         window.addEventListener('beforeunload', handleUnload);
 
-        // Handle hash-based tour launch
-        const handleHashChange = () => {
-            const hash = window.location.hash;
-            if (hash.startsWith('#tour-')) {
-                const tour = getTourByHash(hash);
-                if (tour && startTourRef.current) {
-                    startTourRef.current(tour.id);
-                    // Remove hash after starting
-                    window.history.replaceState(
-                        null,
-                        '',
-                        `${window.location.pathname}${window.location.search}`
-                    );
-                }
-            }
-        };
-        handleHashChange(); // Check on mount
-        window.addEventListener('hashchange', handleHashChange);
-
         return () => {
             window.removeEventListener('resize', checkMobile);
             window.removeEventListener('beforeunload', handleUnload);
-            window.removeEventListener('hashchange', handleHashChange);
         };
     }, []);
 
@@ -540,6 +520,77 @@ export function TourProvider({
     useEffect(() => {
         startTourRef.current = startTour;
     }, [startTour]);
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Hash-based tour launch (separate from initialization for proper timing)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    useEffect(() => {
+        // Only check hash when all dependencies are ready
+        if (!i18nReady || !stateLoaded || !startTourRef.current) {
+            console.log('[TourProvider] Hash check NOT ready yet:', {
+                i18nReady,
+                stateLoaded,
+                hasStartTourRef: !!startTourRef.current,
+                currentHash: window.location.hash
+            });
+            return;
+        }
+
+        console.log('[TourProvider] Hash check ready:', {
+            i18nReady,
+            stateLoaded,
+            hasStartTourRef: !!startTourRef.current,
+            currentHash: window.location.hash
+        });
+
+        const handleHashChange = () => {
+            const hash = window.location.hash;
+            if (hash.startsWith('#tour-')) {
+                const tour = getTourByHash(hash);
+                if (tour && startTourRef.current) {
+                    console.log('[TourProvider] Starting tour from hash:', {
+                        tourId: tour.id,
+                        hash
+                    });
+
+                    // Edge case: Don't restart if tour is already running
+                    if (isRunning) {
+                        console.warn('[TourProvider] Tour already running, ignoring hash');
+                        return;
+                    }
+
+                    // Use setTimeout to ensure page elements are rendered
+                    setTimeout(() => {
+                        // Edge case: Check if user navigated away during timeout
+                        if (!window.location.hash.startsWith('#tour-')) {
+                            console.log('[TourProvider] User navigated away, canceling tour start');
+                            return;
+                        }
+
+                        startTourRef.current?.(tour.id);
+
+                        // Remove hash after starting
+                        window.history.replaceState(
+                            null,
+                            '',
+                            `${window.location.pathname}${window.location.search}`
+                        );
+                    }, 100); // Small delay for DOM elements to render
+                }
+            }
+        };
+
+        // Check hash on mount (when all deps are ready)
+        handleHashChange();
+
+        // Listen for future hash changes
+        window.addEventListener('hashchange', handleHashChange);
+
+        return () => {
+            window.removeEventListener('hashchange', handleHashChange);
+        };
+    }, [i18nReady, stateLoaded, isRunning]); // Dependencies: wait for readiness
 
     const startContextualTour = useCallback(() => {
         const pathTours = getToursForPath(pathname);
