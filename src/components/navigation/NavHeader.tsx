@@ -97,7 +97,27 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
 
         if (actionName === 'startTour' && item.href?.startsWith('#tour-')) {
             const tourId = item.href.replace('#tour-', '');
+            console.log('[NavHeader] Tour launch:', {
+                itemId: item.id,
+                itemHref: item.href,
+                extractedTourId: tourId
+            });
             setOpenDropdown(null);
+
+            // Legacy tour ID mapping (for database menu items with old IDs)
+            const legacyTourIdMap: Record<string, string> = {
+                "navigation": "dashboard-v1",
+                "new-user": "dashboard-v1",
+                "dashboard": "dashboard-v1",
+                "member": "submit-steps-v1",
+                "league": "league-v1",
+                "leaderboard": "leaderboard-v1",
+                "analytics": "analytics-v1",
+                "settings": "settings-v1",
+                "admin": "admin-v1",
+            };
+
+            const normalizedTourId = legacyTourIdMap[tourId] || tourId;
 
             const tourPaths: Record<string, string> = {
                 "dashboard-v1": "/dashboard",
@@ -109,12 +129,20 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
                 "admin-v1": "/admin/analytics/tours",
             };
 
-            const targetPath = tourPaths[tourId];
-            const hash = `#tour-${tourId}`;
+            const targetPath = tourPaths[normalizedTourId];
+            const hash = `#tour-${normalizedTourId}`;
+
+            console.log('[NavHeader] Tour path resolution:', {
+                originalTourId: tourId,
+                normalizedTourId,
+                targetPath,
+                currentPath: pathname,
+                willNavigate: targetPath && (pathname !== targetPath && !pathname.startsWith(targetPath + '/'))
+            });
 
             // Validate target path - prevent navigation to malformed URLs
             if (!targetPath || targetPath.includes('undefined') || targetPath === '') {
-                if (tourId === 'leaderboard-v1' || tourId === 'analytics-v1') {
+                if (normalizedTourId === 'leaderboard-v1' || normalizedTourId === 'analytics-v1') {
                     const { toast } = await import("@/hooks/use-toast");
                     toast({
                         title: "Navigate to a league first",

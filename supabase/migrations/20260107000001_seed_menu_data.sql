@@ -56,24 +56,25 @@ INSERT INTO menu_items (menu_id, item_key, label, href, icon, sort_order) VALUES
 ('help', 'beta-info', 'Beta Info', '/beta', '📋', 3);
 
 -- Insert Guided Tours submenu items
+-- Note: hrefs must match tour IDs in src/lib/tours/registry.ts
 INSERT INTO menu_items (menu_id, parent_id, item_key, label, href, icon, description, on_click, sort_order)
-SELECT 'help', id, 'tour-navigation', 'Navigation & Menus', '#tour-navigation', '🧭', '~30s', 'startTour', 0
+SELECT 'help', id, 'tour-dashboard', 'Dashboard Tour', '#tour-dashboard-v1', '🏠', '~2m', 'startTour', 0
 FROM menu_items WHERE item_key = 'guides' AND menu_id = 'help';
 
 INSERT INTO menu_items (menu_id, parent_id, item_key, label, href, icon, description, on_click, sort_order)
-SELECT 'help', id, 'tour-new-user', 'Dashboard Basics', '#tour-new-user', '🏠', '~30s', 'startTour', 1
+SELECT 'help', id, 'tour-league-create', 'Create a League', '#tour-league-v1', '🏆', '~1m', 'startTour', 1
 FROM menu_items WHERE item_key = 'guides' AND menu_id = 'help';
 
 INSERT INTO menu_items (menu_id, parent_id, item_key, label, href, icon, description, on_click, sort_order)
-SELECT 'help', id, 'tour-member', 'How to Submit Steps', '#tour-member', '📝', '~1m', 'startTour', 2
+SELECT 'help', id, 'tour-submit-steps', 'Submit Steps', '#tour-submit-steps-v1', '📝', '~2m', 'startTour', 2
 FROM menu_items WHERE item_key = 'guides' AND menu_id = 'help';
 
 INSERT INTO menu_items (menu_id, parent_id, item_key, label, href, icon, description, on_click, sort_order)
-SELECT 'help', id, 'tour-leaderboard', 'Leaderboard & Filters', '#tour-leaderboard', '🏆', '~30s', 'startTour', 3
+SELECT 'help', id, 'tour-leaderboard', 'Leaderboard Tour', '#tour-leaderboard-v1', '📊', '~1m', 'startTour', 3
 FROM menu_items WHERE item_key = 'guides' AND menu_id = 'help';
 
 INSERT INTO menu_items (menu_id, parent_id, item_key, label, href, icon, description, on_click, visible_to, sort_order)
-SELECT 'help', id, 'tour-admin', 'League Owner Guide', '#tour-admin', '👑', '~30s', 'startTour', ARRAY['admin', 'owner', 'superadmin']::TEXT[], 4
+SELECT 'help', id, 'tour-admin', 'Admin Analytics Tour', '#tour-admin-v1', '🛡️', '~1m', 'startTour', ARRAY['admin', 'owner', 'superadmin']::TEXT[], 4
 FROM menu_items WHERE item_key = 'guides' AND menu_id = 'help';
 
 -- Insert USER menu items

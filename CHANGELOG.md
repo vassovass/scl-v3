@@ -58,6 +58,7 @@ All notable changes to StepLeague v3.
 - **Admin Analytics Security** - Switched tour analytics API to `withApiHandler` + admin client and updated RLS policies to use `is_superadmin()`.
 - **Tour UX Quality** - Added mobile content constraints, feature flag filtering, feedback dialog i18n, and reliable hash-based tour launches via the Help menu.
 - **Tour Path Validation & Stale Closure Fix** - Fixed critical tour launching issues: (1) Added `requiredPath` validation to `startTour()` function to prevent tours from starting on incorrect pages, (2) Fixed stale closure bug in hash handler by using a ref to always call the latest `startTour` function. Tours now correctly validate they're on the required page and properly start when launched via hash from help menu, preventing silent failures and misaligned tooltips.
+- **Tour Menu Database Fix** - Fixed incorrect tour IDs in database menu seed data (migration 20260107000001) that prevented tours from launching. Updated tour hrefs to match tour registry IDs (`#tour-dashboard-v1`, `#tour-submit-steps-v1`, etc.). Added legacy tour ID mapping in NavHeader for backwards compatibility with old database values. Added debug console logging for tour path resolution.
 
 ### Removed
 
