@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
@@ -25,8 +25,24 @@ export default function LeagueAnalyticsPage() {
         total_steps: number;
     } | null>(null);
 
+    // Tour view mode switch handler - allows tour to control view mode
+    useEffect(() => {
+        const handleTourViewModeSwitch = (e: CustomEvent) => {
+            const { mode, restoreMode } = e.detail;
+            console.log(`[Analytics] Tour requested view mode switch to: ${mode}`,
+                restoreMode ? `(will restore: ${restoreMode})` : '');
+            setViewMode(mode as ViewMode);
+        };
+
+        window.addEventListener('tour:switch-view-mode', handleTourViewModeSwitch as EventListener);
+
+        return () => {
+            window.removeEventListener('tour:switch-view-mode', handleTourViewModeSwitch as EventListener);
+        };
+    }, []);
+
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-background" data-view-mode={viewMode}>
             {/* Header */}
             <header
                 className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-20"

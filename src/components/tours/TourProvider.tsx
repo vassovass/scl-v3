@@ -266,6 +266,8 @@ export function TourProvider({
     const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
     const [lastCompletedTourId, setLastCompletedTourId] = useState<string | null>(null);
     const [activeVariant, setActiveVariant] = useState<string | null>(null);
+    const [originalSubmissionMode, setOriginalSubmissionMode] = useState<string | null>(null);
+    const [originalViewMode, setOriginalViewMode] = useState<string | null>(null);
 
     const tourStartTime = useRef<number>(0);
     const stepStartTime = useRef<number>(0);
@@ -498,6 +500,88 @@ export function TourProvider({
                 }
             }
 
+            // Special handling for submit steps tour - auto-switch to single mode
+            if (tourId === 'submit-steps-v1') {
+                const currentMode = document.querySelector('[data-submission-mode]')?.getAttribute('data-submission-mode');
+
+                if (currentMode && currentMode !== 'single') {
+                    console.log('[TourProvider] Submit tour requires single mode, switching from:', currentMode);
+                    setOriginalSubmissionMode(currentMode);
+
+                    // Dispatch custom event to switch mode
+                    window.dispatchEvent(new CustomEvent('tour:switch-submission-mode', {
+                        detail: { mode: 'single', restoreMode: currentMode }
+                    }));
+
+                    // Wait for mode switch before starting tour
+                    setTimeout(() => {
+                        // Edge case: Check if user navigated away during timeout
+                        if (window.location.pathname !== pathname) {
+                            console.log('[TourProvider] User navigated away during mode switch, canceling tour start');
+                            setOriginalSubmissionMode(null);
+                            return;
+                        }
+
+                        // Add body class for CSS targeting
+                        document.body.classList.add('joyride-active');
+
+                        // Set state using startTransition for performance
+                        startTransition(() => {
+                            setActiveTour(tour);
+                            setStepIndex(0);
+                            setIsRunning(true);
+                            setActiveVariant(selectedVariant);
+                        });
+
+                        // Track analytics timestamps (actual tracking in effect)
+                        tourStartTime.current = Date.now();
+                        stepStartTime.current = Date.now();
+                    }, 200); // Wait for mode switch
+                    return;
+                }
+            }
+
+            // Special handling for analytics tour - auto-switch to "both" view mode
+            if (tourId === 'analytics-v1') {
+                const currentViewMode = document.querySelector('[data-view-mode]')?.getAttribute('data-view-mode');
+
+                if (currentViewMode && currentViewMode !== 'both') {
+                    console.log('[TourProvider] Analytics tour requires "both" view mode, switching from:', currentViewMode);
+                    setOriginalViewMode(currentViewMode);
+
+                    // Dispatch custom event to switch view mode
+                    window.dispatchEvent(new CustomEvent('tour:switch-view-mode', {
+                        detail: { mode: 'both', restoreMode: currentViewMode }
+                    }));
+
+                    // Wait for view mode switch before starting tour
+                    setTimeout(() => {
+                        // Edge case: Check if user navigated away during timeout
+                        if (window.location.pathname !== pathname) {
+                            console.log('[TourProvider] User navigated away during view mode switch, canceling tour start');
+                            setOriginalViewMode(null);
+                            return;
+                        }
+
+                        // Add body class for CSS targeting
+                        document.body.classList.add('joyride-active');
+
+                        // Set state using startTransition for performance
+                        startTransition(() => {
+                            setActiveTour(tour);
+                            setStepIndex(0);
+                            setIsRunning(true);
+                            setActiveVariant(selectedVariant);
+                        });
+
+                        // Track analytics timestamps (actual tracking in effect)
+                        tourStartTime.current = Date.now();
+                        stepStartTime.current = Date.now();
+                    }, 200); // Wait for view mode switch
+                    return;
+                }
+            }
+
             // Add body class for CSS targeting
             document.body.classList.add('joyride-active');
 
@@ -605,6 +689,24 @@ export function TourProvider({
         // Cancel any pending validations
         cancelAllValidations();
 
+        // Restore submission mode if it was changed for submit tour
+        if (originalSubmissionMode && activeTour.id === 'submit-steps-v1') {
+            console.log('[TourProvider] Restoring submission mode to:', originalSubmissionMode);
+            window.dispatchEvent(new CustomEvent('tour:switch-submission-mode', {
+                detail: { mode: originalSubmissionMode }
+            }));
+            setOriginalSubmissionMode(null);
+        }
+
+        // Restore view mode if it was changed for analytics tour
+        if (originalViewMode && activeTour.id === 'analytics-v1') {
+            console.log('[TourProvider] Restoring view mode to:', originalViewMode);
+            window.dispatchEvent(new CustomEvent('tour:switch-view-mode', {
+                detail: { mode: originalViewMode }
+            }));
+            setOriginalViewMode(null);
+        }
+
         // Track skip
         tourAnalytics.trackTourComplete({
             tourId: activeTour.id,
@@ -637,13 +739,31 @@ export function TourProvider({
         setActiveVariant(null);
         trackedTourStartRef.current = null;
         document.body.classList.remove('joyride-active');
-    }, [activeTour, stepIndex, userId, filteredTourSteps.length]);
+    }, [activeTour, stepIndex, userId, filteredTourSteps.length, originalSubmissionMode, originalViewMode]);
 
     const completeTour = useCallback(() => {
         if (!activeTour) return;
 
         // Cancel any pending validations
         cancelAllValidations();
+
+        // Restore submission mode if it was changed for submit tour
+        if (originalSubmissionMode && activeTour.id === 'submit-steps-v1') {
+            console.log('[TourProvider] Restoring submission mode to:', originalSubmissionMode);
+            window.dispatchEvent(new CustomEvent('tour:switch-submission-mode', {
+                detail: { mode: originalSubmissionMode }
+            }));
+            setOriginalSubmissionMode(null);
+        }
+
+        // Restore view mode if it was changed for analytics tour
+        if (originalViewMode && activeTour.id === 'analytics-v1') {
+            console.log('[TourProvider] Restoring view mode to:', originalViewMode);
+            window.dispatchEvent(new CustomEvent('tour:switch-view-mode', {
+                detail: { mode: originalViewMode }
+            }));
+            setOriginalViewMode(null);
+        }
 
         // Track completion
         tourAnalytics.trackTourComplete({
@@ -683,7 +803,7 @@ export function TourProvider({
         setLastCompletedTourId(activeTour.id);
         setShowFeedbackDialog(true);
         document.body.classList.remove('joyride-active');
-    }, [activeTour, userId, filteredTourSteps.length]);
+    }, [activeTour, userId, filteredTourSteps.length, activeVariant, originalSubmissionMode, originalViewMode]);
 
     const resetAllTours = useCallback(() => {
         startTransition(() => {
@@ -720,6 +840,39 @@ export function TourProvider({
     const handleJoyrideCallback = useCallback(
         (data: CallBackProps) => {
             const { status, type, action, index } = data;
+
+            // Handle error status (including missing target elements)
+            if (status === STATUS.ERROR) {
+                console.warn('[TourProvider] Tour error at step:', index, data);
+
+                if (activeTour) {
+                    const step = filteredTourSteps[index];
+                    if (step) {
+                        tourAnalytics.trackTourDropOff({
+                            tourId: activeTour.id,
+                            stepId: step.id,
+                            stepIndex: index,
+                            totalSteps: filteredTourSteps.length || activeTour.steps.length,
+                            durationMs: Date.now() - tourStartTime.current,
+                            reason: 'error',
+                        });
+                    }
+                }
+
+                // Auto-advance to next step instead of closing tour
+                if (index < filteredTourSteps.length - 1) {
+                    console.log('[TourProvider] Auto-advancing to next step after error');
+                    startTransition(() => {
+                        setStepIndex(index + 1);
+                    });
+                    stepStartTime.current = Date.now();
+                } else {
+                    // Last step - complete tour
+                    console.log('[TourProvider] Last step encountered error, completing tour');
+                    completeTour();
+                }
+                return;
+            }
 
             // Tour finished
             if (status === STATUS.FINISHED) {

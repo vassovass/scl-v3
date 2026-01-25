@@ -321,6 +321,21 @@ export default function SubmitPage() {
         };
     }, [toast]);
 
+    // Tour mode switch handler - allows tour to control submission mode
+    useEffect(() => {
+        const handleTourModeSwitch = (e: CustomEvent) => {
+            const { mode, restoreMode } = e.detail;
+            console.log(`[SubmitSteps] Tour requested mode switch to: ${mode}`, restoreMode ? `(will restore: ${restoreMode})` : '');
+            setSubmissionMode(mode as "single" | "batch" | "bulk-manual");
+        };
+
+        window.addEventListener('tour:switch-submission-mode', handleTourModeSwitch as EventListener);
+
+        return () => {
+            window.removeEventListener('tour:switch-submission-mode', handleTourModeSwitch as EventListener);
+        };
+    }, []);
+
     // Fetch user's leagues
     useEffect(() => {
         if (!session) return;
@@ -490,7 +505,7 @@ export default function SubmitPage() {
     // Instead we can show a specific message inside if user has no leagues, but still allow submission.
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-background" data-submission-mode={submissionMode}>
             {/* Page Title */}
             <div className="border-b border-border bg-card/30">
                 <div className="mx-auto max-w-3xl px-6 py-4">
