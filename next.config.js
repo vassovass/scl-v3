@@ -19,6 +19,49 @@ const nextConfig = {
     NEXT_PUBLIC_APP_VERSION: process.env.npm_package_version || '0.0.0',
     NEXT_PUBLIC_COMMIT_SHA: process.env.VERCEL_GIT_COMMIT_SHA || 'dev',
   },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ANALYTICS PROXY REWRITES
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Route analytics through first-party domain to bypass ad blockers.
+  // Ad blockers maintain lists of known tracking domains (posthog.com,
+  // googletagmanager.com). By proxying through our own domain, these requests
+  // appear as first-party and are not blocked.
+  // Expected improvement: 10-30% more events captured.
+  async rewrites() {
+    return [
+      // ─────────────────────────────────────────────────────────────────────────
+      // PostHog Proxy
+      // Proxies /ingest/* to PostHog's ingestion endpoint
+      // ─────────────────────────────────────────────────────────────────────────
+      {
+        source: '/ingest/static/:path*',
+        destination: 'https://us-assets.i.posthog.com/static/:path*',
+      },
+      {
+        source: '/ingest/:path*',
+        destination: 'https://us.i.posthog.com/:path*',
+      },
+
+      // ─────────────────────────────────────────────────────────────────────────
+      // GTM/GA4 Proxy
+      // Proxies /gtm/* to Google Tag Manager
+      // ─────────────────────────────────────────────────────────────────────────
+      {
+        source: '/gtm/gtm.js',
+        destination: 'https://www.googletagmanager.com/gtm.js',
+      },
+      {
+        source: '/gtm/gtag/js',
+        destination: 'https://www.googletagmanager.com/gtag/js',
+      },
+      // GA4 data collection endpoint
+      {
+        source: '/ga/g/collect',
+        destination: 'https://www.google-analytics.com/g/collect',
+      },
+    ];
+  },
 };
 
 // Default Workbox runtime caching rules from @ducanh2912/next-pwa
