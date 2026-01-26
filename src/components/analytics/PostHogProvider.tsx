@@ -34,12 +34,22 @@ const DEBUG = process.env.NODE_ENV === 'development';
 function initPostHog() {
     if (typeof window === 'undefined') return;
     if (!POSTHOG_KEY) {
-        if (DEBUG) console.warn('[PostHog] No API key found, skipping initialization');
+        console.warn('[PostHog] No API key found, skipping initialization');
         return;
     }
 
     // Check if already initialized
-    if (posthog.__loaded) return;
+    if (posthog.__loaded) {
+        console.log('[PostHog] Already initialized, skipping');
+        return;
+    }
+
+    console.log('[PostHog] Initializing with config:', {
+        api_host: POSTHOG_HOST,
+        ui_host: POSTHOG_UI_HOST,
+        session_recording: true,
+        autocapture: true,
+    });
 
     posthog.init(POSTHOG_KEY, {
         // API host uses first-party proxy to bypass ad blockers
@@ -47,7 +57,7 @@ function initPostHog() {
         // UI host is needed for toolbar, session replay viewer, and debugging
         ui_host: POSTHOG_UI_HOST,
 
-        // Session Replay - MUST HAVE
+        // Session Replay - MUST HAVE (FORCED - always enabled)
         session_recording: {
             recordCrossOriginIframes: true,
         },
@@ -62,18 +72,23 @@ function initPostHog() {
 
         // Performance
         loaded: (ph) => {
-            if (DEBUG) {
-                console.log('[PostHog] Initialized with session replay (via proxy)');
-            }
+            console.log('[PostHog] ✓ Initialized successfully');
+            console.log('[PostHog] Session replay:', ph.sessionRecordingStarted() ? 'ACTIVE' : 'NOT STARTED');
+            console.log('[PostHog] Session ID:', ph.get_session_id());
+            console.log('[PostHog] Distinct ID:', ph.get_distinct_id());
+            console.log('[PostHog] Using proxy:', POSTHOG_HOST);
         },
 
-        // Debug mode in development
-        debug: DEBUG,
+        // Debug mode - always on for now to help troubleshoot
+        debug: true,
 
-        // Respect Do Not Track browser setting initially
-        // But we override with explicit consent below
+        // FORCED TRACKING: Do NOT respect DNT
         respect_dnt: false,
     });
+
+    // Force start session recording immediately
+    posthog.startSessionRecording();
+    console.log('[PostHog] Session recording force-started');
 }
 
 /**
@@ -108,16 +123,27 @@ export function PostHogProvider({
             // Consent banner stays on site but tracking is ALWAYS active
             const shouldTrack = featureEnabled && online;
 
+            console.log('[PostHog] Checking tracking conditions:', {
+                featureEnabled,
+                online,
+                shouldTrack,
+                isReady,
+                hasConsent
+            });
+
             if (shouldTrack && !isReady) {
+                console.log('[PostHog] Starting initialization (FORCED tracking)...');
                 initPostHog();
                 setIsReady(true);
                 setHasConsent(true);
             } else if (!shouldTrack && isReady) {
                 // Feature disabled - opt out (only respects master toggle, NOT consent)
+                console.log('[PostHog] Feature disabled - opting out');
                 posthog.opt_out_capturing();
                 setHasConsent(false);
             } else if (shouldTrack && isReady && !hasConsent) {
                 // Feature re-enabled - opt back in
+                console.log('[PostHog] Feature re-enabled - opting back in');
                 posthog.opt_in_capturing();
                 setHasConsent(true);
             }

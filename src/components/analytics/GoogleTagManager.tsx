@@ -4,6 +4,7 @@ import Script from 'next/script';
 import { useEffect, useState } from "react";
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
+const DEBUG = process.env.NODE_ENV === 'development';
 
 /**
  * Google Tag Manager component
@@ -17,7 +18,10 @@ const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
  * @see PRD 14: Analytics GTM & GA4
  */
 export function GoogleTagManager() {
-    if (!GTM_ID) return null;
+    if (!GTM_ID) {
+        if (DEBUG) console.warn('[GTM] No GTM_ID found in environment, skipping GTM initialization');
+        return null;
+    }
 
     const [shouldLoadGtm, setShouldLoadGtm] = useState(false);
 
@@ -29,16 +33,30 @@ export function GoogleTagManager() {
             // Consent banner stays on site but tracking is ALWAYS active
             // Only skip when offline (prevents noisy network errors)
             const online = navigator.onLine;
+
+            if (DEBUG) {
+                console.log('[GTM] Checking load conditions:', { online, gtmId: GTM_ID });
+            }
+
             setShouldLoadGtm(online);
         };
 
         compute();
 
         // Re-check on network state changes
-        const onOnline = () => compute();
-        const onOffline = () => compute();
+        const onOnline = () => {
+            if (DEBUG) console.log('[GTM] Online event - rechecking');
+            compute();
+        };
+        const onOffline = () => {
+            if (DEBUG) console.log('[GTM] Offline event - rechecking');
+            compute();
+        };
         const onVisibility = () => {
-            if (document.visibilityState === "visible") compute();
+            if (document.visibilityState === "visible") {
+                if (DEBUG) console.log('[GTM] Visibility change - rechecking');
+                compute();
+            }
         };
 
         window.addEventListener("online", onOnline);
@@ -73,6 +91,9 @@ export function GoogleTagManager() {
               'ad_user_data': 'granted',
               'ad_personalization': 'granted'
             });
+
+            console.log('[GTM] Consent defaults set to GRANTED (forced tracking)');
+            console.log('[GTM] dataLayer initialized:', window.dataLayer);
           `,
                 }}
             />
@@ -83,12 +104,26 @@ export function GoogleTagManager() {
                 <Script
                     id="gtm-script"
                     strategy="afterInteractive"
+                    onLoad={() => {
+                        console.log('[GTM] Script loaded successfully via proxy /gtm/gtm.js');
+                        console.log('[GTM] Container ID: ${GTM_ID}');
+                        // Check if GTM is working
+                        setTimeout(() => {
+                            console.log('[GTM] dataLayer after load:', (window as any).dataLayer);
+                            console.log('[GTM] google_tag_manager exists:', !!(window as any).google_tag_manager);
+                        }, 1000);
+                    }}
+                    onError={(e) => {
+                        console.error('[GTM] Script failed to load:', e);
+                    }}
                     dangerouslySetInnerHTML={{
                         __html: `
+            console.log('[GTM] Loading GTM script via proxy...');
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
             j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             '/gtm/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            console.log('[GTM] Script element created, loading from:', '/gtm/gtm.js?id='+i+dl);
             })(window,document,'script','dataLayer','${GTM_ID}');
           `,
                     }}
