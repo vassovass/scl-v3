@@ -1,11 +1,11 @@
 ---
 name: analytics-tracking
-description: Event tracking with GA4 + PostHog, adding new events, and updating GTM. Use when implementing tracking, adding analytics events, or configuring GTM/PostHog. Keywords: analytics, tracking, GA4, PostHog, GTM, dataLayer, event, conversion, metrics.
+description: Event tracking with GA4 + PostHog, adding new events, and updating GTM. Use when implementing tracking, adding analytics events, or configuring GTM/PostHog. Keywords: analytics, tracking, GA4, PostHog, GTM, dataLayer, event, conversion, metrics, proxy, ad blocker.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
-  version: "1.1"
+  version: "1.2"
   project: "stepleague"
-  last_updated: "2026-01-17"
+  last_updated: "2026-01-26"
 ---
 
 # Analytics Tracking Skill
@@ -32,15 +32,56 @@ All events are pushed to both systems from a single `trackEvent()` call.
 └──────────────────────────────────────────────────────────────────┘
 ```
 
+## Ad Blocker Bypass (First-Party Proxy)
+
+Analytics requests are routed through first-party domain proxies to bypass ad blockers.
+Ad blockers maintain lists of known tracking domains (posthog.com, googletagmanager.com).
+By proxying through our own paths, these requests appear first-party and are not blocked.
+
+**Expected improvement: 10-30% more events captured.**
+
+```
+Without proxy (blocked):
+Browser → us.i.posthog.com (BLOCKED by uBlock/AdBlock)
+Browser → www.googletagmanager.com (BLOCKED)
+
+With proxy (bypasses blockers):
+Browser → /ingest/* → Vercel rewrite → us.i.posthog.com (NOT blocked)
+Browser → /gtm/* → Vercel rewrite → googletagmanager.com (NOT blocked)
+```
+
+### Proxy Configuration
+
+| Service | Proxy Path | Original Host |
+|---------|------------|---------------|
+| PostHog | `/ingest/*` | `us.i.posthog.com` |
+| PostHog Static | `/ingest/static/*` | `us-assets.i.posthog.com/static` |
+| GTM | `/gtm/*` | `www.googletagmanager.com` |
+| GA4 | `/ga/*` | `www.google-analytics.com` |
+
+**Key Files:**
+- `next.config.js` - Rewrite rules that proxy requests
+- `src/lib/analytics/proxyConfig.ts` - Central registry of proxy configurations
+- `PostHogProvider.tsx` - Uses `/ingest` as api_host
+- `GoogleTagManager.tsx` - Loads GTM from `/gtm/gtm.js`
+
+### Adding New Analytics Services
+
+1. Add entry to `ANALYTICS_PROXIES` in `src/lib/analytics/proxyConfig.ts`
+2. Add corresponding rewrite rules in `next.config.js`
+3. Update the service's initialization to use the proxy path
+
 ## Key Files
 
 | File | Purpose |
 |------|---------|
 | `src/lib/analytics.ts` | Main tracking library with all event methods |
-| `src/components/analytics/PostHogProvider.tsx` | PostHog SDK initialization, consent-aware |
-| `src/components/analytics/GoogleTagManager.tsx` | GTM loading with consent gates |
+| `src/components/analytics/PostHogProvider.tsx` | PostHog SDK initialization via `/ingest` proxy |
+| `src/components/analytics/GoogleTagManager.tsx` | GTM loading via `/gtm` proxy |
+| `src/lib/analytics/proxyConfig.ts` | Central registry of proxy configurations |
 | `src/lib/consent/cookieConsent.ts` | Cookie consent helpers |
 | `src/lib/__tests__/analytics.test.ts` | Test suite for analytics events |
+| `next.config.js` | Vercel rewrite rules for analytics proxies |
 
 ## Critical Rules
 
