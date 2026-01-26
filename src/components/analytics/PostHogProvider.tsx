@@ -19,7 +19,11 @@ import { useEffect, useState } from 'react';
 
 // PostHog config from environment
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com';
+// Use first-party proxy to bypass ad blockers (see next.config.js rewrites)
+// The /ingest path proxies to PostHog's ingestion endpoint
+const POSTHOG_HOST = '/ingest';
+// UI host is needed for toolbar, session replay viewer, and debugging features
+const POSTHOG_UI_HOST = 'https://us.posthog.com';
 
 // Debug mode in development
 const DEBUG = process.env.NODE_ENV === 'development';
@@ -38,7 +42,10 @@ function initPostHog() {
     if (posthog.__loaded) return;
 
     posthog.init(POSTHOG_KEY, {
+        // API host uses first-party proxy to bypass ad blockers
         api_host: POSTHOG_HOST,
+        // UI host is needed for toolbar, session replay viewer, and debugging
+        ui_host: POSTHOG_UI_HOST,
 
         // Session Replay - MUST HAVE
         session_recording: {
@@ -56,7 +63,7 @@ function initPostHog() {
         // Performance
         loaded: (ph) => {
             if (DEBUG) {
-                console.log('[PostHog] Initialized with session replay');
+                console.log('[PostHog] Initialized with session replay (via proxy)');
             }
         },
 
