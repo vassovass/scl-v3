@@ -4,7 +4,7 @@
 >
 > These PRDs describe WHAT is needed, not HOW to implement. The implementing agent decides the best approach.
 >
-> **Last Updated:** 2026-01-20
+> **Last Updated:** 2026-01-26
 
 ---
 
@@ -83,7 +83,7 @@
 | 37 | [In-App Chat](./PRD_37_In_App_Chat.md) | Database schema for future chat/messaging | 📋 Proposed |
 | 40 | [Submission Audit](./PRD_40_Submission_Audit.md) | Abuse detection & audit logs | 📋 Proposed |
 
-### Alpha Launch (PRDs 43-49) 🚀
+### Alpha Launch (PRDs 43-50) 🚀
 | # | PRD Title | Outcome | Status |
 |---|-----------|---------|--------|
 | 43 | [Nickname Primary Identity](./PRD_43_Nickname_Primary_Identity.md) | Repurpose display_name for leaderboards | ✅ Complete |
@@ -93,6 +93,14 @@
 | 47 | [Head-to-Head Leagues](./PRD_47_Head_To_Head_Leagues.md) | FPL-style weekly matchups (Design) | 📋 Proposed |
 | 48 | [Universal Health Measurement](./PRD_48_Universal_Health_Measurement.md) | Multi-activity SLP conversion (Vision) | 📋 Proposed |
 | 49 | [Alpha Launch Checklist](./PRD_49_Alpha_Launch_Checklist.md) | Launch readiness tracking | 🔄 In Progress |
+| 50 | [Modular Tour System](./PRD_50_Modular_Tour_System.md) | Joyride onboarding rebuild | ✅ Complete |
+
+### Social & Growth (PRDs 51-53) 📢
+| # | PRD Title | Outcome | Status |
+|---|-----------|---------|--------|
+| 51 | [Social Sharing & Stats Hub](./PRD_51_Social_Sharing_Stats_Hub.md) | Beautiful shareable achievement cards for WhatsApp | 🔄 In Progress |
+| 52 | [Sharing Tour](./PRD_52_Sharing_Tour.md) | Joyride onboarding for sharing features | 📋 Proposed |
+| 53 | [Sharing Marketing Page](./PRD_53_Sharing_Marketing_Page.md) | Public /how-to-share page for SEO | 📋 Proposed |
 
 ---
 
@@ -100,44 +108,82 @@
 
 > **Why this order?** Based on dependency analysis and business viability research. Each sprint has a clear gate before proceeding.
 
-### Sprint 1: Alpha Launch (Friends & Family) 🎯
+### Sprint 1: Alpha Launch (Friends & Family) ✅ COMPLETE
 *Goal: Get first 5-50 users testing. Core value prop must work.*
 
-| Order | PRD | Why This Order | Blocker? |
-|-------|-----|----------------|----------|
-| 1 | **[PRD 43] Nickname Identity** | Cannot have public World League without privacy-safe display names | 🛑 BLOCKER |
-| 2 | **[PRD 44] Auto-Enroll World League** | Solves "empty state" - new users have leaderboard immediately | Depends on PRD 43 |
-| 3 | **[PRD 45] Why Upload Daily** | Explains manual screenshot value prop (privacy, anti-cheat) | Marketing |
-| 4 | **[PRD 46] Points System (Design)** | Document scoring rules so users understand rankings | Design only |
-| 5 | **[PRD 49] Alpha Checklist** | Verify all flows work before inviting users | Meta-PRD |
+| Order | PRD | Why This Order | Status |
+|-------|-----|----------------|--------|
+| 1 | **[PRD 43] Nickname Identity** | Cannot have public World League without privacy-safe display names | ✅ Complete |
+| 2 | **[PRD 44] Auto-Enroll World League** | Solves "empty state" - new users have leaderboard immediately | ✅ Complete |
+| 3 | **[PRD 45] Why Upload Daily** | Explains manual screenshot value prop (privacy, anti-cheat) | ✅ Complete |
+| 4 | **[PRD 46] Points System (Design)** | Document scoring rules so users understand rankings | ✅ Complete |
+| 5 | **[PRD 50] Modular Tour System** | Rebuild onboarding for new user experience | ✅ Complete |
+| 6 | **[PRD 49] Alpha Checklist** | Verify all flows work before inviting users | 🔄 In Progress |
 
-**Sprint 1 Gate:** ✅ New user can sign up → see nickname on World League → understand why uploading matters
-
----
-
-### Sprint 2: Product Hunt Prep (Retention & Polish) 🚀
-*Goal: Prevent churn when PH traffic arrives. You only get one launch day.*
-
-| Order | PRD | Why This Order | Blocker? |
-|-------|-----|----------------|----------|
-| 6 | **[PRD 28] Smart Engagement** | "Missed yesterday" prompts prevent D1/D7 churn | 🛑 CRITICAL for retention |
-| 7 | **[PRD 29] Unified Progress** | Fixes broken "Analytics" page, creates compelling personal stats | UX polish |
-| 8 | **[PRD 35] SEO Comparison Pages** | "StepLeague vs Fitbit" captures high-intent search traffic | Marketing |
-| 9 | **[PRD 42] Test Coverage** | Stability before public launch | Quality gate |
-
-**Sprint 2 Gate:** ✅ Users get nudged if inactive → Progress page doesn't look empty → SEO pages indexed
+**Sprint 1 Gate:** ✅ New user can sign up → see nickname on World League → complete onboarding tour → understand why uploading matters
 
 ---
 
-### Sprint 3: Growth & Expansion 📈
+### Sprint 2: Social Sharing & Virality 📢 ← **CURRENT**
+*Goal: Make it easy and appealing to share achievements. Drive organic growth through WhatsApp groups.*
+
+**Why Social Sharing Now?**
+- Alpha users are already sharing screenshots in WhatsApp groups
+- Beautiful share cards will differentiate StepLeague from raw screenshots
+- Viral sharing is the most cost-effective growth channel
+- Foundation for word-of-mouth before Product Hunt launch
+
+| Order | PRD | Why This Order | Status |
+|-------|-----|----------------|--------|
+| 7 | **[PRD 51] Social Sharing & Stats Hub** | Core sharing infrastructure - generates beautiful cards | 📋 Proposed |
+| 8 | **[PRD 52] Sharing Tour** | Teach users how to share (depends on PRD 51) | 📋 Proposed |
+| 9 | **[PRD 53] Sharing Marketing Page** | SEO page for /how-to-share (depends on PRD 51) | 📋 Proposed |
+
+**Sprint 2 Gate:** ✅ Users can share achievements as beautiful cards → New users discover app via shared links → Sharing tour teaches the feature
+
+---
+
+### Sprint 3: Retention & Engagement 🎯
+*Goal: Prevent churn, keep users coming back daily.*
+
+| Order | PRD | Why This Order | Status |
+|-------|-----|----------------|--------|
+| 10 | **[PRD 28] Smart Engagement** | "Missed yesterday" prompts prevent D1/D7 churn | 📋 Proposed |
+| 11 | **[PRD 29] Unified Progress** | Compelling personal stats page to share | 📋 Proposed |
+
+**Sprint 3 Gate:** ✅ Users get nudged if inactive → Progress page provides shareable stats
+
+---
+
+### Sprint 4: Product Hunt Prep 🚀
+*Goal: Polish and stability before public launch. You only get one launch day.*
+
+| Order | PRD | Why This Order | Status |
+|-------|-----|----------------|--------|
+| 12 | **[PRD 35] SEO Comparison Pages** | "StepLeague vs Fitbit" captures high-intent search traffic | 📋 Proposed |
+| 13 | **[PRD 42] Test Coverage** | Stability before public launch | 📋 Proposed |
+
+**Sprint 4 Gate:** ✅ SEO pages indexed → Test coverage at 70% → Ready for Product Hunt
+
+---
+
+### Sprint 5: Growth & Expansion 📈
 *Goal: Scale to 500+ users, explore B2B pivot option.*
 
-| Order | PRD | Why This Order | Notes |
-|-------|-----|----------------|-------|
-| 10 | **[PRD 34] B2B Landing Pages** | Corporate wellness funnel (optional pivot) | Higher revenue potential |
-| 11 | **[PRD 32] Admin Analytics** | Internal KPI dashboard for tracking growth | Operational |
-| 12 | **[PRD 47] Head-to-Head (Design)** | Future feature preview for user feedback | Vision doc |
-| 13 | **[PRD 48] Universal Health (Design)** | Multi-activity support vision | Long-term |
+| Order | PRD | Why This Order | Status |
+|-------|-----|----------------|--------|
+| 14 | **[PRD 34] B2B Landing Pages** | Corporate wellness funnel (optional pivot) | 📋 Proposed |
+| 15 | **[PRD 32] Admin Analytics** | Internal KPI dashboard for tracking growth | 📋 Proposed |
+
+---
+
+### Future Vision (Design Docs)
+*Goal: Document future direction for user feedback and planning.*
+
+| Order | PRD | Notes | Status |
+|-------|-----|-------|--------|
+| — | **[PRD 47] Head-to-Head Leagues** | FPL-style matchups (implement when user demand exists) | 📋 Proposed |
+| — | **[PRD 48] Universal Health Measurement** | Multi-activity SLP conversion (long-term vision) | 📋 Proposed |
 
 ---
 
@@ -154,9 +200,9 @@
 
 | Category | Count |
 |----------|-------|
-| ✅ Complete | 38 PRDs |
-| 📋 Proposed | 11 PRDs |
-| 🔄 Ongoing | 1 PRD |
+| ✅ Complete | 39 PRDs |
+| 📋 Proposed | 14 PRDs |
+| 🔄 Ongoing/In Progress | 2 PRDs |
 
 ---
 

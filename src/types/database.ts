@@ -393,6 +393,88 @@ export type Database = {
           }
         ];
       };
+      // PRD 51: Share Cards for Social Sharing
+      share_cards: {
+        Row: {
+          id: string;
+          short_code: string;
+          user_id: string | null;
+          card_type: "daily" | "weekly" | "personal_best" | "streak" | "rank" | "challenge" | "rank_change";
+          metric_type: "steps" | "calories" | "slp" | "distance" | "swimming" | "cycling" | "running";
+          metric_value: number;
+          period_start: string | null;
+          period_end: string | null;
+          period_label: string | null;
+          league_id: string | null;
+          league_name: string | null;
+          rank: number | null;
+          improvement_pct: number | null;
+          custom_message: string | null;
+          theme: "light" | "dark";
+          created_at: string;
+          views: number;
+          clicks: number;
+          shares_completed: number;
+        };
+        Insert: {
+          id?: string;
+          short_code: string;
+          user_id?: string | null;
+          card_type: "daily" | "weekly" | "personal_best" | "streak" | "rank" | "challenge" | "rank_change";
+          metric_type?: "steps" | "calories" | "slp" | "distance" | "swimming" | "cycling" | "running";
+          metric_value: number;
+          period_start?: string | null;
+          period_end?: string | null;
+          period_label?: string | null;
+          league_id?: string | null;
+          league_name?: string | null;
+          rank?: number | null;
+          improvement_pct?: number | null;
+          custom_message?: string | null;
+          theme?: "light" | "dark";
+          created_at?: string;
+          views?: number;
+          clicks?: number;
+          shares_completed?: number;
+        };
+        Update: {
+          id?: string;
+          short_code?: string;
+          user_id?: string | null;
+          card_type?: "daily" | "weekly" | "personal_best" | "streak" | "rank" | "challenge" | "rank_change";
+          metric_type?: "steps" | "calories" | "slp" | "distance" | "swimming" | "cycling" | "running";
+          metric_value?: number;
+          period_start?: string | null;
+          period_end?: string | null;
+          period_label?: string | null;
+          league_id?: string | null;
+          league_name?: string | null;
+          rank?: number | null;
+          improvement_pct?: number | null;
+          custom_message?: string | null;
+          theme?: "light" | "dark";
+          created_at?: string;
+          views?: number;
+          clicks?: number;
+          shares_completed?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "share_cards_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "share_cards_league_id_fkey";
+            columns: ["league_id"];
+            isOneToOne: false;
+            referencedRelation: "leagues";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -464,6 +546,7 @@ export type Submission = Tables<"submissions">;
 export type SiteSetting = Tables<"site_settings">;
 export type AuditLog = Tables<"audit_log">;
 export type UserPreferences = Tables<"user_preferences">;
+export type ShareCard = Tables<"share_cards">;
 
 // PRD 41: "Act As" Proxy Types
 // ============================

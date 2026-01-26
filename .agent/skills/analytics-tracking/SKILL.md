@@ -121,6 +121,96 @@ Browser → /gtm/* → Vercel rewrite → googletagmanager.com (NOT blocked)
 | `proxy_claimed` | Tracks when a proxy user claims their profile | `proxy_id`, `submission_count`, `league_count` |
 | `high_five_sent` | Tracks high-five engagement interactions | `recipient_id`, `action` (send/remove) |
 
+---
+
+## Share Funnel Tracking (PRD-51)
+
+Social sharing is a key growth driver. Track the full funnel:
+
+### Share Events
+
+| Event | When Fired | Parameters |
+|-------|------------|------------|
+| `share_intent` | User opens share modal | `card_type`, `metric_type`, `source` |
+| `share` | User completes share action | `content_type`, `item_id`, `method` (platform) |
+| `share_link_click` | Recipient clicks shared link | `short_code`, `card_type`, `referrer` |
+| `share_conversion` | Recipient signs up after clicking share | `short_code`, `card_type` |
+
+### Implementation Pattern
+
+```typescript
+// Track share intent (modal opened)
+analytics.shareIntent = (cardType: string, metricType: string, source: string) => {
+  trackEvent('share_intent', {
+    card_type: cardType,        // 'daily', 'weekly', 'streak', etc.
+    metric_type: metricType,    // 'steps', 'calories', etc.
+    source: source,             // 'stats_hub', 'post_submission', 'milestone'
+    category: 'social',
+    action: 'open_modal',
+  });
+};
+
+// Track share completion (existing analytics.share method)
+analytics.share = (contentType: string, itemId: string, method: string) => {
+  trackEvent('share', {
+    content_type: contentType,
+    item_id: itemId,
+    method: method,  // 'whatsapp', 'twitter', 'copy', 'native'
+    category: 'social',
+    action: 'share',
+  });
+};
+
+// Track shared link clicks (on share landing page)
+analytics.shareLinkClick = (shortCode: string, cardType: string) => {
+  trackEvent('share_link_click', {
+    short_code: shortCode,
+    card_type: cardType,
+    referrer: document.referrer,
+    category: 'social',
+    action: 'click',
+  });
+};
+```
+
+### UTM Parameter Conventions
+
+Always add UTM parameters to share URLs:
+
+```typescript
+const shareUrl = new URL(baseUrl);
+shareUrl.searchParams.set('utm_source', 'share');
+shareUrl.searchParams.set('utm_medium', platform);    // 'whatsapp', 'twitter', 'copy'
+shareUrl.searchParams.set('utm_campaign', cardType);  // 'daily', 'streak', 'challenge'
+```
+
+### PostHog Funnel Configuration
+
+Create a funnel in PostHog to track conversion:
+
+```
+share_intent → share → share_link_click → share_conversion
+```
+
+### A/B Testing Share Cards
+
+Use PostHog experiments to test:
+- Different card designs (theme variants)
+- Message templates
+- CTA button text
+- Share prompt timing
+
+```typescript
+const variant = useFeatureFlagVariantKey('share-card-experiment');
+// 'control', 'variant_a', 'variant_b'
+
+// Track which variant was shown
+analytics.trackEvent('share_experiment_shown', {
+  experiment: 'share-card-experiment',
+  variant: variant,
+});
+```
+
 ## Adding a New Tracking Event
 
 ### Step 1: Add event to `analytics.ts`
@@ -322,3 +412,4 @@ Three MCP servers are configured for managing analytics via AI:
 - **`auth-patterns`** - User identification flow integrates with analytics
 - **`project-updates`** - Document new events in AGENTS.md and CHANGELOG.md
 - **`error-handling`** - Track error events alongside regular analytics
+- **`social-sharing`** - Share hook patterns and OG image generation
