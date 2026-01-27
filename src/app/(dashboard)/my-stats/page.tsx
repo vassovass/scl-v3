@@ -4,17 +4,14 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Spinner } from "@/components/ui/Spinner";
-import { ShareButton } from "@/components/ui/ShareButton";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
+import { ShareModal } from "@/components/sharing";
+import { useShareModal } from "@/hooks/useShareModal";
 import {
     type PeriodPreset,
     getPresetLabel,
     getPreviousPeriod,
 } from "@/lib/utils/periods";
-import {
-    generateShareMessage,
-    type CardType,
-} from "@/lib/sharing";
 
 interface StatsHubData {
     user: {
@@ -75,6 +72,9 @@ export default function MyStatsPage() {
     const [selectedLeague, setSelectedLeague] = useState<string>("");
     const [compareEnabled, setCompareEnabled] = useState(true);
 
+    // Share Modal
+    const { isOpen: shareModalOpen, config: shareConfig, openShareModal, closeShareModal } = useShareModal();
+
     const fetchStats = useCallback(async () => {
         if (!user) return;
 
@@ -113,28 +113,6 @@ export default function MyStatsPage() {
     useEffect(() => {
         fetchStats();
     }, [fetchStats]);
-
-    // Generate share URL for a specific stat card
-    const getShareUrl = (cardType: CardType, value: number): string => {
-        const params = new URLSearchParams({
-            card_type: cardType,
-            metric_type: "steps",
-            value: value.toString(),
-            name: data?.user.display_name || "Player",
-        });
-
-        // Add rank for rank card
-        if (cardType === "rank" && data?.league_stats?.rank) {
-            params.set("rank", data.league_stats.rank.toString());
-        }
-
-        // Add streak for streak card
-        if (cardType === "streak") {
-            params.set("streak", value.toString());
-        }
-
-        return `${typeof window !== "undefined" ? window.location.origin : ""}/share/stats?${params.toString()}`;
-    };
 
     if (!user) {
         return (
@@ -243,11 +221,11 @@ export default function MyStatsPage() {
                                         value={data.today_steps}
                                         emoji="📅"
                                         accentColor="sky"
-                                        shareMessage={generateShareMessage("daily", {
+                                        onShareClick={() => openShareModal({
+                                            cardType: "daily",
                                             value: data.today_steps,
                                             metricType: "steps",
-                                        }).text}
-                                        shareUrl={getShareUrl("daily", data.today_steps)}
+                                        })}
                                     />
 
                                     {/* Period Total */}
@@ -265,12 +243,12 @@ export default function MyStatsPage() {
                                                   }
                                                 : undefined
                                         }
-                                        shareMessage={generateShareMessage("weekly", {
+                                        onShareClick={() => openShareModal({
+                                            cardType: "weekly",
                                             value: data.period_stats.total_steps,
                                             metricType: "steps",
-                                            average: data.period_stats.average_per_day,
-                                        }).text}
-                                        shareUrl={getShareUrl("weekly", data.period_stats.total_steps)}
+                                            periodLabel: getPresetLabel(period),
+                                        })}
                                     />
 
                                     {/* Current Streak */}
@@ -281,12 +259,12 @@ export default function MyStatsPage() {
                                         subtitle={`Best: ${data.base_stats.longest_streak} days`}
                                         emoji="🔥"
                                         accentColor="orange"
-                                        shareMessage={generateShareMessage("streak", {
+                                        onShareClick={() => openShareModal({
+                                            cardType: "streak",
                                             value: data.base_stats.current_streak,
                                             metricType: "steps",
                                             streakDays: data.base_stats.current_streak,
-                                        }).text}
-                                        shareUrl={getShareUrl("streak", data.base_stats.current_streak)}
+                                        })}
                                     />
 
                                     {/* Personal Best */}
@@ -303,11 +281,11 @@ export default function MyStatsPage() {
                                         }
                                         emoji="🏆"
                                         accentColor="yellow"
-                                        shareMessage={generateShareMessage("personal_best", {
+                                        onShareClick={() => openShareModal({
+                                            cardType: "personal_best",
                                             value: data.base_stats.best_day_steps,
                                             metricType: "steps",
-                                        }).text}
-                                        shareUrl={getShareUrl("personal_best", data.base_stats.best_day_steps)}
+                                        })}
                                     />
                                 </div>
                             </section>
@@ -337,13 +315,13 @@ export default function MyStatsPage() {
                                                     : "🏅"
                                             }
                                             accentColor="purple"
-                                            shareMessage={generateShareMessage("rank", {
-                                                value: data.league_stats.user_steps,
+                                            onShareClick={() => openShareModal({
+                                                cardType: "rank",
+                                                value: data.league_stats!.user_steps,
                                                 metricType: "steps",
-                                                rank: data.league_stats.rank ?? undefined,
-                                                leagueName: data.league_stats.league_name,
-                                            }).text}
-                                            shareUrl={getShareUrl("rank", data.league_stats.user_steps)}
+                                                rank: data.league_stats!.rank ?? undefined,
+                                                leagueName: data.league_stats!.league_name,
+                                            })}
                                         />
 
                                         {/* League Steps */}
@@ -401,23 +379,36 @@ export default function MyStatsPage() {
                                     <p className="text-sm text-muted-foreground mb-4">
                                         Share your stats and see who can beat you this week!
                                     </p>
-                                    <ShareButton
-                                        message={generateShareMessage("challenge", {
+                                    <button
+                                        onClick={() => openShareModal({
+                                            cardType: "challenge",
                                             value: data.period_stats.total_steps,
                                             metricType: "steps",
-                                        }).text}
-                                        url={getShareUrl("challenge", data.period_stats.total_steps)}
-                                        contentType="stats_hub_challenge"
-                                        className="px-6 py-2"
+                                            periodLabel: getPresetLabel(period),
+                                        })}
+                                        className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition"
                                     >
                                         🎯 Share Challenge
-                                    </ShareButton>
+                                    </button>
                                 </div>
                             </section>
                         </ModuleFeedback>
                     </>
                 ) : null}
             </main>
+
+            {/* Share Modal */}
+            <ShareModal
+                isOpen={shareModalOpen}
+                onClose={closeShareModal}
+                defaultCardType={shareConfig?.cardType}
+                defaultValue={shareConfig?.value ?? 0}
+                metricType={shareConfig?.metricType}
+                rank={shareConfig?.rank}
+                leagueName={shareConfig?.leagueName}
+                streakDays={shareConfig?.streakDays}
+                periodLabel={shareConfig?.periodLabel}
+            />
         </div>
     );
 }
@@ -439,6 +430,7 @@ interface StatCardProps {
     };
     shareMessage?: string;
     shareUrl?: string;
+    onShareClick?: () => void;
 }
 
 function StatCard({
@@ -451,6 +443,7 @@ function StatCard({
     comparison,
     shareMessage,
     shareUrl,
+    onShareClick,
 }: StatCardProps) {
     const colorMap = {
         sky: "bg-sky-500/10 text-sky-400",
@@ -506,16 +499,14 @@ function StatCard({
             </div>
 
             {/* Share Button (appears on hover) */}
-            {shareMessage && shareUrl && (
+            {onShareClick && (
                 <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ShareButton
-                        message={shareMessage}
-                        url={shareUrl}
-                        contentType="stat_card"
-                        className="!px-2 !py-1 text-xs"
+                    <button
+                        onClick={onShareClick}
+                        className="rounded-lg bg-primary px-2 py-1 text-xs text-primary-foreground hover:bg-primary/90 transition"
                     >
                         📤
-                    </ShareButton>
+                    </button>
                 </div>
             )}
         </div>
