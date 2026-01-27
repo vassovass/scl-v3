@@ -10,6 +10,8 @@ import { useOfflineQueue } from "@/hooks/useOfflineQueue";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { WifiOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ShareModal } from "@/components/sharing";
+import { useShareModal } from "@/hooks/useShareModal";
 
 interface SubmissionFormProps {
     leagueId?: string;
@@ -99,6 +101,9 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
     const { addToQueue } = useOfflineQueue();
     const { user } = useAuth();
     const { toast } = useToast();
+
+    // Share modal for post-submission sharing
+    const { isOpen: shareModalOpen, config: shareConfig, openShareModal, closeShareModal } = useShareModal();
 
     // Check online status
     useEffect(() => {
@@ -641,9 +646,22 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                         <div className="flex items-start justify-between gap-3">
                             <div className="flex-1 space-y-2">
                                 {verificationDetails.verified ? (
-                                    <p className="text-sm font-medium text-emerald-400">
-                                        ✓ Verification successful
-                                    </p>
+                                    <div className="flex items-center justify-between gap-2">
+                                        <p className="text-sm font-medium text-emerald-400">
+                                            ✓ Verification successful
+                                        </p>
+                                        <button
+                                            type="button"
+                                            onClick={() => openShareModal({
+                                                cardType: 'daily',
+                                                value: verificationDetails.claimedSteps,
+                                                metricType: 'steps',
+                                            })}
+                                            className="shrink-0 rounded-md bg-primary px-3 py-1 text-xs font-medium text-primary-foreground transition hover:bg-primary/90"
+                                        >
+                                            📤 Share
+                                        </button>
+                                    </div>
                                 ) : (
                                     <p className="text-sm font-medium text-rose-400">
                                         ✗ Verification failed
@@ -808,6 +826,15 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                     )}
                 </button>
             </form>
+
+            {/* Share Modal for post-submission sharing */}
+            <ShareModal
+                isOpen={shareModalOpen}
+                onClose={closeShareModal}
+                defaultCardType={shareConfig?.cardType}
+                defaultValue={shareConfig?.value ?? 0}
+                metricType={shareConfig?.metricType}
+            />
         </>
     );
 }
