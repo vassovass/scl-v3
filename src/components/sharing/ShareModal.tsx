@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useShare, type SharePlatform } from "@/hooks/useShare";
 import { APP_CONFIG } from "@/lib/config";
+import { analytics } from "@/lib/analytics";
 import {
     type CardType,
     type MetricType,
@@ -84,16 +85,19 @@ export function ShareModal({
 
     const [imageLoading, setImageLoading] = useState(true);
     const [showSuccess, setShowSuccess] = useState(false);
+    const hasTrackedOpen = useRef(false);
 
     const { share, copied, supportsNativeShare } = useShare({
         contentType: `share_card_${cardData.cardType}`,
-        onShare: () => {
+        onShare: (platform) => {
+            // Track share completion
+            analytics.shareFunnel.completed(platform, cardData.cardType, cardData.value);
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 2000);
         },
     });
 
-    // Reset state when modal opens
+    // Reset state and track when modal opens
     useEffect(() => {
         if (isOpen) {
             setCardData({
@@ -110,6 +114,14 @@ export function ShareModal({
             });
             setImageLoading(true);
             setShowSuccess(false);
+
+            // Track modal opened (only once per open)
+            if (!hasTrackedOpen.current) {
+                analytics.shareFunnel.modalOpened("share_modal", defaultCardType);
+                hasTrackedOpen.current = true;
+            }
+        } else {
+            hasTrackedOpen.current = false;
         }
     }, [isOpen, defaultCardType, defaultValue, metricType, rank, leagueName, streakDays]);
 
@@ -141,12 +153,16 @@ export function ShareModal({
         return `/api/og?${params.toString()}`;
     }, [cardData, periodLabel]);
 
-    // Generate share URL
-    const getShareUrl = useCallback(() => {
+    // Generate share URL with UTM parameters
+    const getShareUrl = useCallback((platform?: SharePlatform) => {
         const params = new URLSearchParams({
             card_type: cardData.cardType,
             metric_type: cardData.metricType,
             value: cardData.value.toString(),
+            // UTM parameters for tracking
+            utm_source: "share",
+            utm_medium: platform || "direct",
+            utm_campaign: cardData.cardType,
         });
 
         if (cardData.rank && cardData.showRank) {
@@ -176,14 +192,20 @@ export function ShareModal({
     const handleShare = (platform: SharePlatform) => {
         share({
             text: getShareMessage(),
-            url: getShareUrl(),
+            url: getShareUrl(platform),
             title: APP_CONFIG.name,
         }, platform);
     };
 
-    // Update card data helper
+    // Update card data helper with analytics
     const updateCardData = (updates: Partial<CardData>) => {
-        setCardData((prev) => ({ ...prev, ...updates }));
+        setCardData((prev) => {
+            // Track card type changes
+            if (updates.cardType && updates.cardType !== prev.cardType) {
+                analytics.shareFunnel.cardTypeSelected(updates.cardType, prev.cardType);
+            }
+            return { ...prev, ...updates };
+        });
         setImageLoading(true);
     };
 

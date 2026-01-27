@@ -323,6 +323,84 @@ export const analytics = {
     },
 
     // ─────────────────────────────────────────────────────────────────────────
+    // SHARE FUNNEL (PRD-51: Social Sharing & Stats Hub)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** Share funnel tracking for conversion analysis */
+    shareFunnel: {
+        /** Track when share modal is opened (intent) */
+        modalOpened: (source: string, cardType?: string) => {
+            trackEvent('share_modal_opened', {
+                source,
+                card_type: cardType,
+                category: 'share_funnel',
+                action: 'intent',
+            });
+        },
+
+        /** Track card type selection in modal */
+        cardTypeSelected: (cardType: string, previousType?: string) => {
+            trackEvent('share_card_type_selected', {
+                card_type: cardType,
+                previous_type: previousType,
+                category: 'share_funnel',
+                action: 'select',
+            });
+        },
+
+        /** Track when share is completed */
+        completed: (platform: string, cardType: string, value?: number) => {
+            trackEvent('share_completed', {
+                platform,
+                card_type: cardType,
+                metric_value: value,
+                category: 'share_funnel',
+                action: 'complete',
+            });
+        },
+
+        /** Track share link clicks (from shared content) */
+        linkClicked: (shortCode: string, cardType?: string, source?: string) => {
+            trackEvent('share_link_clicked', {
+                short_code: shortCode,
+                card_type: cardType,
+                utm_source: source,
+                category: 'share_funnel',
+                action: 'click',
+            });
+        },
+
+        /** Track sign-up from shared link */
+        signUpFromShare: (shortCode: string, cardType?: string) => {
+            trackEvent('sign_up_from_share', {
+                short_code: shortCode,
+                card_type: cardType,
+                category: 'share_funnel',
+                action: 'convert',
+            });
+        },
+
+        /** Track share prompt shown (post-submission, milestone) */
+        promptShown: (trigger: 'post_submission' | 'personal_best' | 'streak_milestone' | 'rank_change', value?: number) => {
+            trackEvent('share_prompt_shown', {
+                trigger,
+                metric_value: value,
+                category: 'share_funnel',
+                action: 'prompt',
+            });
+        },
+
+        /** Track share prompt dismissed */
+        promptDismissed: (trigger: string) => {
+            trackEvent('share_prompt_dismissed', {
+                trigger,
+                category: 'share_funnel',
+                action: 'dismiss',
+            });
+        },
+    },
+
+    // ─────────────────────────────────────────────────────────────────────────
     // ENGAGEMENT
     // ─────────────────────────────────────────────────────────────────────────
 
