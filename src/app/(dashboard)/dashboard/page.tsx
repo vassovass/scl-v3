@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
 import { GratitudeCard } from "@/components/dashboard/GratitudeCard";
+import { ShareProgressWidget } from "@/components/dashboard/ShareProgressWidget";
 import { getUserLeagues } from "@/lib/leagues";
 import { redirect } from "next/navigation";
 
@@ -29,6 +30,13 @@ export default async function DashboardPage() {
             <h1 className="text-2xl font-bold text-foreground">Your Leagues</h1>
             <div className="flex gap-3">
               <Link
+                href="/my-stats"
+                className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition hover:border-border/80 hover:bg-accent"
+                data-tour="my-stats"
+              >
+                📊 My Stats
+              </Link>
+              <Link
                 href="/settings/profile"
                 className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition hover:border-border/80 hover:bg-accent"
               >
@@ -52,10 +60,10 @@ export default async function DashboardPage() {
           </div>
         </ModuleFeedback>
 
-        {/* Gratitude summary (Proactive Mindfulness) */}
-        {/* Placeholder count until API is updated */}
-        <div className="mt-6 mb-2">
-          <GratitudeCard count={0} className="w-full md:max-w-md" />
+        {/* Progress Widget & Gratitude Row */}
+        <div className="mt-6 mb-2 grid gap-4 md:grid-cols-2">
+          <ShareProgressWidget className="w-full" />
+          <GratitudeCard count={0} className="w-full" />
         </div>
 
         {leagues.length === 0 ? (
