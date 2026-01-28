@@ -7,11 +7,25 @@ import { Spinner } from "@/components/ui/Spinner";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
 import { ShareModal } from "@/components/sharing";
 import { useShareModal } from "@/hooks/useShareModal";
+import { CARD_TYPE_CONFIGS, type CardType } from "@/lib/sharing";
 import {
     type PeriodPreset,
     getPresetLabel,
     getPreviousPeriod,
 } from "@/lib/utils/periods";
+
+interface ShareHistoryItem {
+    id: string;
+    shortCode: string;
+    cardType: string;
+    metricType: string;
+    value: number;
+    createdAt: string;
+    stats: {
+        views: number;
+        clicks: number;
+    };
+}
 
 interface StatsHubData {
     user: {
@@ -75,6 +89,26 @@ export default function MyStatsPage() {
     // Share Modal
     const { isOpen: shareModalOpen, config: shareConfig, openShareModal, closeShareModal } = useShareModal();
 
+    // Share History
+    const [shareHistory, setShareHistory] = useState<ShareHistoryItem[]>([]);
+    const [historyLoading, setHistoryLoading] = useState(false);
+
+    const fetchShareHistory = useCallback(async () => {
+        if (!user) return;
+        setHistoryLoading(true);
+        try {
+            const res = await fetch("/api/share/history?limit=5");
+            if (res.ok) {
+                const json = await res.json();
+                setShareHistory(json.history || []);
+            }
+        } catch (err) {
+            console.error("Error fetching share history:", err);
+        } finally {
+            setHistoryLoading(false);
+        }
+    }, [user]);
+
     const fetchStats = useCallback(async () => {
         if (!user) return;
 
@@ -112,7 +146,8 @@ export default function MyStatsPage() {
 
     useEffect(() => {
         fetchStats();
-    }, [fetchStats]);
+        fetchShareHistory();
+    }, [fetchStats, fetchShareHistory]);
 
     if (!user) {
         return (
@@ -393,6 +428,57 @@ export default function MyStatsPage() {
                                 </div>
                             </section>
                         </ModuleFeedback>
+
+                        {/* Share History */}
+                        {shareHistory.length > 0 && (
+                            <ModuleFeedback moduleId="stats-hub-history" moduleName="Share History">
+                                <section className="mt-8" data-tour="stats-history">
+                                    <h2 className="text-sm font-medium text-muted-foreground mb-3">
+                                        📤 Recently Shared
+                                    </h2>
+                                    <div className="space-y-2">
+                                        {shareHistory.map((item) => {
+                                            const cardConfig = CARD_TYPE_CONFIGS[item.cardType as CardType];
+                                            return (
+                                                <div
+                                                    key={item.id}
+                                                    className="flex items-center justify-between rounded-lg border border-border bg-card/50 p-3"
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="text-lg">
+                                                            {cardConfig?.emoji || "📊"}
+                                                        </span>
+                                                        <div>
+                                                            <p className="text-sm font-medium text-foreground">
+                                                                {cardConfig?.label || item.cardType}
+                                                            </p>
+                                                            <p className="text-xs text-muted-foreground">
+                                                                {item.value.toLocaleString()} steps •{" "}
+                                                                {new Date(item.createdAt).toLocaleDateString()}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                                        <span title="Views">👁 {item.stats.views}</span>
+                                                        <span title="Clicks">🔗 {item.stats.clicks}</span>
+                                                        <button
+                                                            onClick={() => openShareModal({
+                                                                cardType: item.cardType as CardType,
+                                                                value: item.value,
+                                                                metricType: "steps",
+                                                            })}
+                                                            className="rounded px-2 py-1 text-primary hover:bg-primary/10 transition"
+                                                        >
+                                                            Share Again
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </section>
+                            </ModuleFeedback>
+                        )}
                     </>
                 ) : null}
             </main>

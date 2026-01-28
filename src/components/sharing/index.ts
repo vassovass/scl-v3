@@ -7,3 +7,4 @@
  */
 
 export { ShareModal } from './ShareModal';
+export { MilestonePrompt } from './MilestonePrompt';
