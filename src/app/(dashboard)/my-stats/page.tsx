@@ -184,6 +184,7 @@ export default function MyStatsPage() {
                                     value={period}
                                     onChange={(e) => setPeriod(e.target.value as PeriodPreset)}
                                     className="rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-foreground"
+                                    data-tour="period-selector"
                                 >
                                     {PERIOD_OPTIONS.map((p) => (
                                         <option key={p} value={p}>
@@ -422,6 +423,7 @@ export default function MyStatsPage() {
                                             periodLabel: getPresetLabel(period),
                                         })}
                                         className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition"
+                                        data-tour="challenge-share-button"
                                     >
                                         🎯 Share Challenge
                                     </button>

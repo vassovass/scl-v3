@@ -377,6 +377,91 @@
             }
         }
     },
+    "sharing": {
+        "meta": {
+            "name": "Sharing Tour",
+            "description": "Learn how to share your achievements with friends"
+        },
+        "steps": {
+            "welcome": {
+                "title": "Welcome to Stats Hub! 📊",
+                "content": "This is your personal stats dashboard. Here you can track your progress and share achievements with friends. Let's walk through the sharing features!",
+                "mobile": {
+                    "content": "Your stats dashboard - let's learn to share achievements!"
+                }
+            },
+            "statCard": {
+                "title": "Your Achievement Cards",
+                "content": "Each stat card shows a key metric like today's steps, your streak, or personal best. Hover over any card to reveal the share button - your friends will love seeing your progress!",
+                "mobile": {
+                    "content": "Each card shows a stat. Tap to share with friends!"
+                }
+            },
+            "periodDropdown": {
+                "title": "Choose Your Time Period",
+                "content": "Use this dropdown to view stats for different time periods - today, this week, last month, or all time. Your share cards will reflect the selected period.",
+                "mobile": {
+                    "content": "Pick a time period for your stats."
+                }
+            },
+            "shareButton": {
+                "title": "Share Your Challenge! 🎯",
+                "content": "Click this button to create a shareable challenge card. You can customize it and send it directly to WhatsApp, X, or copy the link. Try clicking it now!",
+                "mobile": {
+                    "content": "Tap to create a shareable challenge card!"
+                }
+            },
+            "cardPreview": {
+                "title": "Customize Your Card",
+                "content": "Here's a live preview of your share card. You can change the card type, toggle rank display, switch themes, and add a custom message. The preview updates instantly!",
+                "mobile": {
+                    "content": "Preview your card - customize and share!"
+                }
+            },
+            "whatsappButton": {
+                "title": "Share on WhatsApp 💬",
+                "content": "WhatsApp is the easiest way to challenge friends! Tap this button to open WhatsApp with your challenge card ready to send. Your friends can tap the link to see your stats.",
+                "mobile": {
+                    "content": "Tap to share directly to WhatsApp!"
+                }
+            },
+            "complete": {
+                "title": "You're Ready to Share! 🎉",
+                "content": "Now you know how to share your achievements! Challenge your friends and see who can hit the most steps. Check your share history below to track engagement. Good luck!",
+                "mobile": {
+                    "content": "Ready to share! Challenge your friends!"
+                }
+            }
+        },
+        "variants": {
+            "quick": {
+                "welcome": {
+                    "content": "Welcome to Stats Hub! Let's quickly show you how to share your achievements with friends.",
+                    "mobile": {
+                        "content": "Quick tour: learn to share achievements!"
+                    }
+                },
+                "statCard": {
+                    "content": "Your stats are displayed in cards. Hover over any card to share it with friends!",
+                    "mobile": {
+                        "content": "Stats in cards - hover to share!"
+                    }
+                },
+                "shareButton": {
+                    "content": "Click here to create a challenge card and send it via WhatsApp or other platforms!",
+                    "mobile": {
+                        "content": "Tap to create and share a challenge!"
+                    }
+                },
+                "complete": {
+                    "content": "That's it! Start sharing your achievements and challenge your friends!",
+                    "mobile": {
+                        "content": "Done! Start challenging friends!"
+                    }
+                }
+            }
+        }
+    },
     "common": {
         "buttons": {
             "next": "Next",

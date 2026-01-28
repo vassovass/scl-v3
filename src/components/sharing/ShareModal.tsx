@@ -216,7 +216,7 @@ export function ShareModal({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-            <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl border border-border bg-card shadow-2xl">
+            <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl border border-border bg-card shadow-2xl" data-tour="share-modal">
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-border p-4">
                     <h2 className="text-lg font-semibold text-foreground">
@@ -273,7 +273,7 @@ export function ShareModal({
                         <label className="text-sm font-medium text-muted-foreground mb-2 block">
                             Preview
                         </label>
-                        <div className="relative rounded-lg border border-border overflow-hidden bg-secondary/30">
+                        <div className="relative rounded-lg border border-border overflow-hidden bg-secondary/30" data-tour="share-card-preview">
                             {imageLoading && (
                                 <div className="absolute inset-0 flex items-center justify-center bg-secondary/50 z-10">
                                     <Spinner size="md" />
@@ -352,6 +352,7 @@ export function ShareModal({
                     <button
                         onClick={() => handleShare("whatsapp")}
                         className="w-full flex items-center justify-center gap-3 rounded-lg bg-[#25D366] px-4 py-3 text-white font-medium hover:bg-[#22c55e] transition"
+                        data-tour="share-whatsapp-button"
                     >
                         <span className="text-xl">💬</span>
                         Share on WhatsApp

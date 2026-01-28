@@ -24,6 +24,7 @@ import { leaderboardTour } from './definitions/leaderboard.tour';
 import { analyticsTour } from './definitions/analytics.tour';
 import { settingsTour } from './definitions/settings.tour';
 import { adminTour } from './definitions/admin.tour';
+import { sharingTour } from './definitions/sharing.tour';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TOUR REGISTRY
@@ -41,6 +42,7 @@ export const TOUR_REGISTRY: Record<string, TourDefinition> = {
     [analyticsTour.id]: analyticsTour,
     [settingsTour.id]: settingsTour,
     [adminTour.id]: adminTour,
+    [sharingTour.id]: sharingTour,
 };
 
 // ═══════════════════════════════════════════════════════════════════════════

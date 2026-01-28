@@ -98,8 +98,8 @@
 ### Social & Growth (PRDs 51-53) 📢
 | # | PRD Title | Outcome | Status |
 |---|-----------|---------|--------|
-| 51 | [Social Sharing & Stats Hub](./PRD_51_Social_Sharing_Stats_Hub.md) | Beautiful shareable achievement cards for WhatsApp | 🔄 In Progress |
-| 52 | [Sharing Tour](./PRD_52_Sharing_Tour.md) | Joyride onboarding for sharing features | 📋 Proposed |
+| 51 | [Social Sharing & Stats Hub](./PRD_51_Social_Sharing_Stats_Hub.md) | Beautiful shareable achievement cards for WhatsApp | ✅ Complete |
+| 52 | [Sharing Tour](./PRD_52_Sharing_Tour.md) | Joyride onboarding for sharing features | ✅ Complete |
 | 53 | [Sharing Marketing Page](./PRD_53_Sharing_Marketing_Page.md) | Public /how-to-share page for SEO | 📋 Proposed |
 
 ---
@@ -135,8 +135,8 @@
 
 | Order | PRD | Why This Order | Status |
 |-------|-----|----------------|--------|
-| 7 | **[PRD 51] Social Sharing & Stats Hub** | Core sharing infrastructure - generates beautiful cards | 📋 Proposed |
-| 8 | **[PRD 52] Sharing Tour** | Teach users how to share (depends on PRD 51) | 📋 Proposed |
+| 7 | **[PRD 51] Social Sharing & Stats Hub** | Core sharing infrastructure - generates beautiful cards | ✅ Complete |
+| 8 | **[PRD 52] Sharing Tour** | Teach users how to share (depends on PRD 51) | ✅ Complete |
 | 9 | **[PRD 53] Sharing Marketing Page** | SEO page for /how-to-share (depends on PRD 51) | 📋 Proposed |
 
 **Sprint 2 Gate:** ✅ Users can share achievements as beautiful cards → New users discover app via shared links → Sharing tour teaches the feature
