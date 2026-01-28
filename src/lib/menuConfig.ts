@@ -459,7 +459,7 @@ export function detectMenuLocation(pathname: string): MenuLocation {
     }
 
     // Public/marketing pages
-    const publicPages = ['/', '/pricing', '/how-it-works', '/why-upload', '/privacy', '/terms', '/security', '/stage-info', '/beta', '/roadmap', '/feedback'];
+    const publicPages = ['/', '/pricing', '/how-it-works', '/how-to-share', '/why-upload', '/compare', '/privacy', '/terms', '/security', '/stage-info', '/beta', '/roadmap', '/feedback'];
     if (publicPages.includes(pathname) || publicPages.some(p => pathname === p)) {
         return 'public_header';
     }
