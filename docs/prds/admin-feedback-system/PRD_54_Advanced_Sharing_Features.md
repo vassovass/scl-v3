@@ -167,8 +167,119 @@ Based on your stats, suggest optimal sharing moments:
 
 ---
 
+---
+
+## 🧪 Testing Requirements
+
+> **Emphasis:** Modularity, Systems Thinking, Design System Consistency, Deep Thinking Framework
+
+### Unit Tests (Vitest)
+
+| Component | Tests Required | Priority |
+|-----------|---------------|----------|
+| `DateRangePicker` | Range selection, validation, edge cases (leap years, DST) | High |
+| `periodUtils.ts` (extended) | Custom range calculations, serialization, boundary conditions | High |
+| `challengeUtils.ts` | Status transitions, winner determination, scoring logic | High |
+| `trendCalculations.ts` | Trend detection, comparison overlays, data normalization | Medium |
+
+**Modular Testing Approach:**
+```typescript
+// Each module should be independently testable
+describe('DateRangePicker - Modular', () => {
+    it('validates date range independently of Share Modal', () => {});
+    it('handles timezone edge cases', () => {});
+    it('integrates with existing periodUtils', () => {});
+});
+```
+
+### Integration Tests
+
+| Flow | Tests Required | Priority |
+|------|---------------|----------|
+| Custom Range → Share Modal → OG Image | End-to-end custom period sharing | High |
+| Challenge Creation → Notification → Response | Full challenge lifecycle | High |
+| Trend Data → Chart → Share Card | Trend visualization pipeline | Medium |
+
+### E2E Tests (Playwright)
+
+| Scenario | Test Coverage |
+|----------|---------------|
+| Guest explores challenge feature | Marketing → Sign-up → Challenge creation |
+| User creates custom date range share | Date picker → Preview → Share → Analytics |
+| Challenge acceptance flow | Notification → Accept → Tracking → Resolution |
+| Trend card sharing | Stats Hub → Trend chart → Share → OG preview |
+
+### Design System Consistency Tests
+
+```typescript
+describe('Design System - Challenge Components', () => {
+    it('uses consistent color tokens for challenge states', () => {
+        expect(styles.pending).toMatch(/amber|yellow/);
+        expect(styles.accepted).toMatch(/emerald|green/);
+        expect(styles.declined).toMatch(/red|rose/);
+    });
+
+    it('follows spacing scale from design tokens', () => {});
+    it('uses standard button variants', () => {});
+});
+```
+
+### Systems Thinking Verification
+
+| System | Integration Points | Test Focus |
+|--------|-------------------|------------|
+| Date ranges | periodUtils, OG API, analytics | Consistency across systems |
+| Challenges | notifications, database, edge functions | State machine correctness |
+| Trends | data fetching, charting, caching | Performance under load |
+
+---
+
+## 🧠 Deep Thinking Framework
+
+### Why (Problem Definition)
+- Users can't share calculated progress over custom time periods
+- Challenges are impersonal broadcasts, not social interactions
+- No visual representation of long-term improvement trends
+
+### What (Solution Scope)
+- Custom date range picker with relative shortcuts
+- Friend-targeted challenges with full lifecycle
+- Trend visualization with shareable cards
+
+### How (Implementation Strategy)
+- Modular components that compose with existing sharing infrastructure
+- Database schema designed for future extensibility (group challenges)
+- Chart rendering compatible with OG image generation constraints
+
+### Future-Proofing Considerations
+- Date range picker reusable for analytics filtering
+- Challenge system extendable to team competitions
+- Trend visualization applicable to multiple metric types (PRD-48)
+
+---
+
+## 🎨 Design System Integration
+
+### Color Tokens for Challenge States
+| State | Token | Usage |
+|-------|-------|-------|
+| Pending | `--warning-500` | Challenge awaiting response |
+| Accepted | `--success-500` | Challenge in progress |
+| Completed (Won) | `--primary-500` | Victory state |
+| Completed (Lost) | `--muted-500` | Graceful defeat |
+| Declined | `--destructive-500` | Challenge refused |
+
+### Component Reuse
+- `DateRangePicker` → Reuse in analytics filters
+- `ChallengeCard` → Reuse in notifications, dashboard
+- `TrendChart` → Reuse in Stats Hub, profile page
+
+---
+
 ## Changelog
 
 | Date | Section | Change |
 |------|---------|--------|
 | 2026-01-28 | Initial | Created advanced sharing features PRD |
+| 2026-01-29 | Testing | Added comprehensive testing requirements section |
+| 2026-01-29 | Design | Added Deep Thinking Framework and Design System Integration |

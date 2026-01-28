@@ -77,6 +77,131 @@ When adding new public marketing pages, remember to add them to the `publicPages
 
 ---
 
+## 🧪 Testing Requirements
+
+> **Emphasis:** Modularity, Systems Thinking, Design System Consistency, Deep Thinking Framework
+
+### Unit Tests (Vitest)
+
+**File:** `src/lib/__tests__/menuConfig.test.ts`
+
+Tests added for PRD-55:
+```typescript
+// PRD-55: Marketing pages must show public navigation
+it('detects marketing pages as public (PRD-55)', () => {
+    expect(detectMenuLocation('/how-to-share')).toBe('public_header');
+    expect(detectMenuLocation('/compare')).toBe('public_header');
+    expect(detectMenuLocation('/how-it-works')).toBe('public_header');
+    expect(detectMenuLocation('/why-upload')).toBe('public_header');
+});
+
+it('detects legal pages as public', () => {
+    expect(detectMenuLocation('/terms')).toBe('public_header');
+    expect(detectMenuLocation('/security')).toBe('public_header');
+});
+
+it('defaults unknown routes to app_header', () => {
+    expect(detectMenuLocation('/unknown-route')).toBe('app_header');
+});
+```
+
+### E2E Tests (Playwright)
+
+**File:** `e2e/sharing-marketing.spec.ts`
+
+| Scenario | Test Coverage |
+|----------|---------------|
+| Guest sees public menu | `/how-to-share`, `/compare`, `/` |
+| Mobile hamburger menu | Public menu accessible on 375px viewport |
+| Navigation links work | Logo → home, Sign In → auth |
+| CTA links to sign-up | Primary button href validation |
+
+### Systems Thinking - Test Coverage Matrix
+
+| Route | Unit Test | E2E Test | Auth State |
+|-------|-----------|----------|------------|
+| `/` | `detectMenuLocation` | `navigation.spec.ts` | Guest/Auth |
+| `/how-to-share` | `menuConfig.test.ts` | `sharing-marketing.spec.ts` | Guest |
+| `/compare` | `menuConfig.test.ts` | `sharing-marketing.spec.ts` | Guest |
+| `/dashboard` | `menuConfig.test.ts` | `navigation.spec.ts` | Auth only |
+| `/admin/*` | `menuConfig.test.ts` | `navigation.spec.ts` | SuperAdmin |
+
+### Design System Consistency Tests
+
+The navigation should follow design system patterns:
+
+| Element | Token/Pattern | Verification |
+|---------|---------------|--------------|
+| Logo | Brand colors, consistent sizing | Visual regression |
+| Nav links | Text color `--foreground`, hover state | E2E interaction |
+| Sign In button | Button variant `outline` or `ghost` | Component test |
+| Mobile menu | Drawer pattern, animation tokens | E2E viewport test |
+
+---
+
+## 🧠 Deep Thinking Framework
+
+### Why (Problem Definition)
+Navigation inconsistency creates user confusion and hurts SEO. Guest users landing on marketing pages couldn't discover other features (Pricing, Roadmap) because the public menu wasn't rendering.
+
+### What (Solution Scope)
+Add missing routes to `publicPages` array. This is a config fix, not an architectural change.
+
+### How (Implementation Strategy)
+1. Identify root cause via code analysis
+2. Single-line fix in `menuConfig.ts`
+3. Add unit tests to prevent regression
+4. Add E2E tests for guest navigation flows
+
+### Future-Proofing (Proactive Items)
+
+**P-1: Dynamic Public Route Detection**
+Instead of hardcoded array, detect public routes from Next.js route groups:
+```typescript
+// Future improvement: detect from (public) folder
+const isPublicRoute = pathname.startsWith('/(public)') || staticPublicPages.includes(pathname);
+```
+
+**P-2: Navigation Audit Automation**
+Create CI job that:
+- Spins up preview deployment
+- Runs navigation E2E tests for all user types
+- Flags any route showing wrong menu
+
+**P-3: Route-to-Menu Mapping Documentation**
+Auto-generate documentation showing which routes map to which menus:
+```bash
+npm run docs:nav-matrix
+# Outputs markdown table of route → menu mapping
+```
+
+---
+
+## 🎨 Design System Integration
+
+### Navigation Component Hierarchy
+
+```
+NavHeader (layout-level)
+├── Logo (branded, links to /)
+├── DesktopNav
+│   ├── PublicMenu (guest only, public pages)
+│   ├── AppMenu (authenticated)
+│   └── AdminMenu (superadmin only)
+├── MobileMenu (drawer pattern)
+└── AuthButtons (Sign In / User Avatar)
+```
+
+### Accessibility Requirements
+
+| Element | WCAG | Test |
+|---------|------|------|
+| Skip link | 2.4.1 | Hidden skip-to-content link |
+| Focus management | 2.4.3 | Tab order in mobile menu |
+| Landmarks | 1.3.1 | `<nav>` with aria-label |
+
+---
+
 ## Browser Agent Audit Prompt
 
 For future page audits, use this prompt with Claude's browser agent extension:
