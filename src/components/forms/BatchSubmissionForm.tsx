@@ -6,6 +6,8 @@ import { apiRequest, ApiError } from "@/lib/api/client";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { useToast } from "@/hooks/use-toast";
 import { normalizeError, reportErrorClient, ErrorCode } from "@/lib/errors";
+import { ShareModal } from "@/components/sharing/ShareModal";
+import { analytics } from "@/lib/analytics";
 
 interface BatchSubmissionFormProps {
     leagueId?: string;
@@ -97,6 +99,8 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
     const [extractionStep, setExtractionStep] = useState<string | null>(null); // Detailed step for current extraction
     const [previewImage, setPreviewImage] = useState<string | null>(null); // For modal
     const [limitWarning, setLimitWarning] = useState<string | null>(null);
+    const [showSharePrompt, setShowSharePrompt] = useState(false);
+    const [submittedSteps, setSubmittedSteps] = useState<number>(0);
 
     const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -640,8 +644,19 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
         setOverallStatus(`Completed: ${successCount} successful, ${errorCount} failed`);
         setProcessing(false);
 
-        if (successCount > 0 && onSubmitted) {
-            onSubmitted();
+        if (successCount > 0) {
+            // Calculate total steps submitted
+            const totalSteps = reviewedImages
+                .filter((img) => img.status !== "error")
+                .reduce((sum, img) => sum + (img.editedSteps || 0), 0);
+
+            setSubmittedSteps(totalSteps);
+            setShowSharePrompt(true);
+
+            // Track share prompt shown
+            analytics.shareFunnel.promptShown("post_submission", totalSteps);
+
+            onSubmitted?.();
         }
     };
 
@@ -1008,6 +1023,55 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                         >
                             ✕
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Post-Submission Share Prompt */}
+            {showSharePrompt && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="w-full max-w-sm rounded-xl border border-border bg-card shadow-2xl overflow-hidden">
+                        {/* Celebration Header */}
+                        <div className="bg-gradient-to-r from-primary/20 to-primary/10 p-6 text-center">
+                            <div className="text-5xl mb-3">🎉</div>
+                            <h2 className="text-xl font-bold text-foreground">
+                                Submission Complete!
+                            </h2>
+                            <p className="mt-2 text-sm text-muted-foreground">
+                                You submitted {submittedSteps.toLocaleString()} steps. Share your progress with friends!
+                            </p>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="p-4 space-y-3">
+                            <button
+                                onClick={() => {
+                                    setShowSharePrompt(false);
+                                    // Open share modal with steps
+                                    window.open(
+                                        `https://wa.me/?text=${encodeURIComponent(
+                                            `I just logged ${submittedSteps.toLocaleString()} steps! 🚶‍♂️ Track your progress with SCL.`
+                                        )}`,
+                                        "_blank"
+                                    );
+                                    analytics.shareFunnel.completed("whatsapp", "daily", submittedSteps);
+                                }}
+                                className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#25D366] px-4 py-3 text-white font-medium hover:bg-[#22c55e] transition"
+                            >
+                                <span className="text-xl">💬</span>
+                                Share on WhatsApp
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    setShowSharePrompt(false);
+                                    analytics.shareFunnel.promptDismissed("post_submission");
+                                }}
+                                className="w-full rounded-lg border border-border px-4 py-2 text-sm text-muted-foreground hover:bg-secondary transition"
+                            >
+                                Maybe Later
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
