@@ -22,13 +22,13 @@ export default async function DashboardPage() {
 
   return (
     <DashboardClientWrapper>
-      <div className="min-h-screen bg-background">
+      <div className="bg-background">
         <DashboardWelcomeToast />
-        <div className="mx-auto max-w-5xl px-6 py-12">
+        <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-12">
         <ModuleFeedback moduleId="dashboard-header" moduleName="Dashboard Actions">
-          <div className="flex items-center justify-between" data-tour="dashboard-header">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between" data-tour="dashboard-header">
             <h1 className="text-2xl font-bold text-foreground">Your Leagues</h1>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
               <Link
                 href="/my-stats"
                 className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition hover:border-border/80 hover:bg-accent"

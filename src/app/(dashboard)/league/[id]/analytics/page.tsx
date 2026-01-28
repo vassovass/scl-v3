@@ -42,7 +42,7 @@ export default function LeagueAnalyticsPage() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-background" data-view-mode={viewMode}>
+        <div className="bg-background" data-view-mode={viewMode}>
             {/* Header */}
             <header
                 className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-20"

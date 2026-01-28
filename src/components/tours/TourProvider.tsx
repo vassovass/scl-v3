@@ -1058,6 +1058,8 @@ export function TourProvider({
                             borderRadius: 'var(--radius)',
                             fontSize: '0.875rem',
                             padding: '1rem',
+                            maxWidth: 'min(90vw, 340px)',
+                            margin: '0 8px',
                         },
                         tooltipTitle: {
                             fontSize: '1rem',

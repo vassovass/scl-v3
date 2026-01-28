@@ -81,7 +81,7 @@ export default function CreateLeaguePage() {
     }
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="bg-background">
             {/* Main */}
             <ModuleFeedback moduleId="create-league-form" moduleName="Create League Form">
                 <div className="mx-auto max-w-lg px-6 py-12">

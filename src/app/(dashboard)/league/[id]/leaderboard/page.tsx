@@ -83,7 +83,7 @@ function formatDate(dateStr: string) {
 // Loading skeleton component
 function LeaderboardSkeleton() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       <div className="border-b border-border bg-card/30">
         <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
           <div className="h-7 w-32 bg-muted rounded animate-pulse" />
@@ -269,7 +269,7 @@ function LeaderboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       {/* Header */}
       <div className="border-b border-border bg-card/30" data-tour="leaderboard-header">
         <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">

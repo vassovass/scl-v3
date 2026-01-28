@@ -490,7 +490,7 @@ export default function SubmitPage() {
     // Instead we can show a specific message inside if user has no leagues, but still allow submission.
 
     return (
-        <div className="min-h-screen bg-background" data-submission-mode={submissionMode}>
+        <div className="bg-background" data-submission-mode={submissionMode}>
             {/* Page Title */}
             <div className="border-b border-border bg-card/30">
                 <div className="mx-auto max-w-3xl px-6 py-4">
@@ -507,7 +507,7 @@ export default function SubmitPage() {
             </div>
 
             {/* Main */}
-            <main className="mx-auto max-w-3xl px-6 py-12">
+            <main className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-12">
                 {/* Offline Warning */}
                 {isOffline && (
                     <div className="mb-6 rounded-lg border border-[hsl(var(--warning)/.5)] bg-[hsl(var(--warning)/.1)] p-4 text-[hsl(var(--warning))]">
@@ -545,7 +545,7 @@ export default function SubmitPage() {
                 {/* Submit Steps Section */}
                 <ModuleFeedback moduleId="submission-form" moduleName="Step Submission Form">
                     <section data-tour="submission-form">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <h2 className="text-xl font-semibold text-foreground">Submit Today&apos;s Steps</h2>
                                 <p className="mt-2 text-sm text-muted-foreground">

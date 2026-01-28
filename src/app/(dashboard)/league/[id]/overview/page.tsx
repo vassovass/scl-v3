@@ -126,7 +126,7 @@ export default function LeagueOverviewPage() {
     }
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="bg-background">
             {/* League Header */}
             <div className="border-b border-border bg-card/30">
                 <div className="mx-auto max-w-5xl px-4 sm:px-6 py-4">
