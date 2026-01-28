@@ -95,12 +95,13 @@
 | 49 | [Alpha Launch Checklist](./PRD_49_Alpha_Launch_Checklist.md) | Launch readiness tracking | 🔄 In Progress |
 | 50 | [Modular Tour System](./PRD_50_Modular_Tour_System.md) | Joyride onboarding rebuild | ✅ Complete |
 
-### Social & Growth (PRDs 51-53) 📢
+### Social & Growth (PRDs 51-54) 📢
 | # | PRD Title | Outcome | Status |
 |---|-----------|---------|--------|
 | 51 | [Social Sharing & Stats Hub](./PRD_51_Social_Sharing_Stats_Hub.md) | Beautiful shareable achievement cards for WhatsApp | ✅ Complete |
 | 52 | [Sharing Tour](./PRD_52_Sharing_Tour.md) | Joyride onboarding for sharing features | ✅ Complete |
-| 53 | [Sharing Marketing Page](./PRD_53_Sharing_Marketing_Page.md) | Public /how-to-share page for SEO | 📋 Proposed |
+| 53 | [Sharing Marketing Page](./PRD_53_Sharing_Marketing_Page.md) | Public /how-to-share page for SEO | ✅ Complete |
+| 54 | [Advanced Sharing Features](./PRD_54_Advanced_Sharing_Features.md) | Custom date ranges, friend challenges, trend visualization | 📋 Proposed |
 
 ---
 
