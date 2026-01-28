@@ -241,6 +241,30 @@ describe('Menu Config - Location Detection', () => {
             expect(detectMenuLocation('/privacy')).toBe('public_header');
             expect(detectMenuLocation('/roadmap')).toBe('public_header');
         });
+
+        // PRD-55: Marketing pages must show public navigation
+        it('detects marketing pages as public (PRD-55)', () => {
+            expect(detectMenuLocation('/how-to-share')).toBe('public_header');
+            expect(detectMenuLocation('/compare')).toBe('public_header');
+            expect(detectMenuLocation('/how-it-works')).toBe('public_header');
+            expect(detectMenuLocation('/why-upload')).toBe('public_header');
+        });
+
+        it('detects legal pages as public', () => {
+            expect(detectMenuLocation('/terms')).toBe('public_header');
+            expect(detectMenuLocation('/security')).toBe('public_header');
+        });
+
+        it('detects info pages as public', () => {
+            expect(detectMenuLocation('/stage-info')).toBe('public_header');
+            expect(detectMenuLocation('/beta')).toBe('public_header');
+            expect(detectMenuLocation('/feedback')).toBe('public_header');
+        });
+
+        it('defaults unknown routes to app_header', () => {
+            expect(detectMenuLocation('/unknown-route')).toBe('app_header');
+            expect(detectMenuLocation('/some/nested/path')).toBe('app_header');
+        });
     });
 });
 
