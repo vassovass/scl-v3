@@ -1,6 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { json } from "@/lib/api";
-import { NextResponse } from "next/server";
 
 /**
  * GET /api/stats/public
@@ -11,42 +10,27 @@ import { NextResponse } from "next/server";
  * Used for: Social proof sections, marketing pages, public dashboards
  *
  * PRD-53: Dynamic social proof stats
+ * PRD-56: Uses SECURITY DEFINER function to bypass RLS issues with admin client
  */
 export async function GET() {
     try {
         const adminClient = createAdminClient();
 
-        // Run all queries in parallel for performance
-        const [usersResult, leaguesResult, submissionsResult, shareCardsResult] = await Promise.all([
-            // Count active users (users who have submitted in last 30 days)
-            adminClient
-                .from("submissions")
-                .select("user_id", { count: "exact", head: true })
-                .gte("submission_date", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]),
+        // PRD-56: Use SECURITY DEFINER function to bypass RLS issues
+        // The RLS policies on submissions check auth.uid() which returns NULL
+        // for admin client, causing stats to show zeros. The function bypasses this.
+        const { data: rpcData, error: rpcError } = await adminClient.rpc("get_public_stats");
 
-            // Count active leagues
-            adminClient.from("leagues").select("id", { count: "exact", head: true }),
-
-            // Sum total steps submitted (all time)
-            adminClient.from("submissions").select("steps_count"),
-
-            // Count share cards created
-            adminClient.from("share_cards").select("id", { count: "exact", head: true }),
-        ]);
-
-        // Calculate total steps
-        let totalSteps = 0;
-        if (submissionsResult.data) {
-            totalSteps = submissionsResult.data.reduce(
-                (sum: number, row: { steps_count: number | null }) => sum + (row.steps_count || 0),
-                0
-            );
+        if (rpcError) {
+            console.error("Error calling get_public_stats RPC:", rpcError);
+            // Fall back to direct queries if function doesn't exist yet (pre-migration)
+            return await fallbackStats(adminClient);
         }
 
-        // Get unique active user count
-        const activeUsersCount = usersResult.count || 0;
-        const leaguesCount = leaguesResult.count || 0;
-        const shareCardsCount = shareCardsResult.count || 0;
+        const activeUsersCount = rpcData?.activeUsers || 0;
+        const leaguesCount = rpcData?.leaguesCount || 0;
+        const totalSteps = rpcData?.totalSteps || 0;
+        const shareCardsCount = rpcData?.shareCardsCount || 0;
 
         // Format numbers for display
         const formatNumber = (num: number): string => {
@@ -102,4 +86,64 @@ export async function GET() {
             { status: 200 } // Return 200 with fallback data rather than error
         );
     }
+}
+
+/**
+ * Fallback stats using direct queries (pre-migration compatibility)
+ * Note: This may return zeros due to RLS issues until migration is applied
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function fallbackStats(adminClient: any) {
+    const [usersResult, leaguesResult, submissionsResult, shareCardsResult] = await Promise.all([
+        adminClient
+            .from("submissions")
+            .select("user_id", { count: "exact", head: true })
+            .gte("submission_date", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]),
+        adminClient.from("leagues").select("id", { count: "exact", head: true }),
+        adminClient.from("submissions").select("steps_count"),
+        adminClient.from("share_cards").select("id", { count: "exact", head: true }),
+    ]);
+
+    let totalSteps = 0;
+    if (submissionsResult.data) {
+        totalSteps = submissionsResult.data.reduce(
+            (sum: number, row: { steps_count: number | null }) => sum + (row.steps_count || 0),
+            0
+        );
+    }
+
+    const formatNumber = (num: number): string => {
+        if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M+`;
+        if (num >= 1_000) return `${(num / 1_000).toFixed(0)}K+`;
+        return `${num}+`;
+    };
+
+    const stats = {
+        activeUsers: {
+            value: usersResult.count || 0,
+            formatted: formatNumber(usersResult.count || 0),
+            label: "Active Users",
+        },
+        leagues: {
+            value: leaguesResult.count || 0,
+            formatted: formatNumber(leaguesResult.count || 0),
+            label: "Leagues",
+        },
+        totalSteps: {
+            value: totalSteps,
+            formatted: formatNumber(totalSteps),
+            label: "Steps Tracked",
+        },
+        shareCards: {
+            value: shareCardsResult.count || 0,
+            formatted: formatNumber(shareCardsResult.count || 0),
+            label: "Cards Created",
+        },
+    };
+
+    return json(stats, {
+        headers: {
+            "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+        },
+    });
 }

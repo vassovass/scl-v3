@@ -92,8 +92,8 @@ describe("useABTest Logic", () => {
 
     describe("default behavior", () => {
         it("returns default variant initially", async () => {
-            // PostHog returns undefined (not loaded)
-            vi.mocked(posthogFeatureFlag).mockReturnValue(undefined);
+            // PostHog returns false (not loaded/flag disabled)
+            vi.mocked(posthogFeatureFlag).mockReturnValue(false);
 
             // Import hook after mocks are set up
             const { useABTest } = await import("../useABTest");
@@ -107,7 +107,7 @@ describe("useABTest Logic", () => {
         });
 
         it("sets isLoading to false after timeout", async () => {
-            vi.mocked(posthogFeatureFlag).mockReturnValue(undefined);
+            vi.mocked(posthogFeatureFlag).mockReturnValue(false);
 
             const { useABTest } = await import("../useABTest");
 
@@ -205,7 +205,7 @@ describe("useShareCTATest Logic", () => {
     });
 
     it("returns control variant by default", async () => {
-        vi.mocked(posthogFeatureFlag).mockReturnValue(undefined);
+        vi.mocked(posthogFeatureFlag).mockReturnValue(false);
 
         const { useShareCTATest } = await import("../useABTest");
 

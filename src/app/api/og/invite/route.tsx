@@ -2,7 +2,9 @@ import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 import { APP_CONFIG } from "@/lib/config";
 
-// Note: keep default runtime to avoid Next build warning noise.
+// PRD-56: Edge Runtime required for ImageResponse to properly render images.
+// Without this, images return 0x0 dimensions on Node.js runtime.
+export const runtime = "edge";
 
 export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl;

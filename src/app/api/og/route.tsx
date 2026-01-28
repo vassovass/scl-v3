@@ -1,7 +1,9 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 
-// Note: keep default runtime to avoid Next build warning noise.
+// PRD-56: Edge Runtime required for ImageResponse to properly render images.
+// Without this, images return 0x0 dimensions on Node.js runtime.
+export const runtime = "edge";
 
 // ============================================================================
 // Metric Configurations (inline to avoid edge runtime issues with imports)
