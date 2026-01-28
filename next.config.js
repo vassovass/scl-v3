@@ -46,6 +46,7 @@ const nextConfig = {
       // ─────────────────────────────────────────────────────────────────────────
       // GTM/GA4 Proxy
       // Proxies /gtm/* to Google Tag Manager
+      // IMPORTANT: Query strings are automatically forwarded by Next.js rewrites
       // ─────────────────────────────────────────────────────────────────────────
       {
         source: '/gtm/gtm.js',
@@ -55,10 +56,21 @@ const nextConfig = {
         source: '/gtm/gtag/js',
         destination: 'https://www.googletagmanager.com/gtag/js',
       },
-      // GA4 data collection endpoint
+      // GA4 data collection endpoints - CRITICAL for realtime data
+      // These endpoints receive the actual analytics data from the browser
+      // The transport_url in GTM is set to https://stepleague.com/ga
       {
         source: '/ga/g/collect',
         destination: 'https://www.google-analytics.com/g/collect',
+      },
+      {
+        source: '/ga/j/collect',
+        destination: 'https://www.google-analytics.com/j/collect',
+      },
+      // Catch-all for any GA4 collection path variations
+      {
+        source: '/ga/:path*',
+        destination: 'https://www.google-analytics.com/:path*',
       },
     ];
   },
