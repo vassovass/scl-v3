@@ -793,4 +793,102 @@ export const analytics = {
             });
         },
     },
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // CHALLENGES (PRD-54: Friend-Specific Challenges)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    challenges: {
+        /** Track when a challenge is created */
+        created: (targetId: string, metricType: string, durationDays: number, templateId?: string) => {
+            trackEvent('challenge_created', {
+                target_id: targetId,
+                metric_type: metricType,
+                duration_days: durationDays,
+                template_id: templateId,
+                component: 'ChallengeModal',
+                category: 'challenge',
+                action: 'create',
+            });
+        },
+
+        /** Track when a challenge is accepted */
+        accepted: (challengeId: string, challengerId: string) => {
+            trackEvent('challenge_accepted', {
+                challenge_id: challengeId,
+                challenger_id: challengerId,
+                component: 'ChallengeCard',
+                category: 'challenge',
+                action: 'accept',
+            });
+        },
+
+        /** Track when a challenge is declined */
+        declined: (challengeId: string, challengerId: string) => {
+            trackEvent('challenge_declined', {
+                challenge_id: challengeId,
+                challenger_id: challengerId,
+                component: 'ChallengeCard',
+                category: 'challenge',
+                action: 'decline',
+            });
+        },
+
+        /** Track when a challenge is cancelled */
+        cancelled: (challengeId: string, cancelledBy: 'challenger' | 'target') => {
+            trackEvent('challenge_cancelled', {
+                challenge_id: challengeId,
+                cancelled_by: cancelledBy,
+                component: 'ChallengeCard',
+                category: 'challenge',
+                action: 'cancel',
+            });
+        },
+
+        /** Track when a challenge is completed */
+        completed: (challengeId: string, won: boolean, marginPct: number) => {
+            trackEvent('challenge_completed', {
+                challenge_id: challengeId,
+                result: won ? 'won' : 'lost',
+                margin_pct: marginPct,
+                component: 'ChallengeCard',
+                category: 'challenge',
+                action: 'complete',
+            });
+        },
+
+        /** Track challenge template selection */
+        templateSelected: (templateId: string, templateName: string) => {
+            trackEvent('challenge_template_selected', {
+                template_id: templateId,
+                template_name: templateName,
+                component: 'ChallengeModal',
+                category: 'challenge',
+                action: 'select_template',
+            });
+        },
+
+        /** Track challenge shared */
+        shared: (challengeId: string, platform: string, status: string) => {
+            trackEvent('challenge_shared', {
+                challenge_id: challengeId,
+                platform,
+                status,
+                component: 'ChallengeCard',
+                category: 'challenge',
+                action: 'share',
+            });
+        },
+
+        /** Track challenge dashboard viewed */
+        dashboardViewed: (activeCount: number, pendingCount: number) => {
+            trackEvent('challenges_dashboard_viewed', {
+                active_count: activeCount,
+                pending_count: pendingCount,
+                component: 'ChallengesDashboard',
+                category: 'challenge',
+                action: 'view',
+            });
+        },
+    },
 };
