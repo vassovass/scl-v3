@@ -20,3 +20,5 @@ export {
 } from './ShareMilestoneToast';
 export { ShareInsightsCard, ShareInsightsCardSkeleton } from './ShareInsightsCard';
 export { ShareReminder, SharePromptInline } from './ShareReminder';
+export { ShareHistoryList, ShareHistoryListSkeleton, type ShareHistoryItem } from './ShareHistoryList';
+export { ShareAnalyticsDashboard, ShareAnalyticsDashboardSkeleton } from './ShareAnalyticsDashboard';
