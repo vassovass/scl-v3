@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 echo ========================================
 echo    SCL v3 - Local Development Server
 echo ========================================
@@ -6,7 +7,7 @@ echo.
 
 :: Check if port 3000 is in use and kill the process
 echo Checking for existing process on port 3000...
-for /f "tokens=5" %%a in ('netstat -aon ^| findstr :3000 ^| findstr LISTENING') do (
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr :3000 ^| findstr LISTENING 2^>nul') do (
     echo Found process %%a using port 3000, terminating...
     taskkill /F /PID %%a >nul 2>&1
     if !errorlevel! equ 0 (
