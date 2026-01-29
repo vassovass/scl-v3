@@ -56,6 +56,17 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 // ============================================================================
 
 /**
+ * Decode base64url to string (handles Supabase SSR encoding)
+ */
+function base64UrlToString(input: string): string {
+  // Convert base64url to standard base64
+  let b64 = input.replace(/-/g, "+").replace(/_/g, "/");
+  // Pad to make length divisible by 4
+  while (b64.length % 4 !== 0) b64 += "=";
+  return atob(b64);
+}
+
+/**
  * Parse initial session from cookie (same source as middleware uses).
  * This eliminates the race condition where NavHeader renders before onAuthStateChange fires.
  */
@@ -72,7 +83,16 @@ function getInitialSessionFromCookie(): Session | null {
 
     if (!cookieValue) return null;
 
-    const decoded = JSON.parse(decodeURIComponent(cookieValue));
+    // Decode the cookie value (URL encoded)
+    const rawValue = decodeURIComponent(cookieValue);
+
+    // Handle base64- prefix that Supabase SSR uses
+    const prefix = "base64-";
+    const decodedJson = rawValue.startsWith(prefix)
+      ? base64UrlToString(rawValue.slice(prefix.length))
+      : rawValue;
+
+    const decoded = JSON.parse(decodedJson);
     if (decoded?.access_token && decoded?.user) {
       console.log('[AuthProvider] Initialized session from cookie:', decoded.user.id);
       return decoded as Session;

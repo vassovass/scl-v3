@@ -29,7 +29,7 @@ BEGIN
     SELECT COUNT(DISTINCT user_id)
     INTO active_users_count
     FROM submissions
-    WHERE submission_date >= CURRENT_DATE - INTERVAL '30 days';
+    WHERE for_date >= CURRENT_DATE - INTERVAL '30 days';
 
     -- Count all leagues
     SELECT COUNT(*)
@@ -37,7 +37,7 @@ BEGIN
     FROM leagues;
 
     -- Sum all steps (using COALESCE to handle NULL)
-    SELECT COALESCE(SUM(steps_count), 0)
+    SELECT COALESCE(SUM(steps), 0)
     INTO total_steps
     FROM submissions;
 

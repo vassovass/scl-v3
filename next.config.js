@@ -106,6 +106,12 @@ const withPWA = nextPwa.default({
       { urlPattern: /\/api\/auth\//i, handler: "NetworkOnly" },
       { urlPattern: /\/claim\//i, handler: "NetworkOnly" },
 
+      // ============ API ROUTES - NETWORK ONLY ============
+      // OG images - always fetch fresh to avoid broken image caching
+      { urlPattern: /\/api\/og/i, handler: "NetworkOnly" },
+      // All other API routes should be network-first
+      { urlPattern: /\/api\//i, handler: "NetworkOnly" },
+
       // ============ THIRD-PARTY - NETWORK ONLY ============
       // Third-party analytics (often blocked)
       { urlPattern: /^https:\/\/www\.googletagmanager\.com\/gtm\.js/i, handler: "NetworkOnly" },

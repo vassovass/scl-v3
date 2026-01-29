@@ -98,16 +98,16 @@ async function fallbackStats(adminClient: any) {
         adminClient
             .from("submissions")
             .select("user_id", { count: "exact", head: true })
-            .gte("submission_date", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]),
+            .gte("for_date", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]),
         adminClient.from("leagues").select("id", { count: "exact", head: true }),
-        adminClient.from("submissions").select("steps_count"),
+        adminClient.from("submissions").select("steps"),
         adminClient.from("share_cards").select("id", { count: "exact", head: true }),
     ]);
 
     let totalSteps = 0;
     if (submissionsResult.data) {
         totalSteps = submissionsResult.data.reduce(
-            (sum: number, row: { steps_count: number | null }) => sum + (row.steps_count || 0),
+            (sum: number, row: { steps: number | null }) => sum + (row.steps || 0),
             0
         );
     }

@@ -153,10 +153,11 @@ function formatValue(value: number, metricType: MetricType): string {
 // ============================================================================
 
 export async function GET(request: NextRequest) {
-    const { searchParams } = request.nextUrl;
+    try {
+        const { searchParams } = request.nextUrl;
 
-    // Parse parameters with backwards compatibility
-    const rank = parseInt(searchParams.get("rank") || "1");
+        // Parse parameters with backwards compatibility
+        const rank = parseInt(searchParams.get("rank") || "1");
     const value = parseInt(searchParams.get("steps") || searchParams.get("value") || "0");
     const name = searchParams.get("name") || "Player";
     const period = searchParams.get("period") || "this week";
@@ -358,4 +359,34 @@ export async function GET(request: NextRequest) {
             height: 630,
         }
     );
+    } catch (error) {
+        console.error('[OG Image] Error generating image:', error);
+        // Return a simple error image instead of failing silently
+        return new ImageResponse(
+            (
+                <div
+                    style={{
+                        height: "100%",
+                        width: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "#0f172a",
+                        color: "#ef4444",
+                        fontSize: 32,
+                    }}
+                >
+                    <div>Failed to generate image</div>
+                    <div style={{ fontSize: 18, color: "#94a3b8", marginTop: 10 }}>
+                        Please try again
+                    </div>
+                </div>
+            ),
+            {
+                width: 1200,
+                height: 630,
+            }
+        );
+    }
 }
