@@ -274,11 +274,12 @@ export async function GET(request: NextRequest) {
                         }}
                     >
                         {/* Emoji */}
-                        <div style={{ fontSize: 100, marginBottom: 16 }}>{emoji}</div>
+                        <div style={{ display: "flex", fontSize: 100, marginBottom: 16 }}>{emoji}</div>
 
                         {/* Title (rank/card type) */}
                         <div
                             style={{
+                                display: "flex",
                                 fontSize: 56,
                                 fontWeight: 700,
                                 color: titleColor,
@@ -291,6 +292,7 @@ export async function GET(request: NextRequest) {
                         {/* Name */}
                         <div
                             style={{
+                                display: "flex",
                                 fontSize: 32,
                                 color: themeConfig.textSecondary,
                                 marginBottom: leagueName ? 8 : 32,
@@ -303,6 +305,7 @@ export async function GET(request: NextRequest) {
                         {leagueName && (
                             <div
                                 style={{
+                                    display: "flex",
                                     fontSize: 24,
                                     color: themeConfig.textMuted,
                                     marginBottom: 32,
@@ -326,6 +329,7 @@ export async function GET(request: NextRequest) {
                         >
                             <div
                                 style={{
+                                    display: "flex",
                                     fontSize: 64,
                                     fontWeight: 700,
                                     color: themeConfig.textPrimary,
@@ -335,6 +339,7 @@ export async function GET(request: NextRequest) {
                             </div>
                             <div
                                 style={{
+                                    display: "flex",
                                     fontSize: 24,
                                     color: themeConfig.textMuted,
                                     marginTop: 8,
