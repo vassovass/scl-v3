@@ -891,4 +891,73 @@ export const analytics = {
             });
         },
     },
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // SHARE STREAKS (PRD-56: Sharing Encouragement System)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    shareStreak: {
+        /** Track when a share streak is updated */
+        updated: (newStreak: number, isMilestone: boolean, milestoneValue?: number) => {
+            trackEvent('share_streak_updated', {
+                new_streak: newStreak,
+                is_milestone: isMilestone,
+                milestone_value: milestoneValue,
+                component: 'ShareStreakBadge',
+                category: 'share_streak',
+                action: 'update',
+            });
+        },
+
+        /** Track when a milestone is reached */
+        milestoneReached: (milestoneValue: number, tier: string) => {
+            trackEvent('share_streak_milestone', {
+                milestone_value: milestoneValue,
+                tier,
+                component: 'ShareMilestoneToast',
+                category: 'share_streak',
+                action: 'milestone',
+            });
+        },
+
+        /** Track when a nudge is shown */
+        nudgeShown: (nudgeType: string, currentStreak: number) => {
+            trackEvent('share_nudge_shown', {
+                nudge_type: nudgeType,
+                current_streak: currentStreak,
+                component: 'ShareReminder',
+                category: 'share_streak',
+                action: 'nudge',
+            });
+        },
+
+        /** Track when a nudge is dismissed */
+        nudgeDismissed: (nudgeType: string) => {
+            trackEvent('share_nudge_dismissed', {
+                nudge_type: nudgeType,
+                component: 'ShareReminder',
+                category: 'share_streak',
+                action: 'dismiss',
+            });
+        },
+
+        /** Track when a nudge leads to a share (conversion) */
+        nudgeConverted: (nudgeType: string) => {
+            trackEvent('share_nudge_converted', {
+                nudge_type: nudgeType,
+                component: 'ShareReminder',
+                category: 'share_streak',
+                action: 'convert',
+            });
+        },
+
+        /** Track share insights dashboard viewed */
+        insightsViewed: () => {
+            trackEvent('share_insights_viewed', {
+                component: 'ShareAnalyticsDashboard',
+                category: 'share_streak',
+                action: 'view',
+            });
+        },
+    },
 };
