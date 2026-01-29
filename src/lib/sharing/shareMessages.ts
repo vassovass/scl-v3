@@ -100,6 +100,14 @@ export function generateShareMessage(cardType: CardType, data: ShareData): Share
       }
       break;
 
+    case 'custom_period':
+      if (data.periodLabel) {
+        text = `${formattedValue} (${data.periodLabel}) ${config.emoji}`;
+      } else {
+        text = `${formattedValue} over this period! ${config.emoji}`;
+      }
+      break;
+
     default:
       text = `${formattedValue} ${config.emoji}`;
   }

@@ -10,7 +10,7 @@ export const runtime = "edge";
 // ============================================================================
 
 type MetricType = 'steps' | 'calories' | 'slp' | 'distance' | 'swimming' | 'cycling' | 'running';
-type CardType = 'daily' | 'weekly' | 'personal_best' | 'streak' | 'rank' | 'challenge' | 'rank_change';
+type CardType = 'daily' | 'weekly' | 'personal_best' | 'streak' | 'rank' | 'challenge' | 'rank_change' | 'custom_period';
 
 interface MetricStyle {
     emoji: string;
@@ -81,6 +81,7 @@ const CARD_TYPE_STYLES: Record<CardType, { title: string; color: string }> = {
     rank: { title: "Ranked", color: '#38bdf8' },
     challenge: { title: "Challenge", color: '#10b981' },
     rank_change: { title: "Rank Up!", color: '#22c55e' },
+    custom_period: { title: "Custom Period", color: '#a855f7' },
 };
 
 // Theme configurations
@@ -171,6 +172,10 @@ export async function GET(request: NextRequest) {
     const oldRank = searchParams.get("old_rank");
     const streakDays = searchParams.get("streak_days");
 
+    // PRD-54: Custom period parameters
+    const periodStart = searchParams.get("period_start");
+    const periodEnd = searchParams.get("period_end");
+
     // Get configurations
     const metricStyle = METRIC_STYLES[metricType] || METRIC_STYLES.steps;
     const themeConfig = THEMES[theme] || THEMES.dark;
@@ -197,6 +202,10 @@ export async function GET(request: NextRequest) {
         } else if (cardType === 'challenge') {
             titleText = 'Can you beat this?';
             titleColor = '#10b981'; // emerald
+        } else if (cardType === 'custom_period') {
+            // PRD-54: Custom period card uses the period label as title
+            titleText = customTitle || 'Custom Period';
+            titleColor = '#a855f7'; // purple
         } else if (customTitle) {
             titleText = customTitle;
             titleColor = cardStyle.color;

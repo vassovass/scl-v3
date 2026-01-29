@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Spinner } from "@/components/ui/Spinner";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
-import { ShareModal } from "@/components/sharing";
+import { ShareModal, ShareDateRangePicker } from "@/components/sharing";
 import { useShareModal } from "@/hooks/useShareModal";
 import { CARD_TYPE_CONFIGS, type CardType } from "@/lib/sharing";
 import {
     type PeriodPreset,
     getPresetLabel,
     getPreviousPeriod,
+    formatCustomPeriodLabel,
 } from "@/lib/utils/periods";
 
 interface ShareHistoryItem {
@@ -73,6 +74,7 @@ const PERIOD_OPTIONS: PeriodPreset[] = [
     "last_30_days",
     "this_year",
     "all_time",
+    "custom",
 ];
 
 export default function MyStatsPage() {
@@ -83,6 +85,7 @@ export default function MyStatsPage() {
 
     // Filters
     const [period, setPeriod] = useState<PeriodPreset>("this_week");
+    const [customDateRange, setCustomDateRange] = useState<{ start: string; end: string } | null>(null);
     const [selectedLeague, setSelectedLeague] = useState<string>("");
     const [compareEnabled, setCompareEnabled] = useState(true);
 
@@ -112,14 +115,25 @@ export default function MyStatsPage() {
     const fetchStats = useCallback(async () => {
         if (!user) return;
 
+        // For custom period, require date range to be set
+        if (period === "custom" && !customDateRange) {
+            return;
+        }
+
         setLoading(true);
         setError(null);
 
         try {
             const params = new URLSearchParams({ period });
 
-            // Add comparison period if enabled
-            if (compareEnabled) {
+            // Add custom date range params if period is custom
+            if (period === "custom" && customDateRange) {
+                params.set("start_date", customDateRange.start);
+                params.set("end_date", customDateRange.end);
+            }
+
+            // Add comparison period if enabled (not for custom periods)
+            if (compareEnabled && period !== "custom") {
                 const compPeriod = getPreviousPeriod(period);
                 if (compPeriod) {
                     params.set("comparison_period", compPeriod);
@@ -142,7 +156,7 @@ export default function MyStatsPage() {
         } finally {
             setLoading(false);
         }
-    }, [user, period, selectedLeague, compareEnabled]);
+    }, [user, period, customDateRange, selectedLeague, compareEnabled]);
 
     useEffect(() => {
         fetchStats();
@@ -209,19 +223,33 @@ export default function MyStatsPage() {
                                     </select>
                                 )}
 
-                                {/* Compare Toggle */}
-                                <button
-                                    onClick={() => setCompareEnabled(!compareEnabled)}
-                                    className={`rounded-lg border px-3 py-1.5 text-sm transition ${
-                                        compareEnabled
-                                            ? "border-primary bg-primary/10 text-primary"
-                                            : "border-border text-muted-foreground"
-                                    }`}
-                                >
-                                    📈 Compare
-                                </button>
+                                {/* Compare Toggle (hidden for custom periods) */}
+                                {period !== "custom" && (
+                                    <button
+                                        onClick={() => setCompareEnabled(!compareEnabled)}
+                                        className={`rounded-lg border px-3 py-1.5 text-sm transition ${
+                                            compareEnabled
+                                                ? "border-primary bg-primary/10 text-primary"
+                                                : "border-border text-muted-foreground"
+                                        }`}
+                                    >
+                                        📈 Compare
+                                    </button>
+                                )}
                             </div>
                         </div>
+
+                        {/* Custom Date Range Picker */}
+                        {period === "custom" && (
+                            <div className="mt-3 pt-3 border-t border-border">
+                                <ShareDateRangePicker
+                                    value={customDateRange}
+                                    onChange={(range) => setCustomDateRange(range)}
+                                    showShortcuts={true}
+                                    compact={false}
+                                />
+                            </div>
+                        )}
                     </div>
                 </ModuleFeedback>
             </header>
@@ -266,7 +294,10 @@ export default function MyStatsPage() {
 
                                     {/* Period Total */}
                                     <StatCard
-                                        title={getPresetLabel(period)}
+                                        title={period === "custom" && customDateRange
+                                            ? formatCustomPeriodLabel(customDateRange.start, customDateRange.end)
+                                            : getPresetLabel(period)
+                                        }
                                         value={data.period_stats.total_steps}
                                         subtitle={`${data.period_stats.days_submitted} days`}
                                         emoji="📊"
@@ -280,10 +311,14 @@ export default function MyStatsPage() {
                                                 : undefined
                                         }
                                         onShareClick={() => openShareModal({
-                                            cardType: "weekly",
+                                            cardType: period === "custom" ? "custom_period" : "weekly",
                                             value: data.period_stats.total_steps,
                                             metricType: "steps",
-                                            periodLabel: getPresetLabel(period),
+                                            periodLabel: period === "custom" && customDateRange
+                                                ? formatCustomPeriodLabel(customDateRange.start, customDateRange.end)
+                                                : getPresetLabel(period),
+                                            periodStart: customDateRange?.start,
+                                            periodEnd: customDateRange?.end,
                                         })}
                                     />
 
@@ -496,6 +531,8 @@ export default function MyStatsPage() {
                 leagueName={shareConfig?.leagueName}
                 streakDays={shareConfig?.streakDays}
                 periodLabel={shareConfig?.periodLabel}
+                periodStart={shareConfig?.periodStart}
+                periodEnd={shareConfig?.periodEnd}
             />
         </div>
     );

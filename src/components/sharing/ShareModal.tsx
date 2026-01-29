@@ -13,6 +13,8 @@ import {
     generateShareMessage,
 } from "@/lib/sharing";
 import { Spinner } from "@/components/ui/Spinner";
+import { ShareDateRangePicker } from "./ShareDateRangePicker";
+import { type PeriodPreset, formatCustomPeriodLabel } from "@/lib/utils/periods";
 
 // ============================================================================
 // Types
@@ -28,6 +30,10 @@ interface ShareModalProps {
     leagueName?: string;
     streakDays?: number;
     periodLabel?: string;
+    /** Custom period start date (YYYY-MM-DD) */
+    periodStart?: string;
+    /** Custom period end date (YYYY-MM-DD) */
+    periodEnd?: string;
 }
 
 interface CardData {
@@ -41,6 +47,8 @@ interface CardData {
     showRank: boolean;
     showImprovement: boolean;
     theme: "light" | "dark";
+    /** Custom period date range */
+    customPeriod?: { start: string; end: string } | null;
 }
 
 // ============================================================================
@@ -69,6 +77,8 @@ export function ShareModal({
     leagueName,
     streakDays,
     periodLabel,
+    periodStart,
+    periodEnd,
 }: ShareModalProps) {
     const [cardData, setCardData] = useState<CardData>({
         cardType: defaultCardType,
@@ -81,6 +91,7 @@ export function ShareModal({
         showRank: !!rank,
         showImprovement: false,
         theme: "dark",
+        customPeriod: periodStart && periodEnd ? { start: periodStart, end: periodEnd } : null,
     });
 
     const [imageLoading, setImageLoading] = useState(true);
@@ -111,6 +122,7 @@ export function ShareModal({
                 showRank: !!rank,
                 showImprovement: false,
                 theme: "dark",
+                customPeriod: periodStart && periodEnd ? { start: periodStart, end: periodEnd } : null,
             });
             setImageLoading(true);
             setShowSuccess(false);
@@ -123,7 +135,7 @@ export function ShareModal({
         } else {
             hasTrackedOpen.current = false;
         }
-    }, [isOpen, defaultCardType, defaultValue, metricType, rank, leagueName, streakDays]);
+    }, [isOpen, defaultCardType, defaultValue, metricType, rank, leagueName, streakDays, periodStart, periodEnd]);
 
     // Generate OG image URL
     const getOgImageUrl = useCallback(() => {
@@ -146,7 +158,14 @@ export function ShareModal({
         if (cardData.customMessage) {
             params.set("customTitle", cardData.customMessage);
         }
-        if (periodLabel) {
+
+        // Handle period labels - custom period takes precedence
+        if (cardData.customPeriod && cardData.cardType === "custom_period") {
+            params.set("period_start", cardData.customPeriod.start);
+            params.set("period_end", cardData.customPeriod.end);
+            // Also set a formatted period label for the OG image
+            params.set("period", formatCustomPeriodLabel(cardData.customPeriod.start, cardData.customPeriod.end));
+        } else if (periodLabel) {
             params.set("period", periodLabel);
         }
 
@@ -171,6 +190,11 @@ export function ShareModal({
         if (cardData.streakDays) {
             params.set("streak", cardData.streakDays.toString());
         }
+        // Add custom period dates to share URL
+        if (cardData.customPeriod && cardData.cardType === "custom_period") {
+            params.set("period_start", cardData.customPeriod.start);
+            params.set("period_end", cardData.customPeriod.end);
+        }
 
         const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
         return `${baseUrl}/share/stats?${params.toString()}`;
@@ -178,6 +202,11 @@ export function ShareModal({
 
     // Generate share message
     const getShareMessage = useCallback(() => {
+        // Generate period label for custom periods
+        const customPeriodLabel = cardData.customPeriod
+            ? formatCustomPeriodLabel(cardData.customPeriod.start, cardData.customPeriod.end)
+            : undefined;
+
         return generateShareMessage(cardData.cardType, {
             value: cardData.value,
             metricType: cardData.metricType,
@@ -185,8 +214,9 @@ export function ShareModal({
             leagueName: cardData.showRank ? cardData.leagueName : undefined,
             streakDays: cardData.streakDays,
             customMessage: cardData.customMessage,
+            periodLabel: cardData.cardType === "custom_period" ? customPeriodLabel : periodLabel,
         }).fullMessage;
-    }, [cardData]);
+    }, [cardData, periodLabel]);
 
     // Handle share action
     const handleShare = (platform: SharePlatform) => {
@@ -267,6 +297,23 @@ export function ShareModal({
                             })}
                         </div>
                     </div>
+
+                    {/* Custom Period Date Picker */}
+                    {cardData.cardType === "custom_period" && (
+                        <div>
+                            <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                                Select Date Range
+                            </label>
+                            <ShareDateRangePicker
+                                value={cardData.customPeriod ?? null}
+                                onChange={(range, preset) => {
+                                    updateCardData({ customPeriod: range });
+                                }}
+                                showShortcuts={true}
+                                compact={true}
+                            />
+                        </div>
+                    )}
 
                     {/* Live Preview */}
                     <div>

@@ -34,7 +34,8 @@ export type CardType =
   | 'streak'
   | 'rank'
   | 'challenge'
-  | 'rank_change';
+  | 'rank_change'
+  | 'custom_period';
 
 /**
  * Configuration for each metric type
@@ -190,6 +191,13 @@ export const CARD_TYPE_CONFIGS: Record<CardType, CardTypeConfig> = {
     label: 'Rank Change',
     description: 'Your rank improvement',
     emoji: '🚀',
+    defaultMetric: 'steps',
+  },
+  custom_period: {
+    type: 'custom_period',
+    label: 'Custom',
+    description: 'Any date range you choose',
+    emoji: '📆',
     defaultMetric: 'steps',
   },
 };

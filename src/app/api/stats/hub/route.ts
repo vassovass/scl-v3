@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
-import { presetToDateRange, type PeriodPreset } from "@/lib/utils/periods";
+import { presetToDateRange, customRangeToDateRange, type PeriodPreset } from "@/lib/utils/periods";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +30,10 @@ export async function GET(request: NextRequest) {
     const comparisonPeriod = searchParams.get("comparison_period") as PeriodPreset | null;
     const leagueId = searchParams.get("league_id");
 
+    // PRD-54: Custom date range parameters
+    const startDate = searchParams.get("start_date");
+    const endDate = searchParams.get("end_date");
+
     const adminClient = createAdminClient();
 
     try {
@@ -48,7 +52,10 @@ export async function GET(request: NextRequest) {
             .single();
 
         // 3. Calculate period-specific stats
-        const periodRange = presetToDateRange(period);
+        // PRD-54: Use custom date range if provided, otherwise use preset
+        const periodRange = (period === "custom" && startDate && endDate)
+            ? customRangeToDateRange(startDate, endDate)
+            : presetToDateRange(period);
         let periodStats = {
             total_steps: 0,
             days_submitted: 0,

@@ -14,6 +14,10 @@ export interface ShareModalConfig {
     leagueName?: string;
     streakDays?: number;
     periodLabel?: string;
+    /** Custom period start date (YYYY-MM-DD) - PRD-54 */
+    periodStart?: string;
+    /** Custom period end date (YYYY-MM-DD) - PRD-54 */
+    periodEnd?: string;
 }
 
 /**
