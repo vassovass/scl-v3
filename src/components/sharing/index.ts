@@ -18,3 +18,4 @@ export {
     MilestoneCelebrationOverlay,
     useMilestoneCelebration,
 } from './ShareMilestoneToast';
+export { ShareInsightsCard, ShareInsightsCardSkeleton } from './ShareInsightsCard';
