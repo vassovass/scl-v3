@@ -129,6 +129,14 @@ export async function POST(request: NextRequest) {
             console.error("Share streak update failed:", streakErr);
         }
 
+        // PRD-56: Record share analytics for pattern tracking
+        try {
+            await adminClient.rpc('record_share_analytics', { p_user_id: user.id });
+        } catch (analyticsErr) {
+            // Non-critical - log and continue
+            console.error("Share analytics recording failed:", analyticsErr);
+        }
+
         // Build the share URL
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://stepleague.app";
         const shareUrl = `${baseUrl}/s/${shortCode}`;
