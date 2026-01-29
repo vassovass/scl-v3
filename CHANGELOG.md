@@ -7,6 +7,41 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-01-30]
+
+### Added
+
+- **PRD 56: Sharing Encouragement System** - Comprehensive system to incentivize consistent sharing
+  - **Phase 1: Streak Infrastructure** (`src/lib/sharing/streaks/`, `supabase/migrations/`)
+    - `share_streaks` table tracking current/longest streak per user
+    - `update_share_streak()` database function with milestone detection (7, 14, 30, 100 days)
+    - `get_share_streak()` function with at-risk status calculation
+    - `ShareStreakBadge` component with tiered visuals (Bronze/Silver/Gold/Diamond)
+    - `ShareMilestoneToast` with confetti celebration animation (respects reduced motion)
+    - `/api/share/streak` endpoint for streak data
+  - **Phase 2: Insights & Analytics** (`src/lib/sharing/insights/`, `src/components/sharing/`)
+    - `share_analytics_daily` table for pattern tracking (day of week, hour)
+    - `get_share_insights()` function with week-over-week comparison
+    - `ShareInsightsCard` showing best sharing day/time and trends
+    - `/api/share/insights` endpoint for comprehensive insights
+  - **Phase 3: Nudge System** (`src/components/sharing/`, `src/hooks/`)
+    - Share notification types: `share_streak_milestone`, `share_streak_at_risk`, `share_weekly_summary`
+    - `ShareReminder` component with streak-at-risk, encourage, post-submission modes
+    - `useShareNudge` hook managing nudge logic, dismissal, and snooze
+    - User preferences for nudge frequency (daily/weekly/off)
+  - **Phase 4: Dashboard & Polish**
+    - Extended `/api/share/history` with CTR calculation and best_performing highlight
+    - `ShareHistoryList` showing past shares with performance metrics
+    - `ShareAnalyticsDashboard` composing all sharing analytics
+    - Analytics tracking via `analytics.shareStreak.*` namespace
+
+### Changed
+
+- `/api/share/create` now updates streak and records analytics on each share
+- Share history API now supports pagination and returns CTR metrics
+
+---
+
 ## [2026-01-24]
 
 ### Added
