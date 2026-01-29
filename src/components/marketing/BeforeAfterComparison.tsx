@@ -20,7 +20,7 @@ export function BeforeAfterComparison() {
                     </p>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div className="grid md:grid-cols-2 gap-8 items-center relative">
                     {/* BEFORE */}
                     <div className="relative">
                         <div className="absolute -top-3 -left-3 px-3 py-1 bg-red-500/10 text-red-500 text-sm font-semibold rounded-full border border-red-500/20">
