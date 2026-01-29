@@ -105,6 +105,29 @@ const notificationSettings: SettingDefinition[] = [
     },
 ];
 
+// PRD-56: Share Settings
+const shareSettings: SettingDefinition[] = [
+    {
+        key: "share_nudge_frequency",
+        type: "select",
+        label: "Share Reminders",
+        description: "How often to remind you to share your achievements",
+        default: "daily",
+        options: [
+            { value: "daily", label: "Daily" },
+            { value: "weekly", label: "Weekly" },
+            { value: "off", label: "Off" },
+        ],
+    },
+    {
+        key: "share_post_submission_prompt",
+        type: "toggle",
+        label: "Post-Submission Share Prompt",
+        description: "Show a share prompt after submitting steps",
+        default: true,
+    },
+];
+
 /**
  * User Preferences Registry
  * Exports all user preference sections
@@ -133,6 +156,12 @@ export const USER_PREFERENCE_SECTIONS: SettingsSection[] = [
         title: "Notifications",
         description: "Manage email and push notification preferences",
         settings: notificationSettings,
+    },
+    {
+        id: "sharing",
+        title: "Sharing",
+        description: "Control sharing reminders and prompts",
+        settings: shareSettings,
     },
 ];
 
