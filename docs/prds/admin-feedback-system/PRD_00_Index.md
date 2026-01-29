@@ -4,7 +4,7 @@
 >
 > These PRDs describe WHAT is needed, not HOW to implement. The implementing agent decides the best approach.
 >
-> **Last Updated:** 2026-01-26
+> **Last Updated:** 2026-01-29
 
 ---
 
@@ -103,6 +103,7 @@
 | 53 | [Sharing Marketing Page](./PRD_53_Sharing_Marketing_Page.md) | Public /how-to-share page for SEO | ✅ Complete |
 | 54 | [Advanced Sharing Features](./PRD_54_Advanced_Sharing_Features.md) | Custom date ranges, friend challenges, trend visualization | 📋 Proposed |
 | 55 | [Navigation Menu Consistency](./PRD_55_Navigation_Menu_Consistency.md) | Fix public menu on marketing pages for guests | ✅ Complete |
+| 56 | [Sharing Encouragement](./PRD_56_Sharing_Encouragement.md) | Share streaks, insights, nudges, analytics | 📋 Proposed |
 
 ---
 
@@ -152,8 +153,9 @@
 |-------|-----|----------------|--------|
 | 10 | **[PRD 28] Smart Engagement** | "Missed yesterday" prompts prevent D1/D7 churn | 📋 Proposed |
 | 11 | **[PRD 29] Unified Progress** | Compelling personal stats page to share | 📋 Proposed |
+| 12 | **[PRD 56] Sharing Encouragement** | Share streaks incentivize regular sharing (depends on PRD-51) | 📋 Proposed |
 
-**Sprint 3 Gate:** ✅ Users get nudged if inactive → Progress page provides shareable stats
+**Sprint 3 Gate:** ✅ Users get nudged if inactive → Progress page provides shareable stats → Share streaks drive consistency
 
 ---
 
@@ -203,7 +205,7 @@
 | Category | Count |
 |----------|-------|
 | ✅ Complete | 39 PRDs |
-| 📋 Proposed | 14 PRDs |
+| 📋 Proposed | 15 PRDs |
 | 🔄 Ongoing/In Progress | 2 PRDs |
 
 ---
@@ -275,4 +277,6 @@ graph TD
 | 2026-01-20 | Updated Dependency Graph to show Sprint 1/2/3 structure |
 | 2026-01-20 | Added PRDs 43-49 for Alpha Launch preparation |
 | 2026-01-20 | Enhanced PRDs 43-49 with Systems/Design Considerations and Proactive items |
+| 2026-01-29 | Added PRD-56 (Sharing Encouragement) extracted from PRD-54 Phase 4 |
+| 2026-01-29 | Added PRD-56 to Sprint 3 (Retention & Engagement) |
 

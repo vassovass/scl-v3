@@ -5,7 +5,7 @@
 > **Type:** Feature (Enhancement)
 > **Dependencies:** PRD 51 (Social Sharing & Stats Hub)
 > **Blocks:** None
-> **Last Updated:** 2026-01-28
+> **Last Updated:** 2026-01-29
 
 ---
 
@@ -58,13 +58,9 @@ Enhance StepLeague's sharing capabilities to enable more powerful, personalized 
 | **C-2** | **Shareable trend card** | Can't share long-term progress | New "trend" card type with mini-chart |
 | **C-3** | **Comparison overlay** | Can't compare two periods visually | Overlay two periods on same chart |
 
-### Section D: Sharing Frequency Encouragement — 3 Items
+### Section D: Sharing Frequency Encouragement
 
-| # | Outcome | Problem Solved | Success Criteria |
-|---|---------|----------------|------------------|
-| **D-1** | **Share streak tracking** | No incentive for regular sharing | Track consecutive days shared |
-| **D-2** | **Share frequency insights** | Users don't know their patterns | "You share most on Mondays" |
-| **D-3** | **Share reminder nudges** | Forget to share after upload | Optional "Share your day?" prompt |
+> **Extracted to PRD-56:** This section has been moved to [PRD 56: Sharing Encouragement System](./PRD_56_Sharing_Encouragement.md) for dedicated implementation with expanded scope (18 items + 4 proactive items).
 
 ---
 
@@ -75,7 +71,7 @@ Enhance StepLeague's sharing capabilities to enable more powerful, personalized 
 | Custom date range usage | 20%+ of shares use custom dates | Analytics |
 | Challenge completion rate | 50%+ of challenges get response | Database |
 | Trend card adoption | 10%+ of shares are trend cards | Analytics |
-| Share frequency increase | +25% shares per active user | Analytics |
+| Share frequency increase | See PRD-56 | Moved to PRD-56 |
 
 ---
 
@@ -140,9 +136,8 @@ Enhance StepLeague's sharing capabilities to enable more powerful, personalized 
 4. Add comparison overlay
 
 ### Phase 4: Sharing Encouragement (Retention)
-1. Track share frequency
-2. Add share streak tracking
-3. Implement nudge system
+
+> **Extracted to PRD-56:** See [PRD 56: Sharing Encouragement System](./PRD_56_Sharing_Encouragement.md)
 
 ---
 
