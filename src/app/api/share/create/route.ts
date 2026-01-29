@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
 import { nanoid } from "nanoid";
+import { getMilestoneCelebration } from "@/lib/sharing/streaks";
+import type { ShareStreakUpdateResult, MilestoneCelebration } from "@/lib/sharing/streaks";
 
 // Types matching database schema
 type CardType = "daily" | "weekly" | "personal_best" | "streak" | "rank" | "challenge" | "rank_change";
@@ -101,6 +103,32 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // PRD-56: Update share streak after successful card creation
+        let streakResult: ShareStreakUpdateResult | null = null;
+        let celebration: MilestoneCelebration | null = null;
+
+        try {
+            const { data: streakData, error: streakError } = await adminClient.rpc(
+                'update_share_streak',
+                { p_user_id: user.id }
+            );
+
+            if (streakError) {
+                // Log but don't fail the share - streak is secondary
+                console.error("Error updating share streak:", streakError);
+            } else if (streakData && streakData.length > 0) {
+                streakResult = streakData[0] as ShareStreakUpdateResult;
+
+                // Check for milestone celebration
+                if (streakResult.is_milestone && streakResult.milestone_value > 0) {
+                    celebration = getMilestoneCelebration(streakResult.milestone_value);
+                }
+            }
+        } catch (streakErr) {
+            // Non-critical - log and continue
+            console.error("Share streak update failed:", streakErr);
+        }
+
         // Build the share URL
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://stepleague.app";
         const shareUrl = `${baseUrl}/s/${shortCode}`;
@@ -134,6 +162,13 @@ export async function POST(request: NextRequest) {
                 share: shareUrl,
                 og_image: ogImageUrl,
             },
+            // PRD-56: Include streak update info for client-side celebration
+            streak: streakResult ? {
+                new_streak: streakResult.new_streak,
+                is_milestone: streakResult.is_milestone,
+                milestone_value: streakResult.milestone_value,
+            } : null,
+            celebration,
         });
     } catch (error) {
         console.error("Error in share/create:", error);
