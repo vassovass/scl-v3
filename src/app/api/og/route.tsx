@@ -153,214 +153,240 @@ function formatValue(value: number, metricType: MetricType): string {
 // ============================================================================
 
 export async function GET(request: NextRequest) {
+    const startTime = Date.now();
+    console.log('[OG Image] Request received:', request.nextUrl.toString());
+
     try {
         const { searchParams } = request.nextUrl;
 
+        // Log all parameters for debugging
+        console.log('[OG Image] Parameters:', {
+            card_type: searchParams.get("card_type"),
+            value: searchParams.get("value") || searchParams.get("steps"),
+            metric_type: searchParams.get("metric_type"),
+            name: searchParams.get("name"),
+            theme: searchParams.get("theme"),
+            rank: searchParams.get("rank"),
+        });
+
         // Parse parameters with backwards compatibility
         const rank = parseInt(searchParams.get("rank") || "1");
-    const value = parseInt(searchParams.get("steps") || searchParams.get("value") || "0");
-    const name = searchParams.get("name") || "Player";
-    const period = searchParams.get("period") || "this week";
-    const customEmoji = searchParams.get("emoji");
-    const improvement = searchParams.get("improvement");
-    const customTitle = searchParams.get("title");
-    const leagueName = searchParams.get("league");
+        const value = parseInt(searchParams.get("steps") || searchParams.get("value") || "0");
+        const name = searchParams.get("name") || "Player";
+        const period = searchParams.get("period") || "this week";
+        const customEmoji = searchParams.get("emoji");
+        const improvement = searchParams.get("improvement");
+        const customTitle = searchParams.get("title");
+        const leagueName = searchParams.get("league");
 
-    // New PRD-51 parameters
-    const metricType = (searchParams.get("metric_type") || 'steps') as MetricType;
-    const cardType = searchParams.get("card_type") as CardType | null;
-    const theme = (searchParams.get("theme") || 'dark') as 'light' | 'dark';
-    const oldRank = searchParams.get("old_rank");
-    const streakDays = searchParams.get("streak_days");
+        // New PRD-51 parameters
+        const metricType = (searchParams.get("metric_type") || 'steps') as MetricType;
+        const cardType = searchParams.get("card_type") as CardType | null;
+        const theme = (searchParams.get("theme") || 'dark') as 'light' | 'dark';
+        const oldRank = searchParams.get("old_rank");
+        const streakDays = searchParams.get("streak_days");
 
-    // PRD-54: Custom period parameters
-    const periodStart = searchParams.get("period_start");
-    const periodEnd = searchParams.get("period_end");
+        // PRD-54: Custom period parameters
+        const periodStart = searchParams.get("period_start");
+        const periodEnd = searchParams.get("period_end");
 
-    // Get configurations
-    const metricStyle = METRIC_STYLES[metricType] || METRIC_STYLES.steps;
-    const themeConfig = THEMES[theme] || THEMES.dark;
-    const emoji = customEmoji || metricStyle.emoji;
+        // Get configurations
+        const metricStyle = METRIC_STYLES[metricType] || METRIC_STYLES.steps;
+        const themeConfig = THEMES[theme] || THEMES.dark;
+        const emoji = customEmoji || metricStyle.emoji;
 
-    // Determine title and color
-    let titleText: string;
-    let titleColor: string;
+        // Determine title and color
+        let titleText: string;
+        let titleColor: string;
 
-    if (cardType) {
-        const cardStyle = CARD_TYPE_STYLES[cardType] || CARD_TYPE_STYLES.daily;
+        if (cardType) {
+            const cardStyle = CARD_TYPE_STYLES[cardType] || CARD_TYPE_STYLES.daily;
 
-        // Build title based on card type
-        if (cardType === 'rank' && rank) {
+            // Build title based on card type
+            if (cardType === 'rank' && rank) {
+                const rankInfo = getRankText(rank, customTitle);
+                titleText = rankInfo.text;
+                titleColor = rankInfo.color;
+            } else if (cardType === 'rank_change' && oldRank) {
+                titleText = `#${oldRank} → #${rank}`;
+                titleColor = '#22c55e'; // green
+            } else if (cardType === 'streak' && streakDays) {
+                titleText = `${streakDays} Day Streak!`;
+                titleColor = '#f97316'; // orange
+            } else if (cardType === 'challenge') {
+                titleText = 'Can you beat this?';
+                titleColor = '#10b981'; // emerald
+            } else if (cardType === 'custom_period') {
+                // PRD-54: Custom period card uses the period label as title
+                titleText = customTitle || 'Custom Period';
+                titleColor = '#a855f7'; // purple
+            } else if (customTitle) {
+                titleText = customTitle;
+                titleColor = cardStyle.color;
+            } else {
+                titleText = cardStyle.title;
+                titleColor = cardStyle.color;
+            }
+        } else {
+            // Backwards compatibility: use rank-based logic
             const rankInfo = getRankText(rank, customTitle);
             titleText = rankInfo.text;
             titleColor = rankInfo.color;
-        } else if (cardType === 'rank_change' && oldRank) {
-            titleText = `#${oldRank} → #${rank}`;
-            titleColor = '#22c55e'; // green
-        } else if (cardType === 'streak' && streakDays) {
-            titleText = `${streakDays} Day Streak!`;
-            titleColor = '#f97316'; // orange
-        } else if (cardType === 'challenge') {
-            titleText = 'Can you beat this?';
-            titleColor = '#10b981'; // emerald
-        } else if (cardType === 'custom_period') {
-            // PRD-54: Custom period card uses the period label as title
-            titleText = customTitle || 'Custom Period';
-            titleColor = '#a855f7'; // purple
-        } else if (customTitle) {
-            titleText = customTitle;
-            titleColor = cardStyle.color;
-        } else {
-            titleText = cardStyle.title;
-            titleColor = cardStyle.color;
         }
-    } else {
-        // Backwards compatibility: use rank-based logic
-        const rankInfo = getRankText(rank, customTitle);
-        titleText = rankInfo.text;
-        titleColor = rankInfo.color;
-    }
 
-    // Format the value
-    const formattedValue = formatValue(value, metricType);
-    const unit = metricStyle.unit;
+        // Format the value
+        const formattedValue = formatValue(value, metricType);
+        const unit = metricStyle.unit;
 
-    return new ImageResponse(
-        (
-            <div
-                style={{
-                    height: "100%",
-                    width: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: themeConfig.background,
-                    backgroundImage: themeConfig.backgroundGradient,
-                }}
-            >
-                {/* Main card */}
+        console.log('[OG Image] Generating image with:', {
+            titleText,
+            titleColor,
+            formattedValue,
+            unit,
+            emoji,
+            theme,
+        });
+
+        const response = new ImageResponse(
+            (
                 <div
                     style={{
+                        height: "100%",
+                        width: "100%",
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
-                        padding: "60px 80px",
-                        borderRadius: "32px",
-                        border: `2px solid ${themeConfig.cardBorder}`,
-                        backgroundColor: themeConfig.cardBg,
+                        justifyContent: "center",
+                        backgroundColor: themeConfig.background,
+                        backgroundImage: themeConfig.backgroundGradient,
                     }}
                 >
-                    {/* Emoji */}
-                    <div style={{ fontSize: 100, marginBottom: 16 }}>{emoji}</div>
-
-                    {/* Title (rank/card type) */}
-                    <div
-                        style={{
-                            fontSize: 56,
-                            fontWeight: 700,
-                            color: titleColor,
-                            marginBottom: 8,
-                        }}
-                    >
-                        {titleText}
-                    </div>
-
-                    {/* Name */}
-                    <div
-                        style={{
-                            fontSize: 32,
-                            color: themeConfig.textSecondary,
-                            marginBottom: leagueName ? 8 : 32,
-                        }}
-                    >
-                        {name}
-                    </div>
-
-                    {/* League name (if provided) */}
-                    {leagueName && (
-                        <div
-                            style={{
-                                fontSize: 24,
-                                color: themeConfig.textMuted,
-                                marginBottom: 32,
-                            }}
-                        >
-                            in {leagueName}
-                        </div>
-                    )}
-
-                    {/* Value box */}
+                    {/* Main card */}
                     <div
                         style={{
                             display: "flex",
                             flexDirection: "column",
                             alignItems: "center",
-                            padding: "32px 64px",
-                            borderRadius: "16px",
-                            backgroundImage: `linear-gradient(135deg, ${metricStyle.gradientFrom} 0%, ${metricStyle.gradientTo} 100%)`,
-                            border: `1px solid ${metricStyle.borderColor}`,
+                            padding: "60px 80px",
+                            borderRadius: "32px",
+                            border: `2px solid ${themeConfig.cardBorder}`,
+                            backgroundColor: themeConfig.cardBg,
                         }}
                     >
-                        <div
-                            style={{
-                                fontSize: 64,
-                                fontWeight: 700,
-                                color: themeConfig.textPrimary,
-                            }}
-                        >
-                            {formattedValue}
-                        </div>
-                        <div
-                            style={{
-                                fontSize: 24,
-                                color: themeConfig.textMuted,
-                                marginTop: 8,
-                            }}
-                        >
-                            {unit} {period}
-                        </div>
-                    </div>
+                        {/* Emoji */}
+                        <div style={{ fontSize: 100, marginBottom: 16 }}>{emoji}</div>
 
-                    {/* Improvement badge */}
-                    {improvement && (
+                        {/* Title (rank/card type) */}
+                        <div
+                            style={{
+                                fontSize: 56,
+                                fontWeight: 700,
+                                color: titleColor,
+                                marginBottom: 8,
+                            }}
+                        >
+                            {titleText}
+                        </div>
+
+                        {/* Name */}
+                        <div
+                            style={{
+                                fontSize: 32,
+                                color: themeConfig.textSecondary,
+                                marginBottom: leagueName ? 8 : 32,
+                            }}
+                        >
+                            {name}
+                        </div>
+
+                        {/* League name (if provided) */}
+                        {leagueName && (
+                            <div
+                                style={{
+                                    fontSize: 24,
+                                    color: themeConfig.textMuted,
+                                    marginBottom: 32,
+                                }}
+                            >
+                                in {leagueName}
+                            </div>
+                        )}
+
+                        {/* Value box */}
                         <div
                             style={{
                                 display: "flex",
-                                marginTop: 24,
-                                padding: "12px 24px",
-                                borderRadius: "999px",
-                                backgroundColor: "rgba(16, 185, 129, 0.2)",
-                                color: "#34d399",
-                                fontSize: 20,
+                                flexDirection: "column",
+                                alignItems: "center",
+                                padding: "32px 64px",
+                                borderRadius: "16px",
+                                backgroundImage: `linear-gradient(135deg, ${metricStyle.gradientFrom} 0%, ${metricStyle.gradientTo} 100%)`,
+                                border: `1px solid ${metricStyle.borderColor}`,
                             }}
                         >
-                            📈 +{improvement}% vs last period
+                            <div
+                                style={{
+                                    fontSize: 64,
+                                    fontWeight: 700,
+                                    color: themeConfig.textPrimary,
+                                }}
+                            >
+                                {formattedValue}
+                            </div>
+                            <div
+                                style={{
+                                    fontSize: 24,
+                                    color: themeConfig.textMuted,
+                                    marginTop: 8,
+                                }}
+                            >
+                                {unit} {period}
+                            </div>
                         </div>
-                    )}
-                </div>
 
-                {/* Branding */}
-                <div
-                    style={{
-                        display: "flex",
-                        marginTop: 40,
-                        fontSize: 28,
-                        color: themeConfig.textMuted,
-                    }}
-                >
-                    <span style={{ color: themeConfig.textSecondary }}>Step</span>
-                    <span style={{ color: "#38bdf8" }}>League</span>
+                        {/* Improvement badge */}
+                        {improvement && (
+                            <div
+                                style={{
+                                    display: "flex",
+                                    marginTop: 24,
+                                    padding: "12px 24px",
+                                    borderRadius: "999px",
+                                    backgroundColor: "rgba(16, 185, 129, 0.2)",
+                                    color: "#34d399",
+                                    fontSize: 20,
+                                }}
+                            >
+                                📈 +{improvement}% vs last period
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Branding */}
+                    <div
+                        style={{
+                            display: "flex",
+                            marginTop: 40,
+                            fontSize: 28,
+                            color: themeConfig.textMuted,
+                        }}
+                    >
+                        <span style={{ color: themeConfig.textSecondary }}>Step</span>
+                        <span style={{ color: "#38bdf8" }}>League</span>
+                    </div>
                 </div>
-            </div>
-        ),
-        {
-            width: 1200,
-            height: 630,
-        }
-    );
+            ),
+            {
+                width: 1200,
+                height: 630,
+            }
+        );
+
+        console.log('[OG Image] Generated successfully in', Date.now() - startTime, 'ms');
+        return response;
     } catch (error) {
         console.error('[OG Image] Error generating image:', error);
+        console.error('[OG Image] Stack:', error instanceof Error ? error.stack : 'No stack');
         // Return a simple error image instead of failing silently
         return new ImageResponse(
             (

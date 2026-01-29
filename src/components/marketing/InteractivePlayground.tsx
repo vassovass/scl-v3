@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { Share2, Sparkles } from "lucide-react";
 import { CARD_TYPE_CONFIGS, type CardType, METRIC_CONFIGS } from "@/lib/sharing/metricConfig";
 import { analytics } from "@/lib/analytics";
@@ -13,10 +13,41 @@ import { analytics } from "@/lib/analytics";
  *
  * PRD-53 P-5: Interactive card customization
  */
+const DEBOUNCE_MS = 500;
+
 export function InteractivePlayground() {
     const [stepValue, setStepValue] = useState(12345);
     const [cardType, setCardType] = useState<CardType>("daily");
     const [name, setName] = useState("You");
+
+    // Local state for immediate UI feedback (debounced before updating actual name)
+    const [localName, setLocalName] = useState("You");
+    const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Cleanup debounce timer on unmount
+    useEffect(() => {
+        return () => {
+            if (debounceRef.current) {
+                clearTimeout(debounceRef.current);
+            }
+        };
+    }, []);
+
+    // Debounced name change handler - immediate UI feedback, delayed image update
+    const handleNameChange = (value: string) => {
+        const trimmed = value.slice(0, 20);
+        setLocalName(trimmed); // Immediate UI update
+
+        // Clear existing debounce timer
+        if (debounceRef.current) {
+            clearTimeout(debounceRef.current);
+        }
+
+        // Debounce the actual name state update (which triggers image regeneration)
+        debounceRef.current = setTimeout(() => {
+            setName(trimmed);
+        }, DEBOUNCE_MS);
+    };
 
     // Build the OG image URL with current settings
     const ogImageUrl = useMemo(() => {
@@ -123,8 +154,8 @@ export function InteractivePlayground() {
                             <input
                                 id="name"
                                 type="text"
-                                value={name}
-                                onChange={(e) => setName(e.target.value.slice(0, 20))}
+                                value={localName}
+                                onChange={(e) => handleNameChange(e.target.value)}
                                 placeholder="Your name"
                                 className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                                 maxLength={20}
