@@ -93,6 +93,47 @@ interface CardData {
 }
 
 // ============================================================================
+// Helpers
+// ============================================================================
+
+/**
+ * Calculate the longest consecutive streak within a set of dates.
+ * This finds the maximum number of consecutive days with submissions
+ * in the given date array.
+ *
+ * @param sortedDates Array of YYYY-MM-DD strings (will be sorted internally)
+ * @returns The longest streak of consecutive days
+ */
+function calculateStreakInRange(dates: string[]): number {
+    if (dates.length === 0) return 0;
+    if (dates.length === 1) return 1;
+
+    // Sort dates ascending
+    const sortedDates = [...dates].sort();
+
+    let maxStreak = 1;
+    let currentStreak = 1;
+
+    for (let i = 1; i < sortedDates.length; i++) {
+        const prevDate = new Date(sortedDates[i - 1] + "T00:00:00");
+        const currDate = new Date(sortedDates[i] + "T00:00:00");
+        const diffDays = Math.round((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 1) {
+            // Consecutive day
+            currentStreak++;
+            maxStreak = Math.max(maxStreak, currentStreak);
+        } else if (diffDays > 1) {
+            // Gap in dates - reset streak
+            currentStreak = 1;
+        }
+        // diffDays === 0 means duplicate date, ignore
+    }
+
+    return maxStreak;
+}
+
+// ============================================================================
 // Component
 // ============================================================================
 
@@ -157,6 +198,7 @@ export function ShareModal({
     const [fetchedBestDay, setFetchedBestDay] = useState<{ steps: number; date: string } | undefined>(
         bestDaySteps && bestDayDate ? { steps: bestDaySteps, date: bestDayDate } : undefined
     );
+    const [fetchedStreak, setFetchedStreak] = useState<number | undefined>(streakDays);
     const [availableDates, setAvailableDates] = useState<Array<{ date: string; steps: number }>>([]);
     const [isLoadingBreakdown, setIsLoadingBreakdown] = useState(false);
 
@@ -203,8 +245,14 @@ export function ShareModal({
                     // Update total steps and value
                     const total = breakdown.reduce((sum, d) => sum + d.steps, 0);
                     setCardData(prev => ({ ...prev, value: total }));
+
+                    // Calculate streak within the selected period
+                    const datesWithData = breakdown.map(d => d.date);
+                    const streakInRange = calculateStreakInRange(datesWithData);
+                    setFetchedStreak(streakInRange > 0 ? streakInRange : undefined);
                 } else {
                     setFetchedBestDay(undefined);
+                    setFetchedStreak(undefined);
                 }
             } catch (error) {
                 console.error("Failed to fetch daily breakdown:", error);
@@ -243,7 +291,8 @@ export function ShareModal({
             dailyBreakdown: enrichedBreakdown,
             bestDaySteps: bestToUse?.steps,
             bestDayDate: bestToUse?.date,
-            currentStreak: streakDays,
+            // Use fetched streak (calculated within period) or fall back to prop
+            currentStreak: fetchedStreak ?? streakDays,
             rank: cardData.showRank ? rank : undefined,
             leagueName: cardData.showRank ? leagueName : undefined,
             improvementPercent: improvementPct,
@@ -252,7 +301,7 @@ export function ShareModal({
         cardData.value, cardData.customPeriod, cardData.showRank,
         dayCount, periodStart, periodEnd, averageSteps, dailyBreakdown,
         bestDaySteps, bestDayDate, streakDays, rank, leagueName, improvementPct,
-        fetchedDailyBreakdown, fetchedBestDay
+        fetchedDailyBreakdown, fetchedBestDay, fetchedStreak
     ]);
 
     // Check if we have enough data for the message builder (include fetched data)

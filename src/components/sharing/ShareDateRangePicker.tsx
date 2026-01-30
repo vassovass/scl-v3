@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
 import { DateRangePicker, SubmissionDateInfo } from "@/components/ui/DateRangePicker";
 import {
   PeriodPreset,
@@ -46,6 +47,32 @@ export function ShareDateRangePicker({
   const [selectedPreset, setSelectedPreset] = useState<PeriodPreset | null>(null);
   // Track if custom picker is shown
   const [showCustomPicker, setShowCustomPicker] = useState(false);
+  // Track partial selection (start date only) for display
+  const [partialFrom, setPartialFrom] = useState<Date | null>(null);
+  // Track previous value to detect NEW complete selections
+  const prevValueRef = useRef(value);
+
+  // Close picker when a complete NEW selection is made (Fix 1: decouple from onClose callback)
+  useEffect(() => {
+    const hadCompleteRange = prevValueRef.current?.start && prevValueRef.current?.end;
+    const hasCompleteRange = value?.start && value?.end;
+    const isNewSelection = hasCompleteRange && (
+      !hadCompleteRange ||
+      value.start !== prevValueRef.current?.start ||
+      value.end !== prevValueRef.current?.end
+    );
+
+    if (showCustomPicker && isNewSelection) {
+      // Use a brief delay to ensure state updates propagate before closing
+      const timer = setTimeout(() => {
+        setShowCustomPicker(false);
+        setPartialFrom(null);
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+
+    prevValueRef.current = value;
+  }, [value?.start, value?.end, showCustomPicker]);
 
   // Convert value to DateRange format for the picker
   const dateRangeValue: DateRange | undefined = value
@@ -53,6 +80,8 @@ export function ShareDateRangePicker({
         from: new Date(value.start + "T00:00:00"),
         to: new Date(value.end + "T00:00:00"),
       }
+    : partialFrom
+    ? { from: partialFrom, to: undefined }
     : undefined;
 
   // Handle preset selection
@@ -94,9 +123,11 @@ export function ShareDateRangePicker({
       });
 
       if (range?.from && range?.to) {
+        // Complete range - call onChange and clear partial state
         const startStr = range.from.toISOString().slice(0, 10);
         const endStr = range.to.toISOString().slice(0, 10);
         console.log('[ShareDateRangePicker] Complete range, calling onChange:', { start: startStr, end: endStr });
+        setPartialFrom(null);
         setSelectedPreset("custom");
         onChange({ start: startStr, end: endStr }, "custom");
 
@@ -109,7 +140,12 @@ export function ShareDateRangePicker({
           action: "select_custom",
         });
       } else if (range?.from) {
+        // Partial selection - track for display but don't call onChange
         console.log('[ShareDateRangePicker] Partial selection (start only), waiting for end');
+        setPartialFrom(range.from);
+      } else {
+        // Selection cleared
+        setPartialFrom(null);
       }
     },
     [onChange]
@@ -123,6 +159,12 @@ export function ShareDateRangePicker({
       return shortcut?.label || formatCustomPeriodLabel(value.start, value.end);
     }
     return formatCustomPeriodLabel(value.start, value.end);
+  };
+
+  // Get label for partial selection (while picking end date)
+  const getPartialLabel = (): string | null => {
+    if (!partialFrom || value) return null;
+    return `${format(partialFrom, "MMM d")} - ...`;
   };
 
   return (
@@ -165,17 +207,23 @@ export function ShareDateRangePicker({
         </div>
       )}
 
-      {/* Current Selection Display - Always visible when dates are selected */}
-      {value && (
+      {/* Current Selection Display - Shows complete selection or partial selection */}
+      {(value || partialFrom) && (
         <div className="flex items-center gap-2 text-sm bg-primary/5 rounded-lg px-3 py-2 border border-primary/20">
           <span className="text-muted-foreground">📅</span>
-          <span className="font-medium text-foreground">{getDisplayLabel()}</span>
+          <span className="font-medium text-foreground">
+            {value ? getDisplayLabel() : getPartialLabel()}
+          </span>
+          {partialFrom && !value && (
+            <span className="text-xs text-muted-foreground italic ml-1">(selecting end date)</span>
+          )}
           <button
             type="button"
             onClick={() => {
               onChange(null);
               setSelectedPreset(null);
               setShowCustomPicker(false);
+              setPartialFrom(null);
             }}
             className="text-muted-foreground hover:text-foreground text-xs ml-auto"
             title="Clear selection"
@@ -194,7 +242,8 @@ export function ShareDateRangePicker({
             className={compact ? "scale-90 origin-top-left" : ""}
             submissionData={submissionData}
             disabledAfter={maxDate}
-            onClose={() => setShowCustomPicker(false)}
+            // Don't use onClose here - we handle closing via useEffect when value becomes complete
+            // This prevents the picker from closing before state propagates back to parent
             alwaysOpen={true}
           />
         </div>
