@@ -76,6 +76,18 @@ export enum ErrorCode {
     REQUEST_TIMEOUT = 'REQUEST_TIMEOUT',
     RATE_LIMIT_EXCEEDED = 'RATE_LIMIT_EXCEEDED',
 
+    // Proxy/Claim errors
+    PROXY_NOT_FOUND = 'PROXY_NOT_FOUND',
+    PROXY_ALREADY_CLAIMED = 'PROXY_ALREADY_CLAIMED',
+    PROXY_CLAIM_FAILED = 'PROXY_CLAIM_FAILED',
+    PROXY_INVALID_CODE = 'PROXY_INVALID_CODE',
+    PROXY_SELF_CLAIM = 'PROXY_SELF_CLAIM',
+
+    // Auth errors
+    AUTH_SESSION_EXPIRED = 'AUTH_SESSION_EXPIRED',
+    AUTH_REDIRECT_FAILED = 'AUTH_REDIRECT_FAILED',
+    AUTH_REQUIRED = 'AUTH_REQUIRED',
+
     // Generic fallback
     UNKNOWN_ERROR = 'UNKNOWN_ERROR',
 }
@@ -97,8 +109,22 @@ export interface AppErrorOptions {
     recoverable?: boolean;
 }
 
+/**
+ * Generate a unique, copy-pasteable error ID.
+ * Format: SCL-{SHORT_CODE}-{RANDOM}
+ * Example: SCL-PROXYNOT-x7k2m
+ */
+export function generateErrorId(code: ErrorCode): string {
+    // Create short code from first 8 chars of code (removing underscores)
+    const shortCode = code.replace(/_/g, '').substring(0, 8).toUpperCase();
+    // Random 5-char suffix for uniqueness
+    const random = Math.random().toString(36).substring(2, 7);
+    return `SCL-${shortCode}-${random}`;
+}
+
 export class AppError extends Error {
     readonly code: ErrorCode;
+    readonly errorId: string;
     readonly context?: Record<string, unknown>;
     readonly cause?: Error;
     readonly recoverable: boolean;
@@ -108,6 +134,7 @@ export class AppError extends Error {
         super(options.message);
         this.name = 'AppError';
         this.code = options.code;
+        this.errorId = generateErrorId(options.code);
         this.context = options.context;
         this.cause = options.cause;
         this.recoverable = options.recoverable ?? true;
@@ -123,6 +150,7 @@ export class AppError extends Error {
     toJSON() {
         return {
             name: this.name,
+            errorId: this.errorId,
             code: this.code,
             message: this.message,
             context: this.context,
@@ -131,6 +159,18 @@ export class AppError extends Error {
             stack: this.stack,
             cause: this.cause?.message,
         };
+    }
+
+    /** Get a copy-pasteable string for users to share with support */
+    toCopyableString(): string {
+        return JSON.stringify({
+            errorId: this.errorId,
+            code: this.code,
+            message: this.message,
+            timestamp: this.timestamp,
+            context: this.context,
+            url: typeof window !== 'undefined' ? window.location.href : undefined,
+        }, null, 2);
     }
 
     /** Create user-friendly message */
@@ -152,6 +192,16 @@ export class AppError extends Error {
             [ErrorCode.MENU_ITEM_DELETE_FAILED]: 'Failed to delete menu item. Please try again.',
             [ErrorCode.MENU_BATCH_UPDATE_FAILED]: 'Failed to reorder menu items. Please try again.',
             [ErrorCode.MENU_INVALID_HIERARCHY]: 'Invalid menu structure. Check parent items.',
+            // Proxy errors
+            [ErrorCode.PROXY_NOT_FOUND]: 'This invite link is invalid or has expired.',
+            [ErrorCode.PROXY_ALREADY_CLAIMED]: 'This profile has already been claimed.',
+            [ErrorCode.PROXY_CLAIM_FAILED]: 'Failed to claim profile. Please try again.',
+            [ErrorCode.PROXY_INVALID_CODE]: 'Invalid invite code format.',
+            [ErrorCode.PROXY_SELF_CLAIM]: 'You cannot claim your own proxy profile.',
+            // Auth errors
+            [ErrorCode.AUTH_SESSION_EXPIRED]: 'Your session has expired. Please sign in again.',
+            [ErrorCode.AUTH_REDIRECT_FAILED]: 'Failed to redirect after sign-in.',
+            [ErrorCode.AUTH_REQUIRED]: 'Please sign in to continue.',
         };
 
         return friendlyMessages[this.code] || this.message;

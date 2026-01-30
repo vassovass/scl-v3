@@ -1,12 +1,13 @@
 /**
  * Proxy Claim API - PRD 41 Unified Model
- * 
+ *
  * Allows users to claim a proxy profile using an invite code.
  * After claiming, the proxy becomes a real user with all historical data preserved.
  */
 
 import { z } from "zod";
 import { withApiHandler } from "@/lib/api/handler";
+import { ErrorCode, generateErrorId } from "@/lib/errors";
 
 const claimSchema = z.object({
     merge_strategy: z.enum(['keep_proxy_profile', 'keep_my_profile']).optional().default('keep_proxy_profile'),
@@ -19,7 +20,12 @@ export const GET = withApiHandler({
     const code = params?.code;
 
     if (!code || typeof code !== "string") {
-        return { error: "Invalid invite code", status: 400 };
+        return {
+            error: "Invalid invite code format",
+            errorCode: ErrorCode.PROXY_INVALID_CODE,
+            errorId: generateErrorId(ErrorCode.PROXY_INVALID_CODE),
+            status: 400,
+        };
     }
 
     // Find proxy user by invite code (unified model - proxy is in users table)
@@ -40,12 +46,22 @@ export const GET = withApiHandler({
         .single();
 
     if (proxyError || !proxy) {
-        return { error: "Invalid or expired invite code", status: 404 };
+        return {
+            error: "Invalid or expired invite code",
+            errorCode: ErrorCode.PROXY_NOT_FOUND,
+            errorId: generateErrorId(ErrorCode.PROXY_NOT_FOUND),
+            status: 404,
+        };
     }
 
     // Check if proxy can still be claimed
     if (proxy.claims_remaining <= 0) {
-        return { error: "This profile has already been claimed", status: 400 };
+        return {
+            error: "This profile has already been claimed",
+            errorCode: ErrorCode.PROXY_ALREADY_CLAIMED,
+            errorId: generateErrorId(ErrorCode.PROXY_ALREADY_CLAIMED),
+            status: 400,
+        };
     }
 
     // Get submission count for this proxy
@@ -117,7 +133,12 @@ export const POST = withApiHandler({
     const code = params?.code;
 
     if (!code || typeof code !== "string") {
-        return { error: "Invalid invite code", status: 400 };
+        return {
+            error: "Invalid invite code format",
+            errorCode: ErrorCode.PROXY_INVALID_CODE,
+            errorId: generateErrorId(ErrorCode.PROXY_INVALID_CODE),
+            status: 400,
+        };
     }
 
     // Find proxy user by invite code
@@ -137,17 +158,32 @@ export const POST = withApiHandler({
         .single();
 
     if (proxyError || !proxy) {
-        return { error: "Invalid or expired invite code", status: 404 };
+        return {
+            error: "Invalid or expired invite code",
+            errorCode: ErrorCode.PROXY_NOT_FOUND,
+            errorId: generateErrorId(ErrorCode.PROXY_NOT_FOUND),
+            status: 404,
+        };
     }
 
     // Check if proxy can still be claimed
     if (proxy.claims_remaining <= 0) {
-        return { error: "This profile has already been claimed", status: 400 };
+        return {
+            error: "This profile has already been claimed",
+            errorCode: ErrorCode.PROXY_ALREADY_CLAIMED,
+            errorId: generateErrorId(ErrorCode.PROXY_ALREADY_CLAIMED),
+            status: 400,
+        };
     }
 
     // Prevent users from claiming their own proxy
     if (proxy.managed_by === user!.id) {
-        return { error: "You cannot claim your own proxy", status: 400 };
+        return {
+            error: "You cannot claim your own proxy",
+            errorCode: ErrorCode.PROXY_SELF_CLAIM,
+            errorId: generateErrorId(ErrorCode.PROXY_SELF_CLAIM),
+            status: 400,
+        };
     }
 
     const managerId = proxy.managed_by;
@@ -183,7 +219,12 @@ export const POST = withApiHandler({
 
     if (transferError) {
         console.error("[CLAIM] Failed to transfer submissions:", transferError);
-        return { error: `Failed to transfer submissions: ${transferError.message}`, status: 500 };
+        return {
+            error: `Failed to transfer submissions: ${transferError.message}`,
+            errorCode: ErrorCode.PROXY_CLAIM_FAILED,
+            errorId: generateErrorId(ErrorCode.PROXY_CLAIM_FAILED),
+            status: 500,
+        };
     }
 
     const transferredCount = transferredSubmissions?.length || 0;

@@ -1,9 +1,9 @@
 ---
 name: error-handling
-description: Centralized error handling system for StepLeague using AppError class, error codes, and reporting. Use when implementing error handling, catching exceptions, or displaying error messages to users. Keywords: error, exception, AppError, ErrorCode, catch, try, toast, logging.
+description: Centralized error handling system for StepLeague using AppError class, error codes, and reporting. Use when implementing error handling, catching exceptions, or displaying error messages to users. Keywords: error, exception, AppError, ErrorCode, catch, try, toast, logging, CopyableError.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
-  version: "1.1"
+  version: "1.2"
   project: "stepleague"
 ---
 
@@ -45,6 +45,13 @@ throw new AppError({
 | `context` | `object` | Additional debug info |
 | `cause` | `Error` | Original error that caused this |
 | `recoverable` | `boolean` | Can user retry? Default: `true` |
+
+### Error IDs (NEW)
+
+Every AppError automatically gets a unique `errorId` for easy support reference:
+- Format: `SCL-{CODE}-{random}` (e.g., `SCL-PROXYNOT-x7k2m`)
+- Use `generateErrorId(code)` to create IDs in API routes
+- Include `errorId` in API error responses for user reference
 
 ---
 
@@ -94,6 +101,18 @@ throw new AppError({
 - `TIMEOUT_ERROR` - Request timed out
 - `REQUEST_TIMEOUT` - Operation timed out
 - `RATE_LIMIT_EXCEEDED` - Too many requests
+
+### Proxy/Claim Errors
+- `PROXY_NOT_FOUND` - Proxy/invite code doesn't exist
+- `PROXY_ALREADY_CLAIMED` - Profile already claimed by another user
+- `PROXY_CLAIM_FAILED` - Claim operation failed
+- `PROXY_INVALID_CODE` - Invalid invite code format
+- `PROXY_SELF_CLAIM` - User trying to claim their own proxy
+
+### Auth Errors
+- `AUTH_SESSION_EXPIRED` - User session has expired
+- `AUTH_REDIRECT_FAILED` - Failed to redirect after sign-in
+- `AUTH_REQUIRED` - Authentication required for this action
 
 ### Fallback
 - `UNKNOWN_ERROR` - Catch-all for unexpected errors
@@ -271,6 +290,91 @@ const friendlyMessages: Partial<Record<ErrorCode, string>> = {
 |------|---------|
 | `src/lib/errors.ts` | AppError class, ErrorCode enum, utilities |
 | `src/lib/server/logger.ts` | Server-side logging |
+
+---
+
+## CopyableError Component (NEW)
+
+For user-facing error pages, use `CopyableError` to display errors with copy-to-clipboard functionality:
+
+```typescript
+import { CopyableError } from "@/components/ui/CopyableError";
+
+// In error display
+<CopyableError
+    title="Invalid Invite Link"
+    message={error}
+    errorId={errorId}
+    errorCode={errorCode}
+    context={{ code, url: window.location.href }}
+/>
+```
+
+### CopyableError Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `title` | `string` | Error title (default: "Something went wrong") |
+| `message` | `string` | **Required.** User-friendly error message |
+| `errorId` | `string` | Unique error ID for support reference |
+| `errorCode` | `string` | Technical error code |
+| `context` | `object` | Additional context for debugging |
+| `showCopyButton` | `boolean` | Show copy button (default: true) |
+| `showDashboardLink` | `boolean` | Show dashboard link (default: true) |
+| `actionButton` | `object` | Custom action button with `label` and `href`/`onClick` |
+
+---
+
+## API Error Response Pattern (NEW)
+
+When returning errors from API routes, include structured error info:
+
+```typescript
+import { ErrorCode, generateErrorId } from "@/lib/errors";
+
+// In API route
+if (!proxy) {
+    return {
+        error: "Invalid or expired invite code",
+        errorCode: ErrorCode.PROXY_NOT_FOUND,
+        errorId: generateErrorId(ErrorCode.PROXY_NOT_FOUND),
+        status: 404,
+    };
+}
+```
+
+This allows the frontend to display user-friendly errors with copyable reference IDs.
+
+---
+
+## Error Boundaries (NEW)
+
+For page-level error handling, create an `error.tsx` file in the route directory:
+
+```typescript
+// src/app/(auth)/claim/[code]/error.tsx
+"use client";
+
+import { CopyableError } from "@/components/ui/CopyableError";
+import { generateErrorId, ErrorCode } from "@/lib/errors";
+
+export default function ClaimError({ error, reset }) {
+    const errorId = generateErrorId(ErrorCode.PROXY_CLAIM_FAILED);
+
+    return (
+        <CopyableError
+            title="Unable to Load Page"
+            message={error.message}
+            errorId={errorId}
+            errorCode={ErrorCode.PROXY_CLAIM_FAILED}
+            actionButton={{
+                label: "Try Again",
+                onClick: reset,
+            }}
+        />
+    );
+}
+```
 
 ---
 

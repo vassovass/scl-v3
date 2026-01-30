@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import Link from "next/link";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { analytics } from "@/lib/analytics";
 import { useToast } from "@/hooks/use-toast";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { CopyableError } from "@/components/ui/CopyableError";
+import { ErrorCode } from "@/lib/errors";
 
 interface LeagueInfo {
     id: string;
@@ -44,34 +45,73 @@ export default function ClaimPage() {
     const [claimData, setClaimData] = useState<ClaimData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [errorId, setErrorId] = useState<string | null>(null);
+    const [errorCode, setErrorCode] = useState<string | null>(null);
     const [claiming, setClaiming] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const [mergeStrategy, setMergeStrategy] = useState<MergeStrategy>("keep_proxy_profile");
+    const [loadingTooLong, setLoadingTooLong] = useState(false);
+
+    // Show helpful message if loading takes too long
+    useEffect(() => {
+        if (!authLoading && !loading) return;
+
+        const timeout = setTimeout(() => {
+            setLoadingTooLong(true);
+        }, 10000); // 10 seconds
+
+        return () => clearTimeout(timeout);
+    }, [authLoading, loading]);
 
     // Fetch claim data when authenticated
     useEffect(() => {
-        if (authLoading || !code) return;
+        console.log("[Claim Page] Effect running:", {
+            authLoading,
+            hasSession: !!session,
+            code,
+        });
+
+        if (authLoading) {
+            console.log("[Claim Page] Still loading auth...");
+            return;
+        }
+
+        if (!code) {
+            console.log("[Claim Page] No code in params");
+            setError("Missing invite code");
+            setErrorCode(ErrorCode.PROXY_INVALID_CODE);
+            setLoading(false);
+            return;
+        }
 
         if (!session) {
             // Redirect to sign-in with return URL
+            console.log("[Claim Page] No session, redirecting to sign-in");
             const returnUrl = encodeURIComponent(`/claim/${code}`);
             router.push(`/sign-in?redirect=${returnUrl}`);
             return;
         }
 
         const fetchClaimData = async () => {
+            console.log("[Claim Page] Fetching claim data for code:", code);
             try {
                 const res = await fetch(`/api/proxy-claim/${code}`);
                 const data = await res.json();
 
+                console.log("[Claim Page] API response:", { ok: res.ok, status: res.status, data });
+
                 if (!res.ok) {
                     setError(data.error || "Invalid invite code");
+                    setErrorId(data.errorId || null);
+                    setErrorCode(data.errorCode || null);
                     return;
                 }
 
                 setClaimData(data);
             } catch (err) {
-                setError("Failed to load claim details");
+                console.error("[Claim Page] Fetch error:", err);
+                setError("Failed to load claim details. Please check your connection and try again.");
+                setErrorCode(ErrorCode.API_FETCH_FAILED);
             } finally {
                 setLoading(false);
             }
@@ -129,28 +169,43 @@ export default function ClaimPage() {
 
     if (authLoading || loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-mesh">
-                <div className="animate-pulse text-muted-foreground">Loading...</div>
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-mesh p-4 gap-4">
+                <div className="animate-pulse text-muted-foreground">Loading claim details...</div>
+                {loadingTooLong && (
+                    <div className="max-w-sm text-center space-y-3">
+                        <p className="text-sm text-muted-foreground">
+                            Taking longer than expected...
+                        </p>
+                        <div className="flex flex-col gap-2">
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="px-4 py-2 text-sm rounded-lg border border-border hover:bg-secondary/50 transition"
+                            >
+                                Refresh Page
+                            </button>
+                            <a
+                                href="/reset"
+                                className="px-4 py-2 text-sm text-[hsl(var(--warning))] hover:underline"
+                            >
+                                Clear cache and try again
+                            </a>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-mesh">
-                <div className="max-w-md w-full mx-4 p-6 rounded-lg bg-card/80 border border-destructive/50 text-center">
-                    <span className="text-4xl mb-4 block">❌</span>
-                    <h1 className="text-xl font-semibold text-destructive mb-2">
-                        Invalid Invite Link
-                    </h1>
-                    <p className="text-muted-foreground mb-4">{error}</p>
-                    <Link
-                        href="/dashboard"
-                        className="inline-block px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition"
-                    >
-                        Go to Dashboard
-                    </Link>
-                </div>
+            <div className="min-h-screen flex items-center justify-center bg-gradient-mesh p-4">
+                <CopyableError
+                    title="Invalid Invite Link"
+                    message={error}
+                    errorId={errorId || undefined}
+                    errorCode={errorCode || undefined}
+                    context={{ code, url: `/claim/${code}` }}
+                />
             </div>
         );
     }
