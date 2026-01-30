@@ -60,9 +60,17 @@ export async function GET(request: NextRequest) {
             total_steps: 0,
             days_submitted: 0,
             average_per_day: 0,
+            days_in_range: 0,
+            days_without_submissions: 0,
         };
 
         if (periodRange) {
+            // Calculate total days in range
+            const startDateObj = new Date(periodRange.start + "T00:00:00");
+            const endDateObj = new Date(periodRange.end + "T00:00:00");
+            const msPerDay = 1000 * 60 * 60 * 24;
+            periodStats.days_in_range = Math.floor((endDateObj.getTime() - startDateObj.getTime()) / msPerDay) + 1;
+
             const { data: submissions } = await adminClient
                 .from("submissions")
                 .select("steps, for_date")
@@ -82,6 +90,9 @@ export async function GET(request: NextRequest) {
                 periodStats.days_submitted = byDate.size;
                 periodStats.average_per_day = Math.round(periodStats.total_steps / byDate.size);
             }
+
+            // Calculate days without submissions (gaps)
+            periodStats.days_without_submissions = periodStats.days_in_range - periodStats.days_submitted;
         }
 
         // 4. Calculate comparison period stats if requested

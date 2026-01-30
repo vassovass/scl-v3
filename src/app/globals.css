@@ -857,6 +857,72 @@ body {
 }
 
 /* ============================================
+   DATE PICKER SUBMISSION INDICATORS
+   Heatmap intensity + dot indicator for dates
+   with submissions (PRD-57)
+   ============================================ */
+
+/* Base positioning for dot indicator */
+.rdp-day_has-submission .rdp-day_button {
+  position: relative;
+}
+
+/* Dot indicator for dates with submissions */
+.rdp-day_has-submission .rdp-day_button::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: hsl(var(--success));
+}
+
+/* Heatmap intensity backgrounds - Dark mode */
+.rdp-day_intensity-high .rdp-day_button {
+  background-color: hsl(var(--success) / 0.4) !important;
+}
+
+.rdp-day_intensity-medium .rdp-day_button {
+  background-color: hsl(var(--success) / 0.25) !important;
+}
+
+.rdp-day_intensity-low .rdp-day_button {
+  background-color: hsl(var(--success) / 0.15) !important;
+}
+
+.rdp-day_intensity-minimal .rdp-day_button {
+  background-color: hsl(var(--success) / 0.08) !important;
+}
+
+/* Heatmap intensity backgrounds - Light mode */
+[data-theme="light"] .rdp-day_intensity-high .rdp-day_button {
+  background-color: hsl(var(--success) / 0.35) !important;
+}
+
+[data-theme="light"] .rdp-day_intensity-medium .rdp-day_button {
+  background-color: hsl(var(--success) / 0.22) !important;
+}
+
+[data-theme="light"] .rdp-day_intensity-low .rdp-day_button {
+  background-color: hsl(var(--success) / 0.12) !important;
+}
+
+[data-theme="light"] .rdp-day_intensity-minimal .rdp-day_button {
+  background-color: hsl(var(--success) / 0.06) !important;
+}
+
+/* Ensure dot is visible on all intensity backgrounds */
+.rdp-day_intensity-high .rdp-day_button::after,
+.rdp-day_intensity-medium .rdp-day_button::after,
+.rdp-day_intensity-low .rdp-day_button::after,
+.rdp-day_intensity-minimal .rdp-day_button::after {
+  background-color: hsl(var(--success));
+}
+
+/* ============================================
    JOYRIDE GUIDED TOURS
    Lower header z-index when tour is active so
    tooltips/spotlight aren't covered by sticky nav

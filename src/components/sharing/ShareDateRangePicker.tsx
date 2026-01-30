@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from "react";
 import { DateRange } from "react-day-picker";
-import { DateRangePicker } from "@/components/ui/DateRangePicker";
+import { DateRangePicker, SubmissionDateInfo } from "@/components/ui/DateRangePicker";
 import {
   PeriodPreset,
   presetToDateRange,
@@ -24,6 +24,8 @@ interface ShareDateRangePickerProps {
   maxDate?: Date;
   /** Compact mode for mobile */
   compact?: boolean;
+  /** Submission data for heatmap indicators */
+  submissionData?: SubmissionDateInfo[];
 }
 
 /**
@@ -38,6 +40,7 @@ export function ShareDateRangePicker({
   showShortcuts = true,
   maxDate = new Date(),
   compact = false,
+  submissionData,
 }: ShareDateRangePickerProps) {
   // Track which preset is selected (for highlighting)
   const [selectedPreset, setSelectedPreset] = useState<PeriodPreset | null>(null);
@@ -159,6 +162,9 @@ export function ShareDateRangePicker({
             date={dateRangeValue}
             onSelect={handleCustomRangeSelect}
             className={compact ? "scale-90 origin-top-left" : ""}
+            submissionData={submissionData}
+            disabledAfter={maxDate}
+            onClose={() => setShowCustomPicker(false)}
           />
         </div>
       )}

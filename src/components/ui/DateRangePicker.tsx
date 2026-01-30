@@ -68,13 +68,45 @@ const customStyles = `
     }
   `;
 
+/**
+ * Submission data for heatmap indicators
+ */
+export interface SubmissionDateInfo {
+  date: string;  // ISO date YYYY-MM-DD
+  steps: number;
+}
+
 interface DateRangePickerProps {
   date: DateRange | undefined;
   onSelect: (range: DateRange | undefined) => void;
   className?: string;
+  /** Submission data for heatmap indicators */
+  submissionData?: SubmissionDateInfo[];
+  /** Disable dates after this date (default: none) */
+  disabledAfter?: Date;
+  /** Show close button (useful for mobile) */
+  onClose?: () => void;
 }
 
-export function DateRangePicker({ date, onSelect, className = "" }: DateRangePickerProps) {
+/**
+ * Get intensity level based on step count
+ * Thresholds can be adjusted based on user behavior data
+ */
+function getIntensityLevel(steps: number): "high" | "medium" | "low" | "minimal" {
+  if (steps >= 15000) return "high";
+  if (steps >= 10000) return "medium";
+  if (steps >= 5000) return "low";
+  return "minimal";
+}
+
+export function DateRangePicker({
+  date,
+  onSelect,
+  className = "",
+  submissionData,
+  disabledAfter,
+  onClose,
+}: DateRangePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   // Track whether user is selecting start or end date
   const [selectingEnd, setSelectingEnd] = useState(false);
@@ -146,6 +178,50 @@ export function DateRangePicker({ date, onSelect, className = "" }: DateRangePic
     setSelectingEnd(false);
   };
 
+  // Build modifiers for submission data heatmap
+  const buildModifiers = () => {
+    if (!submissionData || submissionData.length === 0) {
+      return {};
+    }
+
+    // Create a map for quick lookup
+    const dataMap = new Map(submissionData.map((d) => [d.date, d.steps]));
+
+    const formatDateKey = (d: Date) => format(d, "yyyy-MM-dd");
+
+    return {
+      hasSubmission: (d: Date) => dataMap.has(formatDateKey(d)),
+      intensityHigh: (d: Date) => {
+        const steps = dataMap.get(formatDateKey(d));
+        return steps !== undefined && getIntensityLevel(steps) === "high";
+      },
+      intensityMedium: (d: Date) => {
+        const steps = dataMap.get(formatDateKey(d));
+        return steps !== undefined && getIntensityLevel(steps) === "medium";
+      },
+      intensityLow: (d: Date) => {
+        const steps = dataMap.get(formatDateKey(d));
+        return steps !== undefined && getIntensityLevel(steps) === "low";
+      },
+      intensityMinimal: (d: Date) => {
+        const steps = dataMap.get(formatDateKey(d));
+        return steps !== undefined && getIntensityLevel(steps) === "minimal";
+      },
+    };
+  };
+
+  // Build modifiers class names mapping
+  const modifiersClassNames = {
+    hasSubmission: "rdp-day_has-submission",
+    intensityHigh: "rdp-day_intensity-high",
+    intensityMedium: "rdp-day_intensity-medium",
+    intensityLow: "rdp-day_intensity-low",
+    intensityMinimal: "rdp-day_intensity-minimal",
+  };
+
+  // Build disabled matcher
+  const disabledMatcher = disabledAfter ? { after: disabledAfter } : undefined;
+
   return (
     <div className={`relative ${className}`} ref={containerRef} style={style}>
       <style>{customStyles}</style>
@@ -177,14 +253,40 @@ export function DateRangePicker({ date, onSelect, className = "" }: DateRangePic
 
       {isOpen && (
         <div className="absolute top-full left-0 z-50 mt-2 rounded-lg border border-border bg-popover shadow-xl">
-          {/* Selection indicator */}
-          <div className="px-3 py-2 border-b border-slate-700 text-sm">
+          {/* Header with selection indicator and close button */}
+          <div className="flex items-center justify-between px-3 py-2 border-b border-border">
             <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${selectingEnd
-              ? "bg-purple-500/20 text-purple-400"
+              ? "bg-accent text-accent-foreground"
               : "bg-primary/20 text-primary"
               }`}>
               {selectingEnd ? "📅 Select end date" : "📅 Select start date"}
             </span>
+            {onClose && (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  onClose();
+                }}
+                className="text-muted-foreground hover:text-foreground p-1 rounded-sm hover:bg-accent"
+                aria-label="Close date picker"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
+              </button>
+            )}
           </div>
 
           <div className="p-3">
@@ -194,14 +296,36 @@ export function DateRangePicker({ date, onSelect, className = "" }: DateRangePic
               selected={date}
               onDayClick={handleDayClick}
               numberOfMonths={2}
+              modifiers={buildModifiers()}
+              modifiersClassNames={modifiersClassNames}
+              disabled={disabledMatcher}
             />
           </div>
 
-          {/* Helper text */}
-          <div className="px-3 pb-2 text-xs text-muted-foreground">
-            {selectingEnd
-              ? "Click a date to set end • Click before start to reset"
-              : "Click a date to set start"}
+          {/* Helper text with legend */}
+          <div className="px-3 pb-2 space-y-1">
+            <div className="text-xs text-muted-foreground">
+              {selectingEnd
+                ? "Click a date to set end • Click before start to reset"
+                : "Click a date to set start"}
+            </div>
+            {submissionData && submissionData.length > 0 && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-[hsl(var(--success)/0.4)]" />
+                  High
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-[hsl(var(--success)/0.25)]" />
+                  Med
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-[hsl(var(--success)/0.15)]" />
+                  Low
+                </span>
+                <span className="text-muted-foreground/60">• = submitted</span>
+              </div>
+            )}
           </div>
         </div>
       )}

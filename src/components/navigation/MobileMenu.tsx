@@ -6,6 +6,7 @@ import { User } from "@supabase/supabase-js";
 import { MenuItem, UserRole, prepareMenuItems } from "@/lib/menuConfig";
 import { useMenuConfig } from "@/hooks/useMenuConfig";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
+import { Button } from "@/components/ui/button";
 
 interface MobileMenuProps {
     isOpen: boolean;
@@ -108,6 +109,19 @@ export function MobileMenu({
                     onClose={onClose}
                     onAction={handleAction}
                     isActive={isActive}
+                    ctaElement={
+                        <div className="bg-primary/10 rounded-lg p-3 mx-2 my-2 border border-primary/20">
+                            <p className="text-xs text-muted-foreground mb-2">Track & share your journey</p>
+                            <div className="flex gap-2">
+                                <Button variant="outline" size="sm" className="flex-1" asChild>
+                                    <Link href="/my-stats" onClick={onClose}>📊 My Stats</Link>
+                                </Button>
+                                <Button variant="default" size="sm" className="flex-1" asChild>
+                                    <Link href="/my-stats#share" onClick={onClose}>🔗 Share</Link>
+                                </Button>
+                            </div>
+                        </div>
+                    }
                 />
             )}
 
@@ -215,6 +229,8 @@ interface MobileSectionProps {
     onAction: (actionName: string, item: MenuItem) => void;
     isActive: (path: string) => boolean;
     itemClassName?: string;
+    /** Optional CTA element to show at the top of the expanded section */
+    ctaElement?: React.ReactNode;
 }
 
 function MobileSection({
@@ -227,6 +243,7 @@ function MobileSection({
     onAction,
     isActive,
     itemClassName,
+    ctaElement,
 }: MobileSectionProps) {
     return (
         <div className="space-y-1">
@@ -239,6 +256,8 @@ function MobileSection({
             </button>
             {isExpanded && (
                 <div className="space-y-1 animate-in slide-in-from-top-2 duration-150">
+                    {/* Optional CTA element at the top */}
+                    {ctaElement}
                     {items.map((item) => (
                         <MobileMenuItem
                             key={item.id}

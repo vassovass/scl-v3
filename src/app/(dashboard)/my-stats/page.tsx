@@ -46,6 +46,8 @@ interface StatsHubData {
         total_steps: number;
         days_submitted: number;
         average_per_day: number;
+        days_in_range?: number;
+        days_without_submissions?: number;
     };
     comparison_stats: {
         period: PeriodPreset;
@@ -310,6 +312,12 @@ export default function MyStatsPage() {
                                                   }
                                                 : undefined
                                         }
+                                        gapWarning={
+                                            data.period_stats.days_without_submissions &&
+                                            data.period_stats.days_without_submissions > 0
+                                                ? data.period_stats.days_without_submissions
+                                                : undefined
+                                        }
                                         onShareClick={() => openShareModal({
                                             cardType: period === "custom" ? "custom_period" : "weekly",
                                             value: data.period_stats.total_steps,
@@ -553,6 +561,8 @@ interface StatCardProps {
         pct: number;
         label: string;
     };
+    /** Number of days in range that have no submissions */
+    gapWarning?: number;
     shareMessage?: string;
     shareUrl?: string;
     onShareClick?: () => void;
@@ -566,6 +576,7 @@ function StatCard({
     emoji,
     accentColor,
     comparison,
+    gapWarning,
     shareMessage,
     shareUrl,
     onShareClick,
@@ -615,6 +626,11 @@ function StatCard({
                             <span className="text-muted-foreground font-normal">
                                 {comparison.label}
                             </span>
+                        </p>
+                    )}
+                    {gapWarning && gapWarning > 0 && (
+                        <p className="mt-1 text-xs text-warning">
+                            ⚠️ {gapWarning} day{gapWarning > 1 ? "s" : ""} without submissions
                         </p>
                     )}
                 </div>

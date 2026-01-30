@@ -208,6 +208,9 @@ export const MAIN_MENU: MenuDefinition = {
                 { id: 'global-submit', label: 'Submit Steps', href: '/submit-steps', icon: '📝', visibleTo: ['member', 'admin', 'owner', 'superadmin'] },
                 { id: 'create-league', label: 'Create League', href: '/league/create', icon: '➕' },
                 { id: 'join-league', label: 'Join League', href: '/join', icon: '🔗' },
+                // Progress & Sharing CTAs (PRD-57)
+                { id: 'my-stats', label: 'My Stats', href: '/my-stats', icon: '📊', description: 'View your progress', dividerBefore: true, visibleTo: ['member', 'admin', 'owner', 'superadmin'] },
+                { id: 'share-progress', label: 'Share Progress', href: '/my-stats#share', icon: '🔗', description: 'Share with friends', visibleTo: ['member', 'admin', 'owner', 'superadmin'] },
             ]
         },
         {
