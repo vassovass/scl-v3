@@ -29,7 +29,9 @@ export function useShare(options: UseShareOptions = {}) {
     const share = useCallback(async (data: ShareData, platform: SharePlatform = "native") => {
         setIsSharing(true);
         const url = data.url || (typeof window !== "undefined" ? window.location.href : "");
-        const fullMessage = `${data.text}\n${url}`;
+        // Only append URL if not already in the message (shareMessageBuilder may include it)
+        const urlAlreadyInMessage = data.text.includes("stepleague.app") || data.text.includes(url);
+        const fullMessage = urlAlreadyInMessage ? data.text : `${data.text}\n${url}`;
 
         // Track in analytics immediately (capture intent)
         if (options.contentType) {

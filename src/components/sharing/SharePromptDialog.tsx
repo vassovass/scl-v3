@@ -194,6 +194,8 @@ export function SharePromptDialog({
         "day_count",
         "date_range",
         "average",
+        "individual_days",
+        "best_day",
         "streak",
         "rank",
     ];

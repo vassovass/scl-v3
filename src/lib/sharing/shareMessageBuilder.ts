@@ -192,7 +192,7 @@ export function buildShareMessage(
         maxLength = 500,
         platform = "whatsapp",
         includeHashtag = true,
-        includeUrl = true,
+        includeUrl = false, // URL is added by useShare hook, not in message text
         customIntro,
     } = options;
 
