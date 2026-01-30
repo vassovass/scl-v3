@@ -507,11 +507,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             await restoreActiveProfile(proxies, profile);
           }
 
-          // Identify for analytics
+          // Identify for analytics (PostHog + GA4)
+          // Include display_name so we can identify users in session replays
           if (identifiedUserRef.current !== newSession.user.id) {
             identifyUser(newSession.user.id, {
               email: newSession.user.email || '',
               created_at: newSession.user.created_at || '',
+              display_name: profile?.display_name || '',
+              is_superadmin: profile?.is_superadmin || false,
             });
             identifiedUserRef.current = newSession.user.id;
           }
@@ -547,6 +550,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     switch (event) {
       case 'SIGNED_IN':
         if (newSession?.user && identifiedUserRef.current !== newSession.user.id) {
+          // Note: On SIGNED_IN, we may not have the profile yet
+          // The full identification with display_name happens in INITIAL_SESSION
           identifyUser(newSession.user.id, {
             email: newSession.user.email || '',
             created_at: newSession.user.created_at || '',

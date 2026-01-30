@@ -90,6 +90,7 @@ export enum ErrorCode {
 
     // Generic fallback
     UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+    UNEXPECTED_ERROR = 'UNEXPECTED_ERROR',
 }
 
 // =============================================================================

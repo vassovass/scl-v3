@@ -28,6 +28,8 @@ interface CopyableErrorProps {
         href?: string;
         onClick?: () => void;
     };
+    /** Children rendered in the action area (e.g., custom buttons) */
+    children?: React.ReactNode;
 }
 
 /**
@@ -90,6 +92,7 @@ export function CopyableError({
     showDashboardLink = true,
     showReportButton = true,
     actionButton,
+    children,
 }: CopyableErrorProps) {
     const { toast } = useToast();
     const [copied, setCopied] = useState(false);
@@ -347,7 +350,7 @@ ${JSON.stringify(errorData, null, 2)}
                     )
                 )}
 
-                {showDashboardLink && !actionButton && (
+                {showDashboardLink && !actionButton && !children && (
                     <Link
                         href="/dashboard"
                         className="w-full py-2 px-4 rounded-lg bg-primary text-white font-medium hover:bg-primary/90 transition text-center"
@@ -355,6 +358,9 @@ ${JSON.stringify(errorData, null, 2)}
                         Go to Dashboard
                     </Link>
                 )}
+
+                {/* Custom children (e.g., reset button from error boundaries) */}
+                {children}
             </div>
 
             {/* Help text with guidance */}

@@ -37,13 +37,21 @@ export function useAppSettings() {
   const [error, setError] = useState<any>(null);
 
   const loadSettings = useCallback(async () => {
+    // Add timeout to prevent hanging on slow mobile networks
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
     try {
       // Try admin endpoint first (for authenticated users with full settings)
-      let response = await fetch('/api/admin/settings');
+      let response = await fetch('/api/admin/settings', {
+        signal: controller.signal,
+      });
 
       // If unauthorized, fall back to public endpoint (for guests)
       if (response.status === 401) {
-        response = await fetch('/api/settings/public');
+        response = await fetch('/api/settings/public', {
+          signal: controller.signal,
+        });
       }
 
       if (!response.ok) {
@@ -53,11 +61,16 @@ export function useAppSettings() {
       setData(result);
       setError(null);
     } catch (err: any) {
-      console.error('Error loading app settings:', err);
+      if (err.name === 'AbortError') {
+        console.warn('[useAppSettings] Request timeout - using defaults');
+      } else {
+        console.error('Error loading app settings:', err);
+      }
       setError(err);
       // Set empty data on error so getSetting fallbacks work
       setData({ settings: {} });
     } finally {
+      clearTimeout(timeoutId);
       setIsLoading(false);
     }
   }, []);

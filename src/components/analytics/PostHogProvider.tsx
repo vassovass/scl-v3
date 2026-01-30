@@ -51,6 +51,7 @@ function initPostHog() {
         autocapture: true,
     });
 
+    try {
     posthog.init(POSTHOG_KEY, {
         // API host uses first-party proxy to bypass ad blockers
         api_host: POSTHOG_HOST,
@@ -89,6 +90,10 @@ function initPostHog() {
     // Force start session recording immediately
     posthog.startSessionRecording();
     console.log('[PostHog] Session recording force-started');
+    } catch (err) {
+        // Don't crash the app - analytics is non-critical
+        console.error('[PostHog] Failed to initialize:', err);
+    }
 }
 
 /**
