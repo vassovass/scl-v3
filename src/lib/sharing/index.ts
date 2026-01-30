@@ -41,3 +41,35 @@ export {
   getPersonalBestMessage,
   getRankChangeMessage,
 } from './shareMessages';
+
+// Share content configuration (PRD-57)
+export {
+  type ShareContentBlock,
+  type ShareContentCategory,
+  type ShareContentBlockConfig,
+  type ShareMessageData,
+  type ShareContext,
+  SHARE_CONTENT_BLOCKS,
+  SHARE_CONTENT_CATEGORIES,
+  CONTEXT_DEFAULTS,
+  getContentBlockConfig,
+  getBlocksByCategory,
+  getDefaultBlocks,
+  isBlockAvailable,
+  getAvailableBlocks,
+  validateBlockSelection,
+  getBlocksGroupedByCategory,
+} from './shareContentConfig';
+
+// Share message builder (PRD-57)
+export {
+  type BuildMessageOptions,
+  type BuildMessageResult,
+  buildShareMessage,
+  buildBatchSubmissionMessage,
+  buildLeagueShareMessage,
+  buildComparisonMessage,
+  buildDailyBreakdownMessage,
+  getRecommendedMaxLength,
+  isOptimalLength,
+} from './shareMessageBuilder';
