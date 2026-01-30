@@ -105,9 +105,17 @@ describe("buildShareMessage", () => {
             expect(result.message).toContain("#StepLeague");
         });
 
-        it("includes URL by default", () => {
+        it("excludes URL by default (URL added by useShare hook)", () => {
             const data = createBasicData();
             const result = buildShareMessage(["total_steps"], data);
+
+            // URL is now added by useShare hook, not in message text
+            expect(result.message).not.toContain("stepleague.app");
+        });
+
+        it("includes URL when explicitly requested", () => {
+            const data = createBasicData();
+            const result = buildShareMessage(["total_steps"], data, { includeUrl: true });
 
             expect(result.message).toContain("stepleague");
         });
@@ -327,12 +335,23 @@ describe("buildShareMessage", () => {
             expect(result.truncated).toBe(false);
         });
 
-        it("preserves hashtag and URL when truncating", () => {
+        it("preserves hashtag when truncating", () => {
             const data = createFullData();
             const result = buildShareMessage(
                 ["total_steps", "individual_days"],
                 data,
                 { maxLength: 150 }
+            );
+
+            expect(result.message).toContain("#StepLeague");
+        });
+
+        it("preserves hashtag and URL when truncating with includeUrl", () => {
+            const data = createFullData();
+            const result = buildShareMessage(
+                ["total_steps", "individual_days"],
+                data,
+                { maxLength: 200, includeUrl: true }
             );
 
             expect(result.message).toContain("#StepLeague");
