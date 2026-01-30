@@ -6,9 +6,9 @@ import { apiRequest, ApiError } from "@/lib/api/client";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { useToast } from "@/hooks/use-toast";
 import { normalizeError, reportErrorClient, ErrorCode } from "@/lib/errors";
-import { ShareModal } from "@/components/sharing/ShareModal";
+import { SharePromptDialog } from "@/components/sharing/SharePromptDialog";
 import { analytics } from "@/lib/analytics";
-import { APP_CONFIG } from "@/lib/config";
+import { type ShareMessageData } from "@/lib/sharing/shareContentConfig";
 
 interface BatchSubmissionFormProps {
     leagueId?: string;
@@ -101,13 +101,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
     const [previewImage, setPreviewImage] = useState<string | null>(null); // For modal
     const [limitWarning, setLimitWarning] = useState<string | null>(null);
     const [showSharePrompt, setShowSharePrompt] = useState(false);
-    const [submittedSteps, setSubmittedSteps] = useState<number>(0);
-    const [submissionStats, setSubmissionStats] = useState<{
-        dayCount: number;
-        startDate: string;
-        endDate: string;
-        avgSteps: number;
-    } | null>(null);
+    const [shareData, setShareData] = useState<ShareMessageData | null>(null);
 
     const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -652,7 +646,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
         setProcessing(false);
 
         if (successCount > 0) {
-            // Calculate submission stats
+            // Calculate submission stats for sharing
             const successfulImages = reviewedImages.filter((img) => img.status !== "error");
             const totalSteps = successfulImages.reduce((sum, img) => sum + (img.editedSteps || 0), 0);
             const dates = successfulImages
@@ -665,8 +659,14 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
             const endDate = dates[dates.length - 1] || "";
             const avgSteps = dayCount > 0 ? Math.round(totalSteps / dayCount) : 0;
 
-            setSubmittedSteps(totalSteps);
-            setSubmissionStats({ dayCount, startDate, endDate, avgSteps });
+            // Set share data for the SharePromptDialog
+            setShareData({
+                totalSteps,
+                dayCount,
+                startDate,
+                endDate,
+                averageSteps: avgSteps,
+            });
             setShowSharePrompt(true);
 
             // Track share prompt shown
@@ -1043,76 +1043,15 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                 </div>
             )}
 
-            {/* Post-Submission Share Prompt */}
-            {showSharePrompt && submissionStats && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                    <div className="w-full max-w-sm rounded-xl border border-border bg-card shadow-2xl overflow-hidden">
-                        {/* Celebration Header */}
-                        <div className="bg-gradient-to-r from-primary/20 to-primary/10 p-6 text-center">
-                            <div className="text-5xl mb-3">🎉</div>
-                            <h2 className="text-xl font-bold text-foreground">
-                                Submission Complete!
-                            </h2>
-                            <p className="mt-2 text-sm text-muted-foreground">
-                                You logged {submittedSteps.toLocaleString()} steps across {submissionStats.dayCount} day{submissionStats.dayCount !== 1 ? "s" : ""}!
-                            </p>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                                {new Date(submissionStats.startDate).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
-                                {submissionStats.startDate !== submissionStats.endDate && (
-                                    <> - {new Date(submissionStats.endDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</>
-                                )}
-                                {submissionStats.startDate === submissionStats.endDate && (
-                                    <> {new Date(submissionStats.endDate).toLocaleDateString("en-GB", { year: "numeric" })}</>
-                                )}
-                                {" · "}Avg: {submissionStats.avgSteps.toLocaleString()} steps/day
-                            </p>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="p-4 space-y-3">
-                            <button
-                                onClick={() => {
-                                    setShowSharePrompt(false);
-                                    // Format dates for share message
-                                    const formatDate = (dateStr: string) =>
-                                        new Date(dateStr).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
-                                    const startFormatted = formatDate(submissionStats.startDate);
-                                    const endFormatted = new Date(submissionStats.endDate).toLocaleDateString("en-GB", {
-                                        day: "numeric",
-                                        month: "short",
-                                        year: "numeric",
-                                    });
-                                    const dateRange = submissionStats.startDate === submissionStats.endDate
-                                        ? endFormatted
-                                        : `${startFormatted} - ${endFormatted}`;
-
-                                    // Build the share message
-                                    const shareText = `I just logged ${submittedSteps.toLocaleString()} steps! 👟\n\n📅 ${submissionStats.dayCount} day${submissionStats.dayCount !== 1 ? "s" : ""} (${dateRange})\n📊 Avg: ${submissionStats.avgSteps.toLocaleString()} steps/day\n\n${APP_CONFIG.hashtag}\n${APP_CONFIG.url}`;
-                                    window.open(
-                                        `https://wa.me/?text=${encodeURIComponent(shareText)}`,
-                                        "_blank"
-                                    );
-                                    analytics.shareFunnel.completed("whatsapp", "daily", submittedSteps);
-                                }}
-                                className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#25D366] px-4 py-3 text-white font-medium hover:bg-[#22c55e] transition"
-                            >
-                                <span className="text-xl">💬</span>
-                                Share on WhatsApp
-                            </button>
-
-                            <button
-                                onClick={() => {
-                                    setShowSharePrompt(false);
-                                    setSubmissionStats(null);
-                                    analytics.shareFunnel.promptDismissed("post_submission");
-                                }}
-                                className="w-full rounded-lg border border-border px-4 py-2 text-sm text-muted-foreground hover:bg-secondary transition"
-                            >
-                                Maybe Later
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            {/* Post-Submission Share Prompt - Using reusable SharePromptDialog */}
+            {shareData && (
+                <SharePromptDialog
+                    open={showSharePrompt}
+                    onOpenChange={setShowSharePrompt}
+                    data={shareData}
+                    context="batch_submission"
+                    onDismiss={() => setShareData(null)}
+                />
             )}
         </div>
     );
