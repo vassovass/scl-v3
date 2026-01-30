@@ -12,6 +12,8 @@ import {
     Heart,
     Calendar,
     BarChart3,
+    Settings2,
+    Sparkles,
 } from "lucide-react";
 import { APP_CONFIG } from "@/lib/config";
 import { CARD_TYPE_CONFIGS, type CardType } from "@/lib/sharing/metricConfig";
@@ -124,6 +126,9 @@ export default function HowToSharePage() {
 
                 {/* HOW IT WORKS (3 Steps) */}
                 <HowItWorksSection />
+
+                {/* CUSTOMIZABLE CONTENT */}
+                <CustomizeSection />
 
                 {/* BEFORE/AFTER COMPARISON */}
                 <BeforeAfterComparison />
@@ -315,6 +320,127 @@ function HowItWorksSection() {
                         <p className="text-muted-foreground">{step.description}</p>
                     </div>
                 ))}
+            </div>
+        </section>
+    );
+}
+
+// ============================================================================
+// Customize Section (PRD-57)
+// ============================================================================
+
+function CustomizeSection() {
+    const customizeOptions = [
+        {
+            emoji: "👟",
+            label: "Total Steps",
+            description: "Your total for the period",
+        },
+        {
+            emoji: "📅",
+            label: "Days Logged",
+            description: "Number of days submitted",
+        },
+        {
+            emoji: "📆",
+            label: "Date Range",
+            description: "e.g., \"10 Jan - 30 Jan 2026\"",
+        },
+        {
+            emoji: "📊",
+            label: "Daily Average",
+            description: "Average steps per day",
+        },
+        {
+            emoji: "📋",
+            label: "Daily Breakdown",
+            description: "List each day's steps",
+        },
+        {
+            emoji: "🔥",
+            label: "Current Streak",
+            description: "Consecutive active days",
+        },
+        {
+            emoji: "🏆",
+            label: "League Rank",
+            description: "Your position (#3 of 12)",
+        },
+        {
+            emoji: "📈",
+            label: "Improvement %",
+            description: "Change vs previous period",
+        },
+    ];
+
+    return (
+        <section className="py-24 bg-muted/30">
+            <div className="px-6 lg:px-8 max-w-6xl mx-auto">
+                <div className="text-center mb-12">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-sm font-semibold mb-6">
+                        <Settings2 className="w-4 h-4" />
+                        <span>Customize Your Share</span>
+                    </div>
+                    <h2 className="text-3xl font-bold mb-4">Choose What to Share</h2>
+                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                        Toggle on/off the stats you want to include. Share just the total, or add day-by-day breakdown, streaks, and league comparisons.
+                    </p>
+                </div>
+
+                {/* Options Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+                    {customizeOptions.map((option) => (
+                        <div
+                            key={option.label}
+                            className="bg-card border border-border rounded-xl p-4 text-center hover:border-primary/50 transition-colors"
+                        >
+                            <span className="text-2xl mb-2 block">{option.emoji}</span>
+                            <h3 className="font-semibold text-sm mb-1">{option.label}</h3>
+                            <p className="text-xs text-muted-foreground">{option.description}</p>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Example Messages */}
+                <div className="grid md:grid-cols-2 gap-6">
+                    {/* Basic Share */}
+                    <div className="bg-card border border-border rounded-2xl p-6">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Sparkles className="w-5 h-5 text-primary" />
+                            <h3 className="font-semibold">Quick Share</h3>
+                        </div>
+                        <div className="bg-muted rounded-lg p-4 text-sm whitespace-pre-wrap font-mono">
+                            {`I just logged 184,642 steps! 👟
+
+📅 10 days (10 Jan - 30 Jan 2026)
+📊 Avg: 18,464 steps/day
+
+#StepLeague
+https://stepleague.app`}
+                        </div>
+                    </div>
+
+                    {/* Detailed Share */}
+                    <div className="bg-card border border-border rounded-2xl p-6">
+                        <div className="flex items-center gap-2 mb-4">
+                            <BarChart3 className="w-5 h-5 text-primary" />
+                            <h3 className="font-semibold">Detailed Breakdown</h3>
+                        </div>
+                        <div className="bg-muted rounded-lg p-4 text-sm whitespace-pre-wrap font-mono">
+                            {`My week in steps! 👟
+
+Mon 20 Jan: 12,456
+Tue 21 Jan: 8,234
+Wed 22 Jan: 15,678 ⭐
+Thu 23 Jan: 11,234
+Fri 24 Jan: 9,876
+
+Total: 57,478 | Avg: 11,496/day
+
+#StepLeague`}
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     );
