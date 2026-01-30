@@ -195,6 +195,7 @@ export function ShareDateRangePicker({
             submissionData={submissionData}
             disabledAfter={maxDate}
             onClose={() => setShowCustomPicker(false)}
+            alwaysOpen={true}
           />
         </div>
       )}

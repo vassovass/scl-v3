@@ -153,6 +153,58 @@ When you hit a render loop:
 | `useFilterPersistence` | useSearchParams loop | Hydrate-once pattern |
 | `submit-steps/page.tsx` | adminLeagues loop | useMemo for array |
 | `LeagueInviteControl` | Dropdown not closing | useCallback for handlers |
+| `DateRangePicker.tsx` | State resets on parent re-render | useRef for persistence |
+
+---
+
+### Pattern 4: State Loss on Parent Re-render (REAL EXAMPLE)
+
+**File:** `src/components/ui/DateRangePicker.tsx`
+
+**Problem:** Component internal state resets when parent re-renders (e.g., when `onSelect` updates parent state which re-renders child).
+
+```typescript
+// ❌ WRONG - State resets when parent re-renders
+const [selectingEnd, setSelectingEnd] = useState(false);
+
+const handleDayClick = (day: Date) => {
+  if (!selectingEnd) {
+    onSelect({ from: day, to: undefined });
+    setSelectingEnd(true);  // This gets lost when parent re-renders!
+  }
+};
+```
+
+**Fix (from our codebase):**
+
+```typescript
+// ✅ CORRECT - Use ref to persist across re-renders
+const selectingEndRef = useRef(false);
+
+// Sync ref with state
+useEffect(() => {
+  selectingEndRef.current = selectingEnd;
+}, [selectingEnd]);
+
+const handleDayClick = (day: Date) => {
+  const isSelectingEnd = selectingEndRef.current;  // Read from ref
+
+  if (!isSelectingEnd) {
+    onSelect({ from: day, to: undefined });
+    setSelectingEnd(true);
+    selectingEndRef.current = true;  // Update both
+  } else {
+    // Second click works correctly
+    onSelect({ from: date.from, to: day });
+    selectingEndRef.current = false;
+  }
+};
+```
+
+**When to use this pattern:**
+- Child component has multi-step interactions (e.g., date range picker: click start, click end)
+- Parent updates state on each interaction step
+- Parent re-render resets child's useState back to initial value
 
 ---
 

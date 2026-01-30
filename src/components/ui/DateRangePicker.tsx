@@ -87,6 +87,8 @@ interface DateRangePickerProps {
   disabledAfter?: Date;
   /** Show close button (useful for mobile) */
   onClose?: () => void;
+  /** When true, calendar is always visible (for inline/embedded use) */
+  alwaysOpen?: boolean;
 }
 
 /**
@@ -107,11 +109,19 @@ export function DateRangePicker({
   submissionData,
   disabledAfter,
   onClose,
+  alwaysOpen = false,
 }: DateRangePickerProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(alwaysOpen);
   // Track whether user is selecting start or end date
+  // Use a ref to persist across re-renders when parent updates date prop
   const [selectingEnd, setSelectingEnd] = useState(false);
+  const selectingEndRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Sync ref with state for persistence across re-renders
+  useEffect(() => {
+    selectingEndRef.current = selectingEnd;
+  }, [selectingEnd]);
 
   // Close when clicking outside
   useEffect(() => {
@@ -138,18 +148,21 @@ export function DateRangePicker({
   // Handle day click with proper start/end logic
   const handleDayClick = (day: Date) => {
     const dayStr = format(day, 'yyyy-MM-dd');
+    // Use ref to get current value (persists across re-renders)
+    const isSelectingEnd = selectingEndRef.current;
     console.log('[DateRangePicker] handleDayClick:', {
       day: dayStr,
-      selectingEnd,
+      selectingEnd: isSelectingEnd,
       currentFrom: date?.from ? format(date.from, 'yyyy-MM-dd') : null,
       currentTo: date?.to ? format(date.to, 'yyyy-MM-dd') : null
     });
 
-    if (!selectingEnd) {
+    if (!isSelectingEnd) {
       // First click: set start date, clear end date
       console.log('[DateRangePicker] Setting START date, calling onSelect');
       onSelect({ from: day, to: undefined });
       setSelectingEnd(true);
+      selectingEndRef.current = true;
     } else {
       // Second click: set end date
       if (date?.from && day >= date.from) {
@@ -157,7 +170,12 @@ export function DateRangePicker({
         console.log('[DateRangePicker] Setting END date, calling onSelect with COMPLETE range');
         onSelect({ from: date.from, to: day });
         setSelectingEnd(false);
-        setIsOpen(false);
+        selectingEndRef.current = false;
+        if (!alwaysOpen) {
+          setIsOpen(false);
+        }
+        // Call onClose to notify parent (closes the picker in ShareDateRangePicker)
+        onClose?.();
       } else if (date?.from && day < date.from) {
         // Clicked before start date - reset and use as new start
         console.log('[DateRangePicker] Day before start, resetting to new START');
@@ -234,53 +252,62 @@ export function DateRangePicker({
   // Build disabled matcher
   const disabledMatcher = disabledAfter ? { after: disabledAfter } : undefined;
 
+  // Determine if calendar should be shown
+  const showCalendar = alwaysOpen || isOpen;
+
   return (
     <div className={`relative ${className}`} ref={containerRef} style={style}>
       <style>{customStyles}</style>
 
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={handleOpen}
-          className={`flex items-center gap-2 px-3 py-2 text-sm rounded-md border transition-colors ${isOpen
-            ? "border-primary bg-popover text-primary"
-            : "border-border bg-popover text-muted-foreground hover:border-foreground/20 hover:bg-accent hover:text-accent-foreground"
-            }`}
-        >
-          <span className="opacity-70">📅</span>
-          <span>{display}</span>
-        </button>
-
-        {date?.from && (
+      {/* Only show trigger button when not in alwaysOpen mode */}
+      {!alwaysOpen && (
+        <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={handleReset}
-            className="text-slate-500 hover:text-slate-300 text-sm px-2"
-            title="Clear dates"
+            onClick={handleOpen}
+            className={`flex items-center gap-2 px-3 py-2 text-sm rounded-md border transition-colors ${isOpen
+              ? "border-primary bg-popover text-primary"
+              : "border-border bg-popover text-muted-foreground hover:border-foreground/20 hover:bg-accent hover:text-accent-foreground"
+              }`}
           >
-            ✕
+            <span className="opacity-70">📅</span>
+            <span>{display}</span>
           </button>
-        )}
-      </div>
 
-      {/* Mobile: Full-screen overlay | Desktop: Dropdown */}
-      {isOpen && (
+          {date?.from && (
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-slate-500 hover:text-slate-300 text-sm px-2"
+              title="Clear dates"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Mobile: Full-screen overlay | Desktop: Dropdown (or inline when alwaysOpen) */}
+      {showCalendar && (
         <>
-          {/* Mobile overlay backdrop */}
-          <div
-            className="fixed inset-0 bg-black/50 z-40 md:hidden"
-            onClick={() => {
-              setIsOpen(false);
-              onClose?.();
-            }}
-          />
+          {/* Mobile overlay backdrop - only when not alwaysOpen */}
+          {!alwaysOpen && (
+            <div
+              className="fixed inset-0 bg-black/50 z-40 md:hidden"
+              onClick={() => {
+                setIsOpen(false);
+                onClose?.();
+              }}
+            />
+          )}
 
           {/* Date picker container */}
-          <div className={`
-            z-50 rounded-lg border border-border bg-popover shadow-xl
-            fixed inset-x-4 top-1/2 -translate-y-1/2 max-h-[90vh] overflow-y-auto
-            md:absolute md:inset-auto md:top-full md:left-0 md:mt-2 md:translate-y-0 md:max-h-none md:overflow-visible
-          `}>
+          <div className={alwaysOpen
+            ? "rounded-lg border border-border bg-popover shadow-lg"
+            : `z-50 rounded-lg border border-border bg-popover shadow-xl
+               fixed inset-x-4 top-1/2 -translate-y-1/2 max-h-[90vh] overflow-y-auto
+               md:absolute md:inset-auto md:top-full md:left-0 md:mt-2 md:translate-y-0 md:max-h-none md:overflow-visible`
+          }>
             {/* Sticky header with close button - ALWAYS visible */}
             <div className="sticky top-0 flex items-center justify-between px-3 py-2 border-b border-border bg-popover z-10">
               <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${selectingEnd

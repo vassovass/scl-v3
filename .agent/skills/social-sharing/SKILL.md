@@ -598,6 +598,47 @@ import { CARD_TYPE_TOOLTIPS, getBlockTooltip } from "@/lib/sharing/shareTooltips
 | Tooltips not appearing | Wrap with TooltipProvider (delayDuration=300) |
 | Click outside doesn't close | Add `onClick={onClose}` to backdrop div |
 | Content picker shows in compact mode | Use `compact={true}` prop |
+| **DateRangePicker doesn't close on selection** | Use `alwaysOpen={true}` when embedding inline |
+| **Date selection state resets between clicks** | Use `selectingEndRef` to persist state across re-renders |
+
+### DateRangePicker Inline Mode (CRITICAL FIX)
+
+**Problem:** When DateRangePicker is embedded inline (via `showCustomPicker` in ShareDateRangePicker), the `selectingEnd` state resets between clicks because the parent re-renders.
+
+**Root Cause:** When `onSelect` is called, ShareDateRangePicker updates, causing DateRangePicker to re-render and lose its internal `selectingEnd` state.
+
+**Solution:** Use `alwaysOpen={true}` prop and a ref to persist state:
+
+```typescript
+// In ShareDateRangePicker - use alwaysOpen mode
+<DateRangePicker
+  date={dateRangeValue}
+  onSelect={handleCustomRangeSelect}
+  submissionData={submissionData}
+  onClose={() => setShowCustomPicker(false)}
+  alwaysOpen={true}  // CRITICAL: Enables inline mode
+/>
+
+// In DateRangePicker - use ref for persistence
+const selectingEndRef = useRef(false);
+
+const handleDayClick = (day: Date) => {
+  const isSelectingEnd = selectingEndRef.current;  // Use ref, not state
+
+  if (!isSelectingEnd) {
+    onSelect({ from: day, to: undefined });
+    selectingEndRef.current = true;  // Persist across re-renders
+  } else {
+    onSelect({ from: date.from, to: day });
+    selectingEndRef.current = false;
+    onClose?.();  // Close the picker
+  }
+};
+```
+
+**Files Modified:**
+- `src/components/ui/DateRangePicker.tsx` - Added `alwaysOpen` prop and `selectingEndRef`
+- `src/components/sharing/ShareDateRangePicker.tsx` - Added `alwaysOpen={true}`
 
 ---
 
