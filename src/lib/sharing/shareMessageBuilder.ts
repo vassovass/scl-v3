@@ -111,7 +111,7 @@ const BLOCK_RENDERERS: Record<ShareContentBlock, BlockRenderer> = {
     day_count: (data) => {
         if (data.dayCount === undefined) return null;
         const plural = data.dayCount !== 1 ? "s" : "";
-        return `📅 ${data.dayCount} day${plural}`;
+        return `${data.dayCount} day${plural}`;
     },
 
     date_range: (data) => {
@@ -121,7 +121,7 @@ const BLOCK_RENDERERS: Record<ShareContentBlock, BlockRenderer> = {
 
     average: (data) => {
         if (data.averageSteps === undefined) return null;
-        return `📊 Avg: ${formatNumber(data.averageSteps)} steps/day`;
+        return `Avg: ${formatNumber(data.averageSteps)} steps/day`;
     },
 
     individual_days: (data) => {
@@ -143,13 +143,13 @@ const BLOCK_RENDERERS: Record<ShareContentBlock, BlockRenderer> = {
     streak: (data) => {
         if (data.currentStreak === undefined) return null;
         const plural = data.currentStreak !== 1 ? "s" : "";
-        return `🔥 ${data.currentStreak} day${plural} streak`;
+        return `${data.currentStreak} day${plural} streak`;
     },
 
     rank: (data) => {
         if (data.rank === undefined) return null;
         const ofTotal = data.totalMembers ? ` of ${data.totalMembers}` : "";
-        return `🏆 Rank #${data.rank}${ofTotal}`;
+        return `Rank #${data.rank}${ofTotal}`;
     },
 
     league_name: (data) => {
@@ -159,8 +159,8 @@ const BLOCK_RENDERERS: Record<ShareContentBlock, BlockRenderer> = {
 
     improvement: (data) => {
         if (data.improvementPercent === undefined) return null;
-        const emoji = data.improvementPercent >= 0 ? "📈" : "📉";
-        return `${emoji} ${formatImprovement(data.improvementPercent)} vs last period`;
+        const arrow = data.improvementPercent >= 0 ? "↑" : "↓";
+        return `${arrow} ${formatImprovement(data.improvementPercent)} vs last period`;
     },
 
     comparison_self: (data) => {
@@ -172,7 +172,7 @@ const BLOCK_RENDERERS: Record<ShareContentBlock, BlockRenderer> = {
         if (data.leagueAverage === undefined || data.totalSteps === undefined) return null;
         const diff = data.totalSteps - data.leagueAverage;
         const sign = diff >= 0 ? "+" : "";
-        return `👥 League avg: ${formatNumber(data.leagueAverage)} (${sign}${formatNumber(diff)})`;
+        return `League avg: ${formatNumber(data.leagueAverage)} (${sign}${formatNumber(diff)})`;
     },
 };
 
@@ -204,7 +204,7 @@ export function buildShareMessage(
     if (customIntro) {
         lines.push(customIntro);
     } else if (data.totalSteps !== undefined && blocks.includes("total_steps")) {
-        lines.push(`I just logged ${formatNumber(data.totalSteps)} steps! 👟`);
+        lines.push(`I just logged ${formatNumber(data.totalSteps)} steps on StepLeague!`);
         includedBlocks.push("total_steps");
     }
 
@@ -244,13 +244,12 @@ export function buildShareMessage(
         includedBlocks.push(block);
     }
 
-    // Add footer (hashtag and URL)
+    // Add footer (URL instead of hashtag to prevent tracking URL from being appended)
     if (includeHashtag || includeUrl) {
         lines.push(""); // Blank line before footer
-        if (includeHashtag && APP_CONFIG.hashtag) {
-            lines.push(APP_CONFIG.hashtag);
-        }
-        if (includeUrl && APP_CONFIG.url) {
+        // Use clean URL instead of hashtag - this prevents useShare from appending the tracking URL
+        // because it checks for "stepleague.app" in the message
+        if (includeHashtag || includeUrl) {
             lines.push(APP_CONFIG.url);
         }
     }

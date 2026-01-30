@@ -39,12 +39,12 @@ const customStyles = `
         color: hsl(var(--primary-foreground)) !important;
     }
     .rdp-day_today {
-        font-weight: bold;
+        font-weight: normal;
         color: hsl(var(--date-picker-text)) !important;
     }
     .rdp-day_today:not(.rdp-day_selected) {
         background-color: transparent;
-        border: 1px solid hsl(var(--date-picker-accent));
+        border: 1px dashed hsl(var(--muted-foreground) / 0.4);
     }
     .rdp-day_disabled {
         opacity: 0.5;

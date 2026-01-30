@@ -51,6 +51,16 @@ export function ShareDateRangePicker({
   const [partialFrom, setPartialFrom] = useState<Date | null>(null);
   // Track previous value to detect NEW complete selections
   const prevValueRef = useRef(value);
+  // Track if we've already auto-selected
+  const hasAutoSelected = useRef(false);
+
+  // Auto-select "yesterday" preset when mounting with no initial value
+  useEffect(() => {
+    if (!value && selectedPreset === null && !hasAutoSelected.current) {
+      hasAutoSelected.current = true;
+      handlePresetClick("yesterday");
+    }
+  }, []); // Run only on mount
 
   // Close picker when a complete NEW selection is made (Fix 1: decouple from onClose callback)
   useEffect(() => {
