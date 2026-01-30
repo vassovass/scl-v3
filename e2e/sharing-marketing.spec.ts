@@ -90,6 +90,90 @@ test.describe("How-to-Share Marketing Page", () => {
 });
 
 // ============================================================================
+// Customizable Share Content Section Tests (PRD-57)
+// ============================================================================
+
+test.describe("Customizable Share Content Section (PRD-57)", () => {
+    test.beforeEach(async ({ page }) => {
+        await page.goto("/how-to-share");
+    });
+
+    test("customize section is visible", async ({ page }) => {
+        const customizeSection = page.getByText("Choose What to Share");
+        await expect(customizeSection).toBeVisible();
+    });
+
+    test("customize section shows all 8 options", async ({ page }) => {
+        // Check for the customization options
+        await expect(page.getByText("Total Steps")).toBeVisible();
+        await expect(page.getByText("Days Logged")).toBeVisible();
+        await expect(page.getByText("Date Range")).toBeVisible();
+        await expect(page.getByText("Daily Average")).toBeVisible();
+        await expect(page.getByText("Daily Breakdown")).toBeVisible();
+        await expect(page.getByText("Current Streak")).toBeVisible();
+        await expect(page.getByText("League Rank")).toBeVisible();
+        await expect(page.getByText("Improvement %")).toBeVisible();
+    });
+
+    test("customize section shows example messages", async ({ page }) => {
+        // Check for Quick Share example
+        await expect(page.getByText("Quick Share")).toBeVisible();
+
+        // Check for Detailed Breakdown example
+        await expect(page.getByText("Detailed Breakdown")).toBeVisible();
+    });
+
+    test("quick share example contains hashtag", async ({ page }) => {
+        const quickShareExample = page.locator("text=#StepLeague").first();
+        await expect(quickShareExample).toBeVisible();
+    });
+
+    test("detailed breakdown example shows daily format", async ({ page }) => {
+        // Should show day-by-day format
+        const dailyFormat = page.getByText(/Mon.*:/);
+        await expect(dailyFormat.first()).toBeVisible();
+    });
+});
+
+// ============================================================================
+// Customizable Share Content - Negative Tests (PRD-57)
+// ============================================================================
+
+test.describe("Customizable Share - Negative Tests (PRD-57)", () => {
+    test("page loads without errors when section is scrolled into view", async ({ page }) => {
+        await page.goto("/how-to-share");
+
+        // Scroll to customize section
+        await page.getByText("Choose What to Share").scrollIntoViewIfNeeded();
+
+        // No JS errors should occur
+        const errors: string[] = [];
+        page.on("pageerror", (error) => {
+            errors.push(error.message);
+        });
+
+        // Wait a bit for any async errors
+        await page.waitForTimeout(500);
+
+        expect(errors).toHaveLength(0);
+    });
+
+    test("customize section renders correctly on mobile", async ({ page }) => {
+        // Set mobile viewport
+        await page.setViewportSize({ width: 375, height: 667 });
+        await page.goto("/how-to-share");
+
+        // Section should still be visible
+        const customizeSection = page.getByText("Choose What to Share");
+        await customizeSection.scrollIntoViewIfNeeded();
+        await expect(customizeSection).toBeVisible();
+
+        // Options grid should be visible
+        await expect(page.getByText("Total Steps")).toBeVisible();
+    });
+});
+
+// ============================================================================
 // Navigation Tests for Marketing Pages (PRD-55)
 // ============================================================================
 
