@@ -35,6 +35,7 @@ Skills are available in `.claude/skills/` (synced from `.agent/skills/`).
 | `middleware-patterns` | **NEW** Protected routes, redirects |
 | `analytics-tracking` | **NEW** Event tracking (GA4+PostHog), adding events |
 | `mcp-setup` | **NEW** MCP server configuration and troubleshooting |
+| `social-sharing` | Sharing features, OG images, **multi-select message builder** |
 
 ## Claude-Specific Notes
 

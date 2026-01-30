@@ -1,11 +1,11 @@
 ---
 name: social-sharing
-description: Social sharing patterns for StepLeague - OG image generation, share hooks, WhatsApp optimization, and shareable URLs. Use when implementing sharing features, generating OG images, creating share modals, or working with social platform integrations. Keywords: share, OG image, Open Graph, WhatsApp, social, sharing, useShare, share card, metric.
+description: Social sharing patterns for StepLeague - OG image generation, share hooks, WhatsApp optimization, shareable URLs, and multi-select message builder (PRD-57). Use when implementing sharing features, generating OG images, creating share modals, or working with social platform integrations. Keywords: share, OG image, Open Graph, WhatsApp, social, sharing, useShare, share card, metric, message builder, content picker.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
-  version: "1.0"
+  version: "1.1"
   project: "stepleague"
-  last_updated: "2026-01-26"
+  last_updated: "2026-01-30"
 ---
 
 # Social Sharing Skill
@@ -218,10 +218,80 @@ WhatsApp-first layout:
 3. **WhatsApp button** - Large, primary action
 4. Secondary buttons (X/Twitter, Copy Link)
 5. Native share option (if supported)
+6. **Multi-select content picker** (PRD-57) - Customizable message blocks
 
-### Pre-filled Messages by Card Type
+### Multi-Select Message Builder (PRD-57)
+
+**Problem:** Users sharing custom date ranges get misleading messages like "Just logged 29,730 steps today!" when it's actually a 5-day total.
+
+**Solution:** Let users pick exactly what content appears in their share message:
+
+**Files:**
+- `src/lib/sharing/shareContentConfig.ts` - Content block definitions
+- `src/lib/sharing/shareMessageBuilder.ts` - Message builder function
+- `src/components/sharing/ShareContentPicker.tsx` - UI component
+
+**Available Content Blocks:**
+
+| Block ID | Example Output | Category |
+|----------|----------------|----------|
+| `total_steps` | "29,730 steps" | Basic |
+| `day_count` | "📅 5 days" | Basic |
+| `date_range` | "(25 Jan - 29 Jan)" | Basic |
+| `average` | "📊 Avg: 5,946/day" | Detailed |
+| `individual_days` | "Mon: 6,200 ⭐\nTue: 5,100..." | Detailed |
+| `best_day` | "⭐ Best: 8,500 (27 Jan)" | Detailed |
+| `streak` | "🔥 14 days streak" | Comparison |
+| `rank` | "🏆 Rank #3" | Comparison |
+| `improvement` | "📈 +15% vs last period" | Comparison |
+
+**Usage:**
+
+```typescript
+import { buildShareMessage, type ShareContentBlock } from "@/lib/sharing/shareMessageBuilder";
+import { ShareContentPicker } from "@/components/sharing/ShareContentPicker";
+
+// Build message with selected blocks
+const result = buildShareMessage(selectedBlocks, {
+  totalSteps: 29730,
+  dayCount: 5,
+  startDate: "2026-01-25",
+  endDate: "2026-01-29",
+  averageSteps: 5946,
+  dailyBreakdown: [...],
+  bestDaySteps: 8500,
+  bestDayDate: "2026-01-27",
+});
+
+// Result: "29,730 steps 📅 5 days (25 Jan - 29 Jan)\n📊 Avg: 5,946/day\n..."
+```
+
+**Passing Data to ShareModal:**
+
+When opening the share modal, pass all available data:
+
+```typescript
+openShareModal({
+  cardType: "custom_period",
+  value: totalSteps,
+  metricType: "steps",
+  // PRD-57: Full data for multi-select message builder
+  dayCount: periodStats.days_submitted,
+  periodStart: dateRange.start,
+  periodEnd: dateRange.end,
+  averageSteps: periodStats.average_per_day,
+  dailyBreakdown: [{ date: "2026-01-25", steps: 6200 }, ...],
+  bestDaySteps: bestStats.best_day_steps,
+  bestDayDate: bestStats.best_day_date,
+  improvementPct: comparisonStats?.improvement_pct,
+});
+```
+
+### Pre-filled Messages by Card Type (Legacy)
 
 **File:** `src/lib/sharing/shareMessages.ts`
+
+Used as fallback when multi-select data is unavailable:
 
 ```typescript
 export const SHARE_MESSAGES: Record<CardType, (data: ShareData) => string> = {

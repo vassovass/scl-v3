@@ -656,6 +656,14 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                                                 cardType: 'daily',
                                                 value: verificationDetails.claimedSteps,
                                                 metricType: 'steps',
+                                                // PRD-57: Full data for multi-select message builder
+                                                dayCount: 1,
+                                                periodStart: verificationDetails.claimedDate,
+                                                periodEnd: verificationDetails.claimedDate,
+                                                dailyBreakdown: [{
+                                                    date: verificationDetails.claimedDate,
+                                                    steps: verificationDetails.claimedSteps,
+                                                }],
                                             })}
                                             className="shrink-0 rounded-md bg-primary px-3 py-1 text-xs font-medium text-primary-foreground transition hover:bg-primary/90"
                                         >
@@ -834,6 +842,11 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                 defaultCardType={shareConfig?.cardType}
                 defaultValue={shareConfig?.value ?? 0}
                 metricType={shareConfig?.metricType}
+                // PRD-57: Full data for multi-select message builder
+                dayCount={shareConfig?.dayCount}
+                periodStart={shareConfig?.periodStart}
+                periodEnd={shareConfig?.periodEnd}
+                dailyBreakdown={shareConfig?.dailyBreakdown}
             />
         </>
     );

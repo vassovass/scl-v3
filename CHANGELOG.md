@@ -49,6 +49,12 @@ All notable changes to StepLeague v3.
 - `/api/share/create` now updates streak and records analytics on each share
 - Share history API now supports pagination and returns CTR metrics
 - **Batch Submission WhatsApp Share** - Enhanced post-submission share message to include day count, date range (e.g., "10 Jan - 30 Jan 2026"), average steps/day, and proper branding (#StepLeague + app URL)
+- **ShareModal Integration (PRD-57)** - All share buttons now pass full data for multi-select message builder:
+  - My Stats page: Today, Period Total, Streak, Personal Best, Rank, Challenge buttons pass `dayCount`, `periodStart`, `periodEnd`, `dailyBreakdown`, `averageSteps`, `bestDaySteps`, `bestDayDate`, `improvementPct`
+  - SubmissionForm: Post-submission share passes single-day breakdown data
+  - MilestonePrompt: Personal best and streak milestones include full context
+  - Enables "Daily Breakdown" content block selection when sharing custom periods
+- **DateRangePicker Mobile UX** - Full-screen overlay on mobile with sticky header/footer and close button
 
 ---
 

@@ -98,6 +98,9 @@ export default function MyStatsPage() {
     const [shareHistory, setShareHistory] = useState<ShareHistoryItem[]>([]);
     const [historyLoading, setHistoryLoading] = useState(false);
 
+    // Daily breakdown for share message builder (PRD-57)
+    const [dailyBreakdown, setDailyBreakdown] = useState<Array<{ date: string; steps: number }>>([]);
+
     const fetchShareHistory = useCallback(async () => {
         if (!user) return;
         setHistoryLoading(true);
@@ -111,6 +114,21 @@ export default function MyStatsPage() {
             console.error("Error fetching share history:", err);
         } finally {
             setHistoryLoading(false);
+        }
+    }, [user]);
+
+    // Fetch daily breakdown for share message builder (PRD-57)
+    const fetchDailyBreakdown = useCallback(async (startDate: string, endDate: string) => {
+        if (!user) return;
+        try {
+            const res = await fetch(`/api/submissions/available-dates?start=${startDate}&end=${endDate}`);
+            if (res.ok) {
+                const json = await res.json();
+                setDailyBreakdown(json.dates || []);
+            }
+        } catch (err) {
+            console.error("Error fetching daily breakdown:", err);
+            setDailyBreakdown([]);
         }
     }, [user]);
 
@@ -164,6 +182,15 @@ export default function MyStatsPage() {
         fetchStats();
         fetchShareHistory();
     }, [fetchStats, fetchShareHistory]);
+
+    // Fetch daily breakdown when custom date range changes (PRD-57)
+    useEffect(() => {
+        if (customDateRange?.start && customDateRange?.end) {
+            fetchDailyBreakdown(customDateRange.start, customDateRange.end);
+        } else {
+            setDailyBreakdown([]);
+        }
+    }, [customDateRange, fetchDailyBreakdown]);
 
     if (!user) {
         return (
@@ -287,11 +314,18 @@ export default function MyStatsPage() {
                                         value={data.today_steps}
                                         emoji="📅"
                                         accentColor="sky"
-                                        onShareClick={() => openShareModal({
-                                            cardType: "daily",
-                                            value: data.today_steps,
-                                            metricType: "steps",
-                                        })}
+                                        onShareClick={() => {
+                                            const today = new Date().toISOString().slice(0, 10);
+                                            openShareModal({
+                                                cardType: "daily",
+                                                value: data.today_steps,
+                                                metricType: "steps",
+                                                dayCount: 1,
+                                                periodStart: today,
+                                                periodEnd: today,
+                                                dailyBreakdown: [{ date: today, steps: data.today_steps }],
+                                            });
+                                        }}
                                     />
 
                                     {/* Period Total */}
@@ -330,6 +364,7 @@ export default function MyStatsPage() {
                                             // PRD-57: Full data for multi-select message builder
                                             dayCount: data.period_stats.days_submitted,
                                             averageSteps: data.period_stats.average_per_day,
+                                            dailyBreakdown: dailyBreakdown.length > 0 ? dailyBreakdown : undefined,
                                             bestDaySteps: data.base_stats.best_day_steps,
                                             bestDayDate: data.base_stats.best_day_date || undefined,
                                             improvementPct: data.improvement_pct || undefined,
@@ -346,9 +381,10 @@ export default function MyStatsPage() {
                                         accentColor="orange"
                                         onShareClick={() => openShareModal({
                                             cardType: "streak",
-                                            value: data.base_stats.current_streak,
+                                            value: data.today_steps,
                                             metricType: "steps",
                                             streakDays: data.base_stats.current_streak,
+                                            dayCount: data.base_stats.current_streak,
                                         })}
                                     />
 
@@ -370,6 +406,11 @@ export default function MyStatsPage() {
                                             cardType: "personal_best",
                                             value: data.base_stats.best_day_steps,
                                             metricType: "steps",
+                                            bestDaySteps: data.base_stats.best_day_steps,
+                                            bestDayDate: data.base_stats.best_day_date || undefined,
+                                            dayCount: 1,
+                                            periodStart: data.base_stats.best_day_date || undefined,
+                                            periodEnd: data.base_stats.best_day_date || undefined,
                                         })}
                                     />
                                 </div>
@@ -406,6 +447,14 @@ export default function MyStatsPage() {
                                                 metricType: "steps",
                                                 rank: data.league_stats!.rank ?? undefined,
                                                 leagueName: data.league_stats!.league_name,
+                                                // PRD-57: Full data for multi-select message builder
+                                                periodLabel: period === "custom" && customDateRange
+                                                    ? formatCustomPeriodLabel(customDateRange.start, customDateRange.end)
+                                                    : getPresetLabel(period),
+                                                periodStart: customDateRange?.start,
+                                                periodEnd: customDateRange?.end,
+                                                dayCount: data.period_stats.days_submitted,
+                                                averageSteps: data.period_stats.average_per_day,
                                             })}
                                         />
 
@@ -469,7 +518,17 @@ export default function MyStatsPage() {
                                             cardType: "challenge",
                                             value: data.period_stats.total_steps,
                                             metricType: "steps",
-                                            periodLabel: getPresetLabel(period),
+                                            periodLabel: period === "custom" && customDateRange
+                                                ? formatCustomPeriodLabel(customDateRange.start, customDateRange.end)
+                                                : getPresetLabel(period),
+                                            // PRD-57: Full data for multi-select message builder
+                                            periodStart: customDateRange?.start,
+                                            periodEnd: customDateRange?.end,
+                                            dayCount: data.period_stats.days_submitted,
+                                            averageSteps: data.period_stats.average_per_day,
+                                            dailyBreakdown: dailyBreakdown.length > 0 ? dailyBreakdown : undefined,
+                                            bestDaySteps: data.base_stats.best_day_steps,
+                                            bestDayDate: data.base_stats.best_day_date || undefined,
                                         })}
                                         className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition"
                                         data-tour="challenge-share-button"
@@ -550,6 +609,7 @@ export default function MyStatsPage() {
                 // PRD-57: Full data for multi-select message builder
                 dayCount={shareConfig?.dayCount}
                 averageSteps={shareConfig?.averageSteps}
+                dailyBreakdown={shareConfig?.dailyBreakdown}
                 bestDaySteps={shareConfig?.bestDaySteps}
                 bestDayDate={shareConfig?.bestDayDate}
                 improvementPct={shareConfig?.improvementPct}

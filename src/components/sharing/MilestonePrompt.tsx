@@ -52,6 +52,12 @@ export function MilestonePrompt({
         streakDays?: number;
         rank?: number;
         leagueName?: string;
+        // PRD-57: Full data for message builder
+        bestDaySteps?: number;
+        bestDayDate?: string;
+        dayCount?: number;
+        periodStart?: string;
+        periodEnd?: string;
     } | null>(null);
 
     // Process milestones when they change
@@ -74,9 +80,16 @@ export function MilestonePrompt({
                         milestones.personalBest.newValue,
                         milestones.personalBest.oldValue
                     );
+                    // PRD-57: Include full data for message builder
+                    const today = new Date().toISOString().slice(0, 10);
                     config = {
                         cardType: "personal_best",
                         value: milestones.personalBest.newValue,
+                        bestDaySteps: milestones.personalBest.newValue,
+                        bestDayDate: today,
+                        dayCount: 1,
+                        periodStart: today,
+                        periodEnd: today,
                     };
                 }
                 break;
@@ -88,6 +101,8 @@ export function MilestonePrompt({
                         cardType: "streak",
                         value: milestones.streakMilestone.days,
                         streakDays: milestones.streakMilestone.days,
+                        // PRD-57: Include dayCount for message builder
+                        dayCount: milestones.streakMilestone.days,
                     };
                 }
                 break;
@@ -186,6 +201,12 @@ export function MilestonePrompt({
                     streakDays={shareConfig.streakDays}
                     rank={shareConfig.rank}
                     leagueName={shareConfig.leagueName}
+                    // PRD-57: Full data for message builder
+                    bestDaySteps={shareConfig.bestDaySteps}
+                    bestDayDate={shareConfig.bestDayDate}
+                    dayCount={shareConfig.dayCount}
+                    periodStart={shareConfig.periodStart}
+                    periodEnd={shareConfig.periodEnd}
                 />
             )}
         </>

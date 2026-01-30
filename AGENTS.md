@@ -101,6 +101,7 @@
 | [`auth-patterns`](.agent/skills/auth-patterns/SKILL.md) | **NEW** getUser vs getSession, deadlocks, sessions |
 | [`middleware-patterns`](.agent/skills/middleware-patterns/SKILL.md) | **NEW** Protected routes, auth redirects, URL handling |
 | [`analytics-tracking`](.agent/skills/analytics-tracking/SKILL.md) | **NEW** Event tracking (GA4+PostHog), adding events, GTM config |
+| [`social-sharing`](.agent/skills/social-sharing/SKILL.md) | Sharing features, OG images, WhatsApp, **multi-select message builder** (PRD-57) |
 
 ### Key Principles (from `architecture-philosophy`)
 
