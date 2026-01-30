@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { format } from "date-fns";
 import { DayPicker, DateRange } from "react-day-picker";
 import "react-day-picker/dist/style.css";
+import { Button } from "@/components/ui/button";
 
 // Custom style overrides using our semantic variables
 // Inject custom variables for react-day-picker that map to our global theme
@@ -251,30 +252,45 @@ export function DateRangePicker({
         )}
       </div>
 
+      {/* Mobile: Full-screen overlay | Desktop: Dropdown */}
       {isOpen && (
-        <div className="absolute top-full left-0 z-50 mt-2 rounded-lg border border-border bg-popover shadow-xl">
-          {/* Header with selection indicator and close button */}
-          <div className="flex items-center justify-between px-3 py-2 border-b border-border">
-            <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${selectingEnd
-              ? "bg-accent text-accent-foreground"
-              : "bg-primary/20 text-primary"
-              }`}>
-              {selectingEnd ? "📅 Select end date" : "📅 Select start date"}
-            </span>
-            {onClose && (
+        <>
+          {/* Mobile overlay backdrop */}
+          <div
+            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+            onClick={() => {
+              setIsOpen(false);
+              onClose?.();
+            }}
+          />
+
+          {/* Date picker container */}
+          <div className={`
+            z-50 rounded-lg border border-border bg-popover shadow-xl
+            fixed inset-x-4 top-1/2 -translate-y-1/2 max-h-[90vh] overflow-y-auto
+            md:absolute md:inset-auto md:top-full md:left-0 md:mt-2 md:translate-y-0 md:max-h-none md:overflow-visible
+          `}>
+            {/* Sticky header with close button - ALWAYS visible */}
+            <div className="sticky top-0 flex items-center justify-between px-3 py-2 border-b border-border bg-popover z-10">
+              <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${selectingEnd
+                ? "bg-accent text-accent-foreground"
+                : "bg-primary/20 text-primary"
+                }`}>
+                {selectingEnd ? "📅 Select end date" : "📅 Select start date"}
+              </span>
               <button
                 type="button"
                 onClick={() => {
                   setIsOpen(false);
-                  onClose();
+                  onClose?.();
                 }}
-                className="text-muted-foreground hover:text-foreground p-1 rounded-sm hover:bg-accent"
+                className="text-muted-foreground hover:text-foreground p-2 rounded-md hover:bg-accent"
                 aria-label="Close date picker"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
+                  width="20"
+                  height="20"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -286,48 +302,79 @@ export function DateRangePicker({
                   <path d="m6 6 12 12" />
                 </svg>
               </button>
-            )}
-          </div>
-
-          <div className="p-3">
-            <DayPicker
-              mode="range"
-              defaultMonth={date?.from || new Date()}
-              selected={date}
-              onDayClick={handleDayClick}
-              numberOfMonths={2}
-              modifiers={buildModifiers()}
-              modifiersClassNames={modifiersClassNames}
-              disabled={disabledMatcher}
-            />
-          </div>
-
-          {/* Helper text with legend */}
-          <div className="px-3 pb-2 space-y-1">
-            <div className="text-xs text-muted-foreground">
-              {selectingEnd
-                ? "Click a date to set end • Click before start to reset"
-                : "Click a date to set start"}
             </div>
-            {submissionData && submissionData.length > 0 && (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-[hsl(var(--success)/0.4)]" />
-                  High
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-[hsl(var(--success)/0.25)]" />
-                  Med
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-[hsl(var(--success)/0.15)]" />
-                  Low
-                </span>
-                <span className="text-muted-foreground/60">• = submitted</span>
+
+            {/* Calendar - 1 month on mobile, 2 on desktop */}
+            <div className="p-3 flex justify-center">
+              {/* Mobile: single month */}
+              <div className="md:hidden">
+                <DayPicker
+                  mode="range"
+                  defaultMonth={date?.from || new Date()}
+                  selected={date}
+                  onDayClick={handleDayClick}
+                  numberOfMonths={1}
+                  modifiers={buildModifiers()}
+                  modifiersClassNames={modifiersClassNames}
+                  disabled={disabledMatcher}
+                />
               </div>
-            )}
+              {/* Desktop: two months */}
+              <div className="hidden md:block">
+                <DayPicker
+                  mode="range"
+                  defaultMonth={date?.from || new Date()}
+                  selected={date}
+                  onDayClick={handleDayClick}
+                  numberOfMonths={2}
+                  modifiers={buildModifiers()}
+                  modifiersClassNames={modifiersClassNames}
+                  disabled={disabledMatcher}
+                />
+              </div>
+            </div>
+
+            {/* Helper text with legend */}
+            <div className="px-3 pb-2 space-y-1">
+              <div className="text-xs text-muted-foreground text-center md:text-left">
+                {selectingEnd
+                  ? "Tap a date to set end • Tap before start to reset"
+                  : "Tap a date to set start"}
+              </div>
+              {submissionData && submissionData.length > 0 && (
+                <div className="flex items-center justify-center md:justify-start gap-2 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-[hsl(var(--success)/0.4)]" />
+                    High
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-[hsl(var(--success)/0.25)]" />
+                    Med
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-[hsl(var(--success)/0.15)]" />
+                    Low
+                  </span>
+                  <span className="text-muted-foreground/60">• = submitted</span>
+                </div>
+              )}
+            </div>
+
+            {/* Sticky footer with Done button - mobile only */}
+            <div className="sticky bottom-0 p-3 border-t border-border bg-popover md:hidden">
+              <Button
+                variant="default"
+                className="w-full"
+                onClick={() => {
+                  setIsOpen(false);
+                  onClose?.();
+                }}
+              >
+                {date?.from && date?.to ? "Done" : "Close"}
+              </Button>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
