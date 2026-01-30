@@ -117,15 +117,16 @@ export function ShareDateRangePicker({
   const handleCustomRangeSelect = useCallback(
     (range: DateRange | undefined) => {
       console.log('[ShareDateRangePicker] handleCustomRangeSelect called:', {
-        from: range?.from ? range.from.toISOString().slice(0, 10) : null,
-        to: range?.to ? range.to.toISOString().slice(0, 10) : null,
+        from: range?.from ? format(range.from, 'yyyy-MM-dd') : null,
+        to: range?.to ? format(range.to, 'yyyy-MM-dd') : null,
         hasComplete: !!(range?.from && range?.to),
       });
 
       if (range?.from && range?.to) {
         // Complete range - call onChange and clear partial state
-        const startStr = range.from.toISOString().slice(0, 10);
-        const endStr = range.to.toISOString().slice(0, 10);
+        // Use format() instead of toISOString() to preserve local timezone
+        const startStr = format(range.from, 'yyyy-MM-dd');
+        const endStr = format(range.to, 'yyyy-MM-dd');
         console.log('[ShareDateRangePicker] Complete range, calling onChange:', { start: startStr, end: endStr });
         setPartialFrom(null);
         setSelectedPreset("custom");
