@@ -404,7 +404,7 @@ describe('Proxy Configuration Integration', () => {
         const { ANALYTICS_PROXIES } = await import('@/lib/analytics/proxyConfig');
 
         expect(ANALYTICS_PROXIES.ga4.proxyPath).toBe('/ga');
-        expect(ANALYTICS_PROXIES.ga4.transportUrl).toBe('https://stepleague.com/ga');
+        expect(ANALYTICS_PROXIES.ga4.transportUrl).toBe('https://stepleague.app/ga');
     });
 
     it('proxyConfig exports correct GTM proxy path', async () => {

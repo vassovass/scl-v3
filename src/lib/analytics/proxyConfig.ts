@@ -49,7 +49,7 @@ export const ANALYTICS_PROXIES = {
    * Proxy: /ga/* -> www.google-analytics.com/*
    *
    * IMPORTANT: GTM GA4 Configuration tag has transport_url set to
-   * https://stepleague.com/ga to route all collection requests through proxy.
+   * https://stepleague.app/ga to route all collection requests through proxy.
    * This is configured in GTM (version 11+).
    */
   ga4: {
@@ -57,7 +57,7 @@ export const ANALYTICS_PROXIES = {
     proxyPath: '/ga',
     originalHost: 'https://www.google-analytics.com',
     // The full transport URL used in GTM configuration
-    transportUrl: 'https://stepleague.com/ga',
+    transportUrl: 'https://stepleague.app/ga',
   },
 
   // ─────────────────────────────────────────────────────────────────────────

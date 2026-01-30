@@ -58,7 +58,7 @@ const nextConfig = {
       },
       // GA4 data collection endpoints - CRITICAL for realtime data
       // These endpoints receive the actual analytics data from the browser
-      // The transport_url in GTM is set to https://stepleague.com/ga
+      // The transport_url in GTM is set to https://stepleague.app/ga
       {
         source: '/ga/g/collect',
         destination: 'https://www.google-analytics.com/g/collect',
