@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useShare, type SharePlatform } from "@/hooks/useShare";
 import { APP_CONFIG } from "@/lib/config";
 import { analytics } from "@/lib/analytics";
@@ -12,13 +12,29 @@ import {
     getMetricConfig,
     generateShareMessage,
 } from "@/lib/sharing";
+import {
+    type ShareContentBlock,
+    type ShareMessageData,
+    getDefaultBlocks,
+} from "@/lib/sharing/shareContentConfig";
+import { buildShareMessage } from "@/lib/sharing/shareMessageBuilder";
 import { Spinner } from "@/components/ui/Spinner";
 import { ShareDateRangePicker } from "./ShareDateRangePicker";
+import { ShareContentPicker } from "./ShareContentPicker";
 import { type PeriodPreset, formatCustomPeriodLabel } from "@/lib/utils/periods";
+import { ChevronDown } from "lucide-react";
 
 // ============================================================================
 // Types
 // ============================================================================
+
+/**
+ * Daily breakdown entry for message builder
+ */
+interface DailyBreakdownEntry {
+    date: string;
+    steps: number;
+}
 
 interface ShareModalProps {
     isOpen: boolean;
@@ -34,6 +50,20 @@ interface ShareModalProps {
     periodStart?: string;
     /** Custom period end date (YYYY-MM-DD) */
     periodEnd?: string;
+
+    // PRD-57: Full data for multi-select message builder
+    /** Number of days in the period */
+    dayCount?: number;
+    /** Average steps per day */
+    averageSteps?: number;
+    /** Daily breakdown for individual day display */
+    dailyBreakdown?: DailyBreakdownEntry[];
+    /** Best day step count in period */
+    bestDaySteps?: number;
+    /** Best day date (YYYY-MM-DD) */
+    bestDayDate?: string;
+    /** Improvement percentage vs previous period */
+    improvementPct?: number;
 }
 
 interface CardData {
@@ -79,6 +109,13 @@ export function ShareModal({
     periodLabel,
     periodStart,
     periodEnd,
+    // PRD-57: Full data for message builder
+    dayCount,
+    averageSteps,
+    dailyBreakdown,
+    bestDaySteps,
+    bestDayDate,
+    improvementPct,
 }: ShareModalProps) {
     const [cardData, setCardData] = useState<CardData>({
         cardType: defaultCardType,
@@ -97,6 +134,48 @@ export function ShareModal({
     const [imageLoading, setImageLoading] = useState(true);
     const [showSuccess, setShowSuccess] = useState(false);
     const hasTrackedOpen = useRef(false);
+
+    // PRD-57: Multi-select content picker state
+    const [showContentPicker, setShowContentPicker] = useState(false);
+    const [selectedBlocks, setSelectedBlocks] = useState<ShareContentBlock[]>(() =>
+        getDefaultBlocks("custom")
+    );
+
+    // Build ShareMessageData from all available props
+    const shareMessageData: ShareMessageData = useMemo(() => {
+        // Mark the best day in daily breakdown if we have the data
+        const enrichedBreakdown = dailyBreakdown?.map(day => ({
+            date: day.date,
+            steps: day.steps,
+            isBestDay: bestDayDate ? day.date === bestDayDate : false,
+        }));
+
+        return {
+            totalSteps: cardData.value,
+            dayCount: dayCount,
+            startDate: cardData.customPeriod?.start || periodStart,
+            endDate: cardData.customPeriod?.end || periodEnd,
+            averageSteps: averageSteps,
+            dailyBreakdown: enrichedBreakdown,
+            bestDaySteps: bestDaySteps,
+            bestDayDate: bestDayDate,
+            currentStreak: streakDays,
+            rank: cardData.showRank ? rank : undefined,
+            leagueName: cardData.showRank ? leagueName : undefined,
+            improvementPercent: improvementPct,
+        };
+    }, [
+        cardData.value, cardData.customPeriod, cardData.showRank,
+        dayCount, periodStart, periodEnd, averageSteps, dailyBreakdown,
+        bestDaySteps, bestDayDate, streakDays, rank, leagueName, improvementPct
+    ]);
+
+    // Check if we have enough data for the message builder
+    const hasMessageBuilderData = useMemo(() => {
+        return (dayCount !== undefined && dayCount > 0) ||
+               (periodStart && periodEnd) ||
+               dailyBreakdown?.length;
+    }, [dayCount, periodStart, periodEnd, dailyBreakdown]);
 
     const { share, copied, supportsNativeShare } = useShare({
         contentType: `share_card_${cardData.cardType}`,
@@ -200,9 +279,19 @@ export function ShareModal({
         return `${baseUrl}/share/stats?${params.toString()}`;
     }, [cardData]);
 
-    // Generate share message
+    // Generate share message - PRD-57: Use message builder when data available
     const getShareMessage = useCallback(() => {
-        // Generate period label for custom periods
+        // Use the new message builder if we have multi-select data
+        if (hasMessageBuilderData && selectedBlocks.length > 0) {
+            const result = buildShareMessage(selectedBlocks, shareMessageData, {
+                includeHashtag: true,
+                includeUrl: false, // URL added by useShare hook
+                customIntro: cardData.customMessage || undefined,
+            });
+            return result.message;
+        }
+
+        // Fallback to legacy message generator for backwards compatibility
         const customPeriodLabel = cardData.customPeriod
             ? formatCustomPeriodLabel(cardData.customPeriod.start, cardData.customPeriod.end)
             : undefined;
@@ -216,7 +305,7 @@ export function ShareModal({
             customMessage: cardData.customMessage,
             periodLabel: cardData.cardType === "custom_period" ? customPeriodLabel : periodLabel,
         }).fullMessage;
-    }, [cardData, periodLabel]);
+    }, [cardData, periodLabel, hasMessageBuilderData, selectedBlocks, shareMessageData]);
 
     // Handle share action
     const handleShare = (platform: SharePlatform) => {
@@ -386,10 +475,43 @@ export function ShareModal({
                         </p>
                     </div>
 
+                    {/* PRD-57: Multi-select Content Picker */}
+                    {hasMessageBuilderData && (
+                        <div className="border-t border-border pt-4">
+                            <button
+                                type="button"
+                                onClick={() => setShowContentPicker(!showContentPicker)}
+                                className="flex items-center justify-between w-full text-sm font-medium text-foreground hover:text-primary transition"
+                            >
+                                <span>✏️ Customize Message Content</span>
+                                <ChevronDown
+                                    className={`h-4 w-4 transition-transform ${
+                                        showContentPicker ? "rotate-180" : ""
+                                    }`}
+                                />
+                            </button>
+                            <p className="text-xs text-muted-foreground mt-1">
+                                Choose what to include in your share message
+                            </p>
+
+                            {showContentPicker && (
+                                <div className="mt-4">
+                                    <ShareContentPicker
+                                        selectedBlocks={selectedBlocks}
+                                        onChange={setSelectedBlocks}
+                                        availableData={shareMessageData}
+                                        compact={true}
+                                        hideEmptyCategories={true}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     {/* Share Message Preview */}
                     <div className="rounded-lg bg-secondary/50 p-3">
                         <p className="text-xs text-muted-foreground mb-1">Share message:</p>
-                        <p className="text-sm text-foreground">{getShareMessage()}</p>
+                        <p className="text-sm text-foreground whitespace-pre-line">{getShareMessage()}</p>
                     </div>
                 </div>
 

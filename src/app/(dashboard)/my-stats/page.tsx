@@ -327,6 +327,12 @@ export default function MyStatsPage() {
                                                 : getPresetLabel(period),
                                             periodStart: customDateRange?.start,
                                             periodEnd: customDateRange?.end,
+                                            // PRD-57: Full data for multi-select message builder
+                                            dayCount: data.period_stats.days_submitted,
+                                            averageSteps: data.period_stats.average_per_day,
+                                            bestDaySteps: data.base_stats.best_day_steps,
+                                            bestDayDate: data.base_stats.best_day_date || undefined,
+                                            improvementPct: data.improvement_pct || undefined,
                                         })}
                                     />
 
@@ -541,6 +547,12 @@ export default function MyStatsPage() {
                 periodLabel={shareConfig?.periodLabel}
                 periodStart={shareConfig?.periodStart}
                 periodEnd={shareConfig?.periodEnd}
+                // PRD-57: Full data for multi-select message builder
+                dayCount={shareConfig?.dayCount}
+                averageSteps={shareConfig?.averageSteps}
+                bestDaySteps={shareConfig?.bestDaySteps}
+                bestDayDate={shareConfig?.bestDayDate}
+                improvementPct={shareConfig?.improvementPct}
             />
         </div>
     );

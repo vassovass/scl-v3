@@ -155,6 +155,26 @@ export function ShareDateRangePicker({
         </div>
       )}
 
+      {/* Current Selection Display - Always visible when dates are selected */}
+      {value && (
+        <div className="flex items-center gap-2 text-sm bg-primary/5 rounded-lg px-3 py-2 border border-primary/20">
+          <span className="text-muted-foreground">📅</span>
+          <span className="font-medium text-foreground">{getDisplayLabel()}</span>
+          <button
+            type="button"
+            onClick={() => {
+              onChange(null);
+              setSelectedPreset(null);
+              setShowCustomPicker(false);
+            }}
+            className="text-muted-foreground hover:text-foreground text-xs ml-auto"
+            title="Clear selection"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* Custom Date Picker */}
       {showCustomPicker && (
         <div className="mt-2">
@@ -166,26 +186,6 @@ export function ShareDateRangePicker({
             disabledAfter={maxDate}
             onClose={() => setShowCustomPicker(false)}
           />
-        </div>
-      )}
-
-      {/* Current Selection Display */}
-      {value && !showCustomPicker && (
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-muted-foreground">Selected:</span>
-          <span className="font-medium text-foreground">{getDisplayLabel()}</span>
-          <button
-            type="button"
-            onClick={() => {
-              onChange(null);
-              setSelectedPreset(null);
-              setShowCustomPicker(false);
-            }}
-            className="text-muted-foreground hover:text-foreground text-xs ml-2"
-            title="Clear selection"
-          >
-            ✕
-          </button>
         </div>
       )}
     </div>
