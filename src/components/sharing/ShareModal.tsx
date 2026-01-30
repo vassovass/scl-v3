@@ -264,6 +264,16 @@ export function ShareModal({
                dailyBreakdown?.length;
     }, [dayCount, periodStart, periodEnd, dailyBreakdown, fetchedDailyBreakdown, cardData.customPeriod]);
 
+    // DEBUG: Log customPeriod changes
+    useEffect(() => {
+        console.log('[ShareModal] cardData.customPeriod changed:', cardData.customPeriod);
+    }, [cardData.customPeriod]);
+
+    // DEBUG: Log shareMessageData changes
+    useEffect(() => {
+        console.log('[ShareModal] shareMessageData updated:', shareMessageData);
+    }, [shareMessageData]);
+
     const { share, copied, supportsNativeShare } = useShare({
         contentType: `share_card_${cardData.cardType}`,
         onShare: (platform) => {
@@ -396,9 +406,21 @@ export function ShareModal({
 
     // Handle share action
     const handleShare = (platform: SharePlatform) => {
+        const message = getShareMessage();
+        const url = getShareUrl(platform);
+        console.log('[ShareModal] handleShare:', {
+            platform,
+            cardType: cardData.cardType,
+            customPeriod: cardData.customPeriod,
+            value: cardData.value,
+            selectedBlocks,
+            shareMessageData,
+            finalMessage: message,
+            shareUrl: url,
+        });
         share({
-            text: getShareMessage(),
-            url: getShareUrl(platform),
+            text: message,
+            url: url,
             title: APP_CONFIG.name,
         }, platform);
     };
@@ -508,6 +530,7 @@ export function ShareModal({
                             <ShareDateRangePicker
                                 value={cardData.customPeriod ?? null}
                                 onChange={(range, preset) => {
+                                    console.log('[ShareModal] ShareDateRangePicker onChange called:', { range, preset });
                                     updateCardData({ customPeriod: range });
                                 }}
                                 showShortcuts={true}

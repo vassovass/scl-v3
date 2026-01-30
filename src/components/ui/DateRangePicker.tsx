@@ -137,19 +137,30 @@ export function DateRangePicker({
 
   // Handle day click with proper start/end logic
   const handleDayClick = (day: Date) => {
+    const dayStr = format(day, 'yyyy-MM-dd');
+    console.log('[DateRangePicker] handleDayClick:', {
+      day: dayStr,
+      selectingEnd,
+      currentFrom: date?.from ? format(date.from, 'yyyy-MM-dd') : null,
+      currentTo: date?.to ? format(date.to, 'yyyy-MM-dd') : null
+    });
+
     if (!selectingEnd) {
       // First click: set start date, clear end date
+      console.log('[DateRangePicker] Setting START date, calling onSelect');
       onSelect({ from: day, to: undefined });
       setSelectingEnd(true);
     } else {
       // Second click: set end date
       if (date?.from && day >= date.from) {
         // Valid end date (on or after start)
+        console.log('[DateRangePicker] Setting END date, calling onSelect with COMPLETE range');
         onSelect({ from: date.from, to: day });
         setSelectingEnd(false);
         setIsOpen(false);
       } else if (date?.from && day < date.from) {
         // Clicked before start date - reset and use as new start
+        console.log('[DateRangePicker] Day before start, resetting to new START');
         onSelect({ from: day, to: undefined });
         // Stay in selectingEnd mode to pick end date
       }

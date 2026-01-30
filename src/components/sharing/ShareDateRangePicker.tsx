@@ -58,6 +58,8 @@ export function ShareDateRangePicker({
   // Handle preset selection
   const handlePresetClick = useCallback(
     (preset: PeriodPreset) => {
+      console.log('[ShareDateRangePicker] handlePresetClick:', preset);
+
       if (preset === "custom") {
         setShowCustomPicker(true);
         setSelectedPreset("custom");
@@ -66,6 +68,7 @@ export function ShareDateRangePicker({
 
       const range = presetToDateRange(preset);
       if (range) {
+        console.log('[ShareDateRangePicker] Preset range calculated:', range);
         setSelectedPreset(preset);
         setShowCustomPicker(false);
         onChange(range, preset);
@@ -84,9 +87,16 @@ export function ShareDateRangePicker({
   // Handle custom date range selection
   const handleCustomRangeSelect = useCallback(
     (range: DateRange | undefined) => {
+      console.log('[ShareDateRangePicker] handleCustomRangeSelect called:', {
+        from: range?.from ? range.from.toISOString().slice(0, 10) : null,
+        to: range?.to ? range.to.toISOString().slice(0, 10) : null,
+        hasComplete: !!(range?.from && range?.to),
+      });
+
       if (range?.from && range?.to) {
         const startStr = range.from.toISOString().slice(0, 10);
         const endStr = range.to.toISOString().slice(0, 10);
+        console.log('[ShareDateRangePicker] Complete range, calling onChange:', { start: startStr, end: endStr });
         setSelectedPreset("custom");
         onChange({ start: startStr, end: endStr }, "custom");
 
@@ -99,7 +109,7 @@ export function ShareDateRangePicker({
           action: "select_custom",
         });
       } else if (range?.from) {
-        // Partial selection - update UI but don't call onChange yet
+        console.log('[ShareDateRangePicker] Partial selection (start only), waiting for end');
       }
     },
     [onChange]
