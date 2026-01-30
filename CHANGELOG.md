@@ -11,6 +11,15 @@ All notable changes to StepLeague v3.
 
 ### Added
 
+- **PRD 57: Customizable Share Content System** - Users can choose what to include in share messages
+  - `src/lib/sharing/shareContentConfig.ts` - Modular content block registry (total, average, date range, breakdown, streak, rank, improvement)
+  - `src/lib/sharing/shareMessageBuilder.ts` - Dynamic message builder with platform optimization
+  - `src/components/sharing/ShareContentPicker.tsx` - Reusable picker component (shadcn Checkbox, Button)
+  - `src/components/sharing/SharePromptDialog.tsx` - Reusable dialog with customization options
+  - Smart defaults per context (batch submission, daily, weekly, league rank)
+  - Live message preview with character count indicator
+  - `/how-to-share` page updated with new "Customize Your Share" section
+
 - **PRD 56: Sharing Encouragement System** - Comprehensive system to incentivize consistent sharing
   - **Phase 1: Streak Infrastructure** (`src/lib/sharing/streaks/`, `supabase/migrations/`)
     - `share_streaks` table tracking current/longest streak per user
