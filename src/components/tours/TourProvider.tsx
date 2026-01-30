@@ -506,7 +506,7 @@ export function TourProvider({
             }
 
             // Special handling for analytics tour - auto-switch to "both" view mode
-            if (tourId === 'analytics-v1') {
+            if (tourId === 'analytics-v1' && typeof document !== 'undefined') {
                 const currentViewMode = document.querySelector('[data-view-mode]')?.getAttribute('data-view-mode');
 
                 if (currentViewMode && currentViewMode !== 'both') {
@@ -528,7 +528,9 @@ export function TourProvider({
                         }
 
                         // Add body class for CSS targeting
-                        document.body.classList.add('joyride-active');
+                        if (typeof document !== 'undefined') {
+                            document.body.classList.add('joyride-active');
+                        }
 
                         // Set state using startTransition for performance
                         startTransition(() => {
@@ -547,7 +549,9 @@ export function TourProvider({
             }
 
             // Add body class for CSS targeting
-            document.body.classList.add('joyride-active');
+            if (typeof document !== 'undefined') {
+                document.body.classList.add('joyride-active');
+            }
 
             // Set state using startTransition for performance
             startTransition(() => {
@@ -732,7 +736,9 @@ export function TourProvider({
 
         setActiveVariant(null);
         trackedTourStartRef.current = null;
-        document.body.classList.remove('joyride-active');
+        if (typeof document !== 'undefined') {
+            document.body.classList.remove('joyride-active');
+        }
     }, [activeTour, stepIndex, userId, filteredTourSteps.length, originalViewMode]);
 
     const completeTour = useCallback(() => {
@@ -787,7 +793,9 @@ export function TourProvider({
         trackedTourStartRef.current = null;
         setLastCompletedTourId(activeTour.id);
         // Note: Feedback dialog is shown via effect (after state settles) - not synchronously
-        document.body.classList.remove('joyride-active');
+        if (typeof document !== 'undefined') {
+            document.body.classList.remove('joyride-active');
+        }
     }, [activeTour, userId, filteredTourSteps.length, activeVariant, originalViewMode]);
 
     const resetAllTours = useCallback(() => {
@@ -800,7 +808,9 @@ export function TourProvider({
         });
         setActiveVariant(null);
         trackedTourStartRef.current = null;
-        document.body.classList.remove('joyride-active');
+        if (typeof document !== 'undefined') {
+            document.body.classList.remove('joyride-active');
+        }
     }, []);
 
     const hasCompletedTour = useCallback(

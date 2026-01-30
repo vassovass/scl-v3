@@ -122,15 +122,19 @@ export function PostHogProvider({
         if (typeof window === 'undefined') return;
 
         const checkTracking = () => {
-            const online = navigator.onLine;
+            // Note: navigator.onLine is unreliable on mobile networks
+            // It can return false even when there's connectivity (slow networks)
+            // PostHog SDK handles offline gracefully by queueing events
+            // So we only use it as a soft signal, not a hard gate
+            const reportedOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
 
             // FORCED TRACKING: Always track when feature enabled, regardless of consent
-            // Consent banner stays on site but tracking is ALWAYS active
-            const shouldTrack = featureEnabled && online;
+            // We initialize even if reportedOnline is false - PostHog will queue events
+            const shouldTrack = featureEnabled;
 
             console.log('[PostHog] Checking tracking conditions:', {
                 featureEnabled,
-                online,
+                reportedOnline,
                 shouldTrack,
                 isReady,
                 hasConsent

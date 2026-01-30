@@ -45,7 +45,8 @@ export function useMilestoneCelebration(options?: UseMilestoneCelebrationOptions
             const tier = getStreakTier(celebration.milestone);
 
             // Trigger confetti animation (if not reduced motion)
-            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            // SSR guard: check window exists before accessing matchMedia
+            if (typeof window !== 'undefined' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
                 setIsAnimating(true);
                 triggerConfetti(tier.tier);
                 setTimeout(() => setIsAnimating(false), 3000);
@@ -91,6 +92,11 @@ export function useMilestoneCelebration(options?: UseMilestoneCelebrationOptions
  * Lightweight implementation without external dependencies
  */
 function triggerConfetti(tier: StreakTier) {
+    // SSR guard: ensure we're in browser environment
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+        return;
+    }
+
     // Get tier-specific colors
     const tierColors: Record<StreakTier, string[]> = {
         none: ['#888888'],
@@ -104,32 +110,46 @@ function triggerConfetti(tier: StreakTier) {
     const particleCount = 50;
     const particles: Particle[] = [];
 
-    // Create canvas
-    const canvas = document.createElement('canvas');
-    canvas.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 9999;
-    `;
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    document.body.appendChild(canvas);
+    // Get viewport dimensions with fallback
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 800;
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 600;
+
+    // Create canvas with try-catch for DOM manipulation
+    let canvas: HTMLCanvasElement;
+    try {
+        canvas = document.createElement('canvas');
+        canvas.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        `;
+        canvas.width = viewportWidth;
+        canvas.height = viewportHeight;
+        document.body.appendChild(canvas);
+    } catch (err) {
+        console.warn('[Confetti] Failed to create canvas:', err);
+        return;
+    }
 
     const ctx = canvas.getContext('2d');
     if (!ctx) {
-        document.body.removeChild(canvas);
+        try {
+            document.body.removeChild(canvas);
+        } catch {
+            // Canvas may have been removed already
+        }
         return;
     }
 
     // Create particles
     for (let i = 0; i < particleCount; i++) {
         particles.push({
-            x: window.innerWidth / 2,
-            y: window.innerHeight / 2,
+            x: viewportWidth / 2,
+            y: viewportHeight / 2,
             vx: (Math.random() - 0.5) * 20,
             vy: Math.random() * -15 - 5,
             color: colors[Math.floor(Math.random() * colors.length)],
@@ -171,7 +191,14 @@ function triggerConfetti(tier: StreakTier) {
         if (activeParticles > 0) {
             animationId = requestAnimationFrame(animate);
         } else {
-            document.body.removeChild(canvas);
+            // Safe cleanup
+            try {
+                if (canvas.parentNode) {
+                    canvas.parentNode.removeChild(canvas);
+                }
+            } catch {
+                // Canvas may have been removed already
+            }
         }
     };
 
@@ -179,9 +206,13 @@ function triggerConfetti(tier: StreakTier) {
 
     // Cleanup after 3 seconds max
     setTimeout(() => {
-        cancelAnimationFrame(animationId);
-        if (canvas.parentNode) {
-            document.body.removeChild(canvas);
+        try {
+            cancelAnimationFrame(animationId);
+            if (canvas.parentNode) {
+                canvas.parentNode.removeChild(canvas);
+            }
+        } catch {
+            // Canvas may have been removed already
         }
     }, 3000);
 }

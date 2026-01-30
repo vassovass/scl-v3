@@ -71,7 +71,8 @@ function base64UrlToString(input: string): string {
  * This eliminates the race condition where NavHeader renders before onAuthStateChange fires.
  */
 function getInitialSessionFromCookie(): Session | null {
-  if (typeof window === 'undefined') return null; // SSR guard
+  // SSR guard: ensure we're in browser with document access
+  if (typeof window === 'undefined' || typeof document === 'undefined') return null;
 
   try {
     // Match the cookie name pattern used by Supabase SSR
