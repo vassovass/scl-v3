@@ -57,13 +57,19 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 /**
  * Decode base64url to string (handles Supabase SSR encoding)
+ * Wrapped in try-catch because atob() can throw on corrupted/invalid base64 data
  */
 function base64UrlToString(input: string): string {
-  // Convert base64url to standard base64
-  let b64 = input.replace(/-/g, "+").replace(/_/g, "/");
-  // Pad to make length divisible by 4
-  while (b64.length % 4 !== 0) b64 += "=";
-  return atob(b64);
+  try {
+    // Convert base64url to standard base64
+    let b64 = input.replace(/-/g, "+").replace(/_/g, "/");
+    // Pad to make length divisible by 4
+    while (b64.length % 4 !== 0) b64 += "=";
+    return atob(b64);
+  } catch (err) {
+    console.warn('[AuthProvider] Failed to decode base64:', err);
+    return ''; // Return empty string to trigger fallback behavior
+  }
 }
 
 /**

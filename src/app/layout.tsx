@@ -100,7 +100,10 @@ export default async function RootLayout({
         <GoogleTagManagerNoscript />
 
         {/* Hybrid Sync: Bridges Server Cache -> Client Cache */}
-        <HybridCacheSync serverVersion={serverVersion} />
+        {/* Wrapped in SafeLazy to prevent non-critical component from crashing app on mobile */}
+        <SafeLazy fallback={null} errorFallback={null}>
+          <HybridCacheSync serverVersion={serverVersion} />
+        </SafeLazy>
 
         <ThemeProvider
           attribute="data-theme"
