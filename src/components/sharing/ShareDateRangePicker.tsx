@@ -90,13 +90,14 @@ export function ShareDateRangePicker({
   }, [value?.start, value?.end, showCustomPicker]);
 
   // Convert value to DateRange format for the picker
-  const dateRangeValue: DateRange | undefined = value
+  // When partialFrom is set, user is starting a new selection - show that instead of old value
+  const dateRangeValue: DateRange | undefined = partialFrom
+    ? { from: partialFrom, to: undefined }
+    : value
     ? {
         from: new Date(value.start + "T00:00:00"),
         to: new Date(value.end + "T00:00:00"),
       }
-    : partialFrom
-    ? { from: partialFrom, to: undefined }
     : undefined;
 
   // Handle preset selection
