@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { normalizeError, reportErrorClient, ErrorCode } from "@/lib/errors";
 import { ShareModal } from "@/components/sharing/ShareModal";
 import { analytics } from "@/lib/analytics";
+import { APP_CONFIG } from "@/lib/config";
 
 interface BatchSubmissionFormProps {
     leagueId?: string;
@@ -101,6 +102,12 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
     const [limitWarning, setLimitWarning] = useState<string | null>(null);
     const [showSharePrompt, setShowSharePrompt] = useState(false);
     const [submittedSteps, setSubmittedSteps] = useState<number>(0);
+    const [submissionStats, setSubmissionStats] = useState<{
+        dayCount: number;
+        startDate: string;
+        endDate: string;
+        avgSteps: number;
+    } | null>(null);
 
     const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -645,12 +652,21 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
         setProcessing(false);
 
         if (successCount > 0) {
-            // Calculate total steps submitted
-            const totalSteps = reviewedImages
-                .filter((img) => img.status !== "error")
-                .reduce((sum, img) => sum + (img.editedSteps || 0), 0);
+            // Calculate submission stats
+            const successfulImages = reviewedImages.filter((img) => img.status !== "error");
+            const totalSteps = successfulImages.reduce((sum, img) => sum + (img.editedSteps || 0), 0);
+            const dates = successfulImages
+                .map((img) => img.editedDate)
+                .filter((d): d is string => !!d)
+                .sort();
+
+            const dayCount = dates.length;
+            const startDate = dates[0] || "";
+            const endDate = dates[dates.length - 1] || "";
+            const avgSteps = dayCount > 0 ? Math.round(totalSteps / dayCount) : 0;
 
             setSubmittedSteps(totalSteps);
+            setSubmissionStats({ dayCount, startDate, endDate, avgSteps });
             setShowSharePrompt(true);
 
             // Track share prompt shown
@@ -1028,7 +1044,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
             )}
 
             {/* Post-Submission Share Prompt */}
-            {showSharePrompt && (
+            {showSharePrompt && submissionStats && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                     <div className="w-full max-w-sm rounded-xl border border-border bg-card shadow-2xl overflow-hidden">
                         {/* Celebration Header */}
@@ -1038,7 +1054,17 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                 Submission Complete!
                             </h2>
                             <p className="mt-2 text-sm text-muted-foreground">
-                                You submitted {submittedSteps.toLocaleString()} steps. Share your progress with friends!
+                                You logged {submittedSteps.toLocaleString()} steps across {submissionStats.dayCount} day{submissionStats.dayCount !== 1 ? "s" : ""}!
+                            </p>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                {new Date(submissionStats.startDate).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                                {submissionStats.startDate !== submissionStats.endDate && (
+                                    <> - {new Date(submissionStats.endDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</>
+                                )}
+                                {submissionStats.startDate === submissionStats.endDate && (
+                                    <> {new Date(submissionStats.endDate).toLocaleDateString("en-GB", { year: "numeric" })}</>
+                                )}
+                                {" · "}Avg: {submissionStats.avgSteps.toLocaleString()} steps/day
                             </p>
                         </div>
 
@@ -1047,11 +1073,23 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                             <button
                                 onClick={() => {
                                     setShowSharePrompt(false);
-                                    // Open share modal with steps
+                                    // Format dates for share message
+                                    const formatDate = (dateStr: string) =>
+                                        new Date(dateStr).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+                                    const startFormatted = formatDate(submissionStats.startDate);
+                                    const endFormatted = new Date(submissionStats.endDate).toLocaleDateString("en-GB", {
+                                        day: "numeric",
+                                        month: "short",
+                                        year: "numeric",
+                                    });
+                                    const dateRange = submissionStats.startDate === submissionStats.endDate
+                                        ? endFormatted
+                                        : `${startFormatted} - ${endFormatted}`;
+
+                                    // Build the share message
+                                    const shareText = `I just logged ${submittedSteps.toLocaleString()} steps! 👟\n\n📅 ${submissionStats.dayCount} day${submissionStats.dayCount !== 1 ? "s" : ""} (${dateRange})\n📊 Avg: ${submissionStats.avgSteps.toLocaleString()} steps/day\n\n${APP_CONFIG.hashtag}\n${APP_CONFIG.url}`;
                                     window.open(
-                                        `https://wa.me/?text=${encodeURIComponent(
-                                            `I just logged ${submittedSteps.toLocaleString()} steps! 🚶‍♂️ Track your progress with SCL.`
-                                        )}`,
+                                        `https://wa.me/?text=${encodeURIComponent(shareText)}`,
                                         "_blank"
                                     );
                                     analytics.shareFunnel.completed("whatsapp", "daily", submittedSteps);
@@ -1065,6 +1103,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                             <button
                                 onClick={() => {
                                     setShowSharePrompt(false);
+                                    setSubmissionStats(null);
                                     analytics.shareFunnel.promptDismissed("post_submission");
                                 }}
                                 className="w-full rounded-lg border border-border px-4 py-2 text-sm text-muted-foreground hover:bg-secondary transition"
