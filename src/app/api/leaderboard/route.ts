@@ -134,8 +134,18 @@ export const GET = withApiHandler({
   // Fetch proxy member stats for period B if comparison mode
   const proxyStatsB = rangeB ? await fetchProxyUserStats(adminClient, league_id, rangeB, verified) : null;
 
-  // Calculate streaks for all users
-  const allUserIds = Array.from(new Set([...Array.from(statsA.keys()), ...Array.from(statsB?.keys() || [])]));
+  // Fetch ALL league members (not just those with submissions) for complete leaderboard display
+  const { data: allLeagueMembers } = await adminClient
+    .from("memberships")
+    .select("user_id, users!inner(id, display_name, is_proxy)")
+    .eq("league_id", league_id);
+
+  // Separate real users from proxies
+  const realMembers = (allLeagueMembers || []).filter((m: any) => !m.users?.is_proxy);
+  const proxyMembers = (allLeagueMembers || []).filter((m: any) => m.users?.is_proxy === true);
+
+  // Get all user IDs (for user_records and high_fives lookups)
+  const allUserIds = realMembers.map((m: any) => m.user_id);
 
   // Fetch all submission dates for streak calculation
   // PRD 41: proxy_member_id removed - filter by users.is_proxy = false instead
@@ -184,28 +194,44 @@ export const GET = withApiHandler({
   }
 
 
-  // Build results
+  // Build results for ALL real members (including those without submissions)
   const results: ComparisonResult[] = [];
 
-  for (const userId of allUserIds) {
+  for (const member of realMembers) {
+    const userId = member.user_id;
+    const userInfo = member.users as any;
     const a = statsA.get(userId);
     const b = statsB?.get(userId) || null;
 
-    if (!a) continue; // Need at least period A data
+    // Create default stats for members without submissions in period A
+    const defaultStats: UserStats = {
+      user_id: userId,
+      display_name: userInfo?.display_name ?? null,
+      total_steps: 0,
+      days_submitted: 0,
+      verified_days: 0,
+      unverified_days: 0,
+      average_per_day: 0,
+      streak: 0,
+      submission_dates: [],
+      steps_by_date: new Map(),
+    };
+
+    const periodA = a || defaultStats;
 
     // Calculate improvement percentage
     let improvementPct: number | null = null;
     if (b && b.total_steps > 0) {
-      improvementPct = ((a.total_steps - b.total_steps) / b.total_steps) * 100;
+      improvementPct = ((periodA.total_steps - b.total_steps) / b.total_steps) * 100;
     }
 
     // Calculate common days steps (only for days both periods have submissions)
     let commonDaysStepsA: number | null = null;
     let commonDaysStepsB: number | null = null;
-    if (b) {
-      const commonDates = a.submission_dates.filter(d => b.submission_dates.includes(d));
+    if (b && periodA.submission_dates.length > 0) {
+      const commonDates = periodA.submission_dates.filter(d => b.submission_dates.includes(d));
       if (commonDates.length > 0) {
-        commonDaysStepsA = commonDates.reduce((sum, d) => sum + (a.steps_by_date.get(d) || 0), 0);
+        commonDaysStepsA = commonDates.reduce((sum, d) => sum + (periodA.steps_by_date.get(d) || 0), 0);
         commonDaysStepsB = commonDates.reduce((sum, d) => sum + (b.steps_by_date.get(d) || 0), 0);
       }
     }
@@ -218,8 +244,8 @@ export const GET = withApiHandler({
 
     results.push({
       user_id: userId,
-      display_name: a.display_name,
-      period_a: { ...a, streak: periodStreak }, // Keep period streak in stats object for context? Or update?
+      display_name: periodA.display_name,
+      period_a: { ...periodA, streak: periodStreak },
       period_b: b,
       improvement_pct: improvementPct,
       common_days_steps_a: commonDaysStepsA,
@@ -235,20 +261,40 @@ export const GET = withApiHandler({
     });
   }
 
-  // Add proxy members to results
-  for (const [proxyId, proxyStats] of Array.from(proxyStatsA.entries())) {
-    const proxyB = proxyStatsB?.get(proxyId) || null;
+  // Add ALL proxy members to results (including those without submissions)
+  for (const proxyMember of proxyMembers) {
+    const proxyUserId = proxyMember.user_id;
+    const proxyUserInfo = proxyMember.users as any;
+    const proxyStats = proxyStatsA.get(proxyUserId);
+    const proxyB = proxyStatsB?.get(proxyUserId) || null;
+
+    // Create default stats for proxy members without submissions
+    const defaultProxyStats: UserStats = {
+      user_id: `proxy:${proxyUserId}`,
+      display_name: proxyUserInfo?.display_name ?? "Unknown Proxy",
+      total_steps: 0,
+      days_submitted: 0,
+      verified_days: 0,
+      unverified_days: 0,
+      average_per_day: 0,
+      streak: 0,
+      submission_dates: [],
+      steps_by_date: new Map(),
+      is_proxy: true,
+    };
+
+    const periodA = proxyStats || defaultProxyStats;
 
     // Calculate improvement percentage for proxy
     let improvementPct: number | null = null;
     if (proxyB && proxyB.total_steps > 0) {
-      improvementPct = ((proxyStats.total_steps - proxyB.total_steps) / proxyB.total_steps) * 100;
+      improvementPct = ((periodA.total_steps - proxyB.total_steps) / proxyB.total_steps) * 100;
     }
 
     results.push({
-      user_id: proxyStats.user_id, // Already prefixed with "proxy:"
-      display_name: proxyStats.display_name,
-      period_a: { ...proxyStats, streak: 0 },
+      user_id: periodA.user_id, // Already prefixed with "proxy:" or from default
+      display_name: periodA.display_name,
+      period_a: { ...periodA, streak: 0 },
       period_b: proxyB,
       improvement_pct: improvementPct,
       common_days_steps_a: null,
