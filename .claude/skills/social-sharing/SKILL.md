@@ -3,7 +3,7 @@ name: social-sharing
 description: Social sharing patterns for StepLeague - OG image generation, share hooks, WhatsApp optimization, shareable URLs, and multi-select message builder (PRD-57). Use when implementing sharing features, generating OG images, creating share modals, or working with social platform integrations. Keywords: share, OG image, Open Graph, WhatsApp, social, sharing, useShare, share card, metric, message builder, content picker.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
-  version: "1.1"
+  version: "1.2"
   project: "stepleague"
   last_updated: "2026-01-30"
 ---
@@ -510,6 +510,94 @@ Current implementation generates beautiful cards with:
 - Step counts with locale formatting
 - Improvement badges
 - StepLeague branding footer
+
+---
+
+## Data Fetching in ShareModal
+
+When users select "Custom" card type and pick a date range within the modal, data must be fetched dynamically.
+
+### Pattern: Fetch on Custom Period Change
+
+**File:** `src/components/sharing/ShareModal.tsx`
+
+```typescript
+// State for fetched data
+const [fetchedDailyBreakdown, setFetchedDailyBreakdown] = useState<DailyBreakdownEntry[]>();
+const [availableDates, setAvailableDates] = useState<SubmissionDateInfo[]>([]);
+
+// Fetch available dates on mount (for heatmap)
+useEffect(() => {
+  if (!isOpen) return;
+  const fetchAvailableDates = async () => {
+    const res = await apiRequest(`submissions/available-dates?start=${startDate}&end=${endDate}`);
+    setAvailableDates(res.dates || []);
+  };
+  fetchAvailableDates();
+}, [isOpen]);
+
+// Fetch breakdown when custom period changes
+useEffect(() => {
+  if (!cardData.customPeriod || cardData.cardType !== "custom_period") return;
+  const { start, end } = cardData.customPeriod;
+  // Fetch and calculate best day, total, average...
+}, [cardData.customPeriod, cardData.cardType]);
+```
+
+### Why This Matters
+
+Without dynamic fetching:
+- "Daily Breakdown" block stays disabled
+- "Best Day" block stays disabled
+- Heatmap doesn't show on date picker
+
+---
+
+## Tooltip Pattern
+
+Tooltips explain every option in the share UI.
+
+### Files
+
+- `src/lib/sharing/shareTooltips.ts` - Centralized tooltip content
+- `src/components/ui/tooltip.tsx` - shadcn/ui Tooltip component
+
+### Usage
+
+```typescript
+import { CARD_TYPE_TOOLTIPS, getBlockTooltip } from "@/lib/sharing/shareTooltips";
+
+// Wrap with TooltipProvider
+<TooltipProvider delayDuration={300}>
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <button>...</button>
+    </TooltipTrigger>
+    <TooltipContent side="bottom">
+      {CARD_TYPE_TOOLTIPS[cardType]}
+    </TooltipContent>
+  </Tooltip>
+</TooltipProvider>
+```
+
+### Available Tooltip Sources
+
+- `CARD_TYPE_TOOLTIPS` - Explains each card type
+- `CATEGORY_TOOLTIPS` - Explains Basic/Detailed/Comparison categories
+- `SECTION_TOOLTIPS` - Explains UI sections
+- `getBlockTooltip(block, isAvailable)` - Returns appropriate text based on availability
+
+---
+
+## Common Issues & Solutions
+
+| Issue | Solution |
+|-------|----------|
+| ShareModal blocks disabled | Pass full data when opening modal OR fetch dynamically |
+| Heatmap not showing | Pass `submissionData` to ShareDateRangePicker |
+| Tooltips not appearing | Wrap with TooltipProvider (delayDuration=300) |
+| Click outside doesn't close | Add `onClick={onClose}` to backdrop div |
+| Content picker shows in compact mode | Use `compact={true}` prop |
 
 ---
 

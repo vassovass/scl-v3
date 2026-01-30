@@ -22,7 +22,18 @@ import { Spinner } from "@/components/ui/Spinner";
 import { ShareDateRangePicker } from "./ShareDateRangePicker";
 import { ShareContentPicker } from "./ShareContentPicker";
 import { type PeriodPreset, formatCustomPeriodLabel } from "@/lib/utils/periods";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, HelpCircle } from "lucide-react";
+import { apiRequest } from "@/lib/api/client";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+    CARD_TYPE_TOOLTIPS,
+    SECTION_TOOLTIPS,
+} from "@/lib/sharing/shareTooltips";
 
 // ============================================================================
 // Types
@@ -141,24 +152,97 @@ export function ShareModal({
         getDefaultBlocks("custom")
     );
 
-    // Build ShareMessageData from all available props
+    // Data fetching state for custom period
+    const [fetchedDailyBreakdown, setFetchedDailyBreakdown] = useState<DailyBreakdownEntry[] | undefined>(dailyBreakdown);
+    const [fetchedBestDay, setFetchedBestDay] = useState<{ steps: number; date: string } | undefined>(
+        bestDaySteps && bestDayDate ? { steps: bestDaySteps, date: bestDayDate } : undefined
+    );
+    const [availableDates, setAvailableDates] = useState<Array<{ date: string; steps: number }>>([]);
+    const [isLoadingBreakdown, setIsLoadingBreakdown] = useState(false);
+
+    // Fetch available dates on mount (for heatmap - last 90 days)
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const fetchAvailableDates = async () => {
+            try {
+                const endDate = new Date().toISOString().slice(0, 10);
+                const startDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+                const res = await apiRequest<{ dates: Array<{ date: string; steps: number }> }>(
+                    `submissions/available-dates?start=${startDate}&end=${endDate}`
+                );
+                setAvailableDates(res.dates || []);
+            } catch (error) {
+                console.error("Failed to fetch available dates:", error);
+            }
+        };
+
+        fetchAvailableDates();
+    }, [isOpen]);
+
+    // Fetch daily breakdown when custom period changes
+    useEffect(() => {
+        if (!cardData.customPeriod || cardData.cardType !== "custom_period") return;
+
+        const fetchBreakdown = async () => {
+            setIsLoadingBreakdown(true);
+            try {
+                const { start, end } = cardData.customPeriod!;
+                const res = await apiRequest<{ dates: Array<{ date: string; steps: number }> }>(
+                    `submissions/available-dates?start=${start}&end=${end}`
+                );
+
+                const breakdown = res.dates?.map(d => ({ date: d.date, steps: d.steps })) || [];
+                setFetchedDailyBreakdown(breakdown);
+
+                // Calculate best day from breakdown
+                if (breakdown.length > 0) {
+                    const best = breakdown.reduce((max, day) => day.steps > max.steps ? day : max, breakdown[0]);
+                    setFetchedBestDay({ steps: best.steps, date: best.date });
+
+                    // Update total steps and value
+                    const total = breakdown.reduce((sum, d) => sum + d.steps, 0);
+                    setCardData(prev => ({ ...prev, value: total }));
+                } else {
+                    setFetchedBestDay(undefined);
+                }
+            } catch (error) {
+                console.error("Failed to fetch daily breakdown:", error);
+            } finally {
+                setIsLoadingBreakdown(false);
+            }
+        };
+
+        fetchBreakdown();
+    }, [cardData.customPeriod?.start, cardData.customPeriod?.end, cardData.cardType]);
+
+    // Build ShareMessageData from all available props (use fetched data when available)
     const shareMessageData: ShareMessageData = useMemo(() => {
+        // Use fetched data if available, otherwise fall back to props
+        const breakdownToUse = fetchedDailyBreakdown ?? dailyBreakdown;
+        const bestToUse = fetchedBestDay ?? (bestDaySteps && bestDayDate ? { steps: bestDaySteps, date: bestDayDate } : undefined);
+
         // Mark the best day in daily breakdown if we have the data
-        const enrichedBreakdown = dailyBreakdown?.map(day => ({
+        const enrichedBreakdown = breakdownToUse?.map(day => ({
             date: day.date,
             steps: day.steps,
-            isBestDay: bestDayDate ? day.date === bestDayDate : false,
+            isBestDay: bestToUse ? day.date === bestToUse.date : false,
         }));
+
+        // Calculate average from fetched data if available
+        const calculatedAverage = fetchedDailyBreakdown?.length
+            ? Math.round(fetchedDailyBreakdown.reduce((sum, d) => sum + d.steps, 0) / fetchedDailyBreakdown.length)
+            : averageSteps;
 
         return {
             totalSteps: cardData.value,
-            dayCount: dayCount,
+            dayCount: fetchedDailyBreakdown?.length ?? dayCount,
             startDate: cardData.customPeriod?.start || periodStart,
             endDate: cardData.customPeriod?.end || periodEnd,
-            averageSteps: averageSteps,
+            averageSteps: calculatedAverage,
             dailyBreakdown: enrichedBreakdown,
-            bestDaySteps: bestDaySteps,
-            bestDayDate: bestDayDate,
+            bestDaySteps: bestToUse?.steps,
+            bestDayDate: bestToUse?.date,
             currentStreak: streakDays,
             rank: cardData.showRank ? rank : undefined,
             leagueName: cardData.showRank ? leagueName : undefined,
@@ -167,15 +251,18 @@ export function ShareModal({
     }, [
         cardData.value, cardData.customPeriod, cardData.showRank,
         dayCount, periodStart, periodEnd, averageSteps, dailyBreakdown,
-        bestDaySteps, bestDayDate, streakDays, rank, leagueName, improvementPct
+        bestDaySteps, bestDayDate, streakDays, rank, leagueName, improvementPct,
+        fetchedDailyBreakdown, fetchedBestDay
     ]);
 
-    // Check if we have enough data for the message builder
+    // Check if we have enough data for the message builder (include fetched data)
     const hasMessageBuilderData = useMemo(() => {
         return (dayCount !== undefined && dayCount > 0) ||
+               (fetchedDailyBreakdown && fetchedDailyBreakdown.length > 0) ||
                (periodStart && periodEnd) ||
+               (cardData.customPeriod?.start && cardData.customPeriod?.end) ||
                dailyBreakdown?.length;
-    }, [dayCount, periodStart, periodEnd, dailyBreakdown]);
+    }, [dayCount, periodStart, periodEnd, dailyBreakdown, fetchedDailyBreakdown, cardData.customPeriod]);
 
     const { share, copied, supportsNativeShare } = useShare({
         contentType: `share_card_${cardData.cardType}`,
@@ -334,11 +421,22 @@ export function ShareModal({
     const metricConfig = getMetricConfig(cardData.metricType);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-            <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl border border-border bg-card shadow-2xl" data-tour="share-modal">
-                {/* Header */}
+        <TooltipProvider delayDuration={300}>
+            <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+                onClick={onClose}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="share-modal-title"
+            >
+                <div
+                    className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl border border-border bg-card shadow-2xl"
+                    data-tour="share-modal"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {/* Header */}
                 <div className="flex items-center justify-between border-b border-border p-4">
-                    <h2 className="text-lg font-semibold text-foreground">
+                    <h2 id="share-modal-title" className="text-lg font-semibold text-foreground">
                         Share Your Achievement
                     </h2>
                     <button
@@ -363,25 +461,39 @@ export function ShareModal({
                 <div className="p-4 space-y-4">
                     {/* Card Type Selector */}
                     <div>
-                        <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                        <label className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-1">
                             Card Type
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <HelpCircle className="h-3.5 w-3.5 text-muted-foreground/60 hover:text-muted-foreground cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent side="right" className="max-w-xs">
+                                    {SECTION_TOOLTIPS.cardType}
+                                </TooltipContent>
+                            </Tooltip>
                         </label>
                         <div className="grid grid-cols-3 gap-2">
                             {(Object.keys(CARD_TYPE_CONFIGS) as CardType[]).map((type) => {
                                 const config = CARD_TYPE_CONFIGS[type];
                                 return (
-                                    <button
-                                        key={type}
-                                        onClick={() => updateCardData({ cardType: type })}
-                                        className={`rounded-lg border p-2 text-center transition ${
-                                            cardData.cardType === type
-                                                ? "border-primary bg-primary/10 text-primary"
-                                                : "border-border text-muted-foreground hover:border-border/80"
-                                        }`}
-                                    >
-                                        <span className="text-lg">{config.emoji}</span>
-                                        <p className="text-xs mt-1">{config.label}</p>
-                                    </button>
+                                    <Tooltip key={type}>
+                                        <TooltipTrigger asChild>
+                                            <button
+                                                onClick={() => updateCardData({ cardType: type })}
+                                                className={`rounded-lg border p-2 text-center transition ${
+                                                    cardData.cardType === type
+                                                        ? "border-primary bg-primary/10 text-primary"
+                                                        : "border-border text-muted-foreground hover:border-border/80"
+                                                }`}
+                                            >
+                                                <span className="text-lg">{config.emoji}</span>
+                                                <p className="text-xs mt-1">{config.label}</p>
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="bottom" className="max-w-xs">
+                                            {CARD_TYPE_TOOLTIPS[type]}
+                                        </TooltipContent>
+                                    </Tooltip>
                                 );
                             })}
                         </div>
@@ -400,7 +512,14 @@ export function ShareModal({
                                 }}
                                 showShortcuts={true}
                                 compact={true}
+                                submissionData={availableDates}
                             />
+                            {isLoadingBreakdown && (
+                                <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                                    <Spinner size="sm" />
+                                    <span>Loading data...</span>
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -559,6 +678,7 @@ export function ShareModal({
                     </div>
                 </div>
             </div>
-        </div>
+            </div>
+        </TooltipProvider>
     );
 }

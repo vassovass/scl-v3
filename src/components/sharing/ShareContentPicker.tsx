@@ -4,6 +4,12 @@ import { useMemo, useId } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
     type ShareContentBlock,
@@ -15,6 +21,7 @@ import {
     isBlockAvailable,
     getContentBlockConfig,
 } from "@/lib/sharing/shareContentConfig";
+import { CATEGORY_TOOLTIPS, getBlockTooltip } from "@/lib/sharing/shareTooltips";
 
 // ============================================================================
 // Types
@@ -159,17 +166,25 @@ export function ShareContentPicker({
 
                 return (
                     <div key={category} className="space-y-3">
-                        {/* Category Header */}
+                        {/* Category Header with tooltip */}
                         <div className="flex items-center justify-between">
-                            <h4 className="text-sm font-medium text-foreground">
+                            <h4 className="text-sm font-medium text-foreground flex items-center gap-1">
                                 {categoryConfig.label}
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <HelpCircle className="h-3 w-3 text-muted-foreground/60 hover:text-muted-foreground cursor-help" />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" className="max-w-xs">
+                                        {CATEGORY_TOOLTIPS[category]}
+                                    </TooltipContent>
+                                </Tooltip>
                             </h4>
                             <span className="text-xs text-muted-foreground">
                                 {selectedInCategory.length}/{availableInCategory.length}
                             </span>
                         </div>
 
-                        {/* Block Items */}
+                        {/* Block Items with tooltips */}
                         <div
                             className={cn(
                                 "grid gap-2",
@@ -183,44 +198,50 @@ export function ShareContentPicker({
                                 const checkboxId = `${componentId}-${block}`;
 
                                 return (
-                                    <div
-                                        key={block}
-                                        className={cn(
-                                            "flex items-start gap-3 rounded-lg border p-3",
-                                            isAvailable
-                                                ? isSelected
-                                                    ? "border-primary bg-primary/5"
-                                                    : "border-border hover:border-primary/50"
-                                                : "border-muted bg-muted/30 opacity-60"
-                                        )}
-                                    >
-                                        <Checkbox
-                                            id={checkboxId}
-                                            checked={isSelected}
-                                            onCheckedChange={(checked) =>
-                                                handleBlockChange(block, checked === true)
-                                            }
-                                            disabled={!isAvailable}
-                                            className="mt-0.5"
-                                        />
-                                        <div className="flex-1 min-w-0">
-                                            <Label
-                                                htmlFor={checkboxId}
+                                    <Tooltip key={block}>
+                                        <TooltipTrigger asChild>
+                                            <div
                                                 className={cn(
-                                                    "flex items-center gap-2 cursor-pointer",
-                                                    !isAvailable && "cursor-not-allowed"
+                                                    "flex items-start gap-3 rounded-lg border p-3",
+                                                    isAvailable
+                                                        ? isSelected
+                                                            ? "border-primary bg-primary/5"
+                                                            : "border-border hover:border-primary/50"
+                                                        : "border-muted bg-muted/30 opacity-60"
                                                 )}
                                             >
-                                                <span>{blockConfig.emoji}</span>
-                                                <span>{blockConfig.label}</span>
-                                            </Label>
-                                            {!compact && (
-                                                <p className="text-xs text-muted-foreground mt-1">
-                                                    {blockConfig.description}
-                                                </p>
-                                            )}
-                                        </div>
-                                    </div>
+                                                <Checkbox
+                                                    id={checkboxId}
+                                                    checked={isSelected}
+                                                    onCheckedChange={(checked) =>
+                                                        handleBlockChange(block, checked === true)
+                                                    }
+                                                    disabled={!isAvailable}
+                                                    className="mt-0.5"
+                                                />
+                                                <div className="flex-1 min-w-0">
+                                                    <Label
+                                                        htmlFor={checkboxId}
+                                                        className={cn(
+                                                            "flex items-center gap-2 cursor-pointer",
+                                                            !isAvailable && "cursor-not-allowed"
+                                                        )}
+                                                    >
+                                                        <span>{blockConfig.emoji}</span>
+                                                        <span>{blockConfig.label}</span>
+                                                    </Label>
+                                                    {!compact && (
+                                                        <p className="text-xs text-muted-foreground mt-1">
+                                                            {blockConfig.description}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="right" className="max-w-xs">
+                                            <p>{getBlockTooltip(block, isAvailable)}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
                                 );
                             })}
                         </div>
