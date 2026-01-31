@@ -134,11 +134,11 @@ describe('Auth - Sign Up Validation', () => {
 describe('Auth - OAuth Callback Handling', () => {
     describe('Redirect URL construction', () => {
         it('builds correct callback URL', () => {
-            const origin = 'https://stepleague.com';
+            const origin = 'https://stepleague.app';
             const next = '/dashboard';
             const redirectTo = `${origin}/api/auth/callback?next=${next}`;
 
-            expect(redirectTo).toBe('https://stepleague.com/api/auth/callback?next=/dashboard');
+            expect(redirectTo).toBe('https://stepleague.app/api/auth/callback?next=/dashboard');
         });
 
         it('handles localhost origin', () => {
@@ -149,7 +149,7 @@ describe('Auth - OAuth Callback Handling', () => {
         });
 
         it('preserves complex next path', () => {
-            const origin = 'https://stepleague.com';
+            const origin = 'https://stepleague.app';
             const next = '/leagues/abc123/leaderboard?period=this_week';
             const encodedNext = encodeURIComponent(next);
             const redirectTo = `${origin}/api/auth/callback?next=${encodedNext}`;
