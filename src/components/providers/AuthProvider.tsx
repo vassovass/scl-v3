@@ -299,6 +299,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (DEBUG) console.log('[AuthProvider] Setting up onAuthStateChange listener');
     let hasInitialized = false;
 
+    // Hard timeout: if auth isn't resolved in 10s, force loading=false
+    // Prevents users getting stuck on a spinner on slow SA mobile connections
+    const hardTimeout = setTimeout(() => {
+      if (!hasInitialized) {
+        console.error('[AuthProvider] HARD TIMEOUT: Auth not resolved in 10s, forcing loading=false');
+        hasInitialized = true;
+        setLoading(false);
+      }
+    }, 10000);
+
     // Fallback: if INITIAL_SESSION doesn't fire in 2s, read cookies directly
     // Supabase SDK getSession() can hang due to Web Locks API deadlock
     const fallbackTimeout = setTimeout(async () => {
@@ -555,6 +565,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => {
+      clearTimeout(hardTimeout);
       clearTimeout(fallbackTimeout);
       subscription.unsubscribe();
     };
