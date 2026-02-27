@@ -7,7 +7,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
-import { getPasswordStrength } from '../update-password/page';
+import { getPasswordStrength } from '@/lib/utils/passwordStrength';
 
 // ─────────────────────────────────────────────────────────────────────────
 // Password Strength Scoring
