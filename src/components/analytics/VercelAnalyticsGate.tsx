@@ -48,17 +48,14 @@ export function VercelAnalyticsGate() {
     window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", onVisibility);
 
-    // Short-lived poll for consent banner interactions
-    const poll = window.setInterval(compute, 1000);
-    const stopPoll = window.setTimeout(() => window.clearInterval(poll), 15000);
+    // Polling removed: consent is forced, so there's nothing to poll for.
+    // Event listeners above handle network/focus state changes.
 
     return () => {
       window.removeEventListener("online", onOnline);
       window.removeEventListener("offline", onOffline);
       window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", onVisibility);
-      window.clearInterval(poll);
-      window.clearTimeout(stopPoll);
     };
   }, [featureEnabled]);
 

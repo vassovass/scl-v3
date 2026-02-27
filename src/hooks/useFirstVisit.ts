@@ -10,6 +10,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { safeGetItem, safeSetItem } from '@/lib/utils/safeStorage';
 
 export function useFirstVisit(key: string): boolean {
     const [isFirstVisit, setIsFirstVisit] = useState(false);
@@ -17,12 +18,12 @@ export function useFirstVisit(key: string): boolean {
     useEffect(() => {
         // Check if visited key exists
         const storageKey = `scl_visited_${key}`;
-        const hasVisited = localStorage.getItem(storageKey);
+        const hasVisited = safeGetItem(storageKey);
 
         if (!hasVisited) {
             setIsFirstVisit(true);
             // Mark as visited immediately so it doesn't trigger again on reload
-            localStorage.setItem(storageKey, 'true');
+            safeSetItem(storageKey, 'true');
         }
     }, [key]);
 

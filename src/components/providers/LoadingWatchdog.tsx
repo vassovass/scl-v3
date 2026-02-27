@@ -21,6 +21,7 @@ import { ToastAction } from "@/components/ui/toast";
  * Uses existing shadcn toast infrastructure per AGENTS.md patterns.
  */
 
+const DEBUG = process.env.NODE_ENV === 'development';
 const STUCK_THRESHOLD_MS = 15000; // 15 seconds
 
 export function LoadingWatchdog({ children }: { children: React.ReactNode }) {
@@ -39,7 +40,7 @@ export function LoadingWatchdog({ children }: { children: React.ReactNode }) {
 
         // Start stuck detection timer
         const timer = setTimeout(() => {
-            console.log("[LoadingWatchdog] Loading stuck for 15s, showing recovery toast");
+            if (DEBUG) console.log("[LoadingWatchdog] Loading stuck for 15s, showing recovery toast");
             toastShownRef.current = true;
 
             toast({

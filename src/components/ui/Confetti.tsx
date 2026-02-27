@@ -275,11 +275,15 @@ export async function triggerConfettiOnce(
 
     const storageKey = `confetti_shown_${key}`;
 
-    if (sessionStorage.getItem(storageKey)) {
-        return false;
+    try {
+        if (sessionStorage.getItem(storageKey)) {
+            return false;
+        }
+        sessionStorage.setItem(storageKey, 'true');
+    } catch {
+        // Storage blocked (private browsing, etc.) - allow confetti to show
     }
 
-    sessionStorage.setItem(storageKey, 'true');
     await triggerConfetti(preset, options);
     return true;
 }

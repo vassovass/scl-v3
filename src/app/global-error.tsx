@@ -41,12 +41,14 @@ export default function GlobalError({
 
             // Use sendBeacon for best-effort error reporting
             if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-                navigator.sendBeacon('/api/feedback', JSON.stringify({
+                const payload = JSON.stringify({
                     type: 'bug',
                     subject: '[GlobalError] Root layout crash',
                     description: `**Auto-reported root layout crash**\n\n\`\`\`json\n${JSON.stringify(errorData, null, 2)}\n\`\`\``,
                     page_url: errorData.url,
-                }));
+                });
+                // Use Blob with application/json content-type for correct server-side parsing
+                navigator.sendBeacon('/api/feedback', new Blob([payload], { type: 'application/json' }));
             }
         } catch {
             // Ignore errors in error reporting

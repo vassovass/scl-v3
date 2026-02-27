@@ -15,6 +15,7 @@ import { KANBAN_COLUMNS as EXPORT_COLUMNS } from "@/lib/export/presets";
 import { useRouter } from "next/navigation";
 import { reorderArray, moveItemBetweenArrays, shouldIgnoreDrag } from "@/lib/dnd";
 import { toast } from "@/hooks/use-toast";
+import { safeGetItem, safeSetItem } from "@/lib/utils/safeStorage";
 
 interface FeedbackItem {
     id: string;
@@ -178,7 +179,7 @@ export default function KanbanBoard({ initialItems, archivedItems = [] }: Kanban
 
     useEffect(() => {
         // Load column order from local storage
-        const savedOrder = localStorage.getItem("admin-kanban-order");
+        const savedOrder = safeGetItem("admin-kanban-order");
         let orderedColumns = [...COLUMNS];
 
         if (savedOrder) {
@@ -226,7 +227,7 @@ export default function KanbanBoard({ initialItems, archivedItems = [] }: Kanban
 
             // Save new order to local storage
             const orderIds = reorderedColumns.map(c => c.id);
-            localStorage.setItem("admin-kanban-order", JSON.stringify(orderIds));
+            safeSetItem("admin-kanban-order", JSON.stringify(orderIds));
             return;
         }
 

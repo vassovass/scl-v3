@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import FeedbackList from "./FeedbackList";
 import dynamic from "next/dynamic";
+import { safeGetItem, safeSetItem } from "@/lib/utils/safeStorage";
 
 // Dynamic import to avoid SSR issues with drag-and-drop
 const KanbanBoard = dynamic(() => import("./KanbanBoard"), {
@@ -44,7 +45,7 @@ export default function AdminFeedbackClient({ initialItems }: AdminFeedbackClien
 
     // Load saved view preference on mount
     useEffect(() => {
-        const saved = localStorage.getItem(VIEW_STORAGE_KEY);
+        const saved = safeGetItem(VIEW_STORAGE_KEY);
         if (saved === "list" || saved === "kanban") {
             setView(saved);
         }
@@ -53,7 +54,7 @@ export default function AdminFeedbackClient({ initialItems }: AdminFeedbackClien
 
     const handleViewChange = (newView: ViewType) => {
         setView(newView);
-        localStorage.setItem(VIEW_STORAGE_KEY, newView);
+        safeSetItem(VIEW_STORAGE_KEY, newView);
     };
 
     // Don't render until hydrated to prevent flash

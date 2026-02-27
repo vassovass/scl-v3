@@ -8,7 +8,10 @@ import { createClient } from "@/lib/supabase/client";
 import { analytics, identifyUser, clearUser } from "@/lib/analytics";
 import { setCachedSession, clearCachedSession } from "@/lib/auth/sessionCache";
 import { clearAllAppState } from "@/lib/utils/clearAppState";
+import { safeGetItem, safeSetItem, safeRemoveItem, isStorageAvailable } from "@/lib/utils/safeStorage";
 import type { ActiveProfile } from "@/types/database";
+
+const DEBUG = process.env.NODE_ENV === 'development';
 
 // ============================================================================
 // Types
@@ -101,7 +104,7 @@ function getInitialSessionFromCookie(): Session | null {
 
     const decoded = JSON.parse(decodedJson);
     if (decoded?.access_token && decoded?.user) {
-      console.log('[AuthProvider] Initialized session from cookie:', decoded.user.id);
+      if (DEBUG) console.log('[AuthProvider] Initialized session from cookie:', decoded.user.id);
       return decoded as Session;
     }
   } catch (error) {
@@ -129,6 +132,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Track if user was already identified (prevent duplicate events)
   const identifiedUserRef = useRef<string | null>(null);
+
+  // Detect storage availability once on mount (informational)
+  useEffect(() => {
+    if (!isStorageAvailable() && DEBUG) {
+      console.warn('[AuthProvider] localStorage is not available - profile persistence will be skipped');
+    }
+  }, []);
 
   // Computed: are we acting as a proxy?
   const isActingAsProxy = useMemo(() => {
@@ -206,7 +216,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Switch back to self
     if (profileId === null) {
       setActiveProfile(userProfile);
-      localStorage.removeItem(ACTIVE_PROFILE_KEY);
+      safeRemoveItem(ACTIVE_PROFILE_KEY);
       return;
     }
 
@@ -219,14 +229,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Switch to proxy
     setActiveProfile(proxy);
-    localStorage.setItem(ACTIVE_PROFILE_KEY, profileId);
+    safeSetItem(ACTIVE_PROFILE_KEY, profileId);
   }, [userProfile, managedProxies]);
 
   // ============================================================================
   // Restore persisted profile on load
   // ============================================================================
   const restoreActiveProfile = useCallback(async (proxies: ActiveProfile[], user: ActiveProfile) => {
-    const savedProfileId = localStorage.getItem(ACTIVE_PROFILE_KEY);
+    const savedProfileId = safeGetItem(ACTIVE_PROFILE_KEY);
 
     if (!savedProfileId) {
       setActiveProfile(user);
@@ -239,7 +249,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setActiveProfile(savedProxy);
     } else {
       // Invalid/expired - clear and use self
-      localStorage.removeItem(ACTIVE_PROFILE_KEY);
+      safeRemoveItem(ACTIVE_PROFILE_KEY);
       setActiveProfile(user);
     }
   }, []);
@@ -262,7 +272,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Only handle auth-related errors
     if (error && (error.startsWith('auth_') || error === 'auth_callback_failed')) {
-      console.log('[AuthProvider] Auth error detected from URL:', error);
+      if (DEBUG) console.log('[AuthProvider] Auth error detected from URL:', error);
       setAuthError(error);
 
       // Force clean slate - clear stale session that might be causing split state
@@ -273,7 +283,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUserProfile(null);
       setActiveProfile(null);
       setManagedProxies([]);
-      localStorage.removeItem(ACTIVE_PROFILE_KEY);
+      safeRemoveItem(ACTIVE_PROFILE_KEY);
 
       // Remove error from URL to prevent re-triggering
       const newUrl = window.location.pathname;
@@ -286,7 +296,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // onAuthStateChange fires INITIAL_SESSION on page load with session from cookies
   // ============================================================================
   useEffect(() => {
-    console.log('[AuthProvider] Setting up onAuthStateChange listener');
+    if (DEBUG) console.log('[AuthProvider] Setting up onAuthStateChange listener');
     let hasInitialized = false;
 
     // Fallback: if INITIAL_SESSION doesn't fire in 2s, read cookies directly
@@ -333,7 +343,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           };
 
           const rawCookie = readChunkedCookie(storageKey);
-          console.log('[AuthProvider] Fallback: Raw cookie found:', !!rawCookie);
+          if (DEBUG) console.log('[AuthProvider] Fallback: Raw cookie found:', !!rawCookie);
 
           if (rawCookie) {
             // Decode the session
@@ -351,7 +361,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               return; // Stop here, clear state?
             }
 
-            console.log('[AuthProvider] Fallback: Parsed session, user:', sessionData?.user?.id);
+            if (DEBUG) console.log('[AuthProvider] Fallback: Parsed session, user:', sessionData?.user?.id);
 
             if (sessionData?.access_token && sessionData?.user) {
               // Create a session-like object that matches Supabase Session type
@@ -364,7 +374,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 user: sessionData.user,
               } as Session;
 
-              console.log('[AuthProvider] Fallback: Found valid session via cookie parsing!', fallbackSession.user.id);
+              if (DEBUG) console.log('[AuthProvider] Fallback: Found valid session via cookie parsing!', fallbackSession.user.id);
               setSession(fallbackSession);
 
               // Update session cache
@@ -422,10 +432,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 await restoreActiveProfile(proxies, profile);
               }
             } else {
-              console.log('[AuthProvider] Fallback: Cookie parsed but no valid session struct');
+              if (DEBUG) console.log('[AuthProvider] Fallback: Cookie parsed but no valid session struct');
             }
           } else {
-            console.log('[AuthProvider] Fallback: No auth cookie found');
+            if (DEBUG) console.log('[AuthProvider] Fallback: No auth cookie found');
           }
         } catch (e) {
           console.error('[AuthProvider] Fallback cookie parsing exception:', e);
@@ -439,7 +449,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, newSession) => {
-      console.log('[AuthProvider] onAuthStateChange:', event, newSession ? 'session' : 'null');
+      if (DEBUG) console.log('[AuthProvider] onAuthStateChange:', event, newSession ? 'session' : 'null');
 
       // Mark as initialized on first event
       if (!hasInitialized && (event === 'INITIAL_SESSION' || event === 'SIGNED_IN')) {
@@ -466,7 +476,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUserProfile(null);
         setActiveProfile(null);
         setManagedProxies([]);
-        localStorage.removeItem(ACTIVE_PROFILE_KEY);
+        safeRemoveItem(ACTIVE_PROFILE_KEY);
         clearCachedSession();
         setLoading(false);
       }
@@ -475,7 +485,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // This is critical for OAuth redirects where session is set server-side
       if (event === 'INITIAL_SESSION') {
         if (newSession?.user) {
-          console.log('[AuthProvider] INITIAL_SESSION with user:', newSession.user.id);
+          if (DEBUG) console.log('[AuthProvider] INITIAL_SESSION with user:', newSession.user.id);
 
           // VALIDATION: Check if token has expired
           const expiresAt = newSession.expires_at || 0;
@@ -526,10 +536,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             identifiedUserRef.current = newSession.user.id;
           }
         } else {
-          console.log('[AuthProvider] INITIAL_SESSION with no user');
+          if (DEBUG) console.log('[AuthProvider] INITIAL_SESSION with no user');
         }
         setLoading(false);
-        console.log('[AuthProvider] INITIAL_SESSION complete, loading=false');
+        if (DEBUG) console.log('[AuthProvider] INITIAL_SESSION complete, loading=false');
       }
 
       // On sign in, refresh profile and proxies
@@ -591,7 +601,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Sign out
   // ============================================================================
   const signOut = async (redirectTo = "/sign-in?signedOut=true") => {
-    console.log('[AuthProvider] signOut called, redirectTo:', redirectTo);
+    if (DEBUG) console.log('[AuthProvider] signOut called, redirectTo:', redirectTo);
 
     // CRITICAL: Set signing-out state FIRST to prevent data leakage
     setIsSigningOut(true);
@@ -601,11 +611,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession(null);
 
     // Clear proxy state
-    console.log('[AuthProvider] Clearing proxy state...');
+    if (DEBUG) console.log('[AuthProvider] Clearing proxy state...');
     setUserProfile(null);
     setActiveProfile(null);
     setManagedProxies([]);
-    localStorage.removeItem(ACTIVE_PROFILE_KEY);
+    safeRemoveItem(ACTIVE_PROFILE_KEY);
 
     // Clear session cache for API client
     clearCachedSession();
@@ -615,7 +625,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Try to sign out from Supabase with a timeout
     // Sometimes the API call hangs, so we don't want to block the user
-    console.log('[AuthProvider] Calling supabase.auth.signOut() with 5s timeout...');
+    if (DEBUG) console.log('[AuthProvider] Calling supabase.auth.signOut() with 5s timeout...');
     try {
       const signOutPromise = supabase.auth.signOut({ scope: 'global' });
       const timeoutPromise = new Promise<{ error: Error }>((_, reject) =>
@@ -627,22 +637,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (result && 'error' in result && result.error) {
         console.error('[AuthProvider] signOut error:', result.error);
       } else {
-        console.log('[AuthProvider] supabase.auth.signOut() succeeded');
+        if (DEBUG) console.log('[AuthProvider] supabase.auth.signOut() succeeded');
       }
     } catch (error) {
       console.error('[AuthProvider] signOut failed or timed out:', error);
       // Manually clear Supabase auth cookies as fallback
       // This ensures sign-out works even when API fails
-      document.cookie.split(';').forEach(cookie => {
-        const [name] = cookie.trim().split('=');
-        if (name.startsWith('sb-') || name.includes('supabase')) {
-          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-        }
-      });
+      try {
+        document.cookie.split(';').forEach(cookie => {
+          const [name] = cookie.trim().split('=');
+          if (name.startsWith('sb-') || name.includes('supabase')) {
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+          }
+        });
+      } catch (cookieError) {
+        console.warn('[AuthProvider] Cookie cleanup failed:', cookieError);
+      }
     }
 
     // Always redirect, even if signOut API call failed/timed out
-    console.log('[AuthProvider] Redirecting to:', redirectTo);
+    if (DEBUG) console.log('[AuthProvider] Redirecting to:', redirectTo);
     // Use window.location.href for hard navigation (clears all React state)
     window.location.href = redirectTo;
   };

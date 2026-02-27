@@ -92,8 +92,6 @@ export function GoogleTagManager() {
               'ad_personalization': 'granted'
             });
 
-            console.log('[GTM] Consent defaults set to GRANTED (forced tracking)');
-            console.log('[GTM] dataLayer initialized:', window.dataLayer);
           `,
                 }}
             />
@@ -105,25 +103,22 @@ export function GoogleTagManager() {
                     id="gtm-script"
                     strategy="afterInteractive"
                     onLoad={() => {
-                        console.log('[GTM] Script loaded successfully via proxy /gtm/gtm.js');
-                        console.log('[GTM] Container ID: ${GTM_ID}');
-                        // Check if GTM is working
-                        setTimeout(() => {
-                            console.log('[GTM] dataLayer after load:', (window as any).dataLayer);
-                            console.log('[GTM] google_tag_manager exists:', !!(window as any).google_tag_manager);
-                        }, 1000);
+                        if (DEBUG) {
+                            console.log('[GTM] Script loaded successfully via proxy /gtm/gtm.js');
+                            setTimeout(() => {
+                                console.log('[GTM] dataLayer after load:', (window as any).dataLayer);
+                            }, 1000);
+                        }
                     }}
                     onError={(e) => {
                         console.error('[GTM] Script failed to load:', e);
                     }}
                     dangerouslySetInnerHTML={{
                         __html: `
-            console.log('[GTM] Loading GTM script via proxy...');
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
             j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             '/gtm/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            console.log('[GTM] Script element created, loading from:', '/gtm/gtm.js?id='+i+dl);
             })(window,document,'script','dataLayer','${GTM_ID}');
           `,
                     }}

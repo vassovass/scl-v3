@@ -14,7 +14,7 @@
 
 import posthog from 'posthog-js';
 import { PostHogProvider as PHProvider } from 'posthog-js/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 // NOTE: Consent check removed - tracking is FORCED regardless of user choice
 
 // PostHog config from environment
@@ -40,16 +40,18 @@ function initPostHog() {
 
     // Check if already initialized
     if (posthog.__loaded) {
-        console.log('[PostHog] Already initialized, skipping');
+        if (DEBUG) console.log('[PostHog] Already initialized, skipping');
         return;
     }
 
-    console.log('[PostHog] Initializing with config:', {
-        api_host: POSTHOG_HOST,
-        ui_host: POSTHOG_UI_HOST,
-        session_recording: true,
-        autocapture: true,
-    });
+    if (DEBUG) {
+        console.log('[PostHog] Initializing with config:', {
+            api_host: POSTHOG_HOST,
+            ui_host: POSTHOG_UI_HOST,
+            session_recording: true,
+            autocapture: true,
+        });
+    }
 
     try {
     posthog.init(POSTHOG_KEY, {
@@ -73,15 +75,17 @@ function initPostHog() {
 
         // Performance
         loaded: (ph) => {
-            console.log('[PostHog] ✓ Initialized successfully');
-            console.log('[PostHog] Session replay:', ph.sessionRecordingStarted() ? 'ACTIVE' : 'NOT STARTED');
-            console.log('[PostHog] Session ID:', ph.get_session_id());
-            console.log('[PostHog] Distinct ID:', ph.get_distinct_id());
-            console.log('[PostHog] Using proxy:', POSTHOG_HOST);
+            if (DEBUG) {
+                console.log('[PostHog] ✓ Initialized successfully');
+                console.log('[PostHog] Session replay:', ph.sessionRecordingStarted() ? 'ACTIVE' : 'NOT STARTED');
+                console.log('[PostHog] Session ID:', ph.get_session_id());
+                console.log('[PostHog] Distinct ID:', ph.get_distinct_id());
+                console.log('[PostHog] Using proxy:', POSTHOG_HOST);
+            }
         },
 
-        // Debug mode - always on for now to help troubleshoot
-        debug: true,
+        // Debug mode - only in development (was hardcoded true, causing massive log spam in production)
+        debug: DEBUG,
 
         // FORCED TRACKING: Do NOT respect DNT
         respect_dnt: false,
@@ -89,7 +93,7 @@ function initPostHog() {
 
     // Force start session recording immediately
     posthog.startSessionRecording();
-    console.log('[PostHog] Session recording force-started');
+    if (DEBUG) console.log('[PostHog] Session recording force-started');
     } catch (err) {
         // Don't crash the app - analytics is non-critical
         console.error('[PostHog] Failed to initialize:', err);
@@ -116,52 +120,50 @@ export function PostHogProvider({
     featureEnabled?: boolean;
 }) {
     const [isReady, setIsReady] = useState(false);
-    const [hasConsent, setHasConsent] = useState(false);
+    // Use refs for tracking state inside callbacks to avoid useEffect re-entry
+    // (previously isReady and hasConsent were in deps AND set inside the effect)
+    const isReadyRef = useRef(false);
+    const hasConsentRef = useRef(false);
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
         const checkTracking = () => {
-            // Note: navigator.onLine is unreliable on mobile networks
-            // It can return false even when there's connectivity (slow networks)
-            // PostHog SDK handles offline gracefully by queueing events
-            // So we only use it as a soft signal, not a hard gate
-            const reportedOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
-
             // FORCED TRACKING: Always track when feature enabled, regardless of consent
-            // We initialize even if reportedOnline is false - PostHog will queue events
+            // PostHog SDK handles offline gracefully by queueing events
             const shouldTrack = featureEnabled;
 
-            console.log('[PostHog] Checking tracking conditions:', {
-                featureEnabled,
-                reportedOnline,
-                shouldTrack,
-                isReady,
-                hasConsent
-            });
+            if (DEBUG) {
+                console.log('[PostHog] Checking tracking conditions:', {
+                    featureEnabled,
+                    shouldTrack,
+                    isReady: isReadyRef.current,
+                });
+            }
 
-            if (shouldTrack && !isReady) {
-                console.log('[PostHog] Starting initialization (FORCED tracking)...');
+            if (shouldTrack && !isReadyRef.current) {
+                if (DEBUG) console.log('[PostHog] Starting initialization (FORCED tracking)...');
+                isReadyRef.current = true;
+                hasConsentRef.current = true;
                 initPostHog();
-                setIsReady(true);
-                setHasConsent(true);
-            } else if (!shouldTrack && isReady) {
+                setIsReady(true); // triggers re-render to wrap children in PHProvider
+            } else if (!shouldTrack && isReadyRef.current) {
                 // Feature disabled - opt out (only respects master toggle, NOT consent)
-                console.log('[PostHog] Feature disabled - opting out');
+                if (DEBUG) console.log('[PostHog] Feature disabled - opting out');
                 posthog.opt_out_capturing();
-                setHasConsent(false);
-            } else if (shouldTrack && isReady && !hasConsent) {
+                hasConsentRef.current = false;
+            } else if (shouldTrack && isReadyRef.current && !hasConsentRef.current) {
                 // Feature re-enabled - opt back in
-                console.log('[PostHog] Feature re-enabled - opting back in');
+                if (DEBUG) console.log('[PostHog] Feature re-enabled - opting back in');
                 posthog.opt_in_capturing();
-                setHasConsent(true);
+                hasConsentRef.current = true;
             }
         };
 
         // Check immediately
         checkTracking();
 
-        // Re-check on focus and online state
+        // Re-check on focus and online state (event-driven, not polling)
         const onOnline = () => checkTracking();
         const onFocus = () => checkTracking();
         const onVisibility = () => {
@@ -172,18 +174,15 @@ export function PostHogProvider({
         window.addEventListener('focus', onFocus);
         document.addEventListener('visibilitychange', onVisibility);
 
-        // Poll briefly for feature flag updates
-        const poll = window.setInterval(checkTracking, 1000);
-        const stopPoll = window.setTimeout(() => window.clearInterval(poll), 15000);
+        // Polling removed: consent is forced, so there's nothing to poll for.
+        // Event listeners above handle network/focus state changes.
 
         return () => {
             window.removeEventListener('online', onOnline);
             window.removeEventListener('focus', onFocus);
             document.removeEventListener('visibilitychange', onVisibility);
-            window.clearInterval(poll);
-            window.clearTimeout(stopPoll);
         };
-    }, [isReady, hasConsent, featureEnabled]);
+    }, [featureEnabled]);
 
     // If PostHog isn't ready yet (no consent or no key), just render children
     if (!isReady || !POSTHOG_KEY) {
