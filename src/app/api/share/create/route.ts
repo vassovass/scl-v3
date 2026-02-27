@@ -1,207 +1,135 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
+import { z } from "zod";
+import { withApiHandler } from "@/lib/api/handler";
 import { nanoid } from "nanoid";
 import { getMilestoneCelebration } from "@/lib/sharing/streaks";
 import type { ShareStreakUpdateResult, MilestoneCelebration } from "@/lib/sharing/streaks";
-import { checkRateLimit, getRateLimitKey } from "@/lib/api/rateLimit";
-import { tooManyRequests } from "@/lib/api";
 
-// Types matching database schema
-type CardType = "daily" | "weekly" | "personal_best" | "streak" | "rank" | "challenge" | "rank_change";
-type MetricType = "steps" | "calories" | "slp" | "distance" | "swimming" | "cycling" | "running";
-type Theme = "light" | "dark";
-
-interface CreateShareCardRequest {
-    card_type: CardType;
-    metric_type?: MetricType;
-    metric_value: number;
-    period_start?: string;
-    period_end?: string;
-    period_label?: string;
-    league_id?: string;
-    league_name?: string;
-    rank?: number;
-    improvement_pct?: number;
-    custom_message?: string;
-    theme?: Theme;
-}
+const createShareCardSchema = z.object({
+    card_type: z.enum(["daily", "weekly", "personal_best", "streak", "rank", "challenge", "rank_change"]),
+    metric_type: z.enum(["steps", "calories", "slp", "distance", "swimming", "cycling", "running"]).optional(),
+    metric_value: z.number(),
+    period_start: z.string().optional(),
+    period_end: z.string().optional(),
+    period_label: z.string().optional(),
+    league_id: z.string().optional(),
+    league_name: z.string().optional(),
+    rank: z.number().optional(),
+    improvement_pct: z.number().optional(),
+    custom_message: z.string().optional(),
+    theme: z.enum(["light", "dark"]).optional(),
+});
 
 /**
  * POST /api/share/create
  * Creates a persistent share card and returns the short URL
  */
-export async function POST(request: NextRequest) {
-    const supabase = await createServerSupabaseClient();
+export const POST = withApiHandler({
+    auth: 'required',
+    schema: createShareCardSchema,
+    rateLimit: { maxRequests: 10, windowMs: 60_000 },
+}, async ({ user, body, adminClient }) => {
+    // Generate unique short code (8 characters for URL-safe sharing)
+    const shortCode = nanoid(8);
 
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
+    const { data: shareCard, error } = await adminClient
+        .from("share_cards")
+        .insert({
+            short_code: shortCode,
+            user_id: user!.id,
+            card_type: body.card_type,
+            metric_type: body.metric_type || "steps",
+            metric_value: body.metric_value,
+            period_start: body.period_start || null,
+            period_end: body.period_end || null,
+            period_label: body.period_label || null,
+            league_id: body.league_id || null,
+            league_name: body.league_name || null,
+            rank: body.rank || null,
+            improvement_pct: body.improvement_pct || null,
+            custom_message: body.custom_message || null,
+            theme: body.theme || "dark",
+        })
+        .select()
+        .single();
 
-    if (!user) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (error) {
+        console.error("Error creating share card:", error);
+        throw new Error("Failed to create share card");
     }
 
-    // Rate limiting: 10 share cards per minute per user
-    const rlResult = checkRateLimit(getRateLimitKey(request, user), { maxRequests: 10, windowMs: 60_000 });
-    if (!rlResult.allowed) {
-        return tooManyRequests(rlResult.retryAfterMs, rlResult.remaining, 10);
-    }
+    // PRD-56: Update share streak after successful card creation
+    let streakResult: ShareStreakUpdateResult | null = null;
+    let celebration: MilestoneCelebration | null = null;
 
     try {
-        const body: CreateShareCardRequest = await request.json();
-
-        // Validate required fields
-        if (!body.card_type || body.metric_value === undefined) {
-            return NextResponse.json(
-                { error: "Missing required fields: card_type, metric_value" },
-                { status: 400 }
-            );
-        }
-
-        // Validate card_type
-        const validCardTypes: CardType[] = ["daily", "weekly", "personal_best", "streak", "rank", "challenge", "rank_change"];
-        if (!validCardTypes.includes(body.card_type)) {
-            return NextResponse.json(
-                { error: `Invalid card_type. Must be one of: ${validCardTypes.join(", ")}` },
-                { status: 400 }
-            );
-        }
-
-        // Validate metric_type if provided
-        const validMetricTypes: MetricType[] = ["steps", "calories", "slp", "distance", "swimming", "cycling", "running"];
-        if (body.metric_type && !validMetricTypes.includes(body.metric_type)) {
-            return NextResponse.json(
-                { error: `Invalid metric_type. Must be one of: ${validMetricTypes.join(", ")}` },
-                { status: 400 }
-            );
-        }
-
-        // Generate unique short code (8 characters for URL-safe sharing)
-        const shortCode = nanoid(8);
-
-        // Use admin client to insert (bypasses potential RLS issues during creation)
-        const adminClient = createAdminClient();
-
-        const { data: shareCard, error } = await adminClient
-            .from("share_cards")
-            .insert({
-                short_code: shortCode,
-                user_id: user.id,
-                card_type: body.card_type,
-                metric_type: body.metric_type || "steps",
-                metric_value: body.metric_value,
-                period_start: body.period_start || null,
-                period_end: body.period_end || null,
-                period_label: body.period_label || null,
-                league_id: body.league_id || null,
-                league_name: body.league_name || null,
-                rank: body.rank || null,
-                improvement_pct: body.improvement_pct || null,
-                custom_message: body.custom_message || null,
-                theme: body.theme || "dark",
-            })
-            .select()
-            .single();
-
-        if (error) {
-            console.error("Error creating share card:", error);
-            return NextResponse.json(
-                { error: "Failed to create share card" },
-                { status: 500 }
-            );
-        }
-
-        // PRD-56: Update share streak after successful card creation
-        let streakResult: ShareStreakUpdateResult | null = null;
-        let celebration: MilestoneCelebration | null = null;
-
-        try {
-            const { data: streakData, error: streakError } = await adminClient.rpc(
-                'update_share_streak',
-                { p_user_id: user.id }
-            );
-
-            if (streakError) {
-                // Log but don't fail the share - streak is secondary
-                console.error("Error updating share streak:", streakError);
-            } else if (streakData && streakData.length > 0) {
-                streakResult = streakData[0] as ShareStreakUpdateResult;
-
-                // Check for milestone celebration
-                if (streakResult.is_milestone && streakResult.milestone_value > 0) {
-                    celebration = getMilestoneCelebration(streakResult.milestone_value);
-                }
-            }
-        } catch (streakErr) {
-            // Non-critical - log and continue
-            console.error("Share streak update failed:", streakErr);
-        }
-
-        // PRD-56: Record share analytics for pattern tracking
-        try {
-            await adminClient.rpc('record_share_analytics', { p_user_id: user.id });
-        } catch (analyticsErr) {
-            // Non-critical - log and continue
-            console.error("Share analytics recording failed:", analyticsErr);
-        }
-
-        // Build the share URL
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://stepleague.app";
-        const shareUrl = `${baseUrl}/s/${shortCode}`;
-
-        // Build OG image URL for preview
-        const ogParams = new URLSearchParams({
-            value: body.metric_value.toString(),
-            metric_type: body.metric_type || "steps",
-            card_type: body.card_type,
-            theme: body.theme || "dark",
-            period: body.period_label || "",
-            name: user.user_metadata?.display_name || "Player",
-        });
-
-        if (body.rank) ogParams.set("rank", body.rank.toString());
-        if (body.improvement_pct) ogParams.set("improvement", body.improvement_pct.toString());
-        if (body.league_name) ogParams.set("league", body.league_name);
-
-        const ogImageUrl = `${baseUrl}/api/og?${ogParams.toString()}`;
-
-        return NextResponse.json({
-            success: true,
-            share_card: {
-                id: shareCard.id,
-                short_code: shortCode,
-                card_type: body.card_type,
-                metric_type: body.metric_type || "steps",
-                metric_value: body.metric_value,
-            },
-            urls: {
-                share: shareUrl,
-                og_image: ogImageUrl,
-            },
-            // PRD-56: Include streak update info for client-side celebration
-            streak: streakResult ? {
-                new_streak: streakResult.new_streak,
-                is_milestone: streakResult.is_milestone,
-                milestone_value: streakResult.milestone_value,
-            } : null,
-            celebration,
-        });
-    } catch (error) {
-        console.error("Error in share/create:", error);
-        return NextResponse.json(
-            { error: "Internal server error" },
-            { status: 500 }
+        const { data: streakData, error: streakError } = await adminClient.rpc(
+            'update_share_streak',
+            { p_user_id: user!.id }
         );
-    }
-}
 
-/**
- * GET /api/share/create
- * Returns 405 Method Not Allowed
- */
-export async function GET() {
-    return NextResponse.json(
-        { error: "Method not allowed. Use POST to create a share card." },
-        { status: 405 }
-    );
-}
+        if (streakError) {
+            // Log but don't fail the share - streak is secondary
+            console.error("Error updating share streak:", streakError);
+        } else if (streakData && streakData.length > 0) {
+            streakResult = streakData[0] as ShareStreakUpdateResult;
+
+            // Check for milestone celebration
+            if (streakResult.is_milestone && streakResult.milestone_value > 0) {
+                celebration = getMilestoneCelebration(streakResult.milestone_value);
+            }
+        }
+    } catch (streakErr) {
+        // Non-critical - log and continue
+        console.error("Share streak update failed:", streakErr);
+    }
+
+    // PRD-56: Record share analytics for pattern tracking
+    try {
+        await adminClient.rpc('record_share_analytics', { p_user_id: user!.id });
+    } catch (analyticsErr) {
+        // Non-critical - log and continue
+        console.error("Share analytics recording failed:", analyticsErr);
+    }
+
+    // Build the share URL
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://stepleague.app";
+    const shareUrl = `${baseUrl}/s/${shortCode}`;
+
+    // Build OG image URL for preview
+    const ogParams = new URLSearchParams({
+        value: body.metric_value.toString(),
+        metric_type: body.metric_type || "steps",
+        card_type: body.card_type,
+        theme: body.theme || "dark",
+        period: body.period_label || "",
+        name: user!.user_metadata?.display_name || "Player",
+    });
+
+    if (body.rank) ogParams.set("rank", body.rank.toString());
+    if (body.improvement_pct) ogParams.set("improvement", body.improvement_pct.toString());
+    if (body.league_name) ogParams.set("league", body.league_name);
+
+    const ogImageUrl = `${baseUrl}/api/og?${ogParams.toString()}`;
+
+    return {
+        success: true,
+        share_card: {
+            id: shareCard.id,
+            short_code: shortCode,
+            card_type: body.card_type,
+            metric_type: body.metric_type || "steps",
+            metric_value: body.metric_value,
+        },
+        urls: {
+            share: shareUrl,
+            og_image: ogImageUrl,
+        },
+        // PRD-56: Include streak update info for client-side celebration
+        streak: streakResult ? {
+            new_streak: streakResult.new_streak,
+            is_milestone: streakResult.is_milestone,
+            milestone_value: streakResult.milestone_value,
+        } : null,
+        celebration,
+    };
+});

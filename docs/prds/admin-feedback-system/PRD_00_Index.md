@@ -4,8 +4,8 @@
 >
 > These PRDs describe WHAT is needed, not HOW to implement. The implementing agent decides the best approach.
 >
-> **Last Updated:** 2026-02-27
-> **Total PRDs:** 66 (47 complete, 3 partial, 1 in-progress, 15 proposed)
+> **Last Updated:** 2026-02-28
+> **Total PRDs:** 66 (52 complete, 0 partial, 1 in-progress, 13 proposed)
 
 ---
 
@@ -147,7 +147,7 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 ### In Progress
 | # | PRD Title | Status |
 |---|-----------|--------|
-| 36 | [Technical Debt](./PRD_36_Technical_Debt.md) | 🟨 Partial (FeedbackWidget Blob + reload removal done; API standardization → Sprint C) |
+| 36 | [Technical Debt](./PRD_36_Technical_Debt.md) | ✅ Complete |
 | 49 | [Alpha Launch Checklist](./PRD_49_Alpha_Launch_Checklist.md) | 🔄 In Progress |
 
 ### Proposed
@@ -265,10 +265,9 @@ Available MCP servers for PRD verification:
 
 | Category | Count | PRDs |
 |----------|-------|------|
-| ✅ Complete | 47 | 1-27, 30-31, 33, 35, 38-41, 43-46, 50-58, 62 |
-| 🟨 Partial | 2 | 28, 32 |
-| 🔄 In Progress | 2 | 36, 49 |
-| 📋 Proposed | 15 | 29, 34, 37, 42, 47, 48, 59-61, 63-66 |
+| ✅ Complete | 52 | 1-36, 38-46, 50-58, 60, 62, 64-65 |
+| 🔄 In Progress | 1 | 49 |
+| 📋 Proposed | 13 | 37, 47, 48, 59, 61, 63, 66 |
 | **Total** | **66** | |
 
 ---

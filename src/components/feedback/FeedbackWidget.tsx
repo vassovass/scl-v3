@@ -1,10 +1,26 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
-type FeedbackType = "bug" | "feature" | "general" | "positive" | "negative";
+type FeedbackType = "bug" | "feature" | "general";
+
+const TYPE_CONFIG: Record<FeedbackType, { label: string; activeClass: string }> = {
+    general: { label: "General", activeClass: "bg-primary/20 text-primary" },
+    bug: { label: "Bug", activeClass: "bg-destructive/20 text-destructive" },
+    feature: { label: "Feature", activeClass: "bg-[hsl(var(--warning)/0.2)] text-[hsl(var(--warning))]" },
+};
+
+const PLACEHOLDER_MAP: Record<FeedbackType, string> = {
+    bug: "Describe what happened...",
+    feature: "What would you like to see?",
+    general: "Tell us what you think...",
+};
 
 export function FeedbackWidget() {
     const pathname = usePathname();
@@ -15,34 +31,28 @@ export function FeedbackWidget() {
     const [description, setDescription] = useState("");
     const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
     const [screenshot, setScreenshot] = useState<Blob | null>(null);
+    const [isCapturing, setIsCapturing] = useState(false);
 
-    // Reset form when closed
+    // Reset form when closed after success
     useEffect(() => {
-        if (!isOpen) {
-            // small delay to allow animation if we had one, but instant is fine for now
-            if (status === "success") {
-                setStatus("idle");
-                setSubject("");
-                setDescription("");
-                setType("general");
-                setScreenshot(null);
-            }
+        if (!isOpen && status === "success") {
+            setStatus("idle");
+            setSubject("");
+            setDescription("");
+            setType("general");
+            setScreenshot(null);
         }
     }, [isOpen, status]);
-
-    const [isCapturing, setIsCapturing] = useState(false);
 
     const getThemeBackgroundForScreenshot = (): string => {
         try {
             const raw = getComputedStyle(document.documentElement)
                 .getPropertyValue("--background")
                 .trim();
-            // globals.css stores HSL triplets like: "222.2 84% 4.9%"
             if (raw) return `hsl(${raw})`;
         } catch {
             // ignore
         }
-        // Safe fallback (dark default)
         return "#020617";
     };
 
@@ -57,8 +67,6 @@ export function FeedbackWidget() {
                 logging: false,
                 scale: 1,
             });
-            // Use toBlob instead of toDataURL — stores binary Blob in state
-            // instead of a large base64 string, reducing memory usage
             const blob = await new Promise<Blob | null>((resolve) =>
                 canvas.toBlob(resolve, "image/png")
             );
@@ -75,8 +83,6 @@ export function FeedbackWidget() {
         setStatus("submitting");
 
         try {
-            // Convert Blob to base64 data URL at submission time only
-            // (keeps memory-efficient Blob in state, converts on demand)
             let screenshotDataUrl: string | null = null;
             if (screenshot) {
                 screenshotDataUrl = await new Promise<string>((resolve, reject) => {
@@ -94,7 +100,7 @@ export function FeedbackWidget() {
                     type,
                     subject: subject || "Quick Feedback",
                     description,
-                    page_url: window.location.href,
+                    page_url: pathname,
                     screenshot: screenshotDataUrl,
                 }),
             });
@@ -102,44 +108,43 @@ export function FeedbackWidget() {
             if (!res.ok) throw new Error("Failed to submit");
 
             setStatus("success");
-            setTimeout(() => {
-                setIsOpen(false);
-            }, 2000);
+            setTimeout(() => setIsOpen(false), 2000);
         } catch (err) {
             setStatus("error");
             console.error(err);
         }
     };
 
-    // If needed: only show for admins or specific users?
-    // For now, showing for all authenticated users could be good for beta.
     if (!session) return null;
 
     return (
         <div id="feedback-widget" className="fixed bottom-6 right-6 z-50">
             {/* Trigger Button */}
             {!isOpen && (
-                <button
+                <Button
                     onClick={() => setIsOpen(true)}
-                    className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary/90 hover:scale-105 active:scale-95"
+                    size="icon"
+                    className="h-12 w-12 rounded-full shadow-lg shadow-primary/20 transition hover:scale-105 active:scale-95"
                     title="Send Feedback"
                 >
                     <span className="text-xl">💬</span>
-                </button>
+                </Button>
             )}
 
-            {/* Form */}
+            {/* Form Panel */}
             {isOpen && (
                 <div className="w-80 rounded-2xl border border-border bg-popover/95 p-4 shadow-2xl backdrop-blur-md sm:w-96">
                     {/* Header */}
                     <div className="mb-4 flex items-center justify-between">
                         <h3 className="font-semibold text-foreground">Send Feedback</h3>
-                        <button
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 rounded-full"
                             onClick={() => setIsOpen(false)}
-                            className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
                         >
                             ✕
-                        </button>
+                        </Button>
                     </div>
 
                     {status === "success" ? (
@@ -153,99 +158,92 @@ export function FeedbackWidget() {
                     ) : (
                         <form onSubmit={handleSubmit} className="space-y-3">
                             {/* Type Selection */}
-                            <div className="flex gap-2 rounded-lg bg-muted/50 p-1">
-                                {(["general", "bug", "feature"] as const).map((t) => (
-                                    <button
-                                        key={t}
-                                        type="button"
-                                        onClick={() => setType(t)}
-                                        className={`flex-1 rounded-md py-1.5 text-xs font-medium transition ${type === t
-                                            ? t === "bug"
-                                                ? "bg-destructive/20 text-destructive"
-                                                : t === "feature"
-                                                    ? "bg-[hsl(var(--warning)/0.2)] text-[hsl(var(--warning))]"
-                                                    : "bg-primary/20 text-primary"
-                                            : "text-muted-foreground hover:text-foreground"
-                                            }`}
-                                    >
-                                        {t.charAt(0).toUpperCase() + t.slice(1)}
-                                    </button>
-                                ))}
+                            <div className="flex gap-1 rounded-lg bg-muted/50 p-1">
+                                {(Object.entries(TYPE_CONFIG) as [FeedbackType, (typeof TYPE_CONFIG)[FeedbackType]][]).map(
+                                    ([key, config]) => (
+                                        <button
+                                            key={key}
+                                            type="button"
+                                            onClick={() => setType(key)}
+                                            className={cn(
+                                                "flex-1 rounded-md py-1.5 text-xs font-medium transition",
+                                                type === key
+                                                    ? config.activeClass
+                                                    : "text-muted-foreground hover:text-foreground"
+                                            )}
+                                        >
+                                            {config.label}
+                                        </button>
+                                    )
+                                )}
                             </div>
 
-                            {/* Inputs */}
-                            <div>
-                                <input
-                                    type="text"
-                                    placeholder="Subject (optional)"
-                                    value={subject}
-                                    onChange={(e) => setSubject(e.target.value)}
-                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-                                />
-                            </div>
-                            <div>
-                                <textarea
-                                    required
-                                    placeholder={
-                                        type === "bug"
-                                            ? "Describe what happened..."
-                                            : type === "feature"
-                                                ? "What would you like to see?"
-                                                : "Tell us what you think..."
-                                    }
-                                    rows={3}
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
-                                    className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-                                />
-                            </div>
+                            {/* Subject */}
+                            <Input
+                                placeholder="Subject (optional)"
+                                value={subject}
+                                onChange={(e) => setSubject(e.target.value)}
+                            />
 
-                            {/* Screenshot Info */}
-                            <div className="flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    onClick={handleCapture}
-                                    disabled={isCapturing}
-                                    className={`flex flex-1 items-center justify-center gap-2 rounded-lg border border-dashed px-3 py-2 text-xs transition ${screenshot
-                                        ? "border-[hsl(var(--success)/0.5)] bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]"
-                                        : "border-border text-muted-foreground hover:border-border/80 hover:text-foreground"
-                                        }`}
-                                >
-                                    {screenshot ? (
-                                        <>
-                                            <span>📷 Attached</span>
-                                            <span
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setScreenshot(null);
-                                                }}
-                                                className="ml-auto hover:text-[hsl(var(--success))]"
-                                            >
-                                                ✕
-                                            </span>
-                                        </>
-                                    ) : isCapturing ? (
-                                        <>
-                                            <span className="animate-spin">⏳</span>
-                                            <span>Capturing...</span>
-                                        </>
-                                    ) : (
-                                        <>📷 Attach Screenshot</>
-                                    )}
-                                </button>
-                            </div>
+                            {/* Description */}
+                            <Textarea
+                                required
+                                placeholder={PLACEHOLDER_MAP[type]}
+                                rows={3}
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                className="resize-none"
+                            />
+
+                            {/* Screenshot */}
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={screenshot ? undefined : handleCapture}
+                                disabled={isCapturing}
+                                className={cn(
+                                    "w-full border-dashed",
+                                    screenshot && "border-[hsl(var(--success)/0.5)] bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]"
+                                )}
+                            >
+                                {screenshot ? (
+                                    <span className="flex w-full items-center justify-center gap-2">
+                                        📷 Attached
+                                        <span
+                                            role="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setScreenshot(null);
+                                            }}
+                                            className="ml-auto hover:text-foreground"
+                                        >
+                                            ✕
+                                        </span>
+                                    </span>
+                                ) : isCapturing ? (
+                                    <span className="flex items-center gap-2">
+                                        <span className="animate-spin">⏳</span>
+                                        Capturing...
+                                    </span>
+                                ) : (
+                                    "📷 Attach Screenshot"
+                                )}
+                            </Button>
 
                             {/* Submit */}
-                            <button
+                            <Button
                                 type="submit"
                                 disabled={status === "submitting" || !description}
-                                className="w-full rounded-lg bg-primary py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                                className="w-full"
                             >
                                 {status === "submitting" ? "Sending..." : "Send Feedback"}
-                            </button>
+                            </Button>
 
                             {status === "error" && (
-                                <p className="text-center text-xs text-destructive">Failed to send. Please try again.</p>
+                                <p className="text-center text-xs text-destructive">
+                                    Failed to send. Please try again.
+                                </p>
                             )}
                         </form>
                     )}
@@ -254,4 +252,3 @@ export function FeedbackWidget() {
         </div>
     );
 }
-

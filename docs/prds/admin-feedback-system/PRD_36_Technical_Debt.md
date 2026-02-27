@@ -1,7 +1,7 @@
 # PRD 36: Technical Debt & Optimization
 
 > **Order:** 36
-> **Status:** 🔄 In Progress
+> **Status:** ✅ Complete
 > **Type:** Refactor
 > **Dependencies:** PRD 20 (Attachments System)
 > **Blocks:** None
@@ -166,8 +166,20 @@ A codebase free of significant technical debt, with standardized API handling, e
 
 ---
 
+## Proactive Items
+
+1. **API route registry** — Create a `src/lib/api/routeRegistry.ts` that auto-documents all routes with their auth levels, rate limits, and schemas. Useful for API docs generation and security audits. Could surface a `/admin/api-docs` page.
+
+2. **Deprecation lint rule** — Add an ESLint custom rule or a CI grep check that flags any new `NextResponse.json` usage in `src/app/api/` directories, ensuring no legacy patterns slip back in. Could also catch direct `createServerSupabaseClient` usage in route handlers.
+
+3. **Component usage audit dashboard** — Track which components are using design system primitives (shadcn Button, Input, Textarea) vs raw HTML elements across the codebase. Surface this on `/admin/design-system` to proactively identify UI consistency drift.
+
+---
+
 ## Changelog
 
 | Date | Section | Change |
 |------|---------|--------|
 | 2026-01-05 | Initial | Created PRD for tech debt tracking |
+| 2026-02-27 | A-1, C-1, D-1 | FeedbackWidget blob upload, zero `<Database>` generics, zero `window.location.reload()` |
+| 2026-02-28 | A-2, B-1, B-2 | FeedbackWidget UI modernized (shadcn Button/Input/Textarea), 5 API routes migrated to withApiHandler (user/stats, submissions/available-dates, share/history, stats/hub, share/create). Cron and system token routes intentionally kept as-is. |

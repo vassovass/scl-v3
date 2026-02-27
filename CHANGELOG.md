@@ -15,6 +15,10 @@ All notable changes to StepLeague v3.
 - **PRD 34: B2B Landing Pages** ✅ — Corporate wellness landing page (`/teams`) with hero, value props, feature grid, how-it-works, and dual waitlist forms. Features directory (`/teams/features`) with 12 features in 3 categories. Waitlist confirmation page (`/teams/waitlist`). API endpoint with rate limiting (3 req/min), Zod validation, duplicate email detection. WaitlistForm component using FormInput/FormSelect. Migration for `b2b_waitlist` table with RLS. JSON-LD structured data + full SEO metadata. 7 unit tests.
 - **PRD 42: Test Coverage Expansion** ✅ — 113 new tests across 9 test files. API route tests: health check, feedback endpoint, waitlist endpoint. Hook tests: useAppSettings, useShare, useUserStats, useBranding, useSubmissionHistory, useFilterPersistence. Menu system sync: admin menu now includes analytics + menu editor, `/teams` added to public header + footer, `detectMenuLocation` recognizes `/teams` as public. Total: 91 test files, 1932 tests.
 
+### Refactored
+
+- **PRD 36: Technical Debt** ✅ — API standardization: 5 legacy routes migrated to `withApiHandler` (user/stats, submissions/available-dates, share/history, stats/hub, share/create). Eliminated manual auth boilerplate, manual rate limiting, and `NextResponse.json` usage. Share/create now uses Zod schema instead of manual validation. FeedbackWidget UI modernized: raw HTML `<input>`, `<textarea>`, `<button>` replaced with shadcn `Button`, `Input`, `Textarea` components; `cn()` utility for conditional classes; type config extracted to constants; `window.location.href` replaced with `usePathname()`. Cron/system token routes intentionally kept (custom auth).
+
 ---
 
 ## [2026-02-27]
