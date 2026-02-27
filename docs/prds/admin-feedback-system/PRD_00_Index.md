@@ -105,6 +105,15 @@
 | 55 | [Navigation Menu Consistency](./PRD_55_Navigation_Menu_Consistency.md) | Fix public menu on marketing pages for guests | ✅ Complete |
 | 56 | [Sharing Encouragement](./PRD_56_Sharing_Encouragement.md) | Share streaks, insights, nudges, analytics | ✅ Complete |
 
+### Alpha Readiness (PRDs 57-61) 🔒
+| # | PRD Title | Outcome | Status |
+|---|-----------|---------|--------|
+| 57 | [Password Reset Flow](./PRD_57_Password_Reset_Flow.md) | Users can recover forgotten passwords | 📋 Proposed |
+| 58 | [API Rate Limiting](./PRD_58_Rate_Limiting.md) | Endpoints protected from abuse and spam | 📋 Proposed |
+| 59 | [Analytics Implementation](./PRD_59_Analytics_Implementation.md) | Wire up page views, error tracking, performance | 📋 Proposed |
+| 60 | [UX Onboarding](./PRD_60_UX_Onboarding.md) | First 5 minutes guided experience | 📋 Proposed |
+| 61 | [Testing Gaps](./PRD_61_Testing_Gaps.md) | January regression prevention tests | 📋 Proposed |
+
 ---
 
 ## 🏃 Sprint Planning (Execution Order)
@@ -205,7 +214,7 @@
 | Category | Count |
 |----------|-------|
 | ✅ Complete | 40 PRDs |
-| 📋 Proposed | 14 PRDs |
+| 📋 Proposed | 19 PRDs |
 | 🔄 Ongoing/In Progress | 2 PRDs |
 
 ---
@@ -279,4 +288,5 @@ graph TD
 | 2026-01-20 | Enhanced PRDs 43-49 with Systems/Design Considerations and Proactive items |
 | 2026-01-29 | Added PRD-56 (Sharing Encouragement) extracted from PRD-54 Phase 4 |
 | 2026-01-29 | Added PRD-56 to Sprint 3 (Retention & Engagement) |
+| 2026-02-27 | Added PRDs 57-61 from Alpha Readiness Audit (password reset, rate limiting, analytics, onboarding, testing) |
 

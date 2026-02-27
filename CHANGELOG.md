@@ -7,6 +7,25 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-02-27]
+
+### Fixed
+
+- **BLOCKER 2: Agent API authentication** — `/api/agent/current-work` now requires `superadmin` auth via `withApiHandler` (was completely unauthenticated)
+- **Debug logs auth** — `/api/debug/logs` converted from email-based manual check to `withApiHandler({ auth: 'superadmin' })`
+- **AuthProvider hard timeout** — Added 10-second hard timeout to prevent infinite loading spinner on slow SA mobile connections
+- **SA latency reduction** — Added `vercel.json` with `lhr1` (London) region to reduce latency for South African users
+
+### Added
+
+- **PRD 57: Password Reset Flow** — Users can recover forgotten passwords (Alpha BLOCKER 1)
+- **PRD 58: API Rate Limiting** — Endpoint abuse protection (Alpha BLOCKER 5)
+- **PRD 59: Analytics Implementation** — Wire up page views, error tracking, performance events
+- **PRD 60: UX Onboarding** — Guided first 5 minutes experience for new users
+- **PRD 61: Testing Gaps** — January 2026 regression prevention tests
+
+---
+
 ## [2026-01-30]
 
 ### Added
