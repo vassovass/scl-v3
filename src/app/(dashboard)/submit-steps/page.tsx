@@ -16,6 +16,7 @@ import { ProofThumbnail } from "@/components/ui/ProofThumbnail";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { PageViewTracker } from "@/components/analytics/PageViewTracker";
+import { SupportedAppsList } from "@/components/onboarding/SupportedAppsList";
 
 interface League {
     id: string;
@@ -535,6 +536,11 @@ export default function SubmitPage() {
                             </p>
                         </div>
                     </div>
+                </div>
+
+                {/* Supported Apps List for new users (PRD 60) */}
+                <div className="mb-6">
+                    <SupportedAppsList />
                 </div>
 
                 {/* Proxy Submission Section - For Admins/Owners */}

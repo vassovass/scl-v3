@@ -221,34 +221,34 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right: Stats showcase */}
+            {/* Right: Value props showcase */}
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-sky-500/10 to-purple-500/10 blur-3xl" />
               <div className="relative bg-slate-800/50 border border-slate-700/50 rounded-3xl p-8 lg:p-12">
                 <div className="grid grid-cols-2 gap-8">
                   <div className="text-center">
                     <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-sky-400 to-cyan-400 bg-clip-text text-transparent">
-                      10K+
+                      Free
                     </div>
-                    <div className="mt-2 text-sm text-slate-400 uppercase tracking-wider">Steps Tracked</div>
+                    <div className="mt-2 text-sm text-slate-400 uppercase tracking-wider">To Join</div>
                   </div>
                   <div className="text-center">
                     <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                      50+
+                      AI
                     </div>
-                    <div className="mt-2 text-sm text-slate-400 uppercase tracking-wider">Active Leagues</div>
+                    <div className="mt-2 text-sm text-slate-400 uppercase tracking-wider">Verified Steps</div>
                   </div>
                   <div className="text-center">
                     <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                      100+
+                      Daily
                     </div>
-                    <div className="mt-2 text-sm text-slate-400 uppercase tracking-wider">Athletes</div>
+                    <div className="mt-2 text-sm text-slate-400 uppercase tracking-wider">Leaderboards</div>
                   </div>
                   <div className="text-center">
                     <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                      99%
+                      Global
                     </div>
-                    <div className="mt-2 text-sm text-slate-400 uppercase tracking-wider">AI Accuracy</div>
+                    <div className="mt-2 text-sm text-slate-400 uppercase tracking-wider">World League</div>
                   </div>
                 </div>
               </div>

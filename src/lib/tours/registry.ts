@@ -25,6 +25,7 @@ import { analyticsTour } from './definitions/analytics.tour';
 import { settingsTour } from './definitions/settings.tour';
 import { adminTour } from './definitions/admin.tour';
 import { sharingTour } from './definitions/sharing.tour';
+import { onboardingSubmitTour } from './definitions/onboarding-submit.tour';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TOUR REGISTRY
@@ -43,6 +44,7 @@ export const TOUR_REGISTRY: Record<string, TourDefinition> = {
     [settingsTour.id]: settingsTour,
     [adminTour.id]: adminTour,
     [sharingTour.id]: sharingTour,
+    [onboardingSubmitTour.id]: onboardingSubmitTour,
 };
 
 // ═══════════════════════════════════════════════════════════════════════════

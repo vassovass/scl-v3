@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
 import { GratitudeCard } from "@/components/dashboard/GratitudeCard";
 import { ShareProgressWidget } from "@/components/dashboard/ShareProgressWidget";
@@ -10,6 +10,7 @@ import { DashboardWelcomeToast } from "@/components/dashboard/DashboardWelcomeTo
 import { PasswordResetSuccessToast } from "@/components/dashboard/PasswordResetSuccessToast";
 import { DashboardClientWrapper } from "@/components/dashboard/DashboardClientWrapper";
 import { PageViewTracker } from "@/components/analytics/PageViewTracker";
+import { OnboardingSection } from "@/components/onboarding/OnboardingSection";
 
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient();
@@ -19,8 +20,22 @@ export default async function DashboardPage() {
     redirect("/sign-in");
   }
 
-  // Server-side fetch (Zero Waterfall)
-  const leagues = await getUserLeagues(user.id);
+  // Server-side fetch (Zero Waterfall) — parallel queries
+  const adminClient = createAdminClient();
+  const [leagues, submissionCount, userProfile] = await Promise.all([
+    getUserLeagues(user.id),
+    adminClient
+      .from("submissions")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .then(({ count }) => count ?? 0),
+    adminClient
+      .from("users")
+      .select("display_name")
+      .eq("id", user.id)
+      .single()
+      .then(({ data }) => data),
+  ]);
 
   return (
     <DashboardClientWrapper>
@@ -63,6 +78,12 @@ export default async function DashboardPage() {
             </div>
           </div>
         </ModuleFeedback>
+
+        {/* Onboarding for new users (PRD 60) */}
+        <OnboardingSection
+          submissionCount={submissionCount}
+          displayName={userProfile?.display_name ?? user.user_metadata?.display_name}
+        />
 
         {/* Progress Widget & Gratitude Row */}
         <div className="mt-6 mb-2 grid gap-4 md:grid-cols-2">

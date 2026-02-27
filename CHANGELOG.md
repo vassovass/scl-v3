@@ -23,7 +23,7 @@ All notable changes to StepLeague v3.
 - **PRD 58: API Rate Limiting** ✅ — In-memory sliding window rate limiter via `withApiHandler` config. `rateLimit: { maxRequests, windowMs }` on 7 endpoints: feedback (3/min), submissions (5/min), attachments (10/min), proxies (10/min), share/create (10/min), ai/chat (10/min), high-fives (20/min). 429 + `Retry-After` header. 14 unit tests + E2E suite.
 - **PRD 62: Security Headers & CSP** ✅ — OWASP baseline security headers via `next.config.js` `headers()`. X-Frame-Options DENY, X-Content-Type-Options nosniff, HSTS 1yr, Referrer-Policy strict-origin-when-cross-origin, Permissions-Policy (camera/mic/geo/payment disabled), Content-Security-Policy with Supabase + analytics proxy allowlist. 14 unit tests + E2E suite.
 - **PRD 59: Analytics Implementation** — Wire up page views, error tracking, performance events
-- **PRD 60: UX Onboarding** — Guided first 5 minutes experience for new users
+- **PRD 60: UX Onboarding** ✅ — Dashboard onboarding cards (WelcomeCard, SubmitFirstStepsCTA, ScreenshotGuide, WorldLeagueExplainer) for zero-submission users. SupportedAppsList on submit page. Homepage fake stats replaced with honest value props. New `onboarding-submit-v1` tour for first submission guidance. Reusable `OnboardingCard` component with variant-based styling. 11 unit tests.
 - **PRD 61: Testing Gaps** — January 2026 regression prevention tests
 
 ---
