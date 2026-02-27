@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import posthog from "posthog-js";
@@ -94,6 +95,7 @@ export function CopyableError({
     actionButton,
     children,
 }: CopyableErrorProps) {
+    const router = useRouter();
     const { toast } = useToast();
     const [copied, setCopied] = useState(false);
     const [reporting, setReporting] = useState(false);
@@ -375,7 +377,7 @@ ${JSON.stringify(errorData, null, 2)}
                 <ul className="space-y-1 text-left">
                     <li className="flex items-start gap-2">
                         <span className="text-primary">1.</span>
-                        <span><button onClick={() => window.location.reload()} className="text-primary hover:underline">Refresh this page</button> - sometimes that&apos;s all it takes</span>
+                        <span><button onClick={() => router.refresh()} className="text-primary hover:underline">Refresh this page</button> - sometimes that&apos;s all it takes</span>
                     </li>
                     <li className="flex items-start gap-2">
                         <span className="text-primary">2.</span>

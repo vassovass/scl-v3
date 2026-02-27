@@ -30,6 +30,10 @@ All notable changes to StepLeague v3.
 - **PRD 65: Structured Logging & Health Check** ✅ — JSON structured logging (Vercel Log Drain compatible) replacing string-based console output. Request ID tracing (UUID v4) via `X-Request-ID` header on all API responses. Duration measurement (`duration_ms`) for every request. `/api/health` endpoint with DB connectivity check (`auth: 'none'`). Error logging with code extraction from AppError. 24 unit tests.
 - **PRD 61: Testing Gaps** — January 2026 regression prevention tests
 
+### Refactored
+
+- **PRD 36: Technical Debt (partial)** — FeedbackWidget: screenshot capture changed from base64 `toDataURL()` to memory-efficient `Blob` via `canvas.toBlob()`, converted to data URL only at submission time. Feedback API upgraded from `console.log/error` to structured JSON logging. Removed all `window.location.reload()` calls (4 files: CopyableError, claim page, reset page, RoadmapView) replaced with Next.js `router.refresh()`. API standardization deferred to Sprint C.
+
 ---
 
 ## [2026-01-30]

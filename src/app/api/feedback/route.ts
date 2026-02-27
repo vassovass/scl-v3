@@ -1,6 +1,7 @@
 import { withApiHandler } from "@/lib/api/handler";
 import { z } from "zod";
 import { badRequest } from "@/lib/api";
+import { log } from "@/lib/server/logger";
 
 const feedbackSchema = z.object({
     type: z.enum(["bug", "feature", "general", "positive", "negative"]),
@@ -21,14 +22,13 @@ export const POST = withApiHandler({
 }, async ({ user, body, adminClient, request }) => {
     const { type, subject, description, page_url, screenshot } = body;
 
-    console.log("[Feedback API] Submitting feedback:", {
+    log("info", "feedback_submitting", {
         type,
         subject,
         hasUser: !!user,
-        userId: user?.id,
         page_url,
         hasScreenshot: !!screenshot,
-    });
+    }, user?.id);
 
     // Upload screenshot if provided
     let screenshotUrl: string | null = null;
@@ -46,13 +46,13 @@ export const POST = withApiHandler({
                 });
 
             if (uploadError) {
-                console.error("[Feedback API] Screenshot upload error:", uploadError);
+                log("error", "feedback_screenshot_upload_error", { error: uploadError.message }, user?.id);
             } else if (uploadData) {
                 const { data: urlData } = adminClient.storage.from("uploads").getPublicUrl(uploadData.path);
                 screenshotUrl = urlData.publicUrl;
             }
         } catch (err) {
-            console.error("[Feedback API] Screenshot upload failed:", err);
+            log("error", "feedback_screenshot_upload_failed", { error: err instanceof Error ? err.message : "Unknown" }, user?.id);
         }
     }
 
@@ -69,7 +69,7 @@ export const POST = withApiHandler({
         board_status: "backlog", // Ensure it appears in kanban
     };
 
-    console.log("[Feedback API] Inserting:", insertData);
+    log("debug", "feedback_inserting", { type, subject, hasScreenshot: !!screenshotUrl }, user?.id);
 
     const { data, error: insertError } = await adminClient
         .from("feedback")
@@ -78,11 +78,11 @@ export const POST = withApiHandler({
         .single();
 
     if (insertError) {
-        console.error("[Feedback API] Insert error:", insertError);
+        log("error", "feedback_insert_error", { error: insertError.message }, user?.id);
         return badRequest(`Failed to submit feedback: ${insertError.message}`);
     }
 
-    console.log("[Feedback API] Success:", data?.id);
+    log("info", "feedback_submitted", { feedbackId: data?.id, type }, user?.id);
     return { success: true, id: data?.id };
 });
 

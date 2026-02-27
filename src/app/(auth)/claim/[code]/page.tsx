@@ -178,7 +178,7 @@ export default function ClaimPage() {
                         </p>
                         <div className="flex flex-col gap-2">
                             <button
-                                onClick={() => window.location.reload()}
+                                onClick={() => router.refresh()}
                                 className="px-4 py-2 text-sm rounded-lg border border-border hover:bg-secondary/50 transition"
                             >
                                 Refresh Page

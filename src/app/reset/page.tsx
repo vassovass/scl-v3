@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 /**
  * Recovery/Reset page - clears all local state and redirects to sign-in.
@@ -13,6 +14,7 @@ import { useEffect, useState } from "react";
  * URL: /reset
  */
 export default function ResetPage() {
+    const router = useRouter();
     const [status, setStatus] = useState("Initializing reset...");
     const [error, setError] = useState<string | null>(null);
 
@@ -138,7 +140,7 @@ export default function ResetPage() {
                         <p className="text-destructive text-sm">{error}</p>
                         <div className="flex gap-2 justify-center">
                             <button
-                                onClick={() => window.location.reload()}
+                                onClick={() => router.refresh()}
                                 className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:opacity-90"
                             >
                                 Try Again

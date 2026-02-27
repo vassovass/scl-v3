@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import UniversalFilters, { FILTER_PRESETS } from "@/components/shared/UniversalFilters";
 import { FeedbackFilterState, DEFAULT_FILTER_STATE } from "@/lib/filters/feedbackFilters";
 import { BADGE_CONFIG, getBadgeClass, getBadgeConfig } from "@/lib/badges";
@@ -49,6 +50,7 @@ interface RoadmapViewProps {
 }
 
 export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }: RoadmapViewProps) {
+    const router = useRouter();
     const [expandedCard, setExpandedCard] = useState<string | null>(null);
     const [showAllLater, setShowAllLater] = useState(false);
     const [showAllDone, setShowAllDone] = useState(false);
@@ -130,7 +132,7 @@ export default function RoadmapView({ items, isLoggedIn, isSuperAdmin = false }:
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ feedback_id: itemId, priority }),
             });
-            window.location.reload();
+            router.refresh();
         } catch (error) {
             console.error("Vote error:", error);
         }

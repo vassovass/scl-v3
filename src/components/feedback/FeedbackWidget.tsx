@@ -14,7 +14,7 @@ export function FeedbackWidget() {
     const [subject, setSubject] = useState("");
     const [description, setDescription] = useState("");
     const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
-    const [screenshot, setScreenshot] = useState<string | null>(null);
+    const [screenshot, setScreenshot] = useState<Blob | null>(null);
 
     // Reset form when closed
     useEffect(() => {
@@ -53,14 +53,18 @@ export function FeedbackWidget() {
             const canvas = await html2canvas(document.body, {
                 backgroundColor: getThemeBackgroundForScreenshot(),
                 ignoreElements: (element) => element.id === "feedback-widget",
-                useCORS: true, // Crucial for external images (Supabase, etc)
-                logging: false, // Reduce console noise
-                scale: 1, // Default scale to prevent massive images
+                useCORS: true,
+                logging: false,
+                scale: 1,
             });
-            setScreenshot(canvas.toDataURL("image/png"));
+            // Use toBlob instead of toDataURL — stores binary Blob in state
+            // instead of a large base64 string, reducing memory usage
+            const blob = await new Promise<Blob | null>((resolve) =>
+                canvas.toBlob(resolve, "image/png")
+            );
+            if (blob) setScreenshot(blob);
         } catch (err) {
             console.error("Screenshot failed:", err);
-            // Optional: Show a toast or error state here
         } finally {
             setIsCapturing(false);
         }
@@ -71,6 +75,18 @@ export function FeedbackWidget() {
         setStatus("submitting");
 
         try {
+            // Convert Blob to base64 data URL at submission time only
+            // (keeps memory-efficient Blob in state, converts on demand)
+            let screenshotDataUrl: string | null = null;
+            if (screenshot) {
+                screenshotDataUrl = await new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result as string);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(screenshot);
+                });
+            }
+
             const res = await fetch("/api/feedback", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -78,8 +94,8 @@ export function FeedbackWidget() {
                     type,
                     subject: subject || "Quick Feedback",
                     description,
-                    page_url: window.location.href, // full URL
-                    screenshot,
+                    page_url: window.location.href,
+                    screenshot: screenshotDataUrl,
                 }),
             });
 

@@ -5,7 +5,7 @@
 > These PRDs describe WHAT is needed, not HOW to implement. The implementing agent decides the best approach.
 >
 > **Last Updated:** 2026-02-27
-> **Total PRDs:** 66 (47 complete, 2 partial, 2 in-progress, 15 proposed)
+> **Total PRDs:** 66 (47 complete, 3 partial, 1 in-progress, 15 proposed)
 
 ---
 
@@ -147,7 +147,7 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 ### In Progress
 | # | PRD Title | Status |
 |---|-----------|--------|
-| 36 | [Technical Debt](./PRD_36_Technical_Debt.md) | 🔄 In Progress |
+| 36 | [Technical Debt](./PRD_36_Technical_Debt.md) | 🟨 Partial (FeedbackWidget Blob + reload removal done; API standardization → Sprint C) |
 | 49 | [Alpha Launch Checklist](./PRD_49_Alpha_Launch_Checklist.md) | 🔄 In Progress |
 
 ### Proposed
