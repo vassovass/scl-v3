@@ -562,6 +562,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         setLoading(false);
       }
+
+      // PRD 57: Handle password recovery flow
+      if (event === 'PASSWORD_RECOVERY' && newSession?.user) {
+        if (DEBUG) console.log('[AuthProvider] PASSWORD_RECOVERY event, redirecting to /update-password');
+        if (typeof window !== 'undefined' && !window.location.pathname.includes('/update-password')) {
+          router.push('/update-password');
+        }
+        setLoading(false);
+      }
     });
 
     return () => {
@@ -595,6 +604,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         clearUser();
         identifiedUserRef.current = null;
         analytics.logout();
+        break;
+
+      case 'PASSWORD_RECOVERY':
+        analytics.passwordRecoveryStarted();
         break;
 
       case 'USER_UPDATED':

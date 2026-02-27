@@ -21,14 +21,22 @@ export async function GET(request: Request) {
         }, { onConflict: "id", ignoreDuplicates: false });
 
         // PRD 44: Auto-enroll in World League (silent failure)
-        // This ensures every new user immediately has a global leaderboard
-        await enrollInWorldLeague(adminClient, user.id, { method: "auto" });
+        // Skip for password recovery — user already exists (PRD 57)
+        if (next !== "/update-password") {
+          await enrollInWorldLeague(adminClient, user.id, { method: "auto" });
+        }
       }
       return NextResponse.redirect(`${origin}${next}`);
     }
 
     // Specific error: code exchange failed (PKCE mismatch - wrong browser)
     console.error("[Auth Callback] Code exchange failed:", error.message);
+
+    // PRD 57: Redirect to reset-password with error for expired recovery links
+    if (next === "/update-password") {
+      return NextResponse.redirect(`${origin}/reset-password?error=link_expired`);
+    }
+
     return NextResponse.redirect(`${origin}/dashboard?error=auth_code_exchange_failed`);
   }
 

@@ -185,7 +185,7 @@ export async function updateSession(request: NextRequest) {
   const isAuthenticated = !!session?.access_token;
 
   // Protected routes - redirect to sign-in if not authenticated
-  const protectedPaths = ["/dashboard", "/league", "/admin", "/settings", "/claim"];
+  const protectedPaths = ["/dashboard", "/league", "/admin", "/settings", "/claim", "/update-password"];
   const isProtectedPath = protectedPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );
@@ -200,7 +200,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Redirect authenticated users away from auth pages
-  const authPaths = ["/sign-in", "/sign-up"];
+  const authPaths = ["/sign-in", "/sign-up", "/reset-password"];
   const isAuthPath = authPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );
