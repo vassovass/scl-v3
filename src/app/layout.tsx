@@ -92,6 +92,10 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Preconnect to Supabase for faster API calls (PRD 64) */}
+        {process.env.NEXT_PUBLIC_SUPABASE_URL && (
+          <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL} />
+        )}
         {/* GTM: Consent defaults + script (must be in head) */}
         <GoogleTagManager />
       </head>

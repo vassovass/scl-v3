@@ -14,9 +14,10 @@
  * Only the master toggle can disable tracking.
  */
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useFeatureFlag } from "@/hooks/useFeatureFlag";
 import { setTrackingEnabled } from "@/lib/analytics";
+import { initWebVitals } from "@/lib/performance/webVitals";
 import { PostHogProvider } from "./PostHogProvider";
 
 interface AnalyticsGateProviderProps {
@@ -26,9 +27,17 @@ interface AnalyticsGateProviderProps {
 export function AnalyticsGateProvider({ children }: AnalyticsGateProviderProps) {
     const featureEnabled = useFeatureFlag("feature_user_tracking");
 
+    const vitalsInitialized = useRef(false);
+
     // Sync the master toggle to analytics.ts for trackEvent() calls
+    // Initialize Web Vitals collection when tracking becomes enabled (PRD 64)
     useEffect(() => {
         setTrackingEnabled(featureEnabled);
+
+        if (featureEnabled && !vitalsInitialized.current) {
+            vitalsInitialized.current = true;
+            initWebVitals();
+        }
     }, [featureEnabled]);
 
     return (
