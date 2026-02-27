@@ -1,18 +1,39 @@
 /**
- * Server-side logging utility for StepLeague.
- * Logs are written to console (visible in Vercel logs) with structured format.
- * SuperAdmins can access logs via a debug endpoint or UI.
+ * Server-side structured logging utility for StepLeague.
+ *
+ * Outputs JSON-structured logs compatible with Vercel Log Drain.
+ * SuperAdmins can access recent logs via debug endpoint.
+ *
+ * @see PRD 65: Structured Logging & Health Check
  */
 
 export type LogLevel = "debug" | "info" | "warn" | "error";
 
-interface LogEntry {
+export interface LogEntry {
     timestamp: string;
     level: LogLevel;
     message: string;
     context?: Record<string, unknown>;
     userId?: string;
     requestId?: string;
+}
+
+/**
+ * JSON log line format for Vercel Log Drain compatibility.
+ * All fields are top-level for easy querying in log aggregators.
+ */
+export interface StructuredLogLine {
+    timestamp: string;
+    level: LogLevel;
+    message: string;
+    userId?: string;
+    requestId?: string;
+    duration_ms?: number;
+    code?: string;
+    path?: string;
+    method?: string;
+    status?: number;
+    [key: string]: unknown;
 }
 
 // In-memory log buffer for recent logs (for debug endpoint)
@@ -26,11 +47,41 @@ function addToBuffer(entry: LogEntry) {
     }
 }
 
-function formatLogEntry(entry: LogEntry): string {
-    const contextStr = entry.context ? ` | ${JSON.stringify(entry.context)}` : "";
-    const userStr = entry.userId ? ` [user:${entry.userId}]` : "";
-    const reqStr = entry.requestId ? ` [req:${entry.requestId}]` : "";
-    return `[${entry.timestamp}] [${entry.level.toUpperCase()}]${userStr}${reqStr} ${entry.message}${contextStr}`;
+/**
+ * Write a JSON-structured log line to console.
+ * Merges context fields into the top-level object for flat querying.
+ */
+function writeStructuredLog(entry: LogEntry) {
+    const line: StructuredLogLine = {
+        timestamp: entry.timestamp,
+        level: entry.level,
+        message: entry.message,
+    };
+
+    if (entry.userId) line.userId = entry.userId;
+    if (entry.requestId) line.requestId = entry.requestId;
+
+    // Spread context into top-level for flat log querying
+    if (entry.context) {
+        Object.assign(line, entry.context);
+    }
+
+    const json = JSON.stringify(line);
+
+    switch (entry.level) {
+        case "debug":
+            console.debug(json);
+            break;
+        case "info":
+            console.info(json);
+            break;
+        case "warn":
+            console.warn(json);
+            break;
+        case "error":
+            console.error(json);
+            break;
+    }
 }
 
 export function log(
@@ -50,23 +101,7 @@ export function log(
     };
 
     addToBuffer(entry);
-
-    const formatted = formatLogEntry(entry);
-
-    switch (level) {
-        case "debug":
-            console.debug(formatted);
-            break;
-        case "info":
-            console.info(formatted);
-            break;
-        case "warn":
-            console.warn(formatted);
-            break;
-        case "error":
-            console.error(formatted);
-            break;
-    }
+    writeStructuredLog(entry);
 }
 
 export function logDebug(message: string, context?: Record<string, unknown>) {
@@ -91,4 +126,3 @@ export function logError(message: string, context?: Record<string, unknown>) {
 export function getRecentLogs(limit: number = 50): LogEntry[] {
     return logBuffer.slice(-limit);
 }
-

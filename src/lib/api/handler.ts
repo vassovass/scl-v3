@@ -29,6 +29,7 @@ import { User } from "@supabase/supabase-js";
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
 import { json, badRequest, unauthorized, forbidden, serverError, tooManyRequests } from "@/lib/api";
 import { checkRateLimit, getRateLimitKey, type RateLimitConfig } from "./rateLimit";
+import { log } from "@/lib/server/logger";
 
 // =============================================================================
 // Types
@@ -130,8 +131,24 @@ function roleHasAccess(role: MembershipRole, requiredAuth: LeagueAuth): boolean 
 // Main Handler
 // =============================================================================
 
+/** Extract pathname from request URL for logging */
+function getRequestPath(request: Request): string {
+    try {
+        return new URL(request.url).pathname;
+    } catch {
+        return "unknown";
+    }
+}
+
+/** Add X-Request-ID header to a Response */
+function withRequestId(response: Response, requestId: string): Response {
+    response.headers.set("X-Request-ID", requestId);
+    return response;
+}
+
 /**
  * Wrap an API route handler with consistent auth, validation, and error handling.
+ * Includes request ID tracing, duration measurement, and structured logging (PRD 65).
  */
 export function withApiHandler<T extends z.ZodType>(
     config: HandlerConfig<T>,
@@ -141,6 +158,11 @@ export function withApiHandler<T extends z.ZodType>(
         request: Request,
         context?: NextRouteContext
     ): Promise<Response> => {
+        const requestId = crypto.randomUUID();
+        const startTime = Date.now();
+        const path = getRequestPath(request);
+        const method = request.method;
+
         try {
             // Resolve params if provided (Next.js 15 style)
             const params = context?.params ? await context.params : {};
@@ -273,16 +295,35 @@ export function withApiHandler<T extends z.ZodType>(
 
             // If handler returned a Response, use it directly
             if (result instanceof Response) {
-                return result;
+                const duration_ms = Date.now() - startTime;
+                log("info", "request_completed", {
+                    path, method, status: result.status, duration_ms,
+                }, user?.id, requestId);
+                return withRequestId(result, requestId);
             }
 
             // Otherwise wrap in json()
-            return json(result);
+            const response = json(result);
+            const duration_ms = Date.now() - startTime;
+            log("info", "request_completed", {
+                path, method, status: 200, duration_ms,
+            }, user?.id, requestId);
+            return withRequestId(response, requestId);
 
         } catch (error) {
-            console.error("[API Handler Error]", error);
-            return serverError(
-                error instanceof Error ? error.message : "An unexpected error occurred"
+            const duration_ms = Date.now() - startTime;
+            const errorCode = (error as { code?: string })?.code;
+            const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
+
+            log("error", "request_failed", {
+                path, method, status: 500, duration_ms,
+                code: errorCode,
+                error: errorMessage,
+            }, undefined, requestId);
+
+            return withRequestId(
+                serverError(errorMessage),
+                requestId
             );
         }
     };
