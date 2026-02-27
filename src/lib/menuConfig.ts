@@ -284,6 +284,13 @@ export const ADMIN_MENU: MenuDefinition = {
             visibleTo: ['superadmin'],
         },
         {
+            id: 'admin-analytics',
+            label: '📊 Analytics',
+            href: '/admin/analytics',
+            description: 'KPIs, trends, league breakdown',
+            visibleTo: ['superadmin'],
+        },
+        {
             id: 'admin-kanban',
             label: '📋 Kanban Board',
             href: '/admin/kanban',
@@ -291,17 +298,24 @@ export const ADMIN_MENU: MenuDefinition = {
             visibleTo: ['superadmin'],
         },
         {
-            id: 'admin-design',
-            label: '🎨 Design System',
-            href: '/admin/design-system',
-            description: 'Brand guidelines',
-            visibleTo: ['superadmin'],
-        },
-        {
             id: 'admin-feedback',
             label: '💬 Feedback',
             href: '/admin/feedback',
             description: 'View user feedback',
+            visibleTo: ['superadmin'],
+        },
+        {
+            id: 'admin-menus',
+            label: '🍔 Menu Editor',
+            href: '/admin/menus',
+            description: 'Manage navigation menus',
+            visibleTo: ['superadmin'],
+        },
+        {
+            id: 'admin-design',
+            label: '🎨 Design System',
+            href: '/admin/design-system',
+            description: 'Brand guidelines',
             visibleTo: ['superadmin'],
         },
     ]
@@ -318,6 +332,7 @@ export const FOOTER_NAVIGATION: MenuDefinition = {
         { id: 'footer-how-it-works', label: 'How It Works', href: '/how-it-works' },
         { id: 'footer-why-upload', label: 'Why Upload', href: '/why-upload' },
         { id: 'footer-pricing', label: 'Pricing', href: '/pricing' },
+        { id: 'footer-teams', label: 'For Teams', href: '/teams' },
         { id: 'footer-create', label: 'Create League', href: '/league/create' },
         { id: 'footer-join', label: 'Join League', href: '/join' },
     ]
@@ -360,8 +375,8 @@ export const PUBLIC_MENU: MenuDefinition = {
         { id: 'public-features', label: 'Features', href: '/#features', icon: '✨', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
         { id: 'public-how-it-works', label: 'How It Works', href: '/how-it-works', icon: '⚡', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
         { id: 'public-pricing', label: 'Pricing', href: '/pricing', icon: '💎', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
+        { id: 'public-teams', label: 'For Teams', href: '/teams', icon: '🏢', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
         { id: 'public-roadmap', label: 'Roadmap', href: '/roadmap', icon: '🗺️', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
-        { id: 'public-beta', label: 'Stage Info', href: '/stage-info', icon: '📊', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
     ]
 };
 
@@ -463,7 +478,7 @@ export function detectMenuLocation(pathname: string): MenuLocation {
 
     // Public/marketing pages
     const publicPages = ['/', '/pricing', '/how-it-works', '/how-to-share', '/why-upload', '/compare', '/privacy', '/terms', '/security', '/stage-info', '/beta', '/roadmap', '/feedback'];
-    if (publicPages.includes(pathname) || publicPages.some(p => pathname === p)) {
+    if (publicPages.includes(pathname) || publicPages.some(p => pathname === p) || pathname.startsWith('/teams')) {
         return 'public_header';
     }
 

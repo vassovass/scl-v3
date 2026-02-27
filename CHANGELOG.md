@@ -13,6 +13,7 @@ All notable changes to StepLeague v3.
 
 - **PRD 32: Admin Analytics Dashboard** ✅ — Real KPI data integration (Total Users, Active Rate, Avg Steps, Retention, Streak Average, Submission Rate) with period filters (7d/30d/90d/all), trend area chart (Recharts), per-league breakdown table, CSV export endpoint. All via `withApiHandler` with superadmin auth. 18 unit tests.
 - **PRD 34: B2B Landing Pages** ✅ — Corporate wellness landing page (`/teams`) with hero, value props, feature grid, how-it-works, and dual waitlist forms. Features directory (`/teams/features`) with 12 features in 3 categories. Waitlist confirmation page (`/teams/waitlist`). API endpoint with rate limiting (3 req/min), Zod validation, duplicate email detection. WaitlistForm component using FormInput/FormSelect. Migration for `b2b_waitlist` table with RLS. JSON-LD structured data + full SEO metadata. 7 unit tests.
+- **PRD 42: Test Coverage Expansion** ✅ — 113 new tests across 9 test files. API route tests: health check, feedback endpoint, waitlist endpoint. Hook tests: useAppSettings, useShare, useUserStats, useBranding, useSubmissionHistory, useFilterPersistence. Menu system sync: admin menu now includes analytics + menu editor, `/teams` added to public header + footer, `detectMenuLocation` recognizes `/teams` as public. Total: 91 test files, 1932 tests.
 
 ---
 

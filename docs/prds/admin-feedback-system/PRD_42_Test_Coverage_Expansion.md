@@ -1,7 +1,7 @@
 # PRD 42: Test Coverage Expansion
 
 > **Order:** 42
-> **Status:** 📋 Proposed
+> **Status:** ✅ Complete
 > **Type:** Architecture / Quality
 > **Dependencies:** None (can start immediately)
 
@@ -173,8 +173,19 @@ Expand test coverage from ~6% to 70% across critical business logic, ensuring co
 
 ---
 
+## Proactive Items
+
+| # | Item | Description | Trigger |
+|---|------|-------------|---------|
+| 1 | **Coverage trend tracking** | Add a CI step that records coverage % per commit to a JSON file, enabling a coverage-over-time chart on the admin dashboard | When CI pipeline is configured |
+| 2 | **Snapshot testing for critical components** | Add Vitest snapshot tests for complex render output (KanbanBoard, SubmissionForm) to catch unintended UI regressions | When component architecture stabilizes |
+| 3 | **Flaky test detection** | Add `vitest --retry=2` config and a flaky test report that flags tests needing stabilization | When test count exceeds 2000 |
+
+---
+
 ## Changelog
 
 | Date | Section | Change |
 |------|---------|--------|
+| 2026-02-28 | Complete | 113 new tests across 9 files: API routes, hooks, menu system sync |
 | 2026-01-17 | Initial | Created PRD based on test coverage analysis |
