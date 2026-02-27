@@ -7,7 +7,9 @@ import { getUserLeagues } from "@/lib/leagues";
 import { redirect } from "next/navigation";
 
 import { DashboardWelcomeToast } from "@/components/dashboard/DashboardWelcomeToast";
+import { PasswordResetSuccessToast } from "@/components/dashboard/PasswordResetSuccessToast";
 import { DashboardClientWrapper } from "@/components/dashboard/DashboardClientWrapper";
+import { PageViewTracker } from "@/components/analytics/PageViewTracker";
 
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient();
@@ -22,8 +24,10 @@ export default async function DashboardPage() {
 
   return (
     <DashboardClientWrapper>
+      <PageViewTracker pageName="dashboard" pageType="dashboard" />
       <div className="bg-background">
         <DashboardWelcomeToast />
+        <PasswordResetSuccessToast />
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-12">
         <ModuleFeedback moduleId="dashboard-header" moduleName="Dashboard Actions">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between" data-tour="dashboard-header">

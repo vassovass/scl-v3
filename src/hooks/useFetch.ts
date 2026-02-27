@@ -55,11 +55,19 @@ export function useFetch<T>(
         setError(null);
 
         try {
+            const startTime = performance.now();
             const response = await fetch(url, {
                 credentials: 'include',
-                // We can add more flexibility here if needed (headers, method, etc.)
-                // For now, PRD implies simple GET requests primarily.
             });
+            const durationMs = Math.round(performance.now() - startTime);
+
+            // PRD 59: Track API performance
+            import('@/lib/analytics').then(({ analytics }) => {
+                analytics.performance.apiCall(url, durationMs, response.ok);
+                if (durationMs > 2000) {
+                    analytics.error.occurred('slow_api_call', `${url} took ${durationMs}ms`, 'useFetch');
+                }
+            }).catch(() => {});
 
             if (!response.ok) {
                 let errorMessage = response.statusText;

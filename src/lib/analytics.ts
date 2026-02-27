@@ -436,6 +436,28 @@ export const analytics = {
         clearUser();
     },
 
+    // PRD 57: Password reset flow analytics
+    passwordResetRequested: () => {
+        trackEvent('password_reset_requested', {
+            category: 'auth',
+            action: 'request',
+        });
+    },
+
+    passwordResetCompleted: () => {
+        trackEvent('password_reset_completed', {
+            category: 'auth',
+            action: 'complete',
+        });
+    },
+
+    passwordRecoveryStarted: () => {
+        trackEvent('password_recovery_started', {
+            category: 'auth',
+            action: 'recovery_link_clicked',
+        });
+    },
+
     pageView: (pageName: string, pageType?: string) => {
         trackEvent('page_view', {
             page_name: pageName,

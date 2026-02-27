@@ -19,6 +19,11 @@ export default function DashboardError({
 }) {
     useEffect(() => {
         console.error("[Dashboard Error Boundary]", error);
+
+        // PRD 59: Track error in analytics
+        import('@/lib/analytics').then(({ analytics }) => {
+            analytics.error.occurred('dashboard_error_boundary', error.message, 'DashboardError');
+        }).catch(() => {});
     }, [error]);
 
     const errorId = generateErrorId(ErrorCode.UNEXPECTED_ERROR);

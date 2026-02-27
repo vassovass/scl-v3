@@ -270,10 +270,16 @@ export function reportErrorClient(error: AppError | Error): void {
 
     console.error('[AppError]', appError.toJSON());
 
-    // Future: Send to error reporting API using beacon (reliable even on page unload)
-    // if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-    //   navigator.sendBeacon('/api/errors', JSON.stringify(appError.toJSON()));
-    // }
+    // Fire analytics event for error tracking (PRD 59)
+    if (typeof window !== 'undefined') {
+        import('@/lib/analytics').then(({ analytics }) => {
+            analytics.error.occurred(
+                appError.code,
+                appError.message,
+                appError.context?.component as string | undefined,
+            );
+        }).catch(() => {});
+    }
 }
 
 // =============================================================================

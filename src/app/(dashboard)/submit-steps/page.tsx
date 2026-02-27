@@ -15,6 +15,7 @@ import { SystemBadge } from "@/components/ui/SystemBadge";
 import { ProofThumbnail } from "@/components/ui/ProofThumbnail";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useAppSettings } from "@/hooks/useAppSettings";
+import { PageViewTracker } from "@/components/analytics/PageViewTracker";
 
 interface League {
     id: string;
@@ -491,6 +492,7 @@ export default function SubmitPage() {
 
     return (
         <div className="bg-background" data-submission-mode={submissionMode}>
+            <PageViewTracker pageName="submit_steps" pageType="funnel" />
             {/* Page Title */}
             <div className="border-b border-border bg-card/30">
                 <div className="mx-auto max-w-3xl px-6 py-4">

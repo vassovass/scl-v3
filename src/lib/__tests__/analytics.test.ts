@@ -44,6 +44,14 @@ describe('Analytics Tracking System', () => {
         // Reset all mocks
         vi.clearAllMocks();
 
+        // Mock requestIdleCallback to execute synchronously in tests
+        // (trackEvent defers via requestIdleCallback/setTimeout, which doesn't fire synchronously)
+        window.requestIdleCallback = (cb: IdleRequestCallback) => {
+            cb({ didTimeout: false, timeRemaining: () => 50 } as IdleDeadline);
+            return 0;
+        };
+        window.cancelIdleCallback = () => {};
+
         // Mock dataLayer
         dataLayerPushes = [];
         Object.defineProperty(window, 'dataLayer', {

@@ -50,6 +50,11 @@ export default function GlobalError({
                 // Use Blob with application/json content-type for correct server-side parsing
                 navigator.sendBeacon('/api/feedback', new Blob([payload], { type: 'application/json' }));
             }
+
+            // PRD 59: Track error in analytics
+            import('@/lib/analytics').then(({ analytics }) => {
+                analytics.error.occurred('global_error_boundary', error.message, 'GlobalError');
+            }).catch(() => {});
         } catch {
             // Ignore errors in error reporting
         }

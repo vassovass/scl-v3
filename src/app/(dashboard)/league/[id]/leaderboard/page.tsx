@@ -16,6 +16,7 @@ import { ShareAchievementButton, AchievementData } from "@/components/ui/Achieve
 import { IDENTITY_LABEL, IDENTITY_FALLBACK } from "@/lib/identity";
 import { HighFiveButton } from "@/components/encouragement/HighFiveButton";
 import { CheerPrompt } from "@/components/encouragement/CheerPrompt";
+import { PageViewTracker } from "@/components/analytics/PageViewTracker";
 
 // ... (Types remain same) ...
 
@@ -576,6 +577,7 @@ function LeaderboardContent() {
 export default function LeaderboardPage() {
   return (
     <Suspense fallback={<LeaderboardSkeleton />}>
+      <PageViewTracker pageName="leaderboard" pageType="dashboard" />
       <LeaderboardContent />
     </Suspense>
   );
