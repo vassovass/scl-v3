@@ -10,7 +10,8 @@ const HighFiveSchema = z.object({
 
 export const POST = withApiHandler({
     auth: 'required',
-    schema: HighFiveSchema
+    schema: HighFiveSchema,
+    rateLimit: { maxRequests: 20, windowMs: 60_000 },
 }, async ({ user, body, adminClient }) => {
     if (!user) throw new Error("User required");
 

@@ -10,5 +10,9 @@ export { withApiHandler } from './handler';
 export type { HandlerConfig, HandlerContext } from './handler';
 
 // Response helpers (from existing api.ts)
-export { json, jsonError, badRequest, unauthorized, forbidden, notFound, serverError } from '../api';
+export { json, jsonError, badRequest, unauthorized, forbidden, notFound, serverError, tooManyRequests } from '../api';
+
+// Rate limiting
+export { checkRateLimit, getRateLimitKey } from './rateLimit';
+export type { RateLimitConfig, RateLimitResult } from './rateLimit';
 

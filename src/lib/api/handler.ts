@@ -27,7 +27,8 @@
 import { z } from "zod";
 import { User } from "@supabase/supabase-js";
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
-import { json, badRequest, unauthorized, forbidden, serverError } from "@/lib/api";
+import { json, badRequest, unauthorized, forbidden, serverError, tooManyRequests } from "@/lib/api";
+import { checkRateLimit, getRateLimitKey, type RateLimitConfig } from "./rateLimit";
 
 // =============================================================================
 // Types
@@ -53,6 +54,8 @@ export interface HandlerConfig<T extends z.ZodType = z.ZodType> {
     auth: AuthLevel;
     /** Optional Zod schema for request body validation */
     schema?: T;
+    /** Optional rate limiting config (in-memory sliding window) */
+    rateLimit?: RateLimitConfig;
 }
 
 export interface HandlerContext<T = unknown> {
@@ -148,6 +151,18 @@ export function withApiHandler<T extends z.ZodType>(
 
             // Get current user
             const { data: { user } } = await supabase.auth.getUser();
+
+            // ======================
+            // Rate Limiting
+            // ======================
+
+            if (config.rateLimit) {
+                const key = getRateLimitKey(request, user);
+                const result = checkRateLimit(key, config.rateLimit);
+                if (!result.allowed) {
+                    return tooManyRequests(result.retryAfterMs, result.remaining, result.limit);
+                }
+            }
 
             // ======================
             // Auth Checks

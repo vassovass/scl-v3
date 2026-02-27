@@ -13,6 +13,7 @@ export const dynamic = 'force-dynamic';
 export const POST = withApiHandler({
     auth: 'superadmin',
     schema: aiChatSchema,
+    rateLimit: { maxRequests: 10, windowMs: 60_000 },
 }, async ({ body, adminClient }) => {
     const { message, conversationHistory } = body;
 

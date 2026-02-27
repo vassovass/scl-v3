@@ -39,3 +39,22 @@ export function serverError(message = "Internal Server Error"): Response {
   return jsonError(500, message);
 }
 
+export function tooManyRequests(
+  retryAfterMs: number,
+  remaining: number = 0,
+  limit: number = 0,
+  message = "Too many requests. Please wait a moment and try again."
+): Response {
+  const retryAfterSeconds = Math.ceil(retryAfterMs / 1000);
+  return new Response(JSON.stringify({ error: message }), {
+    status: 429,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+      "Retry-After": String(retryAfterSeconds),
+      "X-RateLimit-Limit": String(limit),
+      "X-RateLimit-Remaining": String(remaining),
+    },
+  });
+}
+

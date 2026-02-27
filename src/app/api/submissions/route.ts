@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
-import { json, badRequest, unauthorized, forbidden, serverError, jsonError } from "@/lib/api";
+import { json, badRequest, unauthorized, forbidden, serverError, jsonError, tooManyRequests } from "@/lib/api";
 import { callVerificationFunction } from "@/lib/server/verify";
+import { checkRateLimit, getRateLimitKey } from "@/lib/api/rateLimit";
 
 const createSchema = z.object({
     league_id: z.string().uuid().optional().nullable(),
@@ -38,6 +39,12 @@ export async function POST(request: Request): Promise<Response> {
 
         if (authError || !user) {
             return unauthorized();
+        }
+
+        // Rate limiting: 5 submissions per minute per user
+        const rlResult = checkRateLimit(getRateLimitKey(request, user), { maxRequests: 5, windowMs: 60_000 });
+        if (!rlResult.allowed) {
+            return tooManyRequests(rlResult.retryAfterMs, rlResult.remaining, 5);
         }
 
         // Get session for access token

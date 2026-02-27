@@ -17,6 +17,7 @@ const feedbackSchema = z.object({
 export const POST = withApiHandler({
     auth: 'none', // Feedback can be anonymous
     schema: feedbackSchema,
+    rateLimit: { maxRequests: 3, windowMs: 60_000 },
 }, async ({ user, body, adminClient, request }) => {
     const { type, subject, description, page_url, screenshot } = body;
 

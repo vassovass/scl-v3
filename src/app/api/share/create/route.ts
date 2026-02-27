@@ -3,6 +3,8 @@ import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/se
 import { nanoid } from "nanoid";
 import { getMilestoneCelebration } from "@/lib/sharing/streaks";
 import type { ShareStreakUpdateResult, MilestoneCelebration } from "@/lib/sharing/streaks";
+import { checkRateLimit, getRateLimitKey } from "@/lib/api/rateLimit";
+import { tooManyRequests } from "@/lib/api";
 
 // Types matching database schema
 type CardType = "daily" | "weekly" | "personal_best" | "streak" | "rank" | "challenge" | "rank_change";
@@ -37,6 +39,12 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Rate limiting: 10 share cards per minute per user
+    const rlResult = checkRateLimit(getRateLimitKey(request, user), { maxRequests: 10, windowMs: 60_000 });
+    if (!rlResult.allowed) {
+        return tooManyRequests(rlResult.retryAfterMs, rlResult.remaining, 10);
     }
 
     try {

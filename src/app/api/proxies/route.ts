@@ -123,6 +123,7 @@ export const GET = withApiHandler({
 export const POST = withApiHandler({
     auth: "required",
     schema: createProxySchema,
+    rateLimit: { maxRequests: 10, windowMs: 60_000 },
 }, async ({ user, body, adminClient }) => {
     // Step 1: Check quota
     const MAX_PROXIES = 50; // TODO: Get from settings when available

@@ -98,6 +98,7 @@ export async function GET(request: Request): Promise<Response> {
 export const POST = withApiHandler({
     auth: 'required',
     schema: uploadSchema,
+    rateLimit: { maxRequests: 10, windowMs: 60_000 },
 }, async ({ user, body, adminClient }) => {
     const { entity_type, entity_id, file_name, file_type, file_data } = body;
 
