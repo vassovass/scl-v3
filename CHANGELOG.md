@@ -25,6 +25,7 @@ All notable changes to StepLeague v3.
 - **PRD 59: Analytics Implementation** — Wire up page views, error tracking, performance events
 - **PRD 60: UX Onboarding** ✅ — Dashboard onboarding cards (WelcomeCard, SubmitFirstStepsCTA, ScreenshotGuide, WorldLeagueExplainer) for zero-submission users. SupportedAppsList on submit page. Homepage fake stats replaced with honest value props. New `onboarding-submit-v1` tour for first submission guidance. Reusable `OnboardingCard` component with variant-based styling. 11 unit tests.
 - **PRD 28: Smart Engagement** ✅ — MissedDayCard and StreakWarning components using reusable OnboardingCard (variant="warning"). `useEngagement` hook derives missed-day and streak-at-risk state from `useUserSubmissions`. EngagementPrompts container on dashboard for users with submissions. Submit page `?date=` query param with DatePrefillBanner. Session-based dismiss via sessionStorage. 17 unit tests.
+- **PRD 29: Unified Progress** ✅ — New `/progress` page with Personal/League toggle (shadcn Tabs). StepBankCard (gamified lifetime total), PersonalProgressView (streak cards, empty state), LeagueProgressView (rank, you vs avg). Menu renamed: "Analytics" → "My Progress". Reuses existing `/api/stats/hub` and `/api/user/stats` APIs. 7 unit tests.
 - **PRD 61: Testing Gaps** — January 2026 regression prevention tests
 
 ---

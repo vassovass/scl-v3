@@ -197,7 +197,7 @@ export const MAIN_MENU: MenuDefinition = {
             children: [
                 { id: 'league-submit', label: 'Submit Steps', href: '/submit-steps', icon: '📝' },
                 { id: 'league-leaderboard', label: 'Leaderboard', href: '/league/[id]/leaderboard', icon: '🏆' },
-                { id: 'league-analytics', label: 'Analytics', href: '/league/[id]/analytics', icon: '📊' },
+                { id: 'league-analytics', label: 'My Progress', href: '/progress', icon: '📊' },
             ]
         },
         {
@@ -240,7 +240,7 @@ export const HELP_MENU: MenuDefinition = {
                 { id: 'tour-league-create', label: 'Create a League', href: '#tour-league-v1', icon: '🏆', description: '~1m', onClick: 'startTour' },
                 { id: 'tour-submit-steps', label: 'Submit Steps', href: '#tour-submit-steps-v1', icon: '📝', description: '~2m', onClick: 'startTour' },
                 { id: 'tour-leaderboard', label: 'Leaderboard Tour', href: '#tour-leaderboard-v1', icon: '📊', description: '~1m', onClick: 'startTour', requiresLeague: true },
-                { id: 'tour-analytics', label: 'Analytics Tour', href: '#tour-analytics-v1', icon: '📈', description: '~1m', onClick: 'startTour', requiresLeague: true },
+                { id: 'tour-analytics', label: 'Progress Tour', href: '#tour-analytics-v1', icon: '📈', description: '~1m', onClick: 'startTour' },
                 { id: 'tour-settings', label: 'Settings Tour', href: '#tour-settings-v1', icon: '⚙️', description: '~1m', onClick: 'startTour' },
                 { id: 'tour-admin', label: 'Admin Analytics Tour', href: '#tour-admin-v1', icon: '🛡️', description: '~1m', onClick: 'startTour', visibleTo: ['admin', 'owner', 'superadmin'] },
             ]
