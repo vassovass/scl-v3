@@ -1,7 +1,7 @@
 # PRD 34: B2B Landing Pages
 
 > **Order:** 34
-> **Status:** 📋 Proposed
+> **Status:** ✅ Complete
 > **Type:** Feature
 > **Dependencies:** None
 > **Blocks:** None
@@ -194,8 +194,19 @@ ALTER TABLE b2b_waitlist ENABLE ROW LEVEL SECURITY;
 
 ---
 
+## 🚀 Proactive Items
+
+| # | Item | Description | Trigger |
+|---|------|-------------|---------|
+| 1 | **Admin waitlist dashboard** | Add `/admin/waitlist` page showing signups with filtering, sorting, and CSV export so the team can follow up with leads | When first B2B signups arrive |
+| 2 | **UTM parameter capture** | Automatically capture `utm_source`, `utm_medium`, `utm_campaign` from URL params and store in the `source` field for attribution tracking | Before paid acquisition campaigns |
+| 3 | **Automated welcome email** | Add a Supabase Edge Function trigger on `b2b_waitlist` insert that sends a branded confirmation email via Resend/SendGrid (keeps lead warm) | When email service is configured |
+
+---
+
 ## Changelog
 
 | Date | Section | Change |
 |------|---------|--------|
+| 2026-02-28 | Complete | Implemented: 3 pages, waitlist API, WaitlistForm, migration, 7 tests |
 | 2026-01-05 | Initial | Created PRD for B2B landing pages |

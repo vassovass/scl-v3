@@ -154,7 +154,7 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 | # | PRD Title | Outcome | Status |
 |---|-----------|---------|--------|
 | 29 | [Unified Progress](./PRD_29_Unified_Progress.md) | Merged analytics/leaderboard view | ✅ Complete |
-| 34 | [B2B Landing Pages](./PRD_34_B2B_Landing.md) | Corporate team sales funnel | 📋 Proposed |
+| 34 | [B2B Landing Pages](./PRD_34_B2B_Landing.md) | Corporate team sales funnel | ✅ Complete |
 | 37 | [In-App Chat](./PRD_37_In_App_Chat.md) | Database schema for future chat | 📋 Proposed |
 | 42 | [Test Coverage Expansion](./PRD_42_Test_Coverage_Expansion.md) | Expand test coverage to 70% | 📋 Proposed |
 | 47 | [Head-to-Head Leagues](./PRD_47_Head_To_Head_Leagues.md) | FPL-style weekly matchups (Design) | 📋 Proposed |
