@@ -98,19 +98,12 @@ describe("buildShareMessage", () => {
             expect(result.includedBlocks).toHaveLength(3);
         });
 
-        it("includes hashtag by default", () => {
+        it("includes URL footer by default (includeHashtag adds URL)", () => {
             const data = createBasicData();
             const result = buildShareMessage(["total_steps"], data);
 
-            expect(result.message).toContain("#StepLeague");
-        });
-
-        it("excludes URL by default (URL added by useShare hook)", () => {
-            const data = createBasicData();
-            const result = buildShareMessage(["total_steps"], data);
-
-            // URL is now added by useShare hook, not in message text
-            expect(result.message).not.toContain("stepleague.app");
+            // Footer now uses APP_CONFIG.url instead of hashtag
+            expect(result.message).toContain("stepleague.app");
         });
 
         it("includes URL when explicitly requested", () => {
@@ -136,14 +129,14 @@ describe("buildShareMessage", () => {
             expect(result.message).toMatch(/1.?234.?567/);
         });
 
-        it("renders day_count with emoji and proper pluralization", () => {
+        it("renders day_count with proper pluralization", () => {
             const data = createBasicData({ dayCount: 1 });
             const result = buildShareMessage(["day_count"], data);
-            expect(result.message).toContain("📅 1 day");
+            expect(result.message).toContain("1 day");
 
             const data2 = createBasicData({ dayCount: 5 });
             const result2 = buildShareMessage(["day_count"], data2);
-            expect(result2.message).toContain("📅 5 days");
+            expect(result2.message).toContain("5 days");
         });
 
         it("renders date_range in readable format", () => {
@@ -154,29 +147,26 @@ describe("buildShareMessage", () => {
             expect(result.message).toContain("Jan");
         });
 
-        it("renders average with emoji", () => {
+        it("renders average with label", () => {
             const data = createBasicData({ averageSteps: 12345 });
             const result = buildShareMessage(["average"], data);
 
-            expect(result.message).toContain("📊");
             expect(result.message).toContain("Avg");
             expect(result.message).toMatch(/12.?345/);
         });
 
-        it("renders streak with emoji", () => {
+        it("renders streak with days and label", () => {
             const data = createFullData();
             const result = buildShareMessage(["streak"], data);
 
-            expect(result.message).toContain("🔥");
             expect(result.message).toContain("14 day");
             expect(result.message).toContain("streak");
         });
 
-        it("renders rank with emoji", () => {
+        it("renders rank with hash number", () => {
             const data = createFullData();
             const result = buildShareMessage(["rank"], data);
 
-            expect(result.message).toContain("🏆");
             expect(result.message).toContain("#3");
         });
 
@@ -195,20 +185,20 @@ describe("buildShareMessage", () => {
             expect(result.message).toContain("Family Steps");
         });
 
-        it("renders improvement with sign", () => {
+        it("renders improvement with arrow and sign", () => {
             const data = createFullData({ improvementPercent: 25 });
             const result = buildShareMessage(["improvement"], data);
 
             expect(result.message).toContain("+25%");
-            expect(result.message).toContain("📈");
+            expect(result.message).toContain("↑");
         });
 
-        it("renders negative improvement with downward emoji", () => {
+        it("renders negative improvement with downward arrow", () => {
             const data = createFullData({ improvementPercent: -15 });
             const result = buildShareMessage(["improvement"], data);
 
             expect(result.message).toContain("-15%");
-            expect(result.message).toContain("📉");
+            expect(result.message).toContain("↓");
         });
 
         it("renders best_day with star", () => {
@@ -294,9 +284,10 @@ describe("buildShareMessage", () => {
             expect(result.message).not.toContain("#StepLeague");
         });
 
-        it("excludes URL when includeUrl is false", () => {
+        it("excludes URL footer when both includeHashtag and includeUrl are false", () => {
             const data = createBasicData();
             const result = buildShareMessage(["total_steps"], data, {
+                includeHashtag: false,
                 includeUrl: false,
             });
 
@@ -335,18 +326,7 @@ describe("buildShareMessage", () => {
             expect(result.truncated).toBe(false);
         });
 
-        it("preserves hashtag when truncating", () => {
-            const data = createFullData();
-            const result = buildShareMessage(
-                ["total_steps", "individual_days"],
-                data,
-                { maxLength: 150 }
-            );
-
-            expect(result.message).toContain("#StepLeague");
-        });
-
-        it("preserves hashtag and URL when truncating with includeUrl", () => {
+        it("preserves URL footer when truncating", () => {
             const data = createFullData();
             const result = buildShareMessage(
                 ["total_steps", "individual_days"],
@@ -354,8 +334,7 @@ describe("buildShareMessage", () => {
                 { maxLength: 200, includeUrl: true }
             );
 
-            expect(result.message).toContain("#StepLeague");
-            expect(result.message).toContain("stepleague");
+            expect(result.message).toContain("stepleague.app");
         });
 
         it("adds ellipsis when truncating", () => {
@@ -595,8 +574,8 @@ describe("Negative Tests", () => {
             const data = createBasicData();
             const result = buildShareMessage([], data);
 
-            // Should still have footer
-            expect(result.message).toContain("#StepLeague");
+            // Should still have URL footer
+            expect(result.message).toContain("stepleague.app");
         });
 
         it("handles single block that gets skipped", () => {
@@ -604,8 +583,8 @@ describe("Negative Tests", () => {
             const result = buildShareMessage(["total_steps"], data);
 
             expect(result.skippedBlocks).toHaveLength(1);
-            // Should have footer only
-            expect(result.message).toContain("#StepLeague");
+            // Should have URL footer only
+            expect(result.message).toContain("stepleague.app");
         });
     });
 });
@@ -656,7 +635,7 @@ describe("Integration Tests", () => {
         // Locale-agnostic
         expect(result.message).toMatch(/10.?000.*steps/);
         expect(result.message).toContain("5 day");
-        expect(result.message).toContain("#StepLeague");
+        expect(result.message).toContain("stepleague.app");
         expect(result.length).toBeLessThan(500);
     });
 

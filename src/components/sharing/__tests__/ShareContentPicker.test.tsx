@@ -15,9 +15,15 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render as baseRender, screen, fireEvent } from "@testing-library/react";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { ShareContentPicker, ShareContentPickerInline } from "../ShareContentPicker";
 import type { ShareContentBlock, ShareMessageData } from "@/lib/sharing/shareContentConfig";
+
+// shadcn Tooltip requires TooltipProvider ancestor — wrap all renders
+function render(ui: React.ReactNode, options?: Parameters<typeof baseRender>[1]) {
+    return baseRender(<TooltipProvider>{ui}</TooltipProvider>, options);
+}
 
 // ============================================================================
 // Test Data Factories

@@ -59,22 +59,30 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 // ============================================================================
-// Mock: ResizeObserver (for UI components)
+// Mock: ResizeObserver (class-based for instanceof support)
 // ============================================================================
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-}));
+class MockResizeObserver implements ResizeObserver {
+    observe = vi.fn();
+    unobserve = vi.fn();
+    disconnect = vi.fn();
+    constructor(_callback: ResizeObserverCallback) {}
+}
+vi.stubGlobal('ResizeObserver', MockResizeObserver);
 
 // ============================================================================
-// Mock: IntersectionObserver (for lazy loading)
+// Mock: IntersectionObserver (class-based for instanceof — Next.js Link needs this)
 // ============================================================================
-global.IntersectionObserver = vi.fn().mockImplementation(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-}));
+class MockIntersectionObserver implements IntersectionObserver {
+    readonly root: Element | null = null;
+    readonly rootMargin: string = '';
+    readonly thresholds: ReadonlyArray<number> = [];
+    observe = vi.fn();
+    unobserve = vi.fn();
+    disconnect = vi.fn();
+    takeRecords = vi.fn().mockReturnValue([]);
+    constructor(_cb: IntersectionObserverCallback, _opts?: IntersectionObserverInit) {}
+}
+vi.stubGlobal('IntersectionObserver', MockIntersectionObserver);
 
 // ============================================================================
 // Suppress console noise in tests

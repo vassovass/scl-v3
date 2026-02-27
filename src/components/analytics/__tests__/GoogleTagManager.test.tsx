@@ -11,6 +11,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, waitFor, act } from '@testing-library/react';
+import { renderToString } from 'react-dom/server';
 
 // ============================================================================
 // Mock next/script
@@ -311,11 +312,10 @@ describe('GoogleTagManager Component', () => {
             process.env.NEXT_PUBLIC_GTM_ID = 'GTM-TEST123';
 
             const { GoogleTagManagerNoscript } = await import('../GoogleTagManager');
-            const { container } = render(<GoogleTagManagerNoscript />);
-
-            const iframe = container.querySelector('iframe');
-            expect(iframe?.getAttribute('src')).toContain('https://www.googletagmanager.com/ns.html');
-            expect(iframe?.getAttribute('src')).toContain('GTM-TEST123');
+            // jsdom strips noscript children entirely — use renderToString for static HTML
+            const html = renderToString(<GoogleTagManagerNoscript />);
+            expect(html).toContain('https://www.googletagmanager.com/ns.html');
+            expect(html).toContain('GTM-TEST123');
         });
     });
 });

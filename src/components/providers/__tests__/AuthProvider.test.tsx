@@ -49,6 +49,26 @@ vi.mock('@/lib/auth/sessionCache', () => ({
   clearCachedSession: vi.fn(),
 }));
 
+// Chainable Supabase query mock — supports deep chains like .select().eq().eq().is().eq().order()
+// singleValue: returned by .single() (profile fetch)
+// awaitValue: returned when chain is awaited without .single() (proxy list fetch)
+function createChainableMock(
+  singleValue: { data: any; error: any } = { data: null, error: null },
+  awaitValue?: { data: any; error: any },
+) {
+  const listResult = awaitValue ?? { data: [], error: null };
+  const mock: any = {};
+  const chainMethods = ['select', 'eq', 'neq', 'gt', 'lt', 'gte', 'lte', 'like',
+    'ilike', 'is', 'in', 'contains', 'order', 'limit', 'range'];
+
+  for (const m of chainMethods) mock[m] = vi.fn().mockReturnValue(mock);
+  mock.single = vi.fn().mockResolvedValue(singleValue);
+  mock.maybeSingle = vi.fn().mockResolvedValue(singleValue);
+  // When awaited directly (without .single()), resolve with list result
+  mock.then = vi.fn().mockImplementation((resolve: any) => resolve(listResult));
+  return mock;
+}
+
 // Mock clearAllAppState
 vi.mock('@/lib/utils/clearAppState', () => ({
   clearAllAppState: vi.fn().mockResolvedValue(undefined),
@@ -316,22 +336,18 @@ describe('AuthProvider - Session Expiry Validation', () => {
       };
     });
 
-    // Mock from().select() for profile fetch
-    mockSupabaseClient.from.mockReturnValue({
-      select: vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
-          single: vi.fn().mockResolvedValue({
-            data: {
-              id: 'test-user-id',
-              display_name: 'Test User',
-              is_superadmin: false,
-              is_proxy: false,
-            },
-            error: null,
-          }),
-        }),
-      }),
-    });
+    // Mock from().select()...chain for profile fetch + refreshProxies
+    mockSupabaseClient.from.mockReturnValue(
+      createChainableMock({
+        data: {
+          id: 'test-user-id',
+          display_name: 'Test User',
+          is_superadmin: false,
+          is_proxy: false,
+        },
+        error: null,
+      })
+    );
 
     const { result } = renderHook(() => useAuth(), {
       wrapper: ({ children }) => <AuthProvider>{children}</AuthProvider>,
@@ -346,5 +362,69 @@ describe('AuthProvider - Session Expiry Validation', () => {
     expect(result.current.session).toBeDefined();
     expect(result.current.session?.user.id).toBe('test-user-id');
     expect(result.current.user).toBeDefined();
+  });
+});
+
+// ============================================================================
+// PRD 61: Auth Failure Resilience Tests
+// ============================================================================
+
+describe('AuthProvider - Auth Failure Resilience', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('resolves loading when onAuthStateChange fires an error event', async () => {
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://test.supabase.co');
+
+    // Simulate onAuthStateChange calling back with no session (error scenario)
+    mockSupabaseClient.auth.onAuthStateChange.mockImplementation((callback) => {
+      // Fire INITIAL_SESSION with null session (auth error)
+      setTimeout(() => {
+        callback('INITIAL_SESSION', null);
+      }, 0);
+
+      return {
+        data: {
+          subscription: { unsubscribe: vi.fn() },
+        },
+      };
+    });
+
+    const { result } = renderHook(() => useAuth(), {
+      wrapper: ({ children }) => <AuthProvider>{children}</AuthProvider>,
+    });
+
+    // Wait for loading to resolve
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    // ✅ EXPECTED: No crash, session is null, no user
+    expect(result.current.session).toBeNull();
+    expect(result.current.user).toBeNull();
+  });
+
+  it('handles blocked localStorage gracefully during auth init', async () => {
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://test.supabase.co');
+
+    // Block localStorage (mimicking Safari private browsing / in-app browser)
+    const spy = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new DOMException('The operation is insecure', 'SecurityError');
+    });
+
+    mockSupabaseClient.auth.onAuthStateChange.mockImplementation((callback) => {
+      setTimeout(() => callback('INITIAL_SESSION', null), 0);
+      return { data: { subscription: { unsubscribe: vi.fn() } } };
+    });
+
+    // Should not crash even though localStorage is blocked
+    expect(() => {
+      renderHook(() => useAuth(), {
+        wrapper: ({ children }) => <AuthProvider>{children}</AuthProvider>,
+      });
+    }).not.toThrow();
+
+    spy.mockRestore();
   });
 });
