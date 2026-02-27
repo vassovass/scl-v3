@@ -340,6 +340,15 @@ _Forward-thinking items that anticipate future needs:_
 
 ---
 
+## 📋 Documentation Update Checklist
+
+- [ ] AGENTS.md — Add H2H league patterns
+- [ ] CHANGELOG.md — Log H2H league feature
+- [ ] PRD_00_Index.md — Update PRD 47 status to ✅ Complete
+- [ ] **Git commit** — Stage all PRD changes, commit with conventional message: `type(scope): PRD 47 — short description`
+
+---
+
 ## Changelog
 
 | Date | Section | Change |

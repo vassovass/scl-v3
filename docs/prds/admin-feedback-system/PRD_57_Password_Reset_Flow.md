@@ -26,6 +26,27 @@ Allow users who forget their password to reset it without admin intervention. Cu
 | `src/app/(auth)/layout.tsx` | Auth page layout wrapper |
 | `.claude/skills/auth-patterns/SKILL.md` | Auth patterns and best practices |
 | `.claude/skills/form-components/SKILL.md` | Form input patterns with accessibility |
+| `.claude/skills/supabase-patterns/SKILL.md` | Supabase client patterns, RLS |
+| `.claude/skills/design-system/SKILL.md` | CSS variables, theming, shadcn/ui |
+
+### MCP Servers
+
+| Server | Purpose |
+|--------|---------|
+| **Supabase MCP** | Verify auth schema, test resetPasswordForEmail flow |
+| **Playwright MCP** | E2E test full password reset flow |
+| **PostHog MCP** | Verify password reset funnel events |
+
+### Task-Optimized Structure
+
+| Phase | Mode | Task |
+|-------|------|------|
+| 1 | `[READ-ONLY]` | Audit existing auth pages (`sign-in`, `sign-up`) for pattern reference |
+| 2 | `[READ-ONLY]` | Check auth callback handler for existing event handling |
+| 3 | `[WRITE]` | Create reset-password request page `[PARALLEL with Phase 4]` |
+| 4 | `[WRITE]` | Create update-password page `[PARALLEL with Phase 3]` |
+| 5 | `[WRITE]` | Add PASSWORD_RECOVERY handler to auth callback `[SEQUENTIAL]` |
+| 6 | `[WRITE]` | Write Vitest + Playwright tests `[SEQUENTIAL]` |
 
 ---
 
@@ -83,10 +104,25 @@ Allow users who forget their password to reset it without admin intervention. Cu
 
 ---
 
+## 📋 Documentation Update Checklist
+
+- [ ] AGENTS.md — Add password reset flow to auth section
+- [ ] `auth-patterns` skill — Add password reset pattern with PKCE flow
+- [ ] CHANGELOG.md — Log password reset feature
+- [ ] PRD_00_Index.md — Update PRD 57 status to ✅ Complete
+
 ## 🔗 Related Documents
 
 - [Alpha Readiness Audit](../../ALPHA_READINESS_AUDIT.md) — BLOCKER 1
 - [PRD 49: Alpha Launch Checklist](./PRD_49_Alpha_Launch_Checklist.md)
+- [Auth Patterns Skill](../../../.agent/skills/auth-patterns/SKILL.md)
+- [Form Components Skill](../../../.agent/skills/form-components/SKILL.md)
+
+## 📚 Best Practice References
+
+- **NIST 800-63B:** Min 8 chars, no forced complexity rules, never reveal if email exists
+- **Supabase PKCE flow:** `resetPasswordForEmail()` sends magic link, `PASSWORD_RECOVERY` event emitted by `onAuthStateChange`
+- **Rate limiting:** Supabase already rate limits to 1 email per 60s per address. Show friendly message on 429.
 
 ---
 

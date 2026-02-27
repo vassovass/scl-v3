@@ -26,6 +26,25 @@ Reduce the "time to aha moment" from 5-10 minutes to 2-3 minutes after signup. C
 | `.claude/skills/design-system/SKILL.md` | CSS variables, theming, UI patterns |
 | `.claude/skills/form-components/SKILL.md` | Reusable form input patterns |
 
+### MCP Servers
+
+| Server | Purpose |
+|--------|---------|
+| **Supabase MCP** | Query actual user/league counts for homepage stats |
+| **Playwright MCP** | E2E test onboarding flow for new users |
+| **PostHog MCP** | Verify onboarding funnel events |
+
+### Task-Optimized Structure
+
+| Phase | Mode | Task |
+|-------|------|------|
+| 1 | `[READ-ONLY]` | Audit dashboard empty state and homepage hardcoded stats |
+| 2 | `[WRITE]` | Create welcome card + CTA components `[PARALLEL with Phase 3]` |
+| 3 | `[WRITE]` | Create screenshot guide + app list components `[PARALLEL with Phase 2]` |
+| 4 | `[WRITE]` | Fix homepage stats (query real data or hide) `[PARALLEL with Phase 2]` |
+| 5 | `[WRITE]` | Wire onboarding visibility logic (show only for zero submissions) `[SEQUENTIAL]` |
+| 6 | `[WRITE]` | Write Vitest + Playwright tests `[SEQUENTIAL]` |
+
 ---
 
 ## 🏗️ Detailed Feature Requirements
@@ -83,6 +102,21 @@ Reduce the "time to aha moment" from 5-10 minutes to 2-3 minutes after signup. C
 ### Phase 3: Homepage Fixes
 1. Replace hardcoded stats with real counts or hide for alpha
 2. Fix proof thumbnail fallback
+
+## 📋 Documentation Update Checklist
+
+- [ ] AGENTS.md — Add onboarding component patterns
+- [ ] `design-system` skill — Add empty state card pattern
+- [ ] CHANGELOG.md — Log onboarding improvements
+- [ ] PRD_00_Index.md — Update PRD 60 status to ✅ Complete
+- [ ] **Git commit** — Stage all PRD changes, commit with conventional message: `type(scope): PRD 60 — short description`
+
+## 📚 Best Practice References
+
+- **Empty states:** Show actionable guidance, not blank screens. Use progressive disclosure.
+- **Onboarding:** Reduce time-to-value. First action within 2 minutes of signup.
+- **Social proof:** Only show real numbers. Fake stats destroy trust (remove "10K+ Steps" etc.).
+- **Screenshot guidance:** Show device-specific examples (iOS Health, Google Fit, Samsung Health).
 
 ---
 

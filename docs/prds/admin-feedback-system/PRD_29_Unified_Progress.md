@@ -1,30 +1,46 @@
 # PRD 29: Unified Progress View
 
-> **Order:** 29 of 36
+> **Order:** 29
+> **Status:** 📋 Proposed
+> **Type:** Feature
+> **Dependencies:** None (analytics routes exist)
+> **Blocks:** None
 > **Previous:** [PRD 28: Smart Engagement](./PRD_28_Smart_Engagement.md)
 > **Next:** [PRD 30: Duplicate Submissions](./PRD_30_Duplicate_Resolution.md)
-> **Depends on:** PRD 27 (hub tabs)
-> **Status:** 📋 Proposed
 
 ---
 
-## ⚠️ Agent Instructions (MANDATORY)
+## ⚠️ Agent Context
 
-Before starting work on this PRD, the implementing agent MUST:
+| File | Purpose |
+|------|---------|
+| `src/app/(dashboard)/analytics/page.tsx` | Current page — replace with unified progress |
+| `src/app/(dashboard)/league/[id]/leaderboard/page.tsx` | Existing leaderboard content to merge |
+| `src/app/api/analytics/route.ts` | Existing API — fix and extend |
+| `src/components/dashboard/` | Existing dashboard components for pattern reference |
+| `.claude/skills/design-system/SKILL.md` | CSS variables, chart patterns, shadcn/ui |
+| `.claude/skills/architecture-philosophy/SKILL.md` | Modular design principles |
+| `.claude/skills/analytics-tracking/SKILL.md` | Event tracking for page views |
 
-1. **Read these files for context:**
-   - `AGENTS.md` - Critical rules, patterns, and documentation requirements
-   - `src/app/(dashboard)/analytics/page.tsx` - Current broken page (to be replaced)
-   - `src/app/(dashboard)/league/[id]/leaderboard/page.tsx` - Existing content to merge
-   - `src/app/api/analytics/route.ts` - Existing flawed API (to be fixed)
+### MCP Servers
 
-2. **Follow documentation rules:**
-   - Update `CHANGELOG.md` with all changes
-   - Use date format `YYYY-MM-DD` (current year is 2026)
+| Server | Purpose |
+|--------|---------|
+| **Supabase MCP** | Query progress data, verify API responses |
+| **GA4 Stape MCP** | Verify page view tracking on new route |
+| **PostHog MCP** | Track user journey through progress views |
+| **Playwright MCP** | E2E test progress page, toggle, charts |
 
-3. **After completion:**
-   - Commit with message format: `feat(PRD-29): Brief description`
-   - Mark this PRD as done on the Kanban board
+### Task-Optimized Structure
+
+| Phase | Mode | Task |
+|-------|------|------|
+| 1 | `[READ-ONLY]` | Audit analytics routes and existing leaderboard components |
+| 2 | `[WRITE]` | Fix and extend `/api/analytics` route `[PARALLEL with Phase 3]` |
+| 3 | `[WRITE]` | Create `ProgressToggle`, `StepBankCard`, `ComparisonChart` components `[PARALLEL with Phase 2]` |
+| 4 | `[WRITE]` | Rename route from `/analytics` to `/progress`, update menu config `[SEQUENTIAL]` |
+| 5 | `[WRITE]` | Wire components with data fetching and empty states `[SEQUENTIAL]` |
+| 6 | `[WRITE]` | Write Vitest + Playwright tests `[SEQUENTIAL]` |
 
 ---
 
@@ -104,13 +120,15 @@ Refactor `src/app/(dashboard)/analytics/page.tsx` to:
 
 ---
 
-## Success Criteria
+## ✅ Success Criteria
 
-- [ ] "Analytics" renamed to "My Progress" in all menus
-- [ ] Page loads in < 1s (fix API performance)
-- [ ] Toggle switches between Personal and Social views
-- [ ] Charts handle empty data states gracefully (New User Onboarding)
-- [ ] Mobile-responsive charts
+| Metric | Target | Verification Method |
+|--------|--------|---------------------|
+| Menu renamed | "My Progress" in all menus | Visual check + Playwright E2E |
+| Page load | < 1s (fix API performance) | Lighthouse audit |
+| Toggle works | Switches between Personal and Social | Playwright click test |
+| Empty state | Graceful for new users | Vitest with empty data |
+| Mobile responsive | Charts work on mobile | Playwright mobile viewport |
 
 ---
 
@@ -159,6 +177,23 @@ All UI components must:
 
 - [ ] CHANGELOG.md updated
 - [ ] AGENTS.md updated
+
+---
+
+## 📋 Documentation Update Checklist
+
+- [ ] AGENTS.md — Add progress view pattern, update menu reference
+- [ ] `design-system` skill — Add chart/toggle component patterns
+- [ ] CHANGELOG.md — Log progress view feature
+- [ ] PRD_00_Index.md — Update PRD 29 status to ✅ Complete
+- [ ] **Git commit** — Stage all PRD changes, commit with conventional message: `type(scope): PRD 29 — short description`
+
+## 📚 Best Practice References
+
+- **Charts:** Use shadcn/ui Chart component (built on Recharts). Mobile-first: stack charts vertically.
+- **Toggle UX:** Use a segmented control (tab-like), not a checkbox. Active state clearly visible.
+- **Empty states:** Never show empty charts. Show "Submit your first steps to see progress here" with CTA.
+- **Gamification:** "Step Bank" concept makes lifetime totals feel like earned currency.
 
 ---
 

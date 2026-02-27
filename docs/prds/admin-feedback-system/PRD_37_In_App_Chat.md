@@ -805,6 +805,7 @@ Roll out phases independently.
 - [ ] CHANGELOG.md updated
 - [ ] AGENTS.md updated with chat patterns
 - [ ] Types added to `database.ts`
+- [ ] **Git commit** — Stage all PRD changes, commit with conventional message: `type(scope): PRD 37 — short description`
 
 ---
 

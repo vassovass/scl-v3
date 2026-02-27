@@ -3,8 +3,8 @@
 > **Order:** 49
 > **Status:** 🔄 In Progress
 > **Type:** Meta/Tracking
-> **Dependencies:** PRD 43, 44, 45, 46
-> **Blocks:** None
+> **Dependencies:** PRDs 57, 58, 59, 60, 61, 62, 63
+> **Blocks:** None (this tracks readiness)
 
 ---
 
@@ -13,6 +13,34 @@
 Track all requirements and tasks needed before inviting friends and family to alpha test StepLeague. This is a living checklist document that coordinates the alpha launch effort across multiple PRDs.
 
 **Problem Solved:** Multiple PRDs need to be completed for alpha. This checklist provides a single view of readiness and prevents launching with critical gaps.
+
+---
+
+## ⚠️ Agent Context
+
+| File | Purpose |
+|------|---------|
+| `docs/ALPHA_READINESS_AUDIT.md` | Comprehensive audit of alpha blockers |
+| `docs/prds/admin-feedback-system/PRD_00_Index.md` | Sprint plan and PRD status tracking |
+| `.claude/skills/testing-patterns/SKILL.md` | Test verification patterns |
+| `.claude/skills/auth-patterns/SKILL.md` | Auth flow verification |
+
+### MCP Servers
+
+| Server | Purpose |
+|--------|---------|
+| **Supabase MCP** | Verify database readiness, RLS policies |
+| **Playwright MCP** | Full E2E verification of alpha user flows |
+| **PostHog MCP** | Verify analytics are capturing before inviting users |
+
+### Task-Optimized Structure
+
+| Phase | Mode | Task |
+|-------|------|------|
+| 1 | `[READ-ONLY]` | Verify all blocking PRDs are complete |
+| 2 | `[READ-ONLY]` | Run full E2E test suite across Chromium + Firefox |
+| 3 | `[WRITE]` | Update checklist items based on verification `[SEQUENTIAL]` |
+| 4 | `[WRITE]` | Update PRD statuses in index `[SEQUENTIAL]` |
 
 ---
 
@@ -30,6 +58,16 @@ Track all requirements and tasks needed before inviting friends and family to al
 | 6 | Basic onboarding flow works | Existing | ✅ | Joyride tours exist |
 | 7 | Step submission works (single + batch) | Existing | ✅ | Core functionality |
 | 8 | Private league creation/joining works | Existing | ✅ | Core functionality |
+
+### Alpha Readiness Audit Blockers (from Feb 2026 Audit)
+
+| # | Blocker | PRD | Status | Notes |
+|---|---------|-----|--------|-------|
+| 1 | Password reset flow | PRD 57 | ⬜ | Zero password recovery exists |
+| 2 | Agent API auth | Fixed | ✅ | Token-based auth for Supabase MCP |
+| 3 | GDPR consent | Excluded | ⏭️ | Out of scope for alpha (manual compliance) |
+| 4 | User identification | Fixed | ✅ | `identifyUser` wired in AuthProvider |
+| 5 | API rate limiting | PRD 58 | ⬜ | Zero rate limiting on 75 API routes |
 
 ### Should Have (Important but not blocking)
 
@@ -203,6 +241,22 @@ _Forward-thinking items that anticipate future needs:_
    - **50 users**: Feedback triage process working, at least 1 private league created
 
    This prevents scaling too fast before stability is proven.
+
+---
+
+## 📋 Documentation Update Checklist
+
+- [ ] AGENTS.md — Update alpha status section
+- [ ] CHANGELOG.md — Log alpha launch milestone
+- [ ] PRD_00_Index.md — Update PRD 49 status to ✅ Complete
+- [ ] **Git commit** — Stage all PRD changes, commit with conventional message: `type(scope): PRD 49 — short description`
+
+## 📚 Best Practice References
+
+- **Staged rollout:** 5 → 20 → 50 users with clear criteria at each gate.
+- **Feedback triage:** Categorize immediately: `bug-critical`, `bug-minor`, `ux-issue`, `feature-request`.
+- **Monitoring:** Verify analytics and error tracking are live BEFORE inviting users.
+- **Rollback plan:** Feature flags allow disabling World League enrollment if critical bugs found.
 
 ---
 

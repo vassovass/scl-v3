@@ -28,6 +28,24 @@ Add the specific tests that would have caught the January 2026 production errors
 | `.claude/skills/testing-patterns/SKILL.md` | Testing patterns and mocking strategies |
 | `.claude/skills/react-debugging/SKILL.md` | Infinite loops, useMemo/useCallback patterns |
 
+### MCP Servers
+
+| Server | Purpose |
+|--------|---------|
+| **Playwright MCP** | Add Firefox/WebKit projects, cross-browser smoke test |
+| **Supabase MCP** | Verify storage-blocked auth still works |
+
+### Task-Optimized Structure
+
+| Phase | Mode | Task |
+|-------|------|------|
+| 1 | `[READ-ONLY]` | Audit existing test coverage for storage, error boundaries, auth |
+| 2 | `[WRITE]` | Add safeStorage SecurityError tests `[PARALLEL with Phase 3]` |
+| 3 | `[WRITE]` | Add error boundary render + recovery tests `[PARALLEL with Phase 2]` |
+| 4 | `[WRITE]` | Add Firefox + WebKit to playwright.config.ts `[PARALLEL with Phase 2]` |
+| 5 | `[WRITE]` | Add auth failure tests (500, timeout, PostHog init) `[SEQUENTIAL]` |
+| 6 | `[WRITE]` | Add cross-browser smoke test E2E `[SEQUENTIAL]` |
+
 ---
 
 ## 🏗️ Detailed Feature Requirements
@@ -94,6 +112,21 @@ Add the specific tests that would have caught the January 2026 production errors
 ### Phase 3: Auth Failure Tests
 1. Add sign-in API error handling tests
 2. Add network timeout tests
+
+## 📋 Documentation Update Checklist
+
+- [ ] AGENTS.md — Add cross-browser testing requirement
+- [ ] `testing-patterns` skill — Add storage mock and error boundary test patterns
+- [ ] CHANGELOG.md — Log testing gap fixes
+- [ ] PRD_00_Index.md — Update PRD 61 status to ✅ Complete
+- [ ] **Git commit** — Stage all PRD changes, commit with conventional message: `type(scope): PRD 61 — short description`
+
+## 📚 Best Practice References
+
+- **Storage mocking:** Use `vi.stubGlobal` to simulate `SecurityError` on `localStorage.getItem`
+- **Error boundaries:** Test with `ErrorBoundary` wrapper + component that throws on render
+- **Cross-browser:** Firefox + WebKit catch different security and rendering issues
+- **Auth resilience:** Test with `vi.fn().mockRejectedValue()` for network failures
 
 ---
 

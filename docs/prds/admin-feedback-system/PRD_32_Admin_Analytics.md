@@ -1,31 +1,49 @@
 # PRD 32: Admin Analytics Dashboard
 
-> **Order:** 32 of 36
+> **Order:** 32
+> **Status:** 🟨 Partial
+> **Type:** Feature
+> **Dependencies:** None (feature flags available)
+> **Blocks:** None
+> **Remaining Scope:** KPI data integration, trend charts, export (UI scaffold exists)
 > **Previous:** [PRD 31: Social Encouragement](./PRD_31_Social_Encouragement.md)
 > **Next:** [PRD 33: Pricing & How It Works](./PRD_33_Pricing_HowItWorks.md)
-> **Depends on:** PRD 26 (feature flags)
-> **Status:** 📋 Proposed
 > **Phase:** Product Hunt Stage
 
 ---
 
-## ⚠️ Agent Instructions (MANDATORY)
+## ⚠️ Agent Context
 
-Before starting work on this PRD, the implementing agent MUST:
+| File | Purpose |
+|------|---------|
+| `src/app/admin/analytics/page.tsx` | Existing scaffold — wire KPI data here |
+| `src/app/admin/layout.tsx` | Admin layout with tabs |
+| `src/app/api/admin/` | Existing admin API routes for pattern reference |
+| `src/types/database.ts` | Schema reference for aggregation queries |
+| `.claude/skills/supabase-patterns/SKILL.md` | Query patterns, materialized views |
+| `.claude/skills/design-system/SKILL.md` | Chart components, KPI cards |
+| `.claude/skills/api-handler/SKILL.md` | withApiHandler pattern |
 
-1. **Read these files for context:**
-   - `AGENTS.md` - Critical rules, patterns, and documentation requirements
-   - `src/app/admin/` - Existing admin pages (kanban, feedback)
-   - `src/types/database.ts` - Existing tables
-   - PRD 21 for shadcn charts components
+### MCP Servers
 
-2. **Follow documentation rules:**
-   - Update `CHANGELOG.md` with all changes
-   - Use date format `YYYY-MM-DD` (current year is 2026)
+| Server | Purpose |
+|--------|---------|
+| **Supabase MCP** | Create materialized views, verify aggregation queries |
+| **GA4 Stape MCP** | Pull analytics reports for comparison with internal data |
+| **PostHog MCP** | Dashboard insights, verify admin usage patterns |
+| **Playwright MCP** | E2E test admin analytics dashboard |
 
-3. **After completion:**
-   - Commit with message format: `feat(PRD-32): Brief description`
-   - Mark this PRD as done on the Kanban board
+### Task-Optimized Structure
+
+| Phase | Mode | Task |
+|-------|------|------|
+| 1 | `[READ-ONLY]` | Audit existing admin analytics scaffold and available data |
+| 2 | `[WRITE]` | Create `/api/admin/analytics` route with KPI calculations `[PARALLEL with Phase 3]` |
+| 3 | `[WRITE]` | Create materialized view for daily aggregates `[PARALLEL with Phase 2]` |
+| 4 | `[WRITE]` | Wire KPI cards with real data `[SEQUENTIAL]` |
+| 5 | `[WRITE]` | Add trend charts with Recharts/shadcn `[SEQUENTIAL]` |
+| 6 | `[WRITE]` | Add CSV/PDF export `[SEQUENTIAL]` |
+| 7 | `[WRITE]` | Write Vitest + Playwright tests `[SEQUENTIAL]` |
 
 ---
 
@@ -144,6 +162,32 @@ Auto-generate polished PDF reports for B2B.
 
 ---
 
+## 🏗️ Detailed Feature Requirements
+
+### Section A: KPI Integration — 3 Items
+
+| # | Outcome | Problem Solved | Success Criteria |
+|---|---------|----------------|------------------|
+| **A-1** | **KPI cards show real data** | Admin sees placeholder dashes | Total users, active rate, avg steps, retention show live values |
+| **A-2** | **Period filter works** | No time-range selection | 7d, 30d, 90d filters update all KPIs |
+| **A-3** | **League filter works** | Can't see per-league stats | Dropdown filters all data by selected league |
+
+### Section B: Visualizations — 2 Items
+
+| # | Outcome | Problem Solved | Success Criteria |
+|---|---------|----------------|------------------|
+| **B-1** | **Participation trend chart** | No visual trend data | Line chart shows daily active users over period |
+| **B-2** | **Engagement by league bar chart** | No league comparison view | Bar chart ranks leagues by activity |
+
+### Section C: Export — 2 Items
+
+| # | Outcome | Problem Solved | Success Criteria |
+|---|---------|----------------|------------------|
+| **C-1** | **CSV export** | Can't export data for HR reports | CSV downloads with filtered data |
+| **C-2** | **PDF report** | No polished reports for B2B sales | PDF generates with KPIs and charts |
+
+---
+
 ## Verification Checklist
 
 > **IMPORTANT:** After implementation, verify at these specific locations.
@@ -176,6 +220,23 @@ Auto-generate polished PDF reports for B2B.
 ## Feature Flag
 
 Analytics export is gated by `feature_analytics_export` (PRD 26).
+
+---
+
+## 📋 Documentation Update Checklist
+
+- [ ] AGENTS.md — Add admin analytics API pattern
+- [ ] `supabase-patterns` skill — Add materialized view pattern
+- [ ] CHANGELOG.md — Log admin analytics data integration
+- [ ] PRD_00_Index.md — Update PRD 32 status to ✅ Complete
+- [ ] **Git commit** — Stage all PRD changes, commit with conventional message: `type(scope): PRD 32 — short description`
+
+## 📚 Best Practice References
+
+- **Materialized views:** Use `analytics_daily` materialized view for pre-aggregated stats. Refresh via Supabase cron or on-demand.
+- **KPI calculations:** Active rate = users with submission in period / total users. Retention = users active this AND last period.
+- **Chart library:** Use shadcn/ui Chart (Recharts wrapper). Responsive by default.
+- **Export:** CSV via `papaparse`, PDF via `jsPDF` or server-side generation.
 
 ---
 

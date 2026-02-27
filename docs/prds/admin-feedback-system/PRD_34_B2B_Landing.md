@@ -1,29 +1,47 @@
 # PRD 34: B2B Landing Pages
 
-> **Order:** 34 of 36
+> **Order:** 34
+> **Status:** 📋 Proposed
+> **Type:** Feature
+> **Dependencies:** None
+> **Blocks:** None
 > **Previous:** [PRD 33: Pricing & How It Works](./PRD_33_Pricing_HowItWorks.md)
 > **Next:** [PRD 35: SEO Comparison Pages](./PRD_35_SEO_Comparison.md)
-> **Status:** 📋 Proposed
 > **Phase:** Marketing & Growth
 
 ---
 
-## ⚠️ Agent Instructions (MANDATORY)
+## ⚠️ Agent Context
 
-Before starting work on this PRD, the implementing agent MUST:
+| File | Purpose |
+|------|---------|
+| `src/app/(public)/page.tsx` | Homepage — reference for public page patterns |
+| `src/app/(public)/compare/page.tsx` | SEO comparison page — reference for SSG patterns |
+| `src/app/globals.css` | Design tokens and CSS variables |
+| `.claude/skills/design-system/SKILL.md` | CSS variables, UI patterns, shadcn/ui |
+| `.claude/skills/form-components/SKILL.md` | Form input patterns with accessibility |
+| `.claude/skills/supabase-patterns/SKILL.md` | Database patterns for waitlist table |
 
-1. **Read these files for context:**
-   - `AGENTS.md` - Critical rules, patterns, and documentation requirements
-   - `src/app/(marketing)/` - Existing marketing pages if any
-   - `src/app/globals.css` - Design tokens
+### MCP Servers
 
-2. **Follow documentation rules:**
-   - Update `CHANGELOG.md` with all changes
-   - Use date format `YYYY-MM-DD` (current year is 2026)
+| Server | Purpose |
+|--------|---------|
+| **Supabase MCP** | Create `b2b_waitlist` table, verify RLS |
+| **GA4 Stape MCP** | Verify conversion tracking on waitlist form |
+| **GTM Stape MCP** | Set up conversion tags for form submissions |
+| **Playwright MCP** | E2E test landing page, waitlist form |
 
-3. **After completion:**
-   - Commit with message format: `feat(PRD-34): Brief description`
-   - Mark this PRD as done on the Kanban board
+### Task-Optimized Structure
+
+| Phase | Mode | Task |
+|-------|------|------|
+| 1 | `[READ-ONLY]` | Audit existing public pages for pattern reference |
+| 2 | `[WRITE]` | Create `b2b_waitlist` table migration `[PARALLEL with Phase 3]` |
+| 3 | `[WRITE]` | Create `/teams` landing page components `[PARALLEL with Phase 2]` |
+| 4 | `[WRITE]` | Create `/teams/features` directory page `[PARALLEL with Phase 2]` |
+| 5 | `[WRITE]` | Create waitlist API endpoint and form submission `[SEQUENTIAL]` |
+| 6 | `[WRITE]` | Add SEO metadata, JSON-LD, OG images `[SEQUENTIAL]` |
+| 7 | `[WRITE]` | Write Vitest + Playwright tests `[SEQUENTIAL]` |
 
 ---
 
@@ -103,6 +121,33 @@ ALTER TABLE b2b_waitlist ENABLE ROW LEVEL SECURITY;
 
 ---
 
+## 🏗️ Detailed Feature Requirements
+
+### Section A: Landing Page — 3 Items
+
+| # | Outcome | Problem Solved | Success Criteria |
+|---|---------|----------------|------------------|
+| **A-1** | **Main landing at `/teams`** | No B2B presence | Page loads with hero, value props, features, CTA |
+| **A-2** | **Features directory at `/teams/features`** | HR managers can't see full feature list | Grid of features organized by use case |
+| **A-3** | **Mobile responsive** | B2B buyers browse on mobile | All sections stack properly on mobile |
+
+### Section B: Waitlist & Conversion — 3 Items
+
+| # | Outcome | Problem Solved | Success Criteria |
+|---|---------|----------------|------------------|
+| **B-1** | **Waitlist form captures leads** | No way to collect B2B interest | Email, company, size, role fields saved to `b2b_waitlist` |
+| **B-2** | **Thank you page after signup** | No confirmation after form submit | Redirect to `/teams/waitlist` with confirmation message |
+| **B-3** | **Conversion tracking** | Can't measure B2B funnel | GA4 conversion event fires on form submission |
+
+### Section C: SEO — 2 Items
+
+| # | Outcome | Problem Solved | Success Criteria |
+|---|---------|----------------|------------------|
+| **C-1** | **SEO optimized metadata** | Pages won't rank for corporate wellness | Title, description, OG tags for "corporate wellness" keywords |
+| **C-2** | **JSON-LD structured data** | No rich snippets in search | Organization + Product schema markup |
+
+---
+
 ## Verification Checklist
 
 > **IMPORTANT:** After implementation, verify at these specific locations.
@@ -129,6 +174,23 @@ ALTER TABLE b2b_waitlist ENABLE ROW LEVEL SECURITY;
 
 - [ ] CHANGELOG.md updated
 - [ ] AGENTS.md updated
+
+---
+
+## 📋 Documentation Update Checklist
+
+- [ ] AGENTS.md — Add B2B page patterns
+- [ ] `design-system` skill — Add landing page section patterns
+- [ ] CHANGELOG.md — Log B2B landing pages
+- [ ] PRD_00_Index.md — Update PRD 34 status to ✅ Complete
+- [ ] **Git commit** — Stage all PRD changes, commit with conventional message: `type(scope): PRD 34 — short description`
+
+## 📚 Best Practice References
+
+- **Landing page UX:** Hero -> Trust -> Value Props -> Features -> How It Works -> CTA. Maximum 1 CTA per section.
+- **B2B waitlist:** Minimal fields (email required, rest optional). Show social proof (waitlist count) after 10+ signups.
+- **SEO:** Target "corporate wellness program", "employee step challenge", "team fitness challenge" keywords.
+- **RLS:** `b2b_waitlist` must be SuperAdmin-only read. Public insert for waitlist form.
 
 ---
 

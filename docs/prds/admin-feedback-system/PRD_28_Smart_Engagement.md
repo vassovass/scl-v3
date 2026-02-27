@@ -1,20 +1,48 @@
 # PRD 28: Smart Engagement & Notifications
 
-> **Order:** 28 of 36
+> **Order:** 28
+> **Status:** 🟨 Partial
+> **Type:** Feature
+> **Dependencies:** PRD 25 (User Prefs for notification settings)
+> **Blocks:** None
+> **Remaining Scope:** Missed-day prompt UI, streak warning component (streak freeze already done)
 > **Previous:** [PRD 27: League Hub](./PRD_27_League_Hub.md)
 > **Next:** [PRD 29: Unified Progress](./PRD_29_Unified_Progress.md)
 > **Prioritized By:** User Request (2026-01-05) - "Smart Missed Day Prompt"
-> **Status:** 📋 Proposed
 > **Includes:** Formerly "PRD 25 Smart Step Reminder"
-> **Depends on:** PRD 25 (User Prefs for notification settings)
 
 ---
 
-## ⚠️ Agent Instructions (MANDATORY)
+## ⚠️ Agent Context
 
-1. **Read `AGENTS.md`**.
-2. **Read `src/app/(dashboard)/dashboard/page.tsx`**.
-3. **Goal**: Proactive engagement to prevent churn.
+| File | Purpose |
+|------|---------|
+| `src/app/(dashboard)/dashboard/page.tsx` | Dashboard — add missed-day prompt here |
+| `src/app/(dashboard)/submit-steps/page.tsx` | Submit page — accept `?date=` query param |
+| `src/lib/appSettings.ts` | Contains streak freeze settings (already done) |
+| `src/types/database.ts` | User preferences schema |
+| `.claude/skills/design-system/SKILL.md` | CSS variables, component patterns |
+| `.claude/skills/supabase-patterns/SKILL.md` | Data fetching patterns |
+| `.claude/skills/analytics-tracking/SKILL.md` | Track engagement events |
+
+### MCP Servers
+
+| Server | Purpose |
+|--------|---------|
+| **Supabase MCP** | Query submission history for missed days |
+| **PostHog MCP** | Verify engagement funnel events |
+| **Playwright MCP** | E2E test missed-day prompt flow |
+
+### Task-Optimized Structure
+
+| Phase | Mode | Task |
+|-------|------|------|
+| 1 | `[READ-ONLY]` | Audit existing streak freeze code and dashboard layout |
+| 2 | `[WRITE]` | Create `MissedDayCard` component `[PARALLEL with Phase 3]` |
+| 3 | `[WRITE]` | Create `StreakWarning` component `[PARALLEL with Phase 2]` |
+| 4 | `[WRITE]` | Add `?date=` query param support to submit page `[SEQUENTIAL]` |
+| 5 | `[WRITE]` | Wire components into dashboard with visibility logic `[SEQUENTIAL]` |
+| 6 | `[WRITE]` | Write Vitest + Playwright tests `[SEQUENTIAL]` |
 
 ---
 
@@ -93,6 +121,25 @@ const { misseddays, riskLevel } = useEngagement(userSubmissions);
 
 ---
 
+## 🏗️ Detailed Feature Requirements
+
+### Section A: Missed Day Prompt — 3 Items
+
+| # | Outcome | Problem Solved | Success Criteria |
+|---|---------|----------------|------------------|
+| **A-1** | **Dashboard shows missed day card** | Users forget to submit for yesterday | Card appears if yesterday has no submission |
+| **A-2** | **One-click submit for missed day** | Extra clicks to submit for past date | Card links to `/submit-steps?date=YYYY-MM-DD` |
+| **A-3** | **Card is dismissible** | Persistent prompts annoy users | Dismiss button hides card for session |
+
+### Section B: Streak Protection — 2 Items
+
+| # | Outcome | Problem Solved | Success Criteria |
+|---|---------|----------------|------------------|
+| **B-1** | **Evening streak warning** | Streaks break silently | Warning shown after 6PM local if no today submission |
+| **B-2** | **Streak freeze already implemented** | Users need forgiveness for missed days | ✅ DONE — in `appSettings.ts` and `user_preferences` |
+
+---
+
 ## Verification Checklist
 
 > **IMPORTANT:** After implementation, verify at these specific locations.
@@ -116,6 +163,22 @@ const { misseddays, riskLevel } = useEngagement(userSubmissions);
 ### Documentation Checks
 
 - [ ] CHANGELOG.md updated
+
+---
+
+## 📋 Documentation Update Checklist
+
+- [ ] AGENTS.md — Add missed-day prompt pattern
+- [ ] `design-system` skill — Add engagement card component pattern
+- [ ] CHANGELOG.md — Log engagement features
+- [ ] PRD_00_Index.md — Update PRD 28 status to ✅ Complete
+- [ ] **Git commit** — Stage all PRD changes, commit with conventional message: `type(scope): PRD 28 — short description`
+
+## 📚 Best Practice References
+
+- **Timezone handling:** Always use client-side timezone for "today" and "yesterday" checks. Store dates as `YYYY-MM-DD`.
+- **Nudge UX:** Use constructive, encouraging tone — never guilt. "Keep your history complete!" not "You missed a day!"
+- **Dismissibility:** All notification-style UI must be dismissible. Persist dismiss state per session (not permanently).
 
 ---
 

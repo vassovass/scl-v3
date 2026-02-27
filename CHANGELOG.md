@@ -15,11 +15,13 @@ All notable changes to StepLeague v3.
 - **Debug logs auth** — `/api/debug/logs` converted from email-based manual check to `withApiHandler({ auth: 'superadmin' })`
 - **AuthProvider hard timeout** — Added 10-second hard timeout to prevent infinite loading spinner on slow SA mobile connections
 - **SA latency reduction** — Added `vercel.json` with `lhr1` (London) region to reduce latency for South African users
+- **Analytics test fix** — Added `requestIdleCallback` mock to prevent test failures from deferred event tracking
 
 ### Added
 
-- **PRD 57: Password Reset Flow** — Users can recover forgotten passwords (Alpha BLOCKER 1)
-- **PRD 58: API Rate Limiting** — Endpoint abuse protection (Alpha BLOCKER 5)
+- **PRD 57: Password Reset Flow** ✅ — Supabase PKCE recovery: `/reset-password` → email link → `/update-password` with strength indicator → dashboard toast. NIST 800-63B compliant (min 8 chars, never reveals email existence). Rate limit detection. 3 new analytics events. 29 unit tests + E2E suite.
+- **PRD 58: API Rate Limiting** ✅ — In-memory sliding window rate limiter via `withApiHandler` config. `rateLimit: { maxRequests, windowMs }` on 7 endpoints: feedback (3/min), submissions (5/min), attachments (10/min), proxies (10/min), share/create (10/min), ai/chat (10/min), high-fives (20/min). 429 + `Retry-After` header. 14 unit tests + E2E suite.
+- **PRD 62: Security Headers & CSP** ✅ — OWASP baseline security headers via `next.config.js` `headers()`. X-Frame-Options DENY, X-Content-Type-Options nosniff, HSTS 1yr, Referrer-Policy strict-origin-when-cross-origin, Permissions-Policy (camera/mic/geo/payment disabled), Content-Security-Policy with Supabase + analytics proxy allowlist. 14 unit tests + E2E suite.
 - **PRD 59: Analytics Implementation** — Wire up page views, error tracking, performance events
 - **PRD 60: UX Onboarding** — Guided first 5 minutes experience for new users
 - **PRD 61: Testing Gaps** — January 2026 regression prevention tests

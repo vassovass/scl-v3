@@ -29,15 +29,40 @@ const mySchema = z.object({
 export const POST = withApiHandler({
   auth: 'required',
   schema: mySchema,
+  rateLimit: { maxRequests: 5, windowMs: 60_000 }, // Optional: 5 req/min
 }, async ({ user, body, adminClient }) => {
   const { data } = await adminClient
     .from("table")
     .insert({ ...body, user_id: user.id })
     .select()
     .single();
-  
+
   return { success: true, data };
 });
+```
+
+### Rate Limiting (PRD 58)
+
+Add `rateLimit` to any `withApiHandler` config for automatic per-user/IP rate limiting:
+
+```typescript
+rateLimit: { maxRequests: 10, windowMs: 60_000 } // 10 requests per minute
+```
+
+- Keyed by user ID (authenticated) or IP (anonymous)
+- Returns 429 with `Retry-After` header when exceeded
+- In-memory sliding window (resets on Vercel cold start — acceptable for alpha)
+
+For manual routes not using `withApiHandler`, use standalone:
+
+```typescript
+import { checkRateLimit, getRateLimitKey } from "@/lib/api/rateLimit";
+import { tooManyRequests } from "@/lib/api";
+
+const rlResult = checkRateLimit(getRateLimitKey(request, user), { maxRequests: 5, windowMs: 60_000 });
+if (!rlResult.allowed) {
+  return tooManyRequests(rlResult.retryAfterMs, rlResult.remaining, 5);
+}
 ```
 
 ---

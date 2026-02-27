@@ -357,6 +357,15 @@ _Forward-thinking items that anticipate future needs:_
 
 ---
 
+## 📋 Documentation Update Checklist
+
+- [ ] AGENTS.md — Add universal health measurement patterns
+- [ ] CHANGELOG.md — Log health measurement feature
+- [ ] PRD_00_Index.md — Update PRD 48 status to ✅ Complete
+- [ ] **Git commit** — Stage all PRD changes, commit with conventional message: `type(scope): PRD 48 — short description`
+
+---
+
 ## Changelog
 
 | Date | Section | Change |

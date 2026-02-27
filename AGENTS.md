@@ -205,6 +205,7 @@ const mySchema = z.object({ name: z.string() });
 export const POST = withApiHandler({
   auth: 'required',  // or 'none', 'superadmin', 'league_member', 'league_admin', 'league_owner'
   schema: mySchema,
+  rateLimit: { maxRequests: 5, windowMs: 60_000 }, // Optional: 5 requests per minute
 }, async ({ user, body, adminClient }) => {
   const { data } = await adminClient.from("table").insert({ ...body, user_id: user.id });
   return { success: true, data };
@@ -477,7 +478,7 @@ Users can get stuck on loading screens due to stale service worker cache or corr
 **Service Worker Config:**
 
 Auth routes use `NetworkOnly` strategy in `next.config.js`:
-- `/sign-in`, `/sign-up`, `/reset`, `/api/auth/`, `/claim/`
+- `/sign-in`, `/sign-up`, `/reset`, `/reset-password`, `/update-password`, `/api/auth/`, `/claim/`
 
 **Usage:**
 
@@ -524,13 +525,32 @@ await clearAllAppState(); // Clears SW caches, browser caches, localStorage, coo
     - When parsing cookies manually, check `expires_at` vs `Date.now() / 1000`.
     - Do not restore expired sessions.
 
+### 9. Password Reset (PKCE Recovery Flow)
 
+**Pattern:** Supabase PKCE code exchange for password recovery.
+
+```
+1. /reset-password → supabase.auth.resetPasswordForEmail(email, { redirectTo: .../api/auth/callback?next=/update-password })
+2. User clicks email link → /api/auth/callback?code=XXXXX&next=/update-password
+3. Callback: exchangeCodeForSession(code) → sets cookies → redirect to /update-password
+4. AuthProvider fires PASSWORD_RECOVERY event → handled in onAuthStateChange
+5. /update-password → supabase.auth.updateUser({ password }) → redirect /dashboard?password_updated=true
+```
+
+**Key files:**
+- `src/app/(auth)/reset-password/page.tsx` — Email input, NIST-compliant (never reveals if email exists)
+- `src/app/(auth)/update-password/page.tsx` — New password with strength indicator (0-4 score)
+- `src/app/api/auth/callback/route.ts` — Handles `next=/update-password` (skips World League enrollment)
+- `src/components/providers/AuthProvider.tsx` — `PASSWORD_RECOVERY` event handler
+- `src/components/dashboard/PasswordResetSuccessToast.tsx` — Post-reset confirmation
+
+**Middleware:** `/update-password` is a protected path (requires recovery session). `/reset-password` is an auth path (redirects if signed in).
 
 ```
 scl-v3/
 ├── src/
 │   ├── app/                      # Next.js App Router
-│   │   ├── (auth)/               # Sign-in, sign-up
+│   │   ├── (auth)/               # Sign-in, sign-up, reset-password, update-password
 │   │   ├── (dashboard)/          # Protected routes (auto NavHeader + Footer)
 │   │   │   ├── dashboard/        # User dashboard
 │   │   │   ├── league/[id]/      # League detail, leaderboard, analytics
@@ -1252,6 +1272,36 @@ When adding a new trackable feature:
 ---
 
 ## Recent Features
+
+### 2026-02-27
+
+- ✅ **PRD 57: Password Reset Flow** (Alpha BLOCKER 1)
+  - Supabase PKCE recovery: `/reset-password` → email link → `/update-password`
+  - Password strength indicator (0-4 score, 4 visual bars)
+  - NIST 800-63B compliant (min 8 chars, never reveals email existence)
+  - Rate limit detection (Supabase 60s per email)
+  - `PASSWORD_RECOVERY` event handler in AuthProvider
+  - `PasswordResetSuccessToast` on dashboard after update
+  - 3 analytics events: `passwordResetRequested`, `passwordResetCompleted`, `passwordRecoveryStarted`
+  - 29 unit tests + Playwright E2E suite
+
+- ✅ **PRD 58: API Rate Limiting** (Alpha BLOCKER 5)
+  - In-memory sliding window rate limiter (`src/lib/api/rateLimit.ts`)
+  - `withApiHandler` config: `rateLimit: { maxRequests, windowMs }` — one line to add rate limiting
+  - 429 response with `Retry-After`, `X-RateLimit-Limit`, `X-RateLimit-Remaining` headers
+  - Key by user ID (authenticated) or IP from `x-forwarded-for` (anonymous)
+  - 7 endpoints protected: feedback (3/min), submissions (5/min), attachments (10/min), proxies (10/min), share/create (10/min), ai/chat (10/min), high-fives (20/min)
+  - Manual routes (submissions, share/create) use standalone `checkRateLimit()` call
+  - In-memory acceptable for alpha (Vercel cold start resets). Upgrade path: Upstash Redis
+  - 14 unit tests + Playwright E2E suite
+
+- ✅ **PRD 62: Security Headers & CSP** (Sprint A Track 1)
+  - OWASP baseline headers via `next.config.js` `async headers()` — covers all responses
+  - X-Frame-Options: DENY, X-Content-Type-Options: nosniff, HSTS 1yr, Referrer-Policy strict-origin
+  - Permissions-Policy disables camera, microphone, geolocation, payment
+  - Content-Security-Policy: `self` + `*.supabase.co`, analytics via first-party proxy rewrites
+  - `unsafe-inline`/`unsafe-eval` required by Next.js (upgrade path: CSP nonces)
+  - 14 unit tests + Playwright E2E suite
 
 ### 2026-01-16
 

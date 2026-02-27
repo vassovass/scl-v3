@@ -4,7 +4,7 @@
 > **Status:** 📋 Proposed
 > **Type:** Feature
 > **Dependencies:** None (analytics infrastructure already exists)
-> **Blocks:** PRD 32 (Admin Analytics)
+> **Blocks:** PRD 32 (Admin Analytics), PRD 64 (Performance Budgets)
 
 ---
 
@@ -25,6 +25,25 @@ Wire up the existing analytics infrastructure that's already built but not conne
 | `src/components/providers/AuthProvider.tsx` | `identifyUser` already wired ✅ |
 | `.claude/skills/analytics-tracking/SKILL.md` | Analytics patterns and event conventions |
 | `.claude/skills/error-handling/SKILL.md` | Error handling patterns |
+
+### MCP Servers
+
+| Server | Purpose |
+|--------|---------|
+| **PostHog MCP** | Verify events appear in PostHog after wiring |
+| **GA4 Stape MCP** | Verify page views in GA4 reports |
+| **GTM Stape MCP** | Verify tags fire correctly for new events |
+
+### Task-Optimized Structure
+
+| Phase | Mode | Task |
+|-------|------|------|
+| 1 | `[READ-ONLY]` | Audit `src/lib/analytics.ts` for unwired events |
+| 2 | `[READ-ONLY]` | Check which pages already have page view tracking |
+| 3 | `[WRITE]` | Create `usePageView` hook and add to key pages `[PARALLEL with Phase 4]` |
+| 4 | `[WRITE]` | Connect `AppError` to analytics events `[PARALLEL with Phase 3]` |
+| 5 | `[WRITE]` | Add performance tracking (Navigation Timing API) `[SEQUENTIAL]` |
+| 6 | `[WRITE]` | Write Vitest + verify via PostHog MCP `[SEQUENTIAL]` |
 
 ---
 
@@ -81,6 +100,21 @@ Wire up the existing analytics infrastructure that's already built but not conne
 ### Phase 3: Performance
 1. Track navigation timing on key pages
 2. Add slow-API detection
+
+## 📋 Documentation Update Checklist
+
+- [ ] AGENTS.md — Add page view tracking pattern
+- [ ] `analytics-tracking` skill — Add `usePageView` hook pattern
+- [ ] CHANGELOG.md — Log analytics wiring
+- [ ] PRD_00_Index.md — Update PRD 59 status to ✅ Complete
+- [ ] **Git commit** — Stage all PRD changes, commit with conventional message: `type(scope): PRD 59 — short description`
+
+## 📚 Best Practice References
+
+- **Page views:** Use `useEffect` for client-side page view tracking (not SSR). Fire once per mount.
+- **Error tracking:** Connect at `AppError` constructor level for automatic capture.
+- **Performance:** Use `PerformanceObserver` for Navigation Timing, report via `sendBeacon` to avoid blocking.
+- **Non-blocking:** All analytics calls must be fire-and-forget. Never block rendering.
 
 ---
 

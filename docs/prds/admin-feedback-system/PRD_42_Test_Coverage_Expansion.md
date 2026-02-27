@@ -31,6 +31,26 @@ Expand test coverage from ~6% to 70% across critical business logic, ensuring co
 - MSW (API mocking)
 - jsdom (browser simulation)
 
+### MCP Servers
+
+| Server | Purpose |
+|--------|---------|
+| **Supabase MCP** | Verify mock factories match real schema |
+| **Playwright MCP** | Cross-browser E2E tests (add Firefox, WebKit) |
+| **PostHog MCP** | Verify analytics events in component tests |
+
+### Task-Optimized Structure
+
+| Phase | Mode | Task |
+|-------|------|------|
+| 1 | `[READ-ONLY]` | Audit current coverage, identify untested critical paths |
+| 2 | `[WRITE]` | Write API route tests (Phase A items) `[PARALLEL with Phase 3]` |
+| 3 | `[WRITE]` | Write hook tests (Phase B items) `[PARALLEL with Phase 2]` |
+| 4 | `[WRITE]` | Write utility tests (Phase C items) `[PARALLEL with Phase 2]` |
+| 5 | `[WRITE]` | Write component tests (Phase D items) `[SEQUENTIAL]` |
+| 6 | `[WRITE]` | Centralize MSW handlers and test utilities (Phase E) `[SEQUENTIAL]` |
+| 7 | `[WRITE]` | Add Firefox + WebKit to Playwright config `[SEQUENTIAL]` |
+
 ---
 
 ## 🏗️ Detailed Feature Requirements
@@ -129,9 +149,27 @@ Expand test coverage from ~6% to 70% across critical business logic, ensuring co
 
 ## 🔗 Related Documents
 
-- [testing-patterns skill](./.agent/skills/testing-patterns/SKILL.md) - Test patterns
-- [AGENTS.md](./AGENTS.md) - Project patterns
-- [vitest.config.ts](./vitest.config.ts) - Test configuration
+- [testing-patterns skill](../../../.agent/skills/testing-patterns/SKILL.md) - Test patterns
+- [AGENTS.md](../../../AGENTS.md) - Project patterns
+- [vitest.config.ts](../../../vitest.config.ts) - Test configuration
+
+---
+
+## 📋 Documentation Update Checklist
+
+- [ ] AGENTS.md — Add test coverage requirements section
+- [ ] `testing-patterns` skill — Add new mock patterns discovered during expansion
+- [ ] CHANGELOG.md — Log test coverage milestone
+- [ ] PRD_00_Index.md — Update PRD 42 status to ✅ Complete
+- [ ] **Git commit** — Stage all PRD changes, commit with conventional message: `type(scope): PRD 42 — short description`
+
+## 📚 Best Practice References
+
+- **Coverage targets:** 70% line coverage overall, 95% for critical paths (auth, submissions, payments).
+- **Mock strategy:** Centralize in `src/__mocks__/handlers.ts`. Never mock what you can test.
+- **Cross-browser:** Add Firefox + WebKit projects to `playwright.config.ts` (PRD 61 dependency).
+- **Test naming:** `describe('[Feature]')` → `it('should [behavior] when [condition]')`. Be descriptive.
+- **MSW handlers:** Use `setupServer` for unit tests, `setupWorker` for integration. Match real API signatures.
 
 ---
 
