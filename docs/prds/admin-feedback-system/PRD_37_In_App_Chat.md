@@ -3,7 +3,7 @@
 > **Order:** 37 of 37
 > **Previous:** [PRD 36: Technical Debt](./PRD_36_Technical_Debt.md)
 > **Depends on:** PRD 26 (feature flags), PRD 31 (social encouragement for high-fives/badges integration)
-> **Status:** 📋 Proposed
+> **Status:** ✅ Complete (Phase A — Schema Only)
 > **Priority:** Database schema NOW, feature implementation LATER
 
 ---
@@ -861,6 +861,16 @@ graph TD
 
 ---
 
+## Proactive Items
+
+1. **Message retention policy** — Add `retention_days` column to `chat_conversations` defaulting to 365, with a future DB function to auto-archive old messages into a `chat_messages_archive` table. Keeps active tables lean and queries fast as chat volume grows.
+
+2. **Read receipt aggregation** — The `last_read_at` on `chat_participants` enables unread count badges without per-message read tracking (more efficient). Future enhancement: add a `typing_indicator` transient field via Supabase Realtime presence, not stored in DB.
+
+3. **Moderation queue admin page** — The `message_reports` table has a full status workflow (pending → reviewed → actioned/dismissed) ready for admin UI. Build `/admin/moderation` showing pending reports with message context, reporter info, and one-click actions (dismiss, warn user, delete message, block user).
+
+---
+
 ## Changelog
 
 | Date | Section | Change |
@@ -868,3 +878,4 @@ graph TD
 | 2026-01-10 | Initial | Created PRD with comprehensive research findings |
 | 2026-01-10 | Research | Added Strava, Peloton case studies |
 | 2026-01-10 | Strategy | Recommended phased approach with exit criteria |
+| 2026-02-28 | Phase A | Schema complete: 9 tables, RLS, indexes, unread view, 3 feature flags, storage bucket, TypeScript types |

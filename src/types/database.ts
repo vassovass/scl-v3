@@ -475,9 +475,435 @@ export type Database = {
           }
         ];
       };
+    // PRD 37: Chat Foundation Tables
+      chat_conversations: {
+        Row: {
+          id: string;
+          conversation_type: "direct" | "league_group";
+          league_id: string | null;
+          name: string | null;
+          avatar_path: string | null;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          conversation_type: "direct" | "league_group";
+          league_id?: string | null;
+          name?: string | null;
+          avatar_path?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          conversation_type?: "direct" | "league_group";
+          league_id?: string | null;
+          name?: string | null;
+          avatar_path?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "chat_conversations_league_id_fkey";
+            columns: ["league_id"];
+            isOneToOne: false;
+            referencedRelation: "leagues";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "chat_conversations_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      chat_participants: {
+        Row: {
+          conversation_id: string;
+          user_id: string;
+          role: "owner" | "admin" | "member";
+          joined_at: string;
+          last_read_at: string;
+          muted: boolean;
+          notifications_enabled: boolean;
+        };
+        Insert: {
+          conversation_id: string;
+          user_id: string;
+          role?: "owner" | "admin" | "member";
+          joined_at?: string;
+          last_read_at?: string;
+          muted?: boolean;
+          notifications_enabled?: boolean;
+        };
+        Update: {
+          conversation_id?: string;
+          user_id?: string;
+          role?: "owner" | "admin" | "member";
+          joined_at?: string;
+          last_read_at?: string;
+          muted?: boolean;
+          notifications_enabled?: boolean;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "chat_participants_conversation_id_fkey";
+            columns: ["conversation_id"];
+            isOneToOne: false;
+            referencedRelation: "chat_conversations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "chat_participants_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      chat_messages: {
+        Row: {
+          id: string;
+          conversation_id: string;
+          sender_id: string;
+          content: string | null;
+          message_type: "text" | "image" | "badge_share" | "high_five" | "achievement" | "system";
+          metadata: Json;
+          edited_at: string | null;
+          deleted_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          conversation_id: string;
+          sender_id: string;
+          content?: string | null;
+          message_type?: "text" | "image" | "badge_share" | "high_five" | "achievement" | "system";
+          metadata?: Json;
+          edited_at?: string | null;
+          deleted_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          conversation_id?: string;
+          sender_id?: string;
+          content?: string | null;
+          message_type?: "text" | "image" | "badge_share" | "high_five" | "achievement" | "system";
+          metadata?: Json;
+          edited_at?: string | null;
+          deleted_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey";
+            columns: ["conversation_id"];
+            isOneToOne: false;
+            referencedRelation: "chat_conversations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "chat_messages_sender_id_fkey";
+            columns: ["sender_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      chat_attachments: {
+        Row: {
+          id: string;
+          message_id: string;
+          storage_path: string;
+          file_name: string;
+          file_size: number;
+          mime_type: string;
+          width: number | null;
+          height: number | null;
+          thumbnail_path: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          message_id: string;
+          storage_path: string;
+          file_name: string;
+          file_size: number;
+          mime_type: string;
+          width?: number | null;
+          height?: number | null;
+          thumbnail_path?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          message_id?: string;
+          storage_path?: string;
+          file_name?: string;
+          file_size?: number;
+          mime_type?: string;
+          width?: number | null;
+          height?: number | null;
+          thumbnail_path?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "chat_attachments_message_id_fkey";
+            columns: ["message_id"];
+            isOneToOne: false;
+            referencedRelation: "chat_messages";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      message_reactions: {
+        Row: {
+          id: string;
+          message_id: string;
+          user_id: string;
+          emoji: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          message_id: string;
+          user_id: string;
+          emoji: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          message_id?: string;
+          user_id?: string;
+          emoji?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "message_reactions_message_id_fkey";
+            columns: ["message_id"];
+            isOneToOne: false;
+            referencedRelation: "chat_messages";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "message_reactions_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      league_activity: {
+        Row: {
+          id: string;
+          league_id: string;
+          user_id: string;
+          activity_type: "submission" | "achievement" | "milestone" | "streak" | "joined" | "high_five_batch" | "custom";
+          content: Json;
+          visibility: "league" | "public";
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          league_id: string;
+          user_id: string;
+          activity_type: "submission" | "achievement" | "milestone" | "streak" | "joined" | "high_five_batch" | "custom";
+          content: Json;
+          visibility?: "league" | "public";
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          league_id?: string;
+          user_id?: string;
+          activity_type?: "submission" | "achievement" | "milestone" | "streak" | "joined" | "high_five_batch" | "custom";
+          content?: Json;
+          visibility?: "league" | "public";
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "league_activity_league_id_fkey";
+            columns: ["league_id"];
+            isOneToOne: false;
+            referencedRelation: "leagues";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "league_activity_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      activity_comments: {
+        Row: {
+          id: string;
+          activity_id: string;
+          user_id: string;
+          parent_id: string | null;
+          content: string;
+          created_at: string;
+          edited_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          activity_id: string;
+          user_id: string;
+          parent_id?: string | null;
+          content: string;
+          created_at?: string;
+          edited_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          activity_id?: string;
+          user_id?: string;
+          parent_id?: string | null;
+          content?: string;
+          created_at?: string;
+          edited_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "activity_comments_activity_id_fkey";
+            columns: ["activity_id"];
+            isOneToOne: false;
+            referencedRelation: "league_activity";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "activity_comments_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "activity_comments_parent_id_fkey";
+            columns: ["parent_id"];
+            isOneToOne: false;
+            referencedRelation: "activity_comments";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      user_blocks: {
+        Row: {
+          blocker_id: string;
+          blocked_id: string;
+          created_at: string;
+        };
+        Insert: {
+          blocker_id: string;
+          blocked_id: string;
+          created_at?: string;
+        };
+        Update: {
+          blocker_id?: string;
+          blocked_id?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_blocks_blocker_id_fkey";
+            columns: ["blocker_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_blocks_blocked_id_fkey";
+            columns: ["blocked_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      message_reports: {
+        Row: {
+          id: string;
+          message_id: string;
+          reporter_id: string;
+          reason: "spam" | "harassment" | "inappropriate" | "other";
+          details: string | null;
+          status: "pending" | "reviewed" | "actioned" | "dismissed";
+          reviewed_by: string | null;
+          reviewed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          message_id: string;
+          reporter_id: string;
+          reason: "spam" | "harassment" | "inappropriate" | "other";
+          details?: string | null;
+          status?: "pending" | "reviewed" | "actioned" | "dismissed";
+          reviewed_by?: string | null;
+          reviewed_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          message_id?: string;
+          reporter_id?: string;
+          reason?: "spam" | "harassment" | "inappropriate" | "other";
+          details?: string | null;
+          status?: "pending" | "reviewed" | "actioned" | "dismissed";
+          reviewed_by?: string | null;
+          reviewed_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "message_reports_message_id_fkey";
+            columns: ["message_id"];
+            isOneToOne: false;
+            referencedRelation: "chat_messages";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "message_reports_reporter_id_fkey";
+            columns: ["reporter_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "message_reports_reviewed_by_fkey";
+            columns: ["reviewed_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Views: {
-      [_ in never]: never;
+      user_unread_counts: {
+        Row: {
+          user_id: string;
+          conversation_id: string;
+          unread_count: number;
+          last_message_at: string | null;
+        };
+      };
     };
     Functions: {
       leaderboard_period: {
@@ -547,6 +973,17 @@ export type SiteSetting = Tables<"site_settings">;
 export type AuditLog = Tables<"audit_log">;
 export type UserPreferences = Tables<"user_preferences">;
 export type ShareCard = Tables<"share_cards">;
+
+// PRD 37: Chat Foundation Types
+export type ChatConversation = Tables<"chat_conversations">;
+export type ChatParticipant = Tables<"chat_participants">;
+export type ChatMessage = Tables<"chat_messages">;
+export type ChatAttachment = Tables<"chat_attachments">;
+export type MessageReaction = Tables<"message_reactions">;
+export type LeagueActivity = Tables<"league_activity">;
+export type ActivityComment = Tables<"activity_comments">;
+export type UserBlock = Tables<"user_blocks">;
+export type MessageReport = Tables<"message_reports">;
 
 // PRD 41: "Act As" Proxy Types
 // ============================
