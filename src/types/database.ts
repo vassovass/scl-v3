@@ -81,6 +81,9 @@ export type Database = {
           daily_step_goal: number;
           max_members: number;
           category: string;
+          // PRD 47: H2H fields
+          h2h_enabled: boolean;
+          h2h_season_weeks: number;
         };
         Insert: {
           id?: string;
@@ -97,6 +100,9 @@ export type Database = {
           daily_step_goal?: number;
           max_members?: number;
           category?: string;
+          // PRD 47: H2H fields
+          h2h_enabled?: boolean;
+          h2h_season_weeks?: number;
         };
         Update: {
           id?: string;
@@ -113,6 +119,9 @@ export type Database = {
           daily_step_goal?: number;
           max_members?: number;
           category?: string;
+          // PRD 47: H2H fields
+          h2h_enabled?: boolean;
+          h2h_season_weeks?: number;
         };
         Relationships: [
           {
@@ -836,6 +845,175 @@ export type Database = {
           }
         ];
       };
+      // PRD 47: Head-to-Head League Tables
+      h2h_seasons: {
+        Row: {
+          id: string;
+          league_id: string;
+          season_number: number;
+          season_type: "fixed" | "endless";
+          total_weeks: number;
+          start_date: string;
+          end_date: string | null;
+          status: "pending" | "active" | "completed" | "cancelled";
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          league_id: string;
+          season_number?: number;
+          season_type?: "fixed" | "endless";
+          total_weeks?: number;
+          start_date: string;
+          end_date?: string | null;
+          status?: "pending" | "active" | "completed" | "cancelled";
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          league_id?: string;
+          season_number?: number;
+          season_type?: "fixed" | "endless";
+          total_weeks?: number;
+          start_date?: string;
+          end_date?: string | null;
+          status?: "pending" | "active" | "completed" | "cancelled";
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "h2h_seasons_league_id_fkey";
+            columns: ["league_id"];
+            isOneToOne: false;
+            referencedRelation: "leagues";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      h2h_fixtures: {
+        Row: {
+          id: string;
+          season_id: string;
+          week_number: number;
+          round_type: "regular" | "semifinal" | "final";
+          home_user_id: string | null;
+          away_user_id: string | null;
+          home_steps: number | null;
+          away_steps: number | null;
+          home_points: number | null;
+          away_points: number | null;
+          status: "scheduled" | "in_progress" | "completed" | "cancelled";
+          completed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          season_id: string;
+          week_number: number;
+          round_type?: "regular" | "semifinal" | "final";
+          home_user_id?: string | null;
+          away_user_id?: string | null;
+          home_steps?: number | null;
+          away_steps?: number | null;
+          home_points?: number | null;
+          away_points?: number | null;
+          status?: "scheduled" | "in_progress" | "completed" | "cancelled";
+          completed_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          season_id?: string;
+          week_number?: number;
+          round_type?: "regular" | "semifinal" | "final";
+          home_user_id?: string | null;
+          away_user_id?: string | null;
+          home_steps?: number | null;
+          away_steps?: number | null;
+          home_points?: number | null;
+          away_points?: number | null;
+          status?: "scheduled" | "in_progress" | "completed" | "cancelled";
+          completed_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "h2h_fixtures_season_id_fkey";
+            columns: ["season_id"];
+            isOneToOne: false;
+            referencedRelation: "h2h_seasons";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "h2h_fixtures_home_user_id_fkey";
+            columns: ["home_user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "h2h_fixtures_away_user_id_fkey";
+            columns: ["away_user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      h2h_standings: {
+        Row: {
+          id: string;
+          season_id: string;
+          user_id: string;
+          played: number;
+          won: number;
+          drawn: number;
+          lost: number;
+          points: number;
+          total_steps: number;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          season_id: string;
+          user_id: string;
+          played?: number;
+          won?: number;
+          drawn?: number;
+          lost?: number;
+          points?: number;
+          total_steps?: number;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          season_id?: string;
+          user_id?: string;
+          played?: number;
+          won?: number;
+          drawn?: number;
+          lost?: number;
+          points?: number;
+          total_steps?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "h2h_standings_season_id_fkey";
+            columns: ["season_id"];
+            isOneToOne: false;
+            referencedRelation: "h2h_seasons";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "h2h_standings_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       message_reports: {
         Row: {
           id: string;
@@ -984,6 +1162,11 @@ export type LeagueActivity = Tables<"league_activity">;
 export type ActivityComment = Tables<"activity_comments">;
 export type UserBlock = Tables<"user_blocks">;
 export type MessageReport = Tables<"message_reports">;
+
+// PRD 47: Head-to-Head League Types
+export type H2HSeason = Tables<"h2h_seasons">;
+export type H2HFixture = Tables<"h2h_fixtures">;
+export type H2HStanding = Tables<"h2h_standings">;
 
 // PRD 41: "Act As" Proxy Types
 // ============================

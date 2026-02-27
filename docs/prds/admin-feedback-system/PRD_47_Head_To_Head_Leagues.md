@@ -1,7 +1,7 @@
 # PRD 47: Head-to-Head League Mode (FPL Style)
 
 > **Order:** 47
-> **Status:** 📋 Proposed (Design Only)
+> **Status:** ✅ Complete (Schema + Algorithm)
 > **Type:** Feature
 > **Dependencies:** PRD 46 (Points System)
 > **Blocks:** None
@@ -355,3 +355,4 @@ _Forward-thinking items that anticipate future needs:_
 |------|---------|--------|
 | 2026-01-20 | Initial | Created FPL-style H2H league design PRD |
 | 2026-01-20 | Systems/Proactive | Added modular design considerations and forward-thinking items |
+| 2026-02-28 | Schema + Algorithm | Migration (3 tables, league columns, RLS, feature flag), TypeScript types, fixture generator with validator + 18 tests, architecture doc |
