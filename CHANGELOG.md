@@ -24,6 +24,7 @@ All notable changes to StepLeague v3.
 - **PRD 62: Security Headers & CSP** ✅ — OWASP baseline security headers via `next.config.js` `headers()`. X-Frame-Options DENY, X-Content-Type-Options nosniff, HSTS 1yr, Referrer-Policy strict-origin-when-cross-origin, Permissions-Policy (camera/mic/geo/payment disabled), Content-Security-Policy with Supabase + analytics proxy allowlist. 14 unit tests + E2E suite.
 - **PRD 59: Analytics Implementation** — Wire up page views, error tracking, performance events
 - **PRD 60: UX Onboarding** ✅ — Dashboard onboarding cards (WelcomeCard, SubmitFirstStepsCTA, ScreenshotGuide, WorldLeagueExplainer) for zero-submission users. SupportedAppsList on submit page. Homepage fake stats replaced with honest value props. New `onboarding-submit-v1` tour for first submission guidance. Reusable `OnboardingCard` component with variant-based styling. 11 unit tests.
+- **PRD 28: Smart Engagement** ✅ — MissedDayCard and StreakWarning components using reusable OnboardingCard (variant="warning"). `useEngagement` hook derives missed-day and streak-at-risk state from `useUserSubmissions`. EngagementPrompts container on dashboard for users with submissions. Submit page `?date=` query param with DatePrefillBanner. Session-based dismiss via sessionStorage. 17 unit tests.
 - **PRD 61: Testing Gaps** — January 2026 regression prevention tests
 
 ---

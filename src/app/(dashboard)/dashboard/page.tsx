@@ -11,6 +11,7 @@ import { PasswordResetSuccessToast } from "@/components/dashboard/PasswordResetS
 import { DashboardClientWrapper } from "@/components/dashboard/DashboardClientWrapper";
 import { PageViewTracker } from "@/components/analytics/PageViewTracker";
 import { OnboardingSection } from "@/components/onboarding/OnboardingSection";
+import { EngagementPrompts } from "@/components/engagement/EngagementPrompts";
 
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient();
@@ -84,6 +85,9 @@ export default async function DashboardPage() {
           submissionCount={submissionCount}
           displayName={userProfile?.display_name ?? user.user_metadata?.display_name}
         />
+
+        {/* Engagement prompts for returning users (PRD 28) */}
+        <EngagementPrompts />
 
         {/* Progress Widget & Gratitude Row */}
         <div className="mt-6 mb-2 grid gap-4 md:grid-cols-2">

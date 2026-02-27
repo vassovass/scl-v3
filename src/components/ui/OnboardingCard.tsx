@@ -20,6 +20,7 @@ interface OnboardingCardProps {
     cta?: {
         label: string;
         href: string;
+        onClick?: () => void;
     };
     /** Optional dismiss handler */
     onDismiss?: () => void;
@@ -100,6 +101,7 @@ export function OnboardingCard({
                             <div className="pt-2">
                                 <Link
                                     href={cta.href}
+                                    onClick={cta.onClick}
                                     className={cn(
                                         "inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium transition",
                                         ctaStyles[variant]

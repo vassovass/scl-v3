@@ -141,7 +141,7 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 ### Partially Complete
 | # | PRD Title | Done | Remaining | Status |
 |---|-----------|------|-----------|--------|
-| 28 | [Smart Engagement](./PRD_28_Smart_Engagement.md) | Streak freeze (in `appSettings.ts` + `user_preferences`) | Missed-day UI, streak warning components | 🟨 Partial |
+| 28 | [Smart Engagement](./PRD_28_Smart_Engagement.md) | Streak freeze + Missed-day prompt + Streak warning + ?date= param | — | ✅ Complete |
 | 32 | [Admin Analytics](./PRD_32_Admin_Analytics.md) | UI scaffold at `/admin/analytics`, tour analytics sub-module | KPI data integration, trend charts, export | 🟨 Partial |
 
 ### In Progress

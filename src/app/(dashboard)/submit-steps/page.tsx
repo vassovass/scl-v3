@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import React, { Suspense, useEffect, useState, useCallback, useMemo, useRef } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useToast } from "@/hooks/use-toast";
 import { normalizeError, reportErrorClient, errorFromResponse, ErrorCode } from "@/lib/errors";
@@ -39,8 +40,40 @@ interface Submission {
 }
 
 /**
+ * Banner shown when user arrives via ?date= param (PRD 28 — missed day CTA).
+ * Wrapped in Suspense per AGENTS.md useSearchParams pattern.
+ */
+function DatePrefillBanner() {
+    const searchParams = useSearchParams();
+    const dateParam = searchParams.get("date");
+
+    if (!dateParam || !/^\d{4}-\d{2}-\d{2}$/.test(dateParam)) return null;
+
+    const displayDate = new Date(dateParam + "T12:00:00").toLocaleDateString(
+        undefined,
+        { weekday: "long", month: "long", day: "numeric", year: "numeric" }
+    );
+
+    return (
+        <div className="mb-6 rounded-lg border border-[hsl(var(--warning)/.3)] bg-[hsl(var(--warning)/.1)] p-4">
+            <div className="flex items-center gap-3">
+                <span className="text-lg">📅</span>
+                <div>
+                    <p className="text-sm font-medium text-foreground">
+                        Submitting for {displayDate}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                        Upload a screenshot from this date. The AI will extract the step count automatically.
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+/**
  * Submit Steps Page - League-agnostic step submission
- * 
+ *
  * This page allows users to submit steps that apply to ALL their leagues.
  * Steps are submitted once and count toward every league the user is part of.
  */
@@ -523,6 +556,11 @@ export default function SubmitPage() {
                         </div>
                     </div>
                 )}
+
+                {/* Date pre-fill banner (PRD 28 — missed day CTA links here) */}
+                <Suspense fallback={null}>
+                    <DatePrefillBanner />
+                </Suspense>
 
                 {/* Global Submission Info */}
                 <div className="mb-8 rounded-lg border border-[hsl(var(--info)/.3)] bg-[hsl(var(--info)/.1)] p-4 text-[hsl(var(--info))]">
