@@ -5,7 +5,7 @@
 > These PRDs describe WHAT is needed, not HOW to implement. The implementing agent decides the best approach.
 >
 > **Last Updated:** 2026-02-28
-> **Total PRDs:** 66 (54 complete, 0 partial, 1 in-progress, 11 proposed)
+> **Total PRDs:** 66 (55 complete, 0 partial, 1 in-progress, 10 proposed)
 
 ---
 
@@ -158,7 +158,7 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 | 37 | [In-App Chat](./PRD_37_In_App_Chat.md) | Database schema for future chat | ✅ Complete (Schema) |
 | 42 | [Test Coverage Expansion](./PRD_42_Test_Coverage_Expansion.md) | Expand test coverage to 70% | ✅ Complete |
 | 47 | [Head-to-Head Leagues](./PRD_47_Head_To_Head_Leagues.md) | FPL-style weekly matchups (Design) | ✅ Complete (Schema) |
-| 48 | [Universal Health Measurement](./PRD_48_Universal_Health_Measurement.md) | Multi-activity SLP conversion (Vision) | 📋 Proposed |
+| 48 | [Universal Health Measurement](./PRD_48_Universal_Health_Measurement.md) | Multi-activity SLP conversion (Vision) | ✅ Complete (Architecture) |
 | 57 | [Password Reset Flow](./PRD_57_Password_Reset_Flow.md) | Users can recover forgotten passwords | ✅ Complete |
 | 58 | [API Rate Limiting](./PRD_58_Rate_Limiting.md) | Endpoints protected from abuse and spam | ✅ Complete |
 | 59 | [Analytics Implementation](./PRD_59_Analytics_Implementation.md) | Wire up page views, error tracking, performance | 📋 Proposed |
@@ -265,9 +265,9 @@ Available MCP servers for PRD verification:
 
 | Category | Count | PRDs |
 |----------|-------|------|
-| ✅ Complete | 52 | 1-36, 38-46, 50-58, 60, 62, 64-65 |
+| ✅ Complete | 55 | 1-38, 40-46, 47-48, 50-58, 60, 62, 64-65 |
 | 🔄 In Progress | 1 | 49 |
-| 📋 Proposed | 13 | 37, 47, 48, 59, 61, 63, 66 |
+| 📋 Proposed | 10 | 59, 61, 63, 66 |
 | **Total** | **66** | |
 
 ---
