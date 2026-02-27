@@ -46,6 +46,11 @@ export const SUPERADMIN_PAGES: AdminPage[] = [
         description: "Configure app-wide settings and development stage",
     },
     {
+        href: "/admin/analytics",
+        label: "📊 Analytics Dashboard",
+        description: "Platform KPIs, trends, league breakdown, and CSV export",
+    },
+    {
         href: "/admin/analytics/tours",
         label: "📈 Tour Analytics",
         description: "Completion rates, drop-off analysis, and feedback summary",

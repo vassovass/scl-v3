@@ -7,6 +7,14 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-02-28]
+
+### Added
+
+- **PRD 32: Admin Analytics Dashboard** ✅ — Real KPI data integration (Total Users, Active Rate, Avg Steps, Retention, Streak Average, Submission Rate) with period filters (7d/30d/90d/all), trend area chart (Recharts), per-league breakdown table, CSV export endpoint. All via `withApiHandler` with superadmin auth. 18 unit tests.
+
+---
+
 ## [2026-02-27]
 
 ### Fixed
