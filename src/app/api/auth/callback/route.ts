@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server";
 import { enrollInWorldLeague } from "@/lib/league/worldLeague";
 
@@ -29,12 +30,16 @@ export async function GET(request: Request) {
       return NextResponse.redirect(`${origin}${next}`);
     }
 
-    // Specific error: code exchange failed (PKCE mismatch - wrong browser)
-    console.error("[Auth Callback] Code exchange failed:", error.message);
+    // Code exchange failed — determine if PKCE verifier was missing (wrong browser)
+    // or if the link genuinely expired
+    const cookieStore = await cookies();
+    const hasCodeVerifier = cookieStore.getAll().some(c => c.name.includes("code-verifier") || c.name.includes("code_verifier"));
+    console.error("[Auth Callback] Code exchange failed:", error.message, "| next:", next, "| code_verifier_present:", hasCodeVerifier);
 
-    // PRD 57: Redirect to reset-password with error for expired recovery links
+    // PRD 57: Redirect to reset-password with specific error for recovery links
     if (next === "/update-password") {
-      return NextResponse.redirect(`${origin}/reset-password?error=link_expired`);
+      const errorType = hasCodeVerifier ? "link_expired" : "wrong_browser";
+      return NextResponse.redirect(`${origin}/reset-password?error=${errorType}`);
     }
 
     return NextResponse.redirect(`${origin}/dashboard?error=auth_code_exchange_failed`);

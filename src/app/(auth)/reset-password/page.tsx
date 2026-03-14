@@ -8,7 +8,9 @@ import { analytics } from "@/lib/analytics";
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
-  const linkExpired = searchParams.get("error") === "link_expired";
+  const errorParam = searchParams.get("error");
+  const linkExpired = errorParam === "link_expired";
+  const wrongBrowser = errorParam === "wrong_browser";
 
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +46,17 @@ function ResetPasswordForm() {
       console.error("[ResetPassword]", resetError.message);
     }
 
+    // Also resend signup confirmation for unconfirmed users.
+    // Confirmed users: no-op. Unconfirmed users: get the confirmation they need.
+    // Non-existent emails: no-op. NIST compliance maintained.
+    await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/api/auth/callback?next=/dashboard`,
+      },
+    }).catch(() => {}); // Silent — this is a best-effort fallback
+
     // Always show success (NIST 800-63B: never reveal if email exists)
     analytics.passwordResetRequested();
     setSuccess(true);
@@ -65,10 +78,17 @@ function ResetPasswordForm() {
         </div>
       )}
 
+      {wrongBrowser && !success && (
+        <div className="mt-6 rounded-lg border border-[hsl(var(--warning)/0.5)] bg-[hsl(var(--warning)/0.1)] px-4 py-3 text-sm text-[hsl(var(--warning))]">
+          Please open the reset link in the same browser you used to request it. Request a new link below if needed.
+        </div>
+      )}
+
       {success ? (
         <div className="mt-8 space-y-4">
-          <div className="rounded-lg border border-[hsl(var(--success)/0.2)] bg-[hsl(var(--success)/0.1)] px-4 py-3 text-sm text-[hsl(var(--success))]">
-            Check your email for a reset link. If you don&apos;t see it, check your spam folder.
+          <div className="rounded-lg border border-[hsl(var(--success)/0.2)] bg-[hsl(var(--success)/0.1)] px-4 py-3 text-sm text-[hsl(var(--success))] space-y-2">
+            <p>Check your email for a reset link. If you haven&apos;t verified your email yet, we&apos;ve sent a verification email instead — please verify first, then try again.</p>
+            <p>Open the link in the same browser you&apos;re using now. Check your spam folder if you don&apos;t see it.</p>
           </div>
           <p className="text-center text-sm text-muted-foreground">
             <Link href="/sign-in" className="text-primary hover:text-primary/80">
