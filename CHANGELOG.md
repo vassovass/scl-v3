@@ -7,6 +7,15 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-03-14]
+
+### Added
+
+- **Branded Supabase Email Templates** — Professional dark-themed HTML email templates for all 6 Supabase auth email types (password reset, signup confirmation, magic link, user invite, email change, reauthentication). StepLeague branding with emoji logo, split-color name, primary blue CTA button. Table-based layout with inline styles for Gmail/Outlook/Apple Mail compatibility. MSO/VML conditionals for Outlook. Version-controlled in `supabase/templates/` with deployment README.
+- **Custom Domain Email Links** — Email links now point to `stepleague.app/api/auth/confirm` instead of `supabase.co/auth/v1/verify`. Uses `{{ .TokenHash }}` template variable with new `/api/auth/confirm` route that calls `verifyOtp()`. Free tier compatible — no custom domain or SMTP required. Includes user sync and World League auto-enrollment matching existing callback flow.
+
+---
+
 ## [2026-02-28]
 
 ### Added

@@ -30,6 +30,7 @@ scl-v3/
 │       ├── supabase/             # Server/client Supabase clients
 │       └── utils/                # Date utilities
 ├── supabase/migrations/          # SQL migrations (numbered YYYYMMDDHHMMSS_name.sql)
+├── supabase/templates/           # Branded HTML email templates (deploy via Supabase Dashboard)
 ├── docs/                         # Reference documentation
 ├── .claude/rules/                # Path-scoped rules (loaded conditionally)
 ├── .claude/skills/               # On-demand skill prompts
