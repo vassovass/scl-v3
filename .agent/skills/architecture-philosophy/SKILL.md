@@ -25,6 +25,52 @@ Before implementing ANY solution:
 
 ---
 
+## Convention Research Protocol (mandatory for every task)
+
+Before writing any implementation code, complete these steps:
+
+### Step 1: Search for precedent
+
+- Grep for similar function names, component patterns, or data flows
+- Check 2-3 existing files that do something analogous to your task
+- Look at the relevant skill(s) for documented patterns
+
+### Step 2: Identify the convention
+
+- How do existing implementations handle this? (naming, structure, imports, error handling, data flow)
+- What utilities/hooks/components do they use?
+- What is the file organization pattern?
+
+### Step 3: Follow the convention
+
+- Use the same utilities, hooks, and components
+- Match the naming conventions (e.g., if hooks use `useX`, actions use `xAction`, API routes use `withApiHandler`)
+- Match the structural patterns (e.g., if similar pages use server components with client islands, do the same)
+
+### Step 4: Extend if needed
+
+- If the existing utility almost fits but needs a small addition, extend it — do not create a parallel utility
+- If you must add a new pattern, document it in the relevant skill or rule file
+
+### What this looks like in practice
+
+| Task | Convention research |
+|------|-------------------|
+| New API route | Open 2 existing routes, note they all use `withApiHandler` + `adminClient` + Zod schema |
+| New page component | Open 2 similar pages, note layout pattern, data fetching approach, component composition |
+| New hook | Search `src/hooks/`, see naming pattern, see how existing hooks handle loading/error states |
+| New utility function | Search `src/lib/`, check if an existing file already covers this domain |
+| New UI component | Check `src/components/ui/` for existing patterns, use shadcn/ui primitives, match CSS variable usage |
+| Error handling | Find how nearby code handles errors — it uses `AppError`, so you must too |
+
+### Anti-pattern: The Competing Convention
+
+> You find that error handling uses `AppError` throughout the codebase, but you throw a plain `new Error()` because "it's simpler for this case."
+
+This is the #1 violation. Even if your approach works, it creates two conventions. Future agents will find both and won't know which to follow. The codebase drifts. **Always use the established convention, even if yours seems simpler.**
+
+---
+
 ## Core Principles
 
 Every solution in StepLeague must follow these principles:

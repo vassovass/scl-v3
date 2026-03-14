@@ -15,7 +15,7 @@ Think in systems, not solutions. Every implementation should strengthen the whol
 2. **Design systems thinking** — Build on the existing design system (shadcn/ui + CSS variables). Every UI element should be a composable, themed component — never one-off styling.
 3. **Modular architecture** — Extract reusable patterns. If it solves one case, ask: "Will this pattern be needed elsewhere?" If yes, make it generic. Use settings over hardcoding, registries over inline strings.
 4. **Proactive & future-proof** — Design for tomorrow, implement for today. Use feature flags (`useFeatureFlag()`), configurable settings (`useAppSettings()`), and extensible schemas. Gate new features, don't hardcode limits.
-5. **Compound value** — Every feature should make the next feature easier to build. Prefer extending existing utilities over creating new ones. Check existing patterns first.
+5. **Compound value** — Every feature should make the next feature easier to build. One direction in the code: find the existing way, use that way, strengthen that way. Never create parallel approaches.
 
 For detailed principles, anti-patterns, and decision frameworks → see `architecture-philosophy` skill.
 
@@ -23,7 +23,7 @@ For detailed principles, anti-patterns, and decision frameworks → see `archite
 
 ## Golden Rules (non-negotiable)
 
-1. **Check existing patterns first** — Search before creating new components, hooks, or utilities. We likely already have it.
+1. **Convention-first development** — Before writing ANY code: (a) search the codebase for how similar things are already done, (b) identify the existing convention, (c) follow that convention exactly, (d) extend it if needed — never introduce a competing pattern. If no convention exists, establish one worth reusing.
 2. **Mobile-first** — Base styles = mobile. Add `md:`, `lg:` prefixes for larger screens. Never desktop-first.
 3. **Untyped Supabase** — NEVER use `<Database>` generics. Always untyped: `adminClient.from("table").select("*")`.
 4. **withApiHandler** — All new API routes MUST use `withApiHandler` from `@/lib/api/handler`. See `api-handler` skill for details.
@@ -62,7 +62,7 @@ For detailed principles, anti-patterns, and decision frameworks → see `archite
 3. Run relevant tests: `npx vitest run`
 4. If you changed a documented pattern, update the relevant rule/skill/doc file
 5. Review `.claude/skills/` — scan ALL available skills and assess which are relevant to your task
-6. Consistency check: does your implementation follow the Design Philosophy above?
+6. Convention check: did you follow existing codebase patterns? Grep for similar implementations and verify your code matches their approach — same utilities, same structure, same naming.
 7. Update CHANGELOG.md with your changes (see `project-updates` skill for format)
 8. Update roadmap if completing a user-facing feature (see `project-updates` skill for API)
 
