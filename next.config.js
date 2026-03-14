@@ -24,8 +24,9 @@ const nextConfig = {
   // SECURITY HEADERS (PRD 62)
   // ═══════════════════════════════════════════════════════════════════════════
   // OWASP baseline security headers applied to all responses.
-  // CSP allows: self, Supabase (*.supabase.co), analytics via first-party
-  // proxy rewrites (so they go through 'self').
+  // CSP allows: self, Supabase, Google Fonts, GTM/GA4, PostHog.
+  // Proxy rewrites handle most analytics through 'self', but GTM/PostHog
+  // dynamically load sub-resources from their actual domains.
   // Note: 'unsafe-inline' and 'unsafe-eval' required by Next.js for now.
   // Upgrade path: CSP nonces via middleware for production hardening.
   async headers() {
@@ -48,11 +49,11 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-              "style-src 'self' 'unsafe-inline'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://us-assets.i.posthog.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: blob: https: *.supabase.co",
-              "font-src 'self' data:",
-              "connect-src 'self' *.supabase.co",
+              "font-src 'self' data: https://fonts.gstatic.com",
+              "connect-src 'self' *.supabase.co https://us.i.posthog.com https://www.google-analytics.com https://www.googletagmanager.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",
