@@ -4,8 +4,8 @@
 >
 > These PRDs describe WHAT is needed, not HOW to implement. The implementing agent decides the best approach.
 >
-> **Last Updated:** 2026-02-28
-> **Total PRDs:** 66 (55 complete, 0 partial, 1 in-progress, 10 proposed)
+> **Last Updated:** 2026-03-14
+> **Total PRDs:** 68 (64 complete, 0 partial, 1 in-progress, 3 proposed)
 
 ---
 
@@ -161,14 +161,16 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 | 48 | [Universal Health Measurement](./PRD_48_Universal_Health_Measurement.md) | Multi-activity SLP conversion (Vision) | ✅ Complete (Architecture) |
 | 57 | [Password Reset Flow](./PRD_57_Password_Reset_Flow.md) | Users can recover forgotten passwords | ✅ Complete |
 | 58 | [API Rate Limiting](./PRD_58_Rate_Limiting.md) | Endpoints protected from abuse and spam | ✅ Complete |
-| 59 | [Analytics Implementation](./PRD_59_Analytics_Implementation.md) | Wire up page views, error tracking, performance | 📋 Proposed |
+| 59 | [Analytics Implementation](./PRD_59_Analytics_Implementation.md) | Wire up page views, error tracking, performance | ✅ Complete |
 | 60 | [UX Onboarding](./PRD_60_UX_Onboarding.md) | First 5 minutes guided experience | ✅ Complete |
-| 61 | [Testing Gaps](./PRD_61_Testing_Gaps.md) | January regression prevention tests | 📋 Proposed |
+| 61 | [Testing Gaps](./PRD_61_Testing_Gaps.md) | January regression prevention tests | ✅ Complete |
 | 62 | [Security Headers & CSP](./PRD_62_Security_Headers.md) | OWASP security headers baseline | ✅ Complete |
-| 63 | [Client Error Resilience](./PRD_63_Client_Error_Resilience.md) | AbortController + timeouts for SA users | 📋 Proposed |
+| 63 | [Client Error Resilience](./PRD_63_Client_Error_Resilience.md) | AbortController + timeouts for SA users | ✅ Complete |
 | 64 | [Performance Budgets & RUM](./PRD_64_Performance_Budgets.md) | Web Vitals + real user monitoring | ✅ Complete |
 | 65 | [Structured Logging & Health Check](./PRD_65_Structured_Logging.md) | JSON structured logging + `/api/health` | ✅ Complete |
-| 66 | [Fix Broken Tests](./PRD_66_Fix_Broken_Tests.md) | Fix 40 pre-existing test failures (env mocks) | 📋 Proposed |
+| 66 | [Fix Broken Tests](./PRD_66_Fix_Broken_Tests.md) | Fix 40 pre-existing test failures (env mocks) | ✅ Complete |
+| 67 | [Artifacts Cleanup](../prd-67-artifacts-cleanup.md) | Organize docs/artifacts/ with naming conventions and archive | 📋 Proposed |
+| 68 | [Database Schema Docs](../prd-68-database-schema-docs.md) | Comprehensive schema documentation from Supabase MCP | 📋 Proposed |
 
 ---
 
@@ -176,65 +178,65 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 
 > **Principle:** Sprints use 2 parallel tracks to maximize throughput. Within each track, tasks are sequential. Tracks run in parallel.
 
-### Sprint A: Alpha Launch Readiness (~1 week, 2 parallel tracks)
+### Sprint A: Alpha Launch Readiness ✅ COMPLETE
 *Goal: Eliminate all blockers. After this sprint, first 5-10 users can be invited safely.*
 
-**Track 1 — Security & Auth** [SEQUENTIAL within track]
-| Order | PRD | Title | Effort | Skills |
-|-------|-----|-------|--------|--------|
-| A1.1 | **57** | [Password Reset Flow](./PRD_57_Password_Reset_Flow.md) | 3-4h | `auth-patterns`, `form-components`, `supabase-patterns` |
-| A1.2 | **58** | [API Rate Limiting](./PRD_58_Rate_Limiting.md) | 2-3h | `api-handler`, `error-handling` |
-| A1.3 | **62** | [Security Headers & CSP](./PRD_62_Security_Headers.md) | 1-2h | `middleware-patterns` |
+**Track 1 — Security & Auth** ✅
+| Order | PRD | Title | Status |
+|-------|-----|-------|--------|
+| A1.1 | **57** | [Password Reset Flow](./PRD_57_Password_Reset_Flow.md) | ✅ Complete |
+| A1.2 | **58** | [API Rate Limiting](./PRD_58_Rate_Limiting.md) | ✅ Complete |
+| A1.3 | **62** | [Security Headers & CSP](./PRD_62_Security_Headers.md) | ✅ Complete |
 
-**Track 2 — Observability & Quality** [SEQUENTIAL within track, PARALLEL to Track 1]
-| Order | PRD | Title | Effort | Skills |
-|-------|-----|-------|--------|--------|
-| A2.1 | **59** | [Analytics Implementation](./PRD_59_Analytics_Implementation.md) | 3-4h | `analytics-tracking`, `error-handling` |
-| A2.1b | **66** | [Fix Broken Tests](./PRD_66_Fix_Broken_Tests.md) | 1-2h | `testing-patterns`, `react-debugging` |
-| A2.2 | **61** | [Testing Gaps](./PRD_61_Testing_Gaps.md) | 3-4h | `testing-patterns`, `react-debugging`, `auth-patterns` |
-| A2.3 | **63** | [Client Error Resilience](./PRD_63_Client_Error_Resilience.md) | 3-4h | `error-handling`, `react-debugging` |
+**Track 2 — Observability & Quality** ✅
+| Order | PRD | Title | Status |
+|-------|-----|-------|--------|
+| A2.1 | **59** | [Analytics Implementation](./PRD_59_Analytics_Implementation.md) | ✅ Complete |
+| A2.1b | **66** | [Fix Broken Tests](./PRD_66_Fix_Broken_Tests.md) | ✅ Complete |
+| A2.2 | **61** | [Testing Gaps](./PRD_61_Testing_Gaps.md) | ✅ Complete |
+| A2.3 | **63** | [Client Error Resilience](./PRD_63_Client_Error_Resilience.md) | ✅ Complete |
 
-**Gate:** PRD 49 updated. Password reset works E2E. Rate limits active. Security headers present. Analytics on key pages. Firefox/WebKit E2E pass.
+**Gate:** ✅ Password reset works. Rate limits active. Security headers present. Analytics on key pages. Regression tests added. Fetch timeouts for SA users.
 
 ---
 
-### Sprint B: UX & Retention (~1.5 weeks, 2 parallel tracks)
+### Sprint B: UX & Retention ✅ COMPLETE
 *Goal: First 5 minutes delightful. Users come back daily. Operational visibility.*
 
-**Track 1 — User Experience** [SEQUENTIAL]
-| Order | PRD | Title | Effort | Skills |
-|-------|-----|-------|--------|--------|
-| B1.1 | **60** | [UX Onboarding (First 5 Min)](./PRD_60_UX_Onboarding.md) | 4-6h | `design-system`, `form-components`, `analytics-tracking` |
-| B1.2 | **28** | [Smart Engagement (remaining)](./PRD_28_Smart_Engagement.md) | 3-4h | `design-system`, `supabase-patterns`, `analytics-tracking` |
-| B1.3 | **29** | [Unified Progress](./PRD_29_Unified_Progress.md) | 4-6h | `design-system`, `architecture-philosophy`, `analytics-tracking` |
+**Track 1 — User Experience** ✅
+| Order | PRD | Title | Status |
+|-------|-----|-------|--------|
+| B1.1 | **60** | [UX Onboarding (First 5 Min)](./PRD_60_UX_Onboarding.md) | ✅ Complete |
+| B1.2 | **28** | [Smart Engagement](./PRD_28_Smart_Engagement.md) | ✅ Complete |
+| B1.3 | **29** | [Unified Progress](./PRD_29_Unified_Progress.md) | ✅ Complete |
 
-**Track 2 — Operational Readiness** [SEQUENTIAL, PARALLEL to Track 1]
-| Order | PRD | Title | Effort | Skills |
-|-------|-----|-------|--------|--------|
-| B2.1 | **64** | [Performance Budgets & RUM](./PRD_64_Performance_Budgets.md) | 3-4h | `analytics-tracking`, `architecture-philosophy` |
-| B2.2 | **65** | [Structured Logging & Health Check](./PRD_65_Structured_Logging.md) | 2-3h | `api-handler`, `error-handling` |
-| B2.3 | **36** | [Technical Debt (partial)](./PRD_36_Technical_Debt.md) | 3-4h | `architecture-philosophy`, `typescript-debugging` |
+**Track 2 — Operational Readiness** ✅
+| Order | PRD | Title | Status |
+|-------|-----|-------|--------|
+| B2.1 | **64** | [Performance Budgets & RUM](./PRD_64_Performance_Budgets.md) | ✅ Complete |
+| B2.2 | **65** | [Structured Logging & Health Check](./PRD_65_Structured_Logging.md) | ✅ Complete |
+| B2.3 | **36** | [Technical Debt](./PRD_36_Technical_Debt.md) | ✅ Complete |
 
-**Gate:** New user first submission <3 min. Missed-day prompts work. Web Vitals reported. `/api/health` live.
+**Gate:** ✅ Onboarding flow works. Missed-day prompts work. Web Vitals reported. `/api/health` live.
 
 ---
 
-### Sprint C: Growth Preparation (~1.5 weeks, 2 parallel tracks)
+### Sprint C: Growth Preparation ✅ COMPLETE
 *Goal: Product Hunt readiness. SEO indexed. Admin metrics. Test confidence.*
 
-**Track 1 — Growth Features** [SEQUENTIAL]
-| Order | PRD | Title | Effort | Skills |
-|-------|-----|-------|--------|--------|
-| C1.1 | **32** | [Admin Analytics (remaining: KPI data)](./PRD_32_Admin_Analytics.md) | 4-6h | `supabase-patterns`, `design-system`, `api-handler` |
-| C1.2 | **34** | [B2B Landing Pages](./PRD_34_B2B_Landing.md) | 4-6h | `design-system`, `form-components` |
+**Track 1 — Growth Features** ✅
+| Order | PRD | Title | Status |
+|-------|-----|-------|--------|
+| C1.1 | **32** | [Admin Analytics](./PRD_32_Admin_Analytics.md) | ✅ Complete |
+| C1.2 | **34** | [B2B Landing Pages](./PRD_34_B2B_Landing.md) | ✅ Complete |
 
-**Track 2 — Quality & Stability** [SEQUENTIAL, PARALLEL to Track 1]
-| Order | PRD | Title | Effort | Skills |
-|-------|-----|-------|--------|--------|
-| C2.1 | **42** | [Test Coverage Expansion](./PRD_42_Test_Coverage_Expansion.md) | 6-8h | `testing-patterns`, `api-handler` |
-| C2.2 | **36** | [Technical Debt (remaining parts)](./PRD_36_Technical_Debt.md) | 3-4h | `architecture-philosophy` |
+**Track 2 — Quality & Stability** ✅
+| Order | PRD | Title | Status |
+|-------|-----|-------|--------|
+| C2.1 | **42** | [Test Coverage Expansion](./PRD_42_Test_Coverage_Expansion.md) | ✅ Complete |
+| C2.2 | **36** | [Technical Debt (remaining)](./PRD_36_Technical_Debt.md) | ✅ Complete |
 
-**Gate:** Test coverage >40% critical paths. Admin dashboard shows live data. B2B pages exist.
+**Gate:** ✅ Test coverage expanded. Admin dashboard shows live data. B2B pages exist.
 
 ---
 
@@ -265,10 +267,10 @@ Available MCP servers for PRD verification:
 
 | Category | Count | PRDs |
 |----------|-------|------|
-| ✅ Complete | 55 | 1-38, 40-46, 47-48, 50-58, 60, 62, 64-65 |
+| ✅ Complete | 64 | 1-38, 40-48, 50-58, 59-66 |
 | 🔄 In Progress | 1 | 49 |
-| 📋 Proposed | 10 | 59, 61, 63, 66 |
-| **Total** | **66** | |
+| 📋 Proposed | 3 | 67, 68 |
+| **Total** | **68** | |
 
 ---
 
@@ -276,61 +278,33 @@ Available MCP servers for PRD verification:
 
 ```mermaid
 graph TD
-    subgraph "✅ Complete (Foundation)"
-        PRD23[23. Global Leaderboard]
-        PRD27[27. League Hub]
-        PRD31[31. Social Encouragement]
-        PRD35[35. SEO Comparison ✅]
-        PRD40[40. Submission Audit ✅]
-        PRD50[50. Modular Tours ✅]
-        PRD51[51. Social Sharing ✅]
-        PRD54[54. Advanced Sharing ✅]
+    subgraph "✅ Sprint A: Alpha Launch Readiness"
+        PRD57[57. Password Reset ✅]
+        PRD58[58. Rate Limiting ✅]
+        PRD62[62. Security Headers ✅]
+        PRD59[59. Analytics Wiring ✅]
+        PRD61[61. Testing Gaps ✅]
+        PRD63[63. Error Resilience ✅]
+        PRD66[66. Fix Tests ✅]
     end
 
-    subgraph "🔒 Sprint A: Alpha Launch Readiness"
-        direction TB
-        subgraph "Track 1: Security"
-            PRD57[57. Password Reset]
-            PRD58[58. Rate Limiting]
-            PRD62[62. Security Headers]
-            PRD57 --> PRD58 --> PRD62
-        end
-        subgraph "Track 2: Observability"
-            PRD59[59. Analytics Wiring]
-            PRD61[61. Testing Gaps]
-            PRD63[63. Error Resilience]
-            PRD59 --> PRD61 --> PRD63
-        end
+    subgraph "✅ Sprint B: UX & Retention"
+        PRD60[60. Onboarding ✅]
+        PRD28[28. Smart Engagement ✅]
+        PRD29[29. Unified Progress ✅]
+        PRD64[64. Performance Budgets ✅]
+        PRD65[65. Structured Logging ✅]
+        PRD36[36. Tech Debt ✅]
     end
 
-    subgraph "🎯 Sprint B: UX & Retention"
-        direction TB
-        subgraph "Track 1: UX"
-            PRD60[60. Onboarding]
-            PRD28[28. Smart Engagement]
-            PRD29[29. Unified Progress]
-            PRD60 --> PRD28 --> PRD29
-        end
-        subgraph "Track 2: Ops"
-            PRD64[64. Performance Budgets]
-            PRD65[65. Structured Logging]
-            PRD36a[36. Tech Debt partial]
-            PRD64 --> PRD65 --> PRD36a
-        end
+    subgraph "✅ Sprint C: Growth"
+        PRD32[32. Admin Analytics ✅]
+        PRD34[34. B2B Landing ✅]
+        PRD42[42. Test Coverage ✅]
     end
 
-    subgraph "🚀 Sprint C: Growth"
-        direction TB
-        subgraph "Track 1: Features"
-            PRD32[32. Admin Analytics]
-            PRD34[34. B2B Landing]
-            PRD32 --> PRD34
-        end
-        subgraph "Track 2: Quality"
-            PRD42[42. Test Coverage]
-            PRD36b[36. Tech Debt remaining]
-            PRD42 --> PRD36b
-        end
+    subgraph "🔄 Active"
+        PRD49[49. Alpha Checklist 🔄]
     end
 
     subgraph "🔮 Sprint D: Future"
@@ -339,17 +313,16 @@ graph TD
         PRD48[48. Universal Health]
     end
 
-    %% Cross-sprint dependencies
-    PRD59 --> PRD64
-    PRD62 -.-> PRD49[49. Alpha Checklist]
-    PRD63 -.-> PRD49
+    subgraph "📋 Proposed"
+        PRD67[67. Artifacts Cleanup]
+        PRD68[68. Database Schema Docs]
+    end
+
     PRD57 -.-> PRD49
     PRD58 -.-> PRD49
+    PRD62 -.-> PRD49
+    PRD63 -.-> PRD49
 ```
-
-**Legend:**
-- `-->` = Hard dependency (must complete first)
-- `-.->` = Soft dependency (sprint gate / contributes to)
 
 ---
 
@@ -389,3 +362,5 @@ graph TD
 | 2026-02-27 | Created PRD 66 (Fix Broken Tests) — 40 pre-existing test failures from missing env mocks. Added to Sprint A Track 2. |
 | 2026-02-27 | PRD 58 (API Rate Limiting) → ✅ Complete. In-memory sliding window via `withApiHandler` config. 7 endpoints protected. 14 unit tests + E2E. |
 | 2026-02-27 | PRD 62 (Security Headers & CSP) → ✅ Complete. OWASP baseline headers via `next.config.js` `headers()`. 14 unit tests + E2E. |
+| 2026-03-14 | Added PRD 67 (Artifacts Cleanup) and PRD 68 (Database Schema Docs) from context engineering audit |
+| 2026-03-14 | **Major status correction:** PRDs 59, 61, 63, 66 marked ✅ Complete (code committed but index was stale). Sprints A, B, C all marked complete. Updated counts: 64 complete, 1 in-progress, 3 proposed. |

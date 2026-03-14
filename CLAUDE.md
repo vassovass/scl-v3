@@ -9,8 +9,8 @@
 
 ## Critical Rules
 
-1. **Think in systems** — Every change should strengthen the whole platform (see Design Philosophy in AGENTS.md)
-2. **Check existing patterns first** — Search before creating new components/hooks/utilities
+1. **Think in systems** — Before solving, map the full impact: dependencies, side effects, reusability. Every change should strengthen the whole platform.
+2. **Convention-first** — Search codebase, identify existing convention, follow it, extend if needed. Never introduce competing patterns.
 3. **Mobile-first** — Base styles = mobile, add `md:`, `lg:` for larger
 4. **Untyped Supabase** — Never use `<Database>` generics
 5. **withApiHandler** — All new API routes must use it
@@ -38,6 +38,3 @@ Each teammate should:
 - Rule files load automatically — no need to read them manually
 - Follow the mandatory pre-completion checklist in AGENTS.md before finishing
 
-## Memory Persistence
-
-Claude Code automatically loads this file. For persistent context across sessions, use the memory system at `~/.claude/projects/`. Current project rules are in AGENTS.md and `.claude/rules/`.

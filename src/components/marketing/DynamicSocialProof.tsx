@@ -16,12 +16,13 @@ interface PublicStats {
     shareCards: StatItem;
 }
 
-// Fallback stats for initial render and error cases
+// Fallback stats shown while loading or on error
+// Uses honest placeholder values — real data replaces via /api/stats/public
 const FALLBACK_STATS: PublicStats = {
-    activeUsers: { value: 0, formatted: "10K+", label: "Active Users" },
-    leagues: { value: 0, formatted: "500+", label: "Leagues" },
-    totalSteps: { value: 0, formatted: "1M+", label: "Steps Tracked" },
-    shareCards: { value: 0, formatted: "50K+", label: "Cards Created" },
+    activeUsers: { value: 0, formatted: "—", label: "Active Users" },
+    leagues: { value: 0, formatted: "—", label: "Leagues" },
+    totalSteps: { value: 0, formatted: "—", label: "Steps Tracked" },
+    shareCards: { value: 0, formatted: "—", label: "Cards Created" },
 };
 
 /**
@@ -69,9 +70,9 @@ export function DynamicSocialProof() {
                     <Award className="w-4 h-4" />
                     <span>Join the Community</span>
                 </div>
-                <h2 className="text-3xl font-bold mb-6">Thousands Already Sharing</h2>
+                <h2 className="text-3xl font-bold mb-6">Community Stats</h2>
                 <p className="text-lg text-muted-foreground mb-12 max-w-xl mx-auto">
-                    Step enthusiasts around the world are tracking and sharing their progress.
+                    Track your progress and compete with friends worldwide.
                 </p>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8">

@@ -30,6 +30,23 @@ When making ANY UI, branding, or component changes:
 
 If the same UI pattern is used 3+ times, extract it into `src/components/ui/`. Add to Component Library in design system page.
 
+## Roadmap Updates (Programmatic)
+
+```typescript
+// Set current work
+POST /api/agent/current-work
+{ "task": "PRD 42 — test coverage", "status": "in_progress" }
+
+// Clear when done
+DELETE /api/agent/current-work
+
+// Mark kanban item done
+PUT /api/admin/kanban
+{ "id": "prd-42", "column": "Done" }
+```
+
+**Roadmap columns**: Now → Next → Later → Future
+
 ## Artifact Storage
 
 All AI-generated planning documents go in `docs/artifacts/`:
@@ -46,7 +63,7 @@ When you modify a pattern, update its documentation in ALL locations:
 | API routes / withApiHandler | rules/api-patterns.md | api-handler | — |
 | Error handling / AppError | rules/architecture.md | error-handling | — |
 | Auth / deadlocks / PKCE | rules/supabase-auth.md | auth-patterns | — |
-| Theme / CSS variables | rules/ui-components.md | design-system | docs/THEME_SYSTEM.md |
+| Theme / CSS variables / contrast | rules/ui-components.md | design-system | docs/THEME_SYSTEM.md |
 | Forms / FormInput | rules/ui-components.md | form-components | docs/FORM_SYSTEM.md |
 | Analytics / GTM / PostHog | rules/analytics.md | analytics-tracking | docs/MCP_SERVERS.md |
 | Offline / PWA / caching | rules/architecture.md | — | — |
@@ -54,3 +71,9 @@ When you modify a pattern, update its documentation in ALL locations:
 | Middleware / redirects | — | middleware-patterns | — |
 | Database schema | — | supabase-patterns | docs/DATABASE_SCHEMA.md |
 | Changelog / roadmap / kanban | rules/documentation.md | project-updates | — |
+| Convention-first protocol | — | architecture-philosophy | AGENTS.md |
+| Layered contrast | rules/ui-components.md | design-system | docs/THEME_SYSTEM.md |
+| PRD creation / index | rules/prds.md | prd-creation | docs/prds/admin-feedback-system/PRD_00_Index.md |
+| Database migrations | rules/migrations.md | supabase-patterns | docs/DATABASE_SCHEMA.md |
+| Hooks / render loops | rules/hooks.md | react-debugging | — |
+| Skill creation / update | rules/skills.md | skill-creation | AGENTS.md (skills table) |

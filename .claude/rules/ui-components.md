@@ -3,7 +3,9 @@ description: Theme system, shadcn/ui, form components, design tokens, tours
 paths:
   - src/components/**
   - src/app/(dashboard)/**
+  - src/app/globals.css
   - src/styles/**
+  - tailwind.config*
 ---
 
 # UI Component Patterns

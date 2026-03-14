@@ -84,8 +84,8 @@ export default function PricingPage() {
                         <FeatureItem included dark>Unlimited History & Stats</FeatureItem>
                     </ul>
 
-                    <ButtonLink href="/waitlist" primary>
-                        Notify Me
+                    <ButtonLink href="/feedback" primary>
+                        Request Early Access
                     </ButtonLink>
                 </div>
             </div>

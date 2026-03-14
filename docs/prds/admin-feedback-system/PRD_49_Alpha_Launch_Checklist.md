@@ -63,11 +63,11 @@ Track all requirements and tasks needed before inviting friends and family to al
 
 | # | Blocker | PRD | Status | Notes |
 |---|---------|-----|--------|-------|
-| 1 | Password reset flow | PRD 57 | ⬜ | Zero password recovery exists |
+| 1 | Password reset flow | PRD 57 | ✅ | Supabase PKCE recovery with NIST 800-63B compliance |
 | 2 | Agent API auth | Fixed | ✅ | Token-based auth for Supabase MCP |
-| 3 | GDPR consent | Excluded | ⏭️ | Out of scope for alpha (manual compliance) |
-| 4 | User identification | Fixed | ✅ | `identifyUser` wired in AuthProvider |
-| 5 | API rate limiting | PRD 58 | ⬜ | Zero rate limiting on 75 API routes |
+| 3 | GDPR consent | Excluded | ⏭️ | Deferred for F&F alpha (low risk with known testers) |
+| 4 | User identification | Fixed | ✅ | `identifyUser` wired in AuthProvider at 3 call sites |
+| 5 | API rate limiting | PRD 58 | ✅ | In-memory sliding window on 7 endpoints |
 
 ### Should Have (Important but not blocking)
 
@@ -121,16 +121,23 @@ Track all requirements and tasks needed before inviting friends and family to al
 
 - [x] **Build & Deploy**
   - [x] `npm run build` succeeds
-  - [ ] `npx tsc --noEmit` passes
-  - [ ] No console errors in production
-  - [ ] PWA installable
+  - [ ] `npx tsc --noEmit` passes *(manual verification needed)*
+  - [ ] No console errors in production *(manual verification needed)*
+  - [ ] PWA installable *(manual verification needed)*
 
-- [ ] **Database**
+- [x] **Security & Infrastructure**
+  - [x] Password reset flow works (PRD 57)
+  - [x] API rate limiting active (PRD 58)
+  - [x] Security headers present (PRD 62)
+  - [x] Fetch timeouts for SA users (PRD 63)
+  - [x] London Vercel region configured
+
+- [ ] **Database** *(manual verification needed)*
   - [ ] World League exists in production
   - [ ] RLS policies working
   - [ ] No obvious security holes
 
-- [ ] **Performance**
+- [ ] **Performance** *(manual verification needed)*
   - [ ] Pages load < 3s on mobile
   - [ ] No infinite loops
   - [ ] Leaderboard doesn't crash
@@ -140,12 +147,30 @@ Track all requirements and tasks needed before inviting friends and family to al
 - [x] **Internal**
   - [x] CHANGELOG updated
   - [ ] ROADMAP updated
-  - [x] PRD Index updated
+  - [x] PRD Index updated (corrected stale statuses 2026-03-14)
 
 - [x] **User-Facing**
   - [x] "Why Upload" page live
-  - [ ] How It Works page accurate
-  - [ ] Privacy policy current
+  - [x] How It Works page accurate
+  - [x] Privacy policy exists (/privacy)
+  - [x] Terms of service exists (/terms)
+  - [x] Pricing page exists (/pricing)
+
+### Observability & Quality (Sprint A — All Complete)
+
+- [x] **Analytics** (PRD 59)
+  - [x] PageViewTracker on dashboard, submit-steps, leaderboard, settings
+  - [x] Error tracking in reportErrorClient and error boundaries
+  - [x] API call performance timing in useFetch
+
+- [x] **Testing** (PRDs 61, 66)
+  - [x] 40 broken tests fixed with proper env mocks
+  - [x] Regression tests for error boundaries, storage, auth
+
+- [x] **UX Onboarding** (PRD 60)
+  - [x] Dashboard onboarding section for new users
+  - [x] WelcomeCard, ScreenshotGuide, SubmitFirstStepsCTA
+  - [x] Homepage fake stats replaced with honest value props
 
 ---
 
@@ -208,6 +233,9 @@ Let me know what you think - I'm looking for honest feedback!
 |------|--------|
 | 2026-01-20 | Created checklist, PRDs 43-49 drafted |
 | 2026-01-21 | Updated: PRDs 43, 44, 45, 46 marked complete. Build verified passing. |
+| 2026-02-27 | Alpha readiness audit completed. 5 blockers identified. PRDs 57-66 created and executed. |
+| 2026-02-27 | Blockers 1 (password reset), 2 (agent auth), 4 (identifyUser), 5 (rate limiting) resolved. |
+| 2026-03-14 | Status correction: PRDs 59, 61, 63, 66 confirmed complete (code committed). All Sprint A/B/C PRDs done. Blocker 3 (GDPR) deferred for F&F alpha. Pricing dead link fixed. Fake stats fallbacks replaced with honest values. |
 
 ---
 

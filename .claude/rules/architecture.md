@@ -1,9 +1,15 @@
 ---
 description: Error handling, offline/PWA, league-agnostic steps, menu system, proxy pattern, caching
 paths:
-  - src/lib/**
-  - src/hooks/**
-  - src/app/**
+  - src/lib/errors.ts
+  - src/lib/offline/**
+  - src/lib/cache/**
+  - src/lib/api/**
+  - src/lib/menuConfig*
+  - src/hooks/useOffline*
+  - src/hooks/usePWA*
+  - src/components/providers/AuthProvider*
+  - src/middleware.ts
 ---
 
 # Architecture Patterns

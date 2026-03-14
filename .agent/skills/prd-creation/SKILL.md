@@ -67,6 +67,19 @@ PRDs should maximize parallelization across Claude Code subagents:
 
 ---
 
+## ⚠️ CRITICAL: PRD Index Update (NEVER SKIP)
+
+**Every PRD creation or status change MUST update `docs/prds/admin-feedback-system/PRD_00_Index.md`:**
+
+1. Add/update the PRD row in the appropriate section (Proposed/In Progress/Complete)
+2. Update the header counts (Total PRDs, proposed/complete/in-progress)
+3. Update the Summary table counts and PRD number list
+4. Add a changelog entry at the bottom with date and description
+
+**This is not optional.** The PRD index is the single source of truth for project planning. Skipping this creates invisible PRDs that no agent or human will find.
+
+---
+
 ## PRD Location & Naming
 
 **Location:** `docs/prds/admin-feedback-system/`
@@ -123,6 +136,7 @@ Include only servers relevant to the specific PRD:
 
 ## Before Finalizing a PRD
 
+- [ ] **PRD_00_Index.md updated** — row added, counts updated, changelog entry added (MANDATORY)
 - [ ] Objective is outcome-based (WHAT, not HOW)
 - [ ] Requirements use table format with numbers
 - [ ] Success criteria are measurable
@@ -131,7 +145,6 @@ Include only servers relevant to the specific PRD:
 - [ ] Test requirements specified
 - [ ] Documentation Update Checklist included
 - [ ] Dependencies identified and ordered
-- [ ] Index file updated with new PRD
 
 ### Anti-Patterns
 

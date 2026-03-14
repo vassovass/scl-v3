@@ -78,10 +78,10 @@ export async function GET() {
             {
                 error: "Failed to fetch stats",
                 // Return fallback stats so the page still works
-                activeUsers: { value: 0, formatted: "10K+", label: "Active Users" },
-                leagues: { value: 0, formatted: "500+", label: "Leagues" },
-                totalSteps: { value: 0, formatted: "1M+", label: "Steps Tracked" },
-                shareCards: { value: 0, formatted: "50K+", label: "Cards Created" },
+                activeUsers: { value: 0, formatted: "—", label: "Active Users" },
+                leagues: { value: 0, formatted: "—", label: "Leagues" },
+                totalSteps: { value: 0, formatted: "—", label: "Steps Tracked" },
+                shareCards: { value: 0, formatted: "—", label: "Cards Created" },
             },
             { status: 200 } // Return 200 with fallback data rather than error
         );

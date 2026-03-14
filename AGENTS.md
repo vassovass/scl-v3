@@ -23,7 +23,7 @@ For detailed principles, anti-patterns, and decision frameworks → see `archite
 
 ## Golden Rules (non-negotiable)
 
-1. **Convention-first development** — Before writing ANY code: (a) search the codebase for how similar things are already done, (b) identify the existing convention, (c) follow that convention exactly, (d) extend it if needed — never introduce a competing pattern. If no convention exists, establish one worth reusing.
+1. **Convention-first** — Before writing code: search for how it's already done, follow that convention, extend if needed. Never introduce competing patterns.
 2. **Mobile-first** — Base styles = mobile. Add `md:`, `lg:` prefixes for larger screens. Never desktop-first.
 3. **Untyped Supabase** — NEVER use `<Database>` generics. Always untyped: `adminClient.from("table").select("*")`.
 4. **withApiHandler** — All new API routes MUST use `withApiHandler` from `@/lib/api/handler`. See `api-handler` skill for details.
@@ -57,14 +57,19 @@ For detailed principles, anti-patterns, and decision frameworks → see `archite
 
 ## Before Finishing Any Task (MANDATORY)
 
+### Quality Gate
+
 1. `npx tsc --noEmit` — must pass, no exceptions
 2. Verify the change works as intended
 3. Run relevant tests: `npx vitest run`
 4. If you changed a documented pattern, update the relevant rule/skill/doc file
 5. Review `.claude/skills/` — scan ALL available skills and assess which are relevant to your task
-6. Convention check: did you follow existing codebase patterns? Grep for similar implementations and verify your code matches their approach — same utilities, same structure, same naming.
-7. Update CHANGELOG.md with your changes (see `project-updates` skill for format)
-8. Update roadmap if completing a user-facing feature (see `project-updates` skill for API)
+6. Convention verification: grep for similar implementations and confirm your code matches — same utilities, same structure, same naming. If it doesn't match, fix it before finishing.
+
+### Documentation Gate
+
+7. Update CHANGELOG.md — add entry with date, category (Added/Changed/Fixed/Removed), and description (see `project-updates` skill)
+8. Update ROADMAP.md — move completed items to Done, update In Progress (see `project-updates` skill for API)
 
 ---
 
@@ -117,6 +122,7 @@ All date operations use `date-fns`. Week starts Monday (ISO 8601). Locale: `en-G
 | `social-sharing` | Sharing features, OG images, multi-select builder |
 | `prd-creation` | Writing outcome-based PRDs |
 | `skill-creation` | Creating new agent skills (requires approval) |
+| `human-writer` | Content creation, SEO copy, and natural writing style |
 | `mcp-setup` | MCP server configuration and troubleshooting |
 
 ---
@@ -128,10 +134,15 @@ Rule files in `.claude/rules/` load automatically based on which files you edit:
 | Domain | Rule File | Triggers on |
 |--------|-----------|-------------|
 | API routes | `rules/api-patterns.md` | `src/app/api/**`, `src/lib/api/**` |
-| UI / Components | `rules/ui-components.md` | `src/components/**`, `src/app/(dashboard)/**` |
+| UI / Components | `rules/ui-components.md` | `src/components/**`, `src/app/(dashboard)/**`, `globals.css`, `tailwind.config*` |
 | Auth / Supabase | `rules/supabase-auth.md` | `src/lib/supabase/**`, `src/middleware.ts`, `src/app/(auth)/**` |
-| Architecture | `rules/architecture.md` | `src/lib/**`, `src/hooks/**`, `src/app/**` |
+| Architecture | `rules/architecture.md` | `src/lib/errors.ts`, `src/lib/offline/**`, `src/lib/cache/**`, `src/lib/api/**` |
+| Hooks | `rules/hooks.md` | `src/hooks/**` |
 | Analytics | `rules/analytics.md` | `src/lib/analytics*`, `src/components/analytics/**` |
+| Testing | `rules/testing.md` | `src/**/*.test.*`, `src/**/__tests__/**`, `e2e/**` |
+| Migrations | `rules/migrations.md` | `supabase/migrations/**` |
+| PRDs | `rules/prds.md` | `docs/prds/**` |
+| Skills | `rules/skills.md` | `.agent/skills/**`, `.claude/skills/**` |
 | Documentation | `rules/documentation.md` | `CHANGELOG.md`, `ROADMAP.md`, `docs/**` |
 
 Reference docs (read on demand when needed):
@@ -144,17 +155,12 @@ Reference docs (read on demand when needed):
 
 ---
 
-## MCP Servers
+## Directory Architecture
 
-| Server | Purpose |
-|--------|---------|
-| Supabase | Database access, migrations, SQL execution |
-| PostHog | Analytics, feature flags, experiments |
-| Google Tag Manager | Tag creation and publishing |
-| Google Analytics 4 | Report generation |
-| Playwright | Browser automation and testing |
-
----
+- `.agent/` — **Universal source of truth** (agent-agnostic skills and rules, works across all AI tools)
+- `.claude/` — Claude Code config (`CLAUDE.md` + symlinks to `.agent/skills/` and `.agent/rules/`)
+- Skills have `compatibility:` frontmatter declaring supported tools (Claude Code, Cursor, etc.)
+- Future AI tools (`.cursor/`, `.windsurf/`) symlink to `.agent/` for shared context
 
 ## Related Files
 
@@ -162,6 +168,6 @@ Reference docs (read on demand when needed):
 - `ROADMAP.md` — Feature roadmap with kanban columns
 - `ARCHITECTURE.md` — Technical architecture deep dive
 - `docs/` — Reference documentation
-- `.claude/skills/` — Detailed patterns and workflows
+- `.agent/skills/` — Detailed patterns and workflows (source of truth)
 - `.claude/rules/` — Behavioral rules (auto-loaded by file path)
-- `docs/prds/` — Product requirement documents (PRD 01-66)
+- `docs/prds/` — Product requirement documents (PRD 01-68)
