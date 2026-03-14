@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { analytics } from "@/lib/analytics";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -109,24 +111,24 @@ function ResetPasswordForm() {
               <label htmlFor="email" className="block text-sm font-medium text-foreground">
                 Email
               </label>
-              <input
+              <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="mt-1 block w-full rounded-lg border border-border bg-card px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                className="mt-1"
                 placeholder="you@example.com"
               />
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50"
+              className="w-full"
             >
               {loading ? "Sending..." : "Send reset link"}
-            </button>
+            </Button>
           </form>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">

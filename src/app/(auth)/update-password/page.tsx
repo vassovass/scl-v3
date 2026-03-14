@@ -1,12 +1,16 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { createClient as createArgsClient } from "@supabase/supabase-js";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { analytics } from "@/lib/analytics";
 import { getPasswordStrength } from "@/lib/utils/passwordStrength";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+const RECOVERY_KEY = "password_recovery";
 
 function UpdatePasswordForm() {
   const router = useRouter();
@@ -16,6 +20,15 @@ function UpdatePasswordForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [isRecoveryFlow, setIsRecoveryFlow] = useState<boolean | null>(null);
+
+  // Check if user arrived via password recovery flow
+  useEffect(() => {
+    if (authLoading) return;
+    const flag = sessionStorage.getItem(RECOVERY_KEY);
+    setIsRecoveryFlow(flag === "1");
+  }, [authLoading]);
 
   const strength = getPasswordStrength(password);
   const passwordsMatch = password === confirmPassword;
@@ -28,8 +41,29 @@ function UpdatePasswordForm() {
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const { error: updateError } = await supabase.auth.updateUser({ password });
+    // Use a stateless client to bypass Web Locks deadlock (see AuthProvider fallback).
+    // The singleton Supabase client can get stuck when INITIAL_SESSION doesn't fire.
+    const accessToken = session?.access_token;
+    if (!accessToken) {
+      setError("Session expired. Please request a new reset link.");
+      setLoading(false);
+      return;
+    }
+
+    const statelessClient = createArgsClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: { headers: { Authorization: `Bearer ${accessToken}` } },
+        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+      }
+    );
+
+    const updatePromise = statelessClient.auth.updateUser({ password });
+    const timeoutPromise = new Promise<{ error: { message: string } }>((resolve) =>
+      setTimeout(() => resolve({ error: { message: "Request timed out. Please try again." } }), 15000)
+    );
+    const { error: updateError } = await Promise.race([updatePromise, timeoutPromise]);
 
     if (updateError) {
       const msg = updateError.message.toLowerCase();
@@ -44,16 +78,42 @@ function UpdatePasswordForm() {
       return;
     }
 
+    // Clear recovery flag so refresh won't show the form again
+    sessionStorage.removeItem(RECOVERY_KEY);
     analytics.passwordResetCompleted();
-    router.push("/dashboard?password_updated=true");
-    router.refresh();
+    setSuccess(true);
+    setLoading(false);
   };
 
-  // Still checking auth state
-  if (authLoading) {
+  // Still checking auth state or recovery flag
+  if (authLoading || isRecoveryFlow === null) {
     return (
       <div className="w-full max-w-sm text-center">
         <p className="text-muted-foreground">Verifying reset link...</p>
+      </div>
+    );
+  }
+
+  // Password updated successfully
+  if (success) {
+    return (
+      <div className="w-full max-w-sm">
+        <div className="text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+            <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-foreground">Password updated</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Your password has been changed successfully.
+          </p>
+        </div>
+        <div className="mt-8">
+          <Button asChild className="w-full">
+            <Link href="/dashboard">Go to dashboard</Link>
+          </Button>
+        </div>
       </div>
     );
   }
@@ -69,18 +129,34 @@ function UpdatePasswordForm() {
           This password reset link has expired or is invalid.
         </p>
         <div className="mt-8 space-y-3">
-          <Link
-            href="/reset-password"
-            className="block w-full rounded-lg bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
-          >
-            Request a new reset link
-          </Link>
-          <Link
-            href="/sign-in"
-            className="block w-full text-center text-sm text-muted-foreground hover:text-primary transition"
-          >
-            Back to sign in
-          </Link>
+          <Button asChild className="w-full">
+            <Link href="/reset-password">Request a new reset link</Link>
+          </Button>
+          <Button asChild variant="link" className="w-full text-muted-foreground">
+            <Link href="/sign-in">Back to sign in</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // User is logged in but didn't arrive via recovery flow (e.g. typed URL directly)
+  if (!isRecoveryFlow) {
+    return (
+      <div className="w-full max-w-sm">
+        <h1 className="text-center text-2xl font-bold text-foreground">
+          No reset in progress
+        </h1>
+        <p className="mt-2 text-center text-sm text-muted-foreground">
+          To change your password, request a reset link first.
+        </p>
+        <div className="mt-8 space-y-3">
+          <Button asChild className="w-full">
+            <Link href="/reset-password">Request a reset link</Link>
+          </Button>
+          <Button asChild variant="link" className="w-full text-muted-foreground">
+            <Link href="/dashboard">Back to dashboard</Link>
+          </Button>
         </div>
       </div>
     );
@@ -106,14 +182,15 @@ function UpdatePasswordForm() {
           <label htmlFor="password" className="block text-sm font-medium text-foreground">
             New password
           </label>
-          <input
+          <Input
             id="password"
             type="password"
+            autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={8}
-            className="mt-1 block w-full rounded-lg border border-border bg-card px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="mt-1"
             placeholder="••••••••"
           />
           {/* Password strength indicator */}
@@ -146,14 +223,15 @@ function UpdatePasswordForm() {
           <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground">
             Confirm password
           </label>
-          <input
+          <Input
             id="confirmPassword"
             type="password"
+            autoComplete="new-password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
             minLength={8}
-            className="mt-1 block w-full rounded-lg border border-border bg-card px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="mt-1"
             placeholder="••••••••"
           />
           {confirmPassword.length > 0 && !passwordsMatch && (
@@ -161,13 +239,13 @@ function UpdatePasswordForm() {
           )}
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={loading || !isValid}
-          className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50"
+          className="w-full"
         >
           {loading ? "Updating..." : "Update password"}
-        </button>
+        </Button>
       </form>
     </div>
   );

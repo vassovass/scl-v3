@@ -566,8 +566,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // PRD 57: Handle password recovery flow
       if (event === 'PASSWORD_RECOVERY' && newSession?.user) {
         if (DEBUG) console.log('[AuthProvider] PASSWORD_RECOVERY event, redirecting to /update-password');
-        if (typeof window !== 'undefined' && !window.location.pathname.includes('/update-password')) {
-          router.push('/update-password');
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('password_recovery', '1');
+          if (!window.location.pathname.includes('/update-password')) {
+            router.push('/update-password');
+          }
         }
         setLoading(false);
       }

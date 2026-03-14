@@ -328,32 +328,44 @@ const performReset = async () => {
 
 ---
 
-## Pattern 8: Password Reset (PKCE Recovery)
+## Pattern 8: Password Reset (Token Hash Recovery)
 
-Supabase uses PKCE code exchange for password recovery. The flow:
+Password recovery uses `{{ .TokenHash }}` in email templates to build custom URLs pointing to `stepleague.app`. Two flows exist:
 
+**Primary flow (token hash — branded emails):**
+```
+1. /reset-password → resetPasswordForEmail(email)
+2. Email link → stepleague.app/api/auth/confirm?token_hash=...&type=recovery
+3. /api/auth/confirm calls verifyOtp({ token_hash, type }) → sets cookies → redirect /update-password
+4. AuthProvider fires PASSWORD_RECOVERY event → sets sessionStorage flag
+5. /update-password checks sessionStorage → shows form → stateless updateUser({ password }) → success screen
+```
+
+**Fallback flow (PKCE — OAuth/social login):**
 ```
 1. /reset-password → resetPasswordForEmail(email, { redirectTo: origin/api/auth/callback?next=/update-password })
 2. Email link → /api/auth/callback?code=XXXXX&next=/update-password
 3. exchangeCodeForSession(code) → sets cookies → redirect /update-password
-4. AuthProvider fires PASSWORD_RECOVERY event
-5. /update-password → updateUser({ password }) → redirect /dashboard?password_updated=true
 ```
 
 **Key patterns:**
 - **NIST 800-63B:** Always show "Check your email" regardless of whether email exists (no enumeration)
 - **Rate limiting:** Supabase enforces 1 email per 60s. Detect via `error.message.includes('security purposes')` or `status === 429`
-- **Expired links:** When code exchange fails with `next=/update-password`, redirect to `/reset-password?error=link_expired`
-- **Skip enrollment:** In callback, skip World League enrollment for recovery (user already exists)
-- **PASSWORD_RECOVERY event:** Handle in AuthProvider `onAuthStateChange` — redirect to `/update-password` if not already there
+- **Expired links:** `/api/auth/confirm` redirects to `/reset-password?error=link_expired` on failure
+- **Skip enrollment:** In confirm route, skip World League enrollment for recovery (user already exists)
+- **PASSWORD_RECOVERY event:** AuthProvider sets `sessionStorage('password_recovery', '1')` and redirects to `/update-password`
+- **Recovery flow gating:** `/update-password` checks sessionStorage flag — no flag = "No reset in progress" message
+- **Web Locks bypass:** `updateUser()` uses stateless client (Pattern 4) to avoid deadlock
+- **Success state:** Shows confirmation screen instead of immediate redirect; clears sessionStorage flag
 
 **Key files:**
 | File | Purpose |
 |------|---------|
 | `src/app/(auth)/reset-password/page.tsx` | Email input → send reset link |
-| `src/app/(auth)/update-password/page.tsx` | New password + strength indicator |
-| `src/app/api/auth/callback/route.ts` | Code exchange, recovery redirect |
-| `src/components/dashboard/PasswordResetSuccessToast.tsx` | Post-update confirmation |
+| `src/app/(auth)/update-password/page.tsx` | New password form with recovery flow gating |
+| `src/app/api/auth/confirm/route.ts` | Token hash verification (primary flow) |
+| `src/app/api/auth/callback/route.ts` | Code exchange (fallback/OAuth flow) |
+| `src/components/dashboard/PasswordResetSuccessToast.tsx` | Dashboard toast after redirect |
 
 ---
 
