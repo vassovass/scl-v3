@@ -289,7 +289,26 @@ className="focus:border-primary"
 
 ### WCAG 2.1 AA Compliance
 
-**All color combinations MUST meet 4.5:1 contrast ratio.**
+**All color combinations MUST meet 4.5:1 contrast ratio (3:1 for large text and UI components).**
+
+#### Layered Contrast Principle
+
+Every UI element exists in a visual layer stack. Each layer must maintain readable contrast with the layer directly behind it. This applies to ALL visual properties:
+
+| Check | Minimum Ratio | Example |
+|-------|---------------|---------|
+| Text vs its background | 4.5:1 (body), 3:1 (large) | Card text on card bg |
+| Element bg vs parent bg | Visually distinct | Card on page, modal on backdrop |
+| Border vs both adjacent surfaces | 3:1 | Border between card and page |
+| Shadow vs surface it falls on | Visible in both themes | `shadow-lg` on light and dark bg |
+| Overlay content vs overlay bg | 4.5:1 | Tooltip text on tooltip bg |
+
+**Critical scenarios:**
+- **Tooltips/popovers on overlays** — tooltip bg must contrast with overlay bg, tooltip text must contrast with tooltip bg
+- **Badges on cards on pages** — 3-deep stacking, each layer visually distinct
+- **Modals with backdrops** — modal bg distinct from backdrop, content readable on modal bg
+- **Toast notifications over any content** — must be readable regardless of what's behind them
+- **Never stack similar hues** — light green text on light blue bg, pastel on pastel = unreadable
 
 #### Light Mode Contrast Enhancements
 
@@ -549,7 +568,10 @@ When working with colors/themes, ensure:
 - [ ] Using semantic CSS variables (NOT hardcoded Tailwind colors)
 - [ ] Added both `:root` AND `[data-theme="light"]` variants for new variables
 - [ ] Tested visual appearance in BOTH light and dark modes
-- [ ] Text contrast meets WCAG 2.1 AA (4.5:1 minimum)
+- [ ] Text contrast meets WCAG 2.1 AA (4.5:1 body, 3:1 large text/UI)
+- [ ] **Layered contrast verified** — each layer readable against its parent (text→bg→parent bg→page)
+- [ ] No similar-hue stacking (pastel on pastel, light green on light blue, etc.)
+- [ ] Shadows visible in both light and dark themes
 - [ ] Using central badge configuration from `badges.ts`
 - [ ] Added `min-w-0` to flex containers that need truncation
 - [ ] Used `flex-shrink-0` on icons in flex layouts

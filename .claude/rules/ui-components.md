@@ -18,6 +18,15 @@ paths:
 - **ALWAYS** use semantic CSS variables: `bg-card`, `text-foreground`, `border-border`
 - Brand: "Step" (white) + "League" (sky-500), hover swaps colors
 
+### Layered Contrast (MANDATORY)
+Every element exists in a layer stack. Each layer must contrast with the one behind it:
+- **Text → its background** (4.5:1 min, 3:1 for large text)
+- **Background → parent background** (visually distinct)
+- **Shadows → surface they fall on** (visible in both themes)
+- **Overlays** (tooltips, modals, popovers) → their backdrop
+- **Never stack similar hues** — e.g., light green text on light blue bg = unreadable
+- **Always verify in BOTH light and dark mode** — what works in dark often fails in light
+
 ### Design Tokens
 Utility classes available globally:
 - `.btn-primary`, `.btn-secondary`, `.btn-ghost`

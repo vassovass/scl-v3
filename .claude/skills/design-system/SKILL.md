@@ -220,33 +220,97 @@ className="focus:outline-none focus:ring-1 focus:ring-primary"
 |-----------|---------------|
 | Body text | **4.5:1** |
 | Large text (18px+ or 14px bold) | **3:1** |
-| UI components | **3:1** |
+| UI components & borders | **3:1** |
 
 ### How to Check
 
-1. Use browser DevTools color picker
+1. Use browser DevTools color picker (Accessibility panel → Contrast ratio)
 2. Or use [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/)
+
+### Layered Contrast (MANDATORY)
+
+Every visual element exists in a **layer stack**. Each layer must maintain contrast with the layer directly behind it. Check ALL of these:
+
+| Layer | Check Against | Example |
+|-------|---------------|---------|
+| **Text** | Its direct background | Tooltip text vs tooltip bg |
+| **Background** | Its parent background | Card bg vs page bg |
+| **Shadow** | The surface it falls on | `shadow-lg` must be visible on both light and dark bg |
+| **Border** | Both adjacent surfaces | Border between card and page must read on both sides |
+| **Overlay content** | Overlay background | Modal text vs modal backdrop |
+| **Icon/badge** | Its container background | Status icon on a card on a page |
+
+#### Common Layering Scenarios
+
+**Tooltips & Popovers (Joyride, shadcn Tooltip, Popover):**
+```tsx
+// ✅ CORRECT — uses semantic vars that auto-contrast in both themes
+<TooltipContent className="bg-popover text-popover-foreground border-border">
+
+// ❌ WRONG — hardcoded, invisible in light mode
+<TooltipContent className="bg-slate-800 text-slate-200">
+```
+
+**Overlays & Modals (multi-layer stacking):**
+```tsx
+// Layer stack: page → backdrop → modal → modal content → toast
+// Each layer must contrast with the one below it
+<div className="bg-background/80 backdrop-blur-sm">     {/* backdrop vs page */}
+  <div className="bg-card border-border shadow-lg">       {/* modal vs backdrop */}
+    <p className="text-foreground">Content</p>             {/* text vs card */}
+    <p className="text-muted-foreground">Secondary</p>     {/* still readable */}
+  </div>
+</div>
+```
+
+**Badges on Cards on Pages (3-deep stacking):**
+```tsx
+// Layer stack: page bg → card bg → badge bg → badge text
+// ✅ Each layer is visually distinct
+<div className="bg-card">
+  <SystemBadge category="status" value="verified" />
+  {/* Badge uses bg-[hsl(var(--success)/0.2)] on bg-card — distinct */}
+  {/* Badge text uses text-[hsl(var(--success))] on badge bg — readable */}
+</div>
+```
+
+**Shadows must be visible in BOTH themes:**
+```tsx
+// ✅ CORRECT — shadow intensity works on both backgrounds
+className="shadow-md dark:shadow-lg"
+
+// ❌ WRONG — shadow invisible on dark background
+className="shadow-sm"  // May vanish on dark bg
+```
 
 ### Common Problem: Muted Text
 
 ```tsx
-// ❌ RISKY - muted-foreground may have low contrast
-<p className="text-muted-foreground text-sm">Small muted text</p>
+// ❌ RISKY - muted-foreground may have low contrast on muted backgrounds
+<div className="bg-muted">
+  <p className="text-muted-foreground text-sm">Low contrast stacking!</p>
+</div>
 
-// ✅ SAFER - use for secondary info only, not critical content
-<p className="text-muted-foreground">Secondary description</p>
-<p className="text-foreground">Important content here</p>
+// ✅ SAFER - use foreground text on muted backgrounds
+<div className="bg-muted">
+  <p className="text-foreground">Readable on muted bg</p>
+  <p className="text-muted-foreground">Only for secondary info on card/background</p>
+</div>
 ```
 
 ### Status Colors Must Have Contrast
 
 ```tsx
-// ✅ Status on dark background - use appropriate contrast
+// ✅ Status text on card background — good contrast
 <span className="text-[hsl(var(--success))]">Verified</span>
-<span className="text-destructive">Error occurred</span>
 
-// ✅ Status as background - ensure text contrast
-<Badge variant="success">Verified</Badge>  // Uses pre-defined contrast
+// ✅ Status as background — paired foreground defined
+<Badge variant="success">Verified</Badge>
+
+// ❌ WRONG — light green text on light blue background
+<div className="bg-[hsl(var(--info)/0.2)]">
+  <span className="text-[hsl(var(--success))]">Hard to read!</span>
+</div>
 ```
 
 ---
@@ -361,10 +425,13 @@ Before completing any UI work:
 
 - [ ] Using semantic CSS variables (not hardcoded colors)
 - [ ] Tested in BOTH light and dark themes
+- [ ] **Layered contrast verified** — every text/bg/border/shadow layer readable against its parent layer
+- [ ] No similar-hue stacking (e.g., light green text on light blue bg)
+- [ ] Shadows visible in both light and dark themes
 - [ ] Used `min-w-0` for flex containers needing truncation
 - [ ] Used `flex-shrink-0` on icons in flex layouts
 - [ ] Added focus indicators to interactive elements
-- [ ] Text contrast meets 4.5:1 ratio
+- [ ] Text contrast meets 4.5:1 ratio (3:1 for large text/UI components)
 - [ ] Updated design system page if adding new patterns
 
 ---
