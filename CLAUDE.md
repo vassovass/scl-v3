@@ -1,51 +1,43 @@
-# CLAUDE.md - Claude Code Context
+# CLAUDE.md — Claude Code Context
 
-> **For Claude Code / Claude AI assistants**
-> This file references the canonical context in AGENTS.md
+> StepLeague v3: Next.js 14 + TypeScript + Supabase + Tailwind CSS
 
-## Quick Reference
+## Read First
 
-See **[AGENTS.md](./AGENTS.md)** for complete project context including:
-- Project structure and tech stack
-- Critical coding patterns
-- Database schema
-- Common issues and fixes
+- **[AGENTS.md](./AGENTS.md)** — Universal rules, design philosophy, skills reference, and pre-completion checklist
+- Rule files in `.claude/rules/` load automatically based on which files you're editing
 
-## Agent Skills
+## Critical Rules
 
-Skills are available in `.claude/skills/` (synced from `.agent/skills/`).
+1. **Think in systems** — Every change should strengthen the whole platform (see Design Philosophy in AGENTS.md)
+2. **Check existing patterns first** — Search before creating new components/hooks/utilities
+3. **Mobile-first** — Base styles = mobile, add `md:`, `lg:` for larger
+4. **Untyped Supabase** — Never use `<Database>` generics
+5. **withApiHandler** — All new API routes must use it
+6. **Never call `getSession()`** — It deadlocks. Use `getUser()` or parse cookie.
 
-> **New skills require user approval** — see `skill-creation` skill.
+## Quick Commands
 
-| Skill | Purpose |
-|-------|---------|
-| `api-handler` | API route pattern with `withApiHandler` |
-| `architecture-philosophy` | Modular design, system thinking |
-| `design-system` | CSS variables, theming, UI patterns |
-| `error-handling` | `AppError` class, error codes |
-| `form-components` | Reusable form inputs with accessibility |
-| `prd-creation` | Outcome-based PRD writing |
-| `project-updates` | Updating changelog, roadmap, kanban |
-| `supabase-patterns` | MCP usage, database, RLS |
-| `skill-creation` | **Meta-skill**: Creating new skills, approval workflow |
-| `react-debugging` | **NEW** Infinite loops, useMemo/useCallback |
-| `typescript-debugging` | **NEW** Build errors, tsc failures |
-| `testing-patterns` | **NEW** Testing, mocking Supabase |
-| `auth-patterns` | **NEW** getUser/getSession, deadlocks |
-| `middleware-patterns` | **NEW** Protected routes, redirects |
-| `analytics-tracking` | **NEW** Event tracking (GA4+PostHog), adding events |
-| `mcp-setup` | **NEW** MCP server configuration and troubleshooting |
-| `social-sharing` | Sharing features, OG images, **multi-select message builder** |
+- Type check: `npx tsc --noEmit`
+- Test: `npx vitest run`
+- Dev: `npm run dev`
+- Lint: `npx next lint`
 
-## Claude-Specific Notes
+## Skills
 
-1. **Read AGENTS.md first** - it contains all patterns and architecture decisions
-2. **Use untyped Supabase** - no `<Database>` generics
-3. **Mobile-first styling** - base = mobile, add `md:`, `lg:` for larger screens
-4. **Use adminClient** - for all database operations in API routes
-5. **Test before pushing** - `npx tsc --noEmit` catches type errors
+Skills in `.claude/skills/` provide domain-specific knowledge. They load on demand — only metadata is always present. **Review ALL available skills before finishing any task** to ensure none were missed.
+
+> New skills require user approval — see `skill-creation` skill.
+
+## For Agent Teams
+
+Each teammate should:
+- Read AGENTS.md for rules and skill reference
+- Use skills for domain-specific knowledge (`.claude/skills/`)
+- Check `docs/` for reference material when needed
+- Rule files load automatically — no need to read them manually
+- Follow the mandatory pre-completion checklist in AGENTS.md before finishing
 
 ## Memory Persistence
 
-Claude Code automatically loads this file. For persistent context, add notes here that should survive across sessions. Current context is maintained in AGENTS.md.
-
+Claude Code automatically loads this file. For persistent context across sessions, use the memory system at `~/.claude/projects/`. Current project rules are in AGENTS.md and `.claude/rules/`.
