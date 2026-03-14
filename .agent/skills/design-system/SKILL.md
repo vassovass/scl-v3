@@ -240,25 +240,37 @@ Every visual element exists in a **layer stack**. Each layer must maintain contr
 | **Overlay content** | Overlay background | Modal text vs modal backdrop |
 | **Icon/badge** | Its container background | Status icon on a card on a page |
 
-#### Common Layering Scenarios
+#### Common Layering Scenarios (based on current codebase)
 
-**Tooltips & Popovers (Joyride, shadcn Tooltip, Popover):**
+**Tooltips (shadcn `TooltipContent` — uses `bg-primary text-primary-foreground`):**
 ```tsx
-// ✅ CORRECT — uses semantic vars that auto-contrast in both themes
-<TooltipContent className="bg-popover text-popover-foreground border-border">
+// ✅ Current pattern — high contrast by default
+<TooltipContent>Tooltip text</TooltipContent>
+// Renders: bg-primary text-primary-foreground — works in both themes
 
 // ❌ WRONG — hardcoded, invisible in light mode
-<TooltipContent className="bg-slate-800 text-slate-200">
+<div className="bg-slate-800 text-slate-200">Tooltip</div>
 ```
 
-**Overlays & Modals (multi-layer stacking):**
+**Popovers & Dropdowns (use `bg-popover text-popover-foreground`):**
 ```tsx
-// Layer stack: page → backdrop → modal → modal content → toast
-// Each layer must contrast with the one below it
-<div className="bg-background/80 backdrop-blur-sm">     {/* backdrop vs page */}
-  <div className="bg-card border-border shadow-lg">       {/* modal vs backdrop */}
-    <p className="text-foreground">Content</p>             {/* text vs card */}
-    <p className="text-muted-foreground">Secondary</p>     {/* still readable */}
+// ✅ Current pattern — semantic popover vars
+<PopoverContent>  {/* bg-popover text-popover-foreground shadow-md */}
+<DropdownMenuContent>  {/* bg-popover text-popover-foreground shadow-md */}
+```
+
+**Overlays & Modals (current Dialog pattern):**
+```tsx
+// Layer stack: page → DialogOverlay → DialogContent → text
+// DialogOverlay: bg-background/80
+// DialogContent: bg-background border shadow-lg
+// Custom modals use: bg-black/50 or bg-black/60 backdrop
+
+// ✅ Current pattern (submit-steps, ShareModal, etc.)
+<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+  <div className="bg-background border border-border shadow-lg rounded-lg">
+    <p className="text-foreground">Content</p>
+    <p className="text-muted-foreground">Secondary info</p>
   </div>
 </div>
 ```
@@ -266,21 +278,29 @@ Every visual element exists in a **layer stack**. Each layer must maintain contr
 **Badges on Cards on Pages (3-deep stacking):**
 ```tsx
 // Layer stack: page bg → card bg → badge bg → badge text
-// ✅ Each layer is visually distinct
+// ✅ Each layer is visually distinct (current badges.ts pattern)
 <div className="bg-card">
   <SystemBadge category="status" value="verified" />
-  {/* Badge uses bg-[hsl(var(--success)/0.2)] on bg-card — distinct */}
-  {/* Badge text uses text-[hsl(var(--success))] on badge bg — readable */}
+  {/* Badge: bg-[hsl(var(--success)/0.2)] on bg-card — distinct */}
+  {/* Badge text: text-[hsl(var(--success))] on badge bg — readable */}
 </div>
 ```
 
-**Shadows must be visible in BOTH themes:**
+**Toasts (Sonner — uses `bg-background text-foreground border-border shadow-lg`):**
 ```tsx
-// ✅ CORRECT — shadow intensity works on both backgrounds
-className="shadow-md dark:shadow-lg"
+// ✅ Already semantic — auto-contrasts in both themes
+// Defined in sonner.tsx: group-[.toaster]:bg-background group-[.toaster]:text-foreground
+```
 
-// ❌ WRONG — shadow invisible on dark background
-className="shadow-sm"  // May vanish on dark bg
+**Shadows — use appropriate weight for the context:**
+```tsx
+// Current patterns in codebase:
+className="shadow"        // Cards (card.tsx default)
+className="shadow-sm"     // Subtle (inputs, switches)
+className="shadow-md"     // Dropdowns, popovers
+className="shadow-lg"     // Modals, nav elements, toasts
+className="shadow-xl"     // Floating date pickers
+// Tip: heavier shadows (lg, xl) are more visible on dark backgrounds
 ```
 
 ### Common Problem: Muted Text

@@ -303,12 +303,15 @@ Every UI element exists in a visual layer stack. Each layer must maintain readab
 | Shadow vs surface it falls on | Visible in both themes | `shadow-lg` on light and dark bg |
 | Overlay content vs overlay bg | 4.5:1 | Tooltip text on tooltip bg |
 
-**Critical scenarios:**
-- **Tooltips/popovers on overlays** — tooltip bg must contrast with overlay bg, tooltip text must contrast with tooltip bg
-- **Badges on cards on pages** — 3-deep stacking, each layer visually distinct
-- **Modals with backdrops** — modal bg distinct from backdrop, content readable on modal bg
-- **Toast notifications over any content** — must be readable regardless of what's behind them
+**Critical scenarios (current codebase patterns):**
+- **Tooltips** (`bg-primary text-primary-foreground`) — high contrast by default in both themes
+- **Popovers/Dropdowns** (`bg-popover text-popover-foreground shadow-md`) — semantic vars handle both themes
+- **Dialog modals** — overlay uses `bg-background/80`, content uses `bg-background border shadow-lg`
+- **Custom modals** — backdrop uses `bg-black/50`–`bg-black/80 backdrop-blur-sm`, content uses `bg-background border-border`
+- **Toasts** (Sonner) — `bg-background text-foreground border-border shadow-lg`
+- **Badges on cards** — badge bg (e.g., `bg-[hsl(var(--success)/0.2)]`) on `bg-card`, badge text on badge bg — 3-deep stacking
 - **Never stack similar hues** — light green text on light blue bg, pastel on pastel = unreadable
+- **Shadows** — use appropriate weight for context: `shadow-sm` (inputs), `shadow-md` (dropdowns), `shadow-lg` (modals/toasts), `shadow-xl` (floating pickers)
 
 #### Light Mode Contrast Enhancements
 

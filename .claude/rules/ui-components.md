@@ -22,8 +22,8 @@ paths:
 Every element exists in a layer stack. Each layer must contrast with the one behind it:
 - **Text → its background** (4.5:1 min, 3:1 for large text)
 - **Background → parent background** (visually distinct)
-- **Shadows → surface they fall on** (visible in both themes)
-- **Overlays** (tooltips, modals, popovers) → their backdrop
+- **Shadows** — use appropriate weight (`shadow-sm` for inputs, `shadow-lg` for modals/toasts)
+- **Overlays** — custom modals use `bg-black/50`–`bg-black/80`, Dialog uses `bg-background/80`
 - **Never stack similar hues** — e.g., light green text on light blue bg = unreadable
 - **Always verify in BOTH light and dark mode** — what works in dark often fails in light
 
