@@ -314,8 +314,41 @@ mcp_supabase-mcp-server_execute_sql({
 
 ---
 
+---
+
+## 6. UI/Styling Change Checklist
+
+When making ANY UI, branding, or component changes, also update:
+
+**Branding Changes:**
+- [ ] `src/components/navigation/NavHeader.tsx` — Header logo
+- [ ] `src/components/layout/GlobalFooter.tsx` — Footer logo
+- [ ] `src/app/admin/design-system/page.tsx` — Design system docs
+
+**New Components/Modules:**
+- [ ] Add to design system page (`/admin/design-system`) with live examples
+- [ ] Add CSS classes to `globals.css` if creating new patterns
+- [ ] Include BOTH `:root` (dark) AND `[data-theme="light"]` variants
+
+**New SuperAdmin Pages:**
+- [ ] Create page in `src/app/admin/[page-name]/page.tsx`
+- [ ] Add entry to `src/lib/adminPages.ts` — menu auto-updates
+
+---
+
+## 7. Artifact Storage Rules
+
+All AI-generated planning documents go in `docs/artifacts/`:
+- Naming: `decisions_[topic].md`, `plan_[feature].md`, `schema_[feature].md`
+- Must include changelog table at end: Date | Section | Change
+- Most recent changes at top of table
+- Must be committed to git (not in hidden `.gemini` or `.claude` folders)
+
+---
+
 ## Related Skills
 
-- `supabase-patterns` - MCP usage and database operations
-- `prd-creation` - PRDs should reference kanban items
-- `architecture-philosophy` - Document new patterns in AGENTS.md
+- `supabase-patterns` — MCP usage and database operations
+- `prd-creation` — PRDs should reference kanban items
+- `architecture-philosophy` — Document new patterns
+- See `.claude/rules/documentation.md` for the cross-reference sync map
