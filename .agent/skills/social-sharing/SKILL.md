@@ -1,9 +1,9 @@
 ---
 name: social-sharing
-description: Social sharing patterns for StepLeague - OG image generation, share hooks, WhatsApp optimization, shareable URLs, and multi-select message builder (PRD-57). Use when implementing sharing features, generating OG images, creating share modals, or working with social platform integrations. Keywords: share, OG image, Open Graph, WhatsApp, social, sharing, useShare, share card, metric, message builder, content picker.
+description: Implements social sharing features including OG image generation, useShare hook, WhatsApp optimization, shareable URLs, and the multi-select message builder. Use when building share modals, generating Open Graph images, creating share cards, or integrating with social platforms.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
-  version: "1.2"
+  version: "1.3"
   project: "stepleague"
   last_updated: "2026-01-30"
 ---
@@ -12,13 +12,7 @@ metadata:
 
 ## Overview
 
-This skill documents patterns for social sharing in StepLeague, including:
-- OG (Open Graph) image generation with Vercel OG
-- The `useShare` hook for multi-platform sharing
-- WhatsApp-specific optimizations
-- Shareable URL structures
-- Share analytics tracking
-- Modular MetricConfig system for future metrics (PRD-48)
+Social sharing in StepLeague covers OG image generation, the `useShare` hook, WhatsApp optimizations, shareable URLs, share analytics, and the modular MetricConfig system.
 
 ---
 
@@ -26,10 +20,7 @@ This skill documents patterns for social sharing in StepLeague, including:
 
 ### 1. Always Use the `useShare` Hook
 
-Never call sharing APIs directly. Always use the `useShare` hook which:
-- Handles all platforms (native, WhatsApp, X, copy)
-- Tracks analytics automatically
-- Provides consistent UX
+Never call sharing APIs directly:
 
 ```typescript
 // ✅ CORRECT
@@ -40,11 +31,7 @@ const { share, isSharing, copied, supportsNativeShare } = useShare({
   itemId: cardId,
 });
 
-await share({
-  title: "My Achievement",
-  text: "I walked 12,345 steps today!",
-  url: shareUrl,
-}, 'whatsapp');
+await share({ title: "My Achievement", text: "12,345 steps!", url: shareUrl }, 'whatsapp');
 
 // ❌ WRONG - Direct platform calls
 window.open(`https://wa.me/?text=${message}`, '_blank');
@@ -52,20 +39,16 @@ window.open(`https://wa.me/?text=${message}`, '_blank');
 
 ### 2. OG Images Must Be 1200x630px
 
-All OG images must follow platform standards:
 - **Size:** 1200x630 pixels (1.91:1 aspect ratio)
-- **File size:** <300KB for fast loading
-- **Text coverage:** <20-25% of image
-- **Format:** PNG or JPG (no transparency/animation)
+- **File size:** <300KB
+- **Text coverage:** <20-25%
+- **Format:** PNG or JPG
 
 ### 3. Use MetricConfig for Metric Display
 
-Never hardcode metric types. Use the MetricConfig system for extensibility:
-
 ```typescript
 // ✅ CORRECT - Config-driven
-import { METRIC_CONFIGS, MetricType } from "@/lib/sharing/metricConfig";
-
+import { METRIC_CONFIGS } from "@/lib/sharing/metricConfig";
 const config = METRIC_CONFIGS[metricType];
 const display = `${config.formatValue(value)} ${config.unit}`;
 
@@ -75,353 +58,50 @@ const display = `${value.toLocaleString()} steps`;
 
 ### 4. WhatsApp Messages Must Be Concise
 
-Research shows concise messages work best in fitness WhatsApp groups:
 - **Max 100 characters** before the URL
-- **Include hashtag** for discoverability (#StepLeague)
+- **Include hashtag** (#StepLeague)
 - **One clear CTA** or achievement
 
-```typescript
-// ✅ CORRECT - Concise
-"Just hit 12,345 steps today! 🚶 #StepLeague"
-
-// ❌ WRONG - Too long
-"Hey everyone! I wanted to share that I walked 12,345 steps today which is amazing because last week I only did 10,000..."
-```
-
 ---
 
-## OG Image Generation
+## Key Files
 
-### File Location
-
-OG image API: `src/app/api/og/route.tsx`
-
-### Using Vercel OG (ImageResponse)
-
-```typescript
-import { ImageResponse } from "next/og";
-import { NextRequest } from "next/server";
-
-export async function GET(request: NextRequest) {
-  const { searchParams } = request.nextUrl;
-
-  const metricType = searchParams.get("metric_type") || "steps";
-  const value = parseInt(searchParams.get("value") || "0");
-  const name = searchParams.get("name") || "Player";
-  // ... more params
-
-  return new ImageResponse(
-    (
-      <div style={{
-        height: "100%",
-        width: "100%",
-        display: "flex",
-        // ... styling
-      }}>
-        {/* Card content */}
-      </div>
-    ),
-    {
-      width: 1200,
-      height: 630,
-    }
-  );
-}
-```
-
-### OG API Parameters
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `metric_type` | string | Yes | steps, calories, slp, distance, etc. |
-| `value` | number | Yes | The metric value |
-| `name` | string | Yes | User's display name |
-| `rank` | number | No | League rank (1-based) |
-| `period` | string | No | "Today", "This Week", "Jan 1-7" |
-| `improvement` | number | No | Improvement percentage |
-| `league` | string | No | League name |
-| `emoji` | string | No | Override default emoji |
-| `theme` | string | No | "dark" or "light" |
-
-### Example URL
-
-```
-/api/og?metric_type=steps&value=12345&name=John&rank=3&period=This%20Week&improvement=15&league=Team%20Alpha
-```
-
----
-
-## MetricConfig System
-
-### Type Definition
-
-**File:** `src/lib/sharing/metricConfig.ts`
-
-```typescript
-export type MetricType =
-  | 'steps'
-  | 'calories'
-  | 'slp'
-  | 'distance'
-  | 'swimming'
-  | 'cycling'
-  | 'running';
-
-export interface MetricConfig {
-  type: MetricType;
-  displayName: string;      // "Steps", "Calories", "SLP"
-  unit: string;             // "steps", "kcal", "SLP", "km"
-  emoji: string;            // "🚶", "🔥", "⚡", "🚴"
-  gradient: string;         // Tailwind gradient classes
-  formatValue: (value: number) => string;
-}
-
-export const METRIC_CONFIGS: Record<MetricType, MetricConfig> = {
-  steps: {
-    type: 'steps',
-    displayName: 'Steps',
-    unit: 'steps',
-    emoji: '🚶',
-    gradient: 'from-sky-500 to-emerald-500',
-    formatValue: (v) => v.toLocaleString(),
-  },
-  // Future metrics added here (PRD-48)
-};
-```
-
-### Usage Pattern
-
-```typescript
-function ShareCard({ metricType, value }: Props) {
-  const config = METRIC_CONFIGS[metricType];
-
-  return (
-    <div className={`bg-gradient-to-r ${config.gradient}`}>
-      <span>{config.emoji}</span>
-      <span>{config.formatValue(value)} {config.unit}</span>
-    </div>
-  );
-}
-```
+| File | Purpose |
+|------|---------|
+| `src/hooks/useShare.ts` | Multi-platform share hook |
+| `src/app/api/og/route.tsx` | OG image generation API |
+| `src/lib/sharing/metricConfig.ts` | Metric type configs |
+| `src/lib/sharing/shareContentConfig.ts` | Content block definitions |
+| `src/lib/sharing/shareMessageBuilder.ts` | Message builder |
+| `src/lib/sharing/shareMessages.ts` | Legacy pre-filled messages |
+| `src/lib/sharing/shareTooltips.ts` | Tooltip content |
+| `src/components/sharing/ShareModal.tsx` | Share modal component |
+| `src/components/sharing/ShareContentPicker.tsx` | Multi-select picker |
+| `src/components/sharing/ShareDateRangePicker.tsx` | Date range for custom shares |
 
 ---
 
 ## Share Flow Patterns
 
-### Share Modal Component
+### Share Modal (WhatsApp-first)
 
-**File:** `src/components/sharing/ShareModal.tsx`
-
-WhatsApp-first layout:
 1. Card preview (shows exactly what will be shared)
 2. Optional message input (max 100 chars)
 3. **WhatsApp button** - Large, primary action
 4. Secondary buttons (X/Twitter, Copy Link)
 5. Native share option (if supported)
-6. **Multi-select content picker** (PRD-57) - Customizable message blocks
+6. **Multi-select content picker** (PRD-57) — customizable message blocks
 
-### Multi-Select Message Builder (PRD-57)
+### Share URL Structure
 
-**Problem:** Users sharing custom date ranges get misleading messages like "Just logged 29,730 steps today!" when it's actually a 5-day total.
-
-**Solution:** Let users pick exactly what content appears in their share message:
-
-**Files:**
-- `src/lib/sharing/shareContentConfig.ts` - Content block definitions
-- `src/lib/sharing/shareMessageBuilder.ts` - Message builder function
-- `src/components/sharing/ShareContentPicker.tsx` - UI component
-
-**Available Content Blocks:**
-
-| Block ID | Example Output | Category |
-|----------|----------------|----------|
-| `total_steps` | "29,730 steps" | Basic |
-| `day_count` | "📅 5 days" | Basic |
-| `date_range` | "(25 Jan - 29 Jan)" | Basic |
-| `average` | "📊 Avg: 5,946/day" | Detailed |
-| `individual_days` | "Mon: 6,200 ⭐\nTue: 5,100..." | Detailed |
-| `best_day` | "⭐ Best: 8,500 (27 Jan)" | Detailed |
-| `streak` | "🔥 14 days streak" | Comparison |
-| `rank` | "🏆 Rank #3" | Comparison |
-| `improvement` | "📈 +15% vs last period" | Comparison |
-
-**Usage:**
-
-```typescript
-import { buildShareMessage, type ShareContentBlock } from "@/lib/sharing/shareMessageBuilder";
-import { ShareContentPicker } from "@/components/sharing/ShareContentPicker";
-
-// Build message with selected blocks
-const result = buildShareMessage(selectedBlocks, {
-  totalSteps: 29730,
-  dayCount: 5,
-  startDate: "2026-01-25",
-  endDate: "2026-01-29",
-  averageSteps: 5946,
-  dailyBreakdown: [...],
-  bestDaySteps: 8500,
-  bestDayDate: "2026-01-27",
-});
-
-// Result: "29,730 steps 📅 5 days (25 Jan - 29 Jan)\n📊 Avg: 5,946/day\n..."
+**Quick shares (URL params):**
+```
+/share/[userId]?type=daily&metric=steps&value=12345&period=today
 ```
 
-**Passing Data to ShareModal:**
-
-When opening the share modal, pass all available data:
-
-```typescript
-openShareModal({
-  cardType: "custom_period",
-  value: totalSteps,
-  metricType: "steps",
-  // PRD-57: Full data for multi-select message builder
-  dayCount: periodStats.days_submitted,
-  periodStart: dateRange.start,
-  periodEnd: dateRange.end,
-  averageSteps: periodStats.average_per_day,
-  dailyBreakdown: [{ date: "2026-01-25", steps: 6200 }, ...],
-  bestDaySteps: bestStats.best_day_steps,
-  bestDayDate: bestStats.best_day_date,
-  improvementPct: comparisonStats?.improvement_pct,
-});
-```
-
-### Pre-filled Messages by Card Type (Legacy)
-
-**File:** `src/lib/sharing/shareMessages.ts`
-
-Used as fallback when multi-select data is unavailable:
-
-```typescript
-export const SHARE_MESSAGES: Record<CardType, (data: ShareData) => string> = {
-  daily: (d) => `Just logged ${d.formattedValue} today! ${d.emoji} #StepLeague`,
-  weekly: (d) => `My week: ${d.formattedValue} (avg ${d.average}/day) 💪 #StepLeague`,
-  personal_best: (d) => `NEW PERSONAL BEST! ${d.formattedValue} 🏆 #StepLeague`,
-  streak: (d) => `${d.value} days in a row! 🔥 #StepLeague`,
-  challenge: (d) => `Can you beat my ${d.formattedValue}? 💪 #StepLeague`,
-  rank_change: (d) => `Moved from #${d.oldRank} to #${d.newRank}! 🚀 #StepLeague`,
-};
-```
-
----
-
-## Share URL Structure
-
-### Quick Shares (URL Params)
-
-For simple shares without persistence:
-
-```
-/share/[userId]?type=daily&metric=steps&value=12345&period=today&rank=3&league=Team%20Alpha
-```
-
-### Persistent Shares (Short Codes)
-
-For trackable shares with analytics:
-
+**Persistent shares (short codes):**
 ```
 /s/xK7mN2pQ
-```
-
-**Database Schema:**
-
-```sql
-CREATE TABLE share_cards (
-  id UUID PRIMARY KEY,
-  short_code VARCHAR(8) UNIQUE NOT NULL,
-  user_id UUID REFERENCES users(id),
-  card_type VARCHAR(50) NOT NULL,
-  metric_type VARCHAR(20) DEFAULT 'steps',
-  metric_value INTEGER NOT NULL,
-  -- ... additional fields
-);
-```
-
-### Generating Short Codes
-
-```typescript
-import { nanoid } from 'nanoid';
-
-function generateShortCode(): string {
-  return nanoid(8); // e.g., "xK7mN2pQ"
-}
-```
-
----
-
-## Analytics Tracking
-
-### Share Events
-
-```typescript
-// Track share intent (modal opened)
-analytics.trackEvent('share_intent', {
-  card_type: 'daily',
-  metric_type: 'steps',
-  source: 'stats_hub', // or 'post_submission', 'milestone'
-});
-
-// Track share completion
-analytics.share('achievement', cardId, platform);
-// Sends to both GA4 and PostHog
-```
-
-### UTM Parameters
-
-Always add UTM parameters to share URLs:
-
-```typescript
-const shareUrl = new URL(baseUrl);
-shareUrl.searchParams.set('utm_source', 'share');
-shareUrl.searchParams.set('utm_medium', platform); // 'whatsapp', 'twitter', 'copy'
-shareUrl.searchParams.set('utm_campaign', cardType); // 'daily', 'streak', etc.
-```
-
-### Share Funnel
-
-Track the full funnel:
-1. `share_intent` - User opened share modal
-2. `share` - User completed share action
-3. `share_link_click` - Recipient clicked shared link
-4. `share_conversion` - Recipient signed up
-
----
-
-## WhatsApp-Specific Optimizations
-
-### Link Preview (OG Tags)
-
-Ensure share pages have proper OG tags:
-
-```typescript
-// In page.tsx generateMetadata
-export async function generateMetadata({ searchParams }): Promise<Metadata> {
-  const ogImageUrl = new URL("/api/og", process.env.NEXT_PUBLIC_APP_URL);
-  // Add all params...
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      images: [{
-        url: ogImageUrl.toString(),
-        width: 1200,
-        height: 630,
-        alt: title,
-      }],
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [ogImageUrl.toString()],
-    },
-  };
-}
 ```
 
 ### WhatsApp URL Format
@@ -431,20 +111,14 @@ const waUrl = `https://wa.me/?text=${encodeURIComponent(fullMessage)}`;
 window.open(waUrl, "_blank", "noopener,noreferrer");
 ```
 
-Note: Don't pre-fill the recipient (`https://wa.me/1234567890`) - let users choose.
-
 ---
 
 ## Integration Points
 
 ### Post-Submission Prompt
 
-After successful upload, show share modal:
-
 ```typescript
-// In BatchSubmissionForm or SubmissionForm
 const handleSubmitSuccess = () => {
-  // Check user preference
   if (userPreferences.sharePromptsEnabled !== false) {
     setShowShareModal(true);
   }
@@ -455,137 +129,10 @@ const handleSubmitSuccess = () => {
 
 ```typescript
 const STREAK_MILESTONES = [7, 14, 30, 50, 100, 365];
-
 function checkForMilestone(newStreak: number): boolean {
   return STREAK_MILESTONES.includes(newStreak);
 }
 ```
-
-### Personal Best Detection
-
-```typescript
-// In submission handler
-if (newSteps > userStats.best_day_steps) {
-  triggerSharePrompt({ type: 'personal_best', value: newSteps });
-}
-```
-
----
-
-## Real Codebase Examples
-
-### useShare Hook
-
-**File:** `src/hooks/useShare.ts`
-
-```typescript
-export function useShare(options: UseShareOptions = {}) {
-  const share = useCallback(async (data: ShareData, platform: SharePlatform = "native") => {
-    // Track in analytics immediately (capture intent)
-    if (options.contentType) {
-      analytics.share(options.contentType, options.itemId, platform);
-    }
-
-    switch (platform) {
-      case "whatsapp":
-        const waUrl = `https://wa.me/?text=${encodeURIComponent(fullMessage)}`;
-        window.open(waUrl, "_blank", "noopener,noreferrer");
-        break;
-      // ... other platforms
-    }
-  }, [options]);
-
-  return { share, isSharing, copied, supportsNativeShare };
-}
-```
-
-### OG Image Route
-
-**File:** `src/app/api/og/route.tsx`
-
-Current implementation generates beautiful cards with:
-- Gradient backgrounds
-- Emoji badges
-- Rank colors (gold for #1, silver for #2, etc.)
-- Step counts with locale formatting
-- Improvement badges
-- StepLeague branding footer
-
----
-
-## Data Fetching in ShareModal
-
-When users select "Custom" card type and pick a date range within the modal, data must be fetched dynamically.
-
-### Pattern: Fetch on Custom Period Change
-
-**File:** `src/components/sharing/ShareModal.tsx`
-
-```typescript
-// State for fetched data
-const [fetchedDailyBreakdown, setFetchedDailyBreakdown] = useState<DailyBreakdownEntry[]>();
-const [availableDates, setAvailableDates] = useState<SubmissionDateInfo[]>([]);
-
-// Fetch available dates on mount (for heatmap)
-useEffect(() => {
-  if (!isOpen) return;
-  const fetchAvailableDates = async () => {
-    const res = await apiRequest(`submissions/available-dates?start=${startDate}&end=${endDate}`);
-    setAvailableDates(res.dates || []);
-  };
-  fetchAvailableDates();
-}, [isOpen]);
-
-// Fetch breakdown when custom period changes
-useEffect(() => {
-  if (!cardData.customPeriod || cardData.cardType !== "custom_period") return;
-  const { start, end } = cardData.customPeriod;
-  // Fetch and calculate best day, total, average...
-}, [cardData.customPeriod, cardData.cardType]);
-```
-
-### Why This Matters
-
-Without dynamic fetching:
-- "Daily Breakdown" block stays disabled
-- "Best Day" block stays disabled
-- Heatmap doesn't show on date picker
-
----
-
-## Tooltip Pattern
-
-Tooltips explain every option in the share UI.
-
-### Files
-
-- `src/lib/sharing/shareTooltips.ts` - Centralized tooltip content
-- `src/components/ui/tooltip.tsx` - shadcn/ui Tooltip component
-
-### Usage
-
-```typescript
-import { CARD_TYPE_TOOLTIPS, getBlockTooltip } from "@/lib/sharing/shareTooltips";
-
-// Wrap with TooltipProvider
-<TooltipProvider delayDuration={300}>
-  <Tooltip>
-    <TooltipTrigger asChild>
-      <button>...</button>
-    </TooltipTrigger>
-    <TooltipContent side="bottom">
-      {CARD_TYPE_TOOLTIPS[cardType]}
-    </TooltipContent>
-  </Tooltip>
-</TooltipProvider>
-```
-
-### Available Tooltip Sources
-
-- `CARD_TYPE_TOOLTIPS` - Explains each card type
-- `CATEGORY_TOOLTIPS` - Explains Basic/Detailed/Comparison categories
-- `SECTION_TOOLTIPS` - Explains UI sections
-- `getBlockTooltip(block, isAvailable)` - Returns appropriate text based on availability
 
 ---
 
@@ -595,50 +142,16 @@ import { CARD_TYPE_TOOLTIPS, getBlockTooltip } from "@/lib/sharing/shareTooltips
 |-------|----------|
 | ShareModal blocks disabled | Pass full data when opening modal OR fetch dynamically |
 | Heatmap not showing | Pass `submissionData` to ShareDateRangePicker |
-| Tooltips not appearing | Wrap with TooltipProvider (delayDuration=300) |
+| Tooltips not appearing | Wrap with `TooltipProvider` (delayDuration=300) |
+| DateRangePicker state resets | Use `alwaysOpen={true}` and `selectingEndRef` |
 | Click outside doesn't close | Add `onClick={onClose}` to backdrop div |
-| Content picker shows in compact mode | Use `compact={true}` prop |
-| **DateRangePicker doesn't close on selection** | Use `alwaysOpen={true}` when embedding inline |
-| **Date selection state resets between clicks** | Use `selectingEndRef` to persist state across re-renders |
 
-### DateRangePicker Inline Mode (CRITICAL FIX)
+---
 
-**Problem:** When DateRangePicker is embedded inline (via `showCustomPicker` in ShareDateRangePicker), the `selectingEnd` state resets between clicks because the parent re-renders.
+## Reference Files
 
-**Root Cause:** When `onSelect` is called, ShareDateRangePicker updates, causing DateRangePicker to re-render and lose its internal `selectingEnd` state.
-
-**Solution:** Use `alwaysOpen={true}` prop and a ref to persist state:
-
-```typescript
-// In ShareDateRangePicker - use alwaysOpen mode
-<DateRangePicker
-  date={dateRangeValue}
-  onSelect={handleCustomRangeSelect}
-  submissionData={submissionData}
-  onClose={() => setShowCustomPicker(false)}
-  alwaysOpen={true}  // CRITICAL: Enables inline mode
-/>
-
-// In DateRangePicker - use ref for persistence
-const selectingEndRef = useRef(false);
-
-const handleDayClick = (day: Date) => {
-  const isSelectingEnd = selectingEndRef.current;  // Use ref, not state
-
-  if (!isSelectingEnd) {
-    onSelect({ from: day, to: undefined });
-    selectingEndRef.current = true;  // Persist across re-renders
-  } else {
-    onSelect({ from: date.from, to: day });
-    selectingEndRef.current = false;
-    onClose?.();  // Close the picker
-  }
-};
-```
-
-**Files Modified:**
-- `src/components/ui/DateRangePicker.tsx` - Added `alwaysOpen` prop and `selectingEndRef`
-- `src/components/sharing/ShareDateRangePicker.tsx` - Added `alwaysOpen={true}`
+For full implementation details (MetricConfig types, message builder blocks, OG API params, data fetching patterns, tooltip system, DateRangePicker fix), see:
+- **[references/implementation-details.md](./references/implementation-details.md)**
 
 ---
 
@@ -647,12 +160,4 @@ const handleDayClick = (day: Date) => {
 - `analytics-tracking` - Share event tracking patterns
 - `design-system` - Card and modal styling
 - `api-handler` - OG API route patterns
-- `architecture-philosophy` - Modular design principles
-
----
-
-## Research References
-
-- [Frontiers Psychology - Fitness Social Media Impact](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2025.1635912/full)
-- [OG Image Gallery - Dimensions Guide](https://www.ogimage.gallery/libary/the-ultimate-guide-to-og-image-dimensions-2024-update)
-- [OpenGraph.xyz - Image Best Practices](https://www.opengraph.xyz/blog/the-ultimate-guide-to-open-graph-images)
+- `react-debugging` - DateRangePicker re-render fix pattern

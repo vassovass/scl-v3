@@ -1,6 +1,6 @@
 ---
 name: architecture-philosophy
-description: Core architectural principles for StepLeague - modular design, system thinking, future-proofing, and maintenance reduction. Use when designing new features, refactoring code, considering implementation approaches, or making any architectural decisions. Keywords: architecture, design, modular, refactoring, reusable, shadcn, maintenance, future-proof, system.
+description: Defines core architectural principles including systems thinking, modular design, future-proofing, and maintenance reduction using shadcn/ui and design system patterns. Use when designing new features, refactoring code, or making architectural decisions.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
   version: "1.1"

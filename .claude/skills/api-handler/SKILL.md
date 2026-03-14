@@ -1,6 +1,6 @@
 ---
 name: api-handler
-description: StepLeague API route pattern using withApiHandler wrapper. Use when creating or modifying any API route in the /api directory. Keywords: API, route, endpoint, handler, auth, POST, GET, PUT, DELETE, validation.
+description: Provides the withApiHandler pattern for API routes, including auth levels, Zod schema validation, rate limiting, and standardized responses. Use when creating new API endpoints, modifying existing routes, or adding authentication to handlers.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
   version: "1.1"

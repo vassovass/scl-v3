@@ -1,6 +1,6 @@
 ---
 name: skill-creation
-description: How to create new agent skills for this project. Use when proposing a new skill, documenting repeated patterns, or formalizing domain knowledge. Keywords: skill, SKILL.md, agent, create skill, new skill, meta.
+description: Guides the creation of new agent skills including SKILL.md structure, approval workflow, and naming conventions. Use when proposing a new skill, documenting repeated patterns, or formalizing domain knowledge into a reusable skill. Requires user approval before creation.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
   version: "1.0"

@@ -1,6 +1,6 @@
 ---
 name: design-system
-description: StepLeague design system, theme configuration, CSS variables, badge styling, and UI patterns. Use when working with colors, themes, styling, badges, buttons, cards, or any visual UI changes. Keywords: CSS, theme, colors, dark mode, light mode, variables, styling, UI, design.
+description: Defines the theme system using CSS variables, dark/light mode configuration, badge color registry, and UI component patterns. Use when styling components, adding theme tokens, working with colors, or making any visual UI changes.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
   version: "1.1"

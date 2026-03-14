@@ -1,6 +1,6 @@
 ---
 name: supabase-patterns
-description: Supabase client patterns for StepLeague, including MCP server usage, auth deadlock prevention, admin client usage, and session handling. Use when working with database queries, authentication, MCP tools, or Supabase client code. Keywords: database, MCP, auth, session, RLS, deadlock, timeout, query, migration.
+description: Covers Supabase client patterns including MCP server usage, admin client for API routes, RLS policies, auth deadlock prevention, and database migrations. Use when writing database queries, working with MCP tools, or managing Supabase client code.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
   version: "1.1"

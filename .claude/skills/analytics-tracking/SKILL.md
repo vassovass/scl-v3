@@ -1,6 +1,6 @@
 ---
 name: analytics-tracking
-description: Event tracking with GA4 + PostHog, adding new events, and updating GTM. Use when implementing tracking, adding analytics events, or configuring GTM/PostHog. Keywords: analytics, tracking, GA4, PostHog, GTM, dataLayer, event, conversion, metrics, proxy, ad blocker.
+description: Implements event tracking with GA4, PostHog, and GTM dataLayer. Covers adding analytics events, conversion tracking, ad blocker handling, and proxy user attribution. Use when adding tracking to features, debugging analytics, or configuring GTM/PostHog integrations.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
   version: "1.2"

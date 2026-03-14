@@ -1,6 +1,6 @@
 ---
 name: error-handling
-description: Centralized error handling system for StepLeague using AppError class, error codes, and reporting. Use when implementing error handling, catching exceptions, or displaying error messages to users. Keywords: error, exception, AppError, ErrorCode, catch, try, toast, logging, CopyableError.
+description: Provides the centralized AppError class, error codes, normalizeError, reportErrorClient, and CopyableError component. Use when implementing try/catch blocks, throwing typed errors, displaying error toasts, or adding error boundaries.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
   version: "1.2"

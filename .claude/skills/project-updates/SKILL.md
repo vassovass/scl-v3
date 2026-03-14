@@ -1,6 +1,6 @@
 ---
 name: project-updates
-description: How to update roadmap, changelog, and Kanban when completing features. Use after finishing any feature, bug fix, or improvement to ensure proper documentation and tracking. Keywords: changelog, roadmap, kanban, feedback, documentation, completion, tracking, MCP.
+description: Manages roadmap, changelog, and kanban updates when completing features. Covers CHANGELOG.md format, kanban API endpoints, MCP database updates, and verification workflows. Use after finishing any feature, bug fix, or improvement.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
   version: "1.1"

@@ -1,6 +1,6 @@
 ---
 name: react-debugging
-description: Debugging React render loops, infinite re-renders, and performance issues in Next.js. Use when encountering "Maximum update depth exceeded", useMemo/useCallback issues, useEffect dependency problems, or useSearchParams loops. Keywords: infinite loop, re-render, useMemo, useCallback, useEffect, Maximum update depth, React error 185.
+description: Diagnoses React render loops, infinite re-renders, and performance issues in Next.js App Router. Covers useMemo/useCallback pitfalls, useEffect dependency problems, and useSearchParams loops. Use when encountering "Maximum update depth exceeded" errors or suspected render loops.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
   version: "1.0"

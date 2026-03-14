@@ -1,6 +1,6 @@
 ---
 name: mcp-setup
-description: MCP server configuration and management. Use when setting up MCP servers, troubleshooting MCP issues, or adding new integrations. Keywords: MCP, model context protocol, supabase, posthog, playwright, gtm, analytics, mcp.json, environment variables, oauth
+description: Configures and troubleshoots MCP servers (Supabase, PostHog, Playwright, GTM, GA4) including .mcp.json setup, environment variables, and OAuth flows. Use when setting up MCP servers, fixing MCP connection issues, or adding new tool integrations.
 compatibility: Claude Code
 metadata:
   version: "1.0"

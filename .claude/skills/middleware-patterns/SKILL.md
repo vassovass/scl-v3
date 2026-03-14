@@ -1,6 +1,6 @@
 ---
 name: middleware-patterns
-description: Next.js middleware patterns for protected routes, auth redirects, and URL handling. Use when working with middleware.ts, protected routes, or auth redirects. Keywords: middleware, protected routes, redirect, auth check, URL, searchParams.
+description: Defines Next.js middleware patterns for protected route guards, auth redirects, and URL/searchParams handling. Use when modifying middleware.ts, adding route protection, or implementing auth-based redirects.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
   version: "1.0"

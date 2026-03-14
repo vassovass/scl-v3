@@ -1,6 +1,6 @@
 ---
 name: form-components
-description: StepLeague reusable form components with accessibility features. Use when creating any form, input field, select dropdown, checkbox, or file upload in the application. Keywords: form, input, select, checkbox, textarea, file upload, accessibility, FormInput, FormSelect.
+description: Provides reusable form components (FormInput, FormSelect, FormCheckbox, FormTextarea, FormFileUpload) with built-in accessibility, validation, and error display. Use when building any form, input field, select dropdown, or file upload UI.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
   version: "1.1"

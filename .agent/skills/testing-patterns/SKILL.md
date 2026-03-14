@@ -1,6 +1,6 @@
 ---
 name: testing-patterns
-description: Testing patterns for Next.js App Router with Supabase. Use when adding tests, verifying fixes, or preventing regressions. Keywords: test, testing, jest, vitest, unit test, integration test, mock, Supabase mock, playwright, e2e.
+description: Provides testing patterns for Next.js App Router with Supabase, including Vitest unit tests, Supabase client mocking, and Playwright E2E tests. Use when writing tests, verifying bug fixes, or adding regression coverage.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
   version: "4.0"

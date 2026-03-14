@@ -1,6 +1,6 @@
 ---
 name: typescript-debugging
-description: Debugging TypeScript build errors in Next.js and Supabase projects. Use when encountering tsc --noEmit failures, type mismatches, 'never' type errors, or Supabase generic issues. Keywords: TypeScript, tsc, build error, type error, never, any, CookieOptions, Database generic.
+description: Diagnoses TypeScript build errors in Next.js with Supabase, including tsc --noEmit failures, type mismatches, never type errors, and Database generic issues. Use when encountering TypeScript compilation errors or type-related build failures.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
   version: "1.0"

@@ -1,6 +1,6 @@
 ---
 name: auth-patterns
-description: Supabase authentication patterns including getUser vs getSession, deadlock avoidance, session handling, and bypass patterns. Use when working with auth, sessions, cookies, or encountering auth hangs/timeouts. Keywords: auth, getUser, getSession, session, deadlock, timeout, cookie, token, Web Locks.
+description: Covers Supabase authentication patterns including getUser vs getSession, Web Locks deadlock avoidance, cookie parsing, and session bypass techniques. Use when working with auth flows, encountering auth hangs or timeouts, or implementing login/logout/password-reset.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
   version: "1.0"
