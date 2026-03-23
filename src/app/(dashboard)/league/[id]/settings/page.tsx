@@ -134,27 +134,27 @@ export default function LeagueSettingsPage() {
                 {/* Header */}
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
-                        <div className="flex items-center gap-2 text-sm text-slate-500">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Link href={`/league/${leagueId}`} className="hover:text-sky-400 transition">
                                 {league.name}
                             </Link>
                             <span>/</span>
                             <span>Settings</span>
                         </div>
-                        <h1 className="mt-1 text-3xl font-bold text-slate-50">League Settings</h1>
+                        <h1 className="mt-1 text-3xl font-bold text-foreground">League Settings</h1>
                     </div>
 
                     <div className="flex gap-3">
                         <Link
                             href={`/league/${leagueId}`}
-                            className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 transition"
+                            className="rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary/80 transition"
                         >
                             Cancel
                         </Link>
                         <button
                             onClick={handleSave}
                             disabled={saving}
-                            className="flex items-center gap-2 rounded-lg bg-sky-500 px-6 py-2 text-sm font-bold text-slate-950 hover:bg-sky-400 disabled:opacity-50 transition shadow-[0_0_15px_rgba(14,165,233,0.3)]"
+                            className="flex items-center gap-2 rounded-lg bg-primary px-6 py-2 text-sm font-bold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition shadow-[0_0_15px_rgba(14,165,233,0.3)]"
                         >
                             {saving && <Spinner size="sm" />}
                             {saving ? "Saving..." : "Save Changes"}

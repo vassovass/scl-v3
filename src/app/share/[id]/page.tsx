@@ -165,7 +165,7 @@ export default async function SharePage({ searchParams: searchParamsPromise }: S
             case "rank":
             default:
                 if (rank === 1) return { emoji: "👑", text: "1st Place!", color: "text-[hsl(var(--warning))]" };
-                if (rank === 2) return { emoji: "🥈", text: "2nd Place!", color: "text-slate-300" };
+                if (rank === 2) return { emoji: "🥈", text: "2nd Place!", color: "text-muted-foreground" };
                 if (rank === 3) return { emoji: "🥉", text: "3rd Place!", color: "text-amber-500" };
                 return { emoji: "🏆", text: `#${rank}`, color: "text-primary" };
         }
@@ -176,23 +176,23 @@ export default async function SharePage({ searchParams: searchParamsPromise }: S
     const isStreak = type === "streak";
 
     return (
-        <div className={`min-h-screen flex items-center justify-center p-6 ${theme === "dark" ? "bg-slate-950" : "bg-slate-100"}`}>
+        <div className={`min-h-screen flex items-center justify-center p-6 ${theme === "dark" ? "bg-background" : "bg-muted"}`}>
             <div className="w-full max-w-md text-center">
                 {/* Achievement Card */}
                 <div className={`rounded-2xl p-8 border shadow-2xl ${theme === "dark"
-                    ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-slate-700"
-                    : "bg-gradient-to-br from-white via-slate-50 to-white border-slate-200"
+                    ? "bg-gradient-to-br from-card via-secondary to-card border-border"
+                    : "bg-gradient-to-br from-card via-muted to-card border-border"
                     }`}>
                     <div className="text-6xl mb-4">{rankDisplay.emoji}</div>
                     <h1 className={`text-3xl font-bold ${rankDisplay.color}`}>
                         {rankDisplay.text}
                     </h1>
-                    <p className={`text-lg mt-2 ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
+                    <p className="text-lg mt-2 text-muted-foreground">
                         {name}
                     </p>
 
                     {league !== APP_CONFIG.name && (
-                        <p className={`text-sm mt-1 ${theme === "dark" ? "text-slate-500" : "text-slate-400"}`}>
+                        <p className="text-sm mt-1 text-muted-foreground">
                             in {league}
                         </p>
                     )}
@@ -200,10 +200,10 @@ export default async function SharePage({ searchParams: searchParamsPromise }: S
                     {/* Value display (not for streak cards which show days in title) */}
                     {!isStreak && (
                         <div className="mt-6 py-6 rounded-xl bg-gradient-to-r from-primary/20 to-emerald-600/20 border border-primary/30">
-                            <div className={`text-4xl font-bold ${theme === "dark" ? "text-white" : "text-slate-900"}`}>
+                            <div className="text-4xl font-bold text-foreground">
                                 {formattedValue}
                             </div>
-                            <div className={`text-sm mt-1 ${theme === "dark" ? "text-slate-300" : "text-slate-500"}`}>
+                            <div className="text-sm mt-1 text-muted-foreground">
                                 {metricConfig.unit} {period}
                             </div>
                         </div>
@@ -211,7 +211,7 @@ export default async function SharePage({ searchParams: searchParamsPromise }: S
 
                     {/* Custom message */}
                     {customMessage && (
-                        <div className={`mt-4 text-sm italic ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+                        <div className="mt-4 text-sm italic text-muted-foreground">
                             "{customMessage}"
                         </div>
                     )}
@@ -226,8 +226,8 @@ export default async function SharePage({ searchParams: searchParamsPromise }: S
                     )}
 
                     {/* Branding */}
-                    <div className={`mt-8 pt-4 border-t ${theme === "dark" ? "border-slate-700" : "border-slate-200"}`}>
-                        <div className={`text-sm font-semibold ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
+                    <div className="mt-8 pt-4 border-t border-border">
+                        <div className="text-sm font-semibold text-muted-foreground">
                             Step<span className="text-primary">League</span>
                         </div>
                     </div>

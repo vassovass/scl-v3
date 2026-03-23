@@ -204,66 +204,66 @@ export function BrandingSettingsRenderer() {
 
             {/* Logo Preview */}
             <div>
-                <h3 className="text-sm font-medium text-slate-300 mb-4">Current Logo</h3>
-                <div className="glass-card p-8 flex items-center justify-center bg-slate-900">
+                <h3 className="text-sm font-medium text-muted-foreground mb-4">Current Logo</h3>
+                <div className="glass-card p-8 flex items-center justify-center bg-card">
                     <Logo size="lg" href="" />
                 </div>
             </div>
 
             {/* Text-Based Logo Section */}
             <div>
-                <h3 className="text-sm font-medium text-slate-300 mb-4">Text-Based Logo</h3>
+                <h3 className="text-sm font-medium text-muted-foreground mb-4">Text-Based Logo</h3>
                 <form onSubmit={handleSaveTextLogo} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                            <label className="block text-sm font-medium text-muted-foreground mb-2">
                                 Emoji/Icon
                             </label>
                             <input
                                 type="text"
                                 value={logoEmoji}
                                 onChange={(e) => setLogoEmoji(e.target.value)}
-                                className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 focus:border-primary focus:outline-none"
+                                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:border-primary focus:outline-none"
                                 placeholder="👟"
                                 maxLength={2}
                             />
-                            <p className="text-xs text-slate-500 mt-1">Single emoji character</p>
+                            <p className="text-xs text-muted-foreground mt-1">Single emoji character</p>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                            <label className="block text-sm font-medium text-muted-foreground mb-2">
                                 Primary Text
                             </label>
                             <input
                                 type="text"
                                 value={logoTextPrimary}
                                 onChange={(e) => setLogoTextPrimary(e.target.value)}
-                                className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 focus:border-primary focus:outline-none"
+                                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:border-primary focus:outline-none"
                                 placeholder="Step"
                                 maxLength={20}
                             />
-                            <p className="text-xs text-slate-500 mt-1">First part of logo text</p>
+                            <p className="text-xs text-muted-foreground mt-1">First part of logo text</p>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                            <label className="block text-sm font-medium text-muted-foreground mb-2">
                                 Secondary Text
                             </label>
                             <input
                                 type="text"
                                 value={logoTextSecondary}
                                 onChange={(e) => setLogoTextSecondary(e.target.value)}
-                                className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 focus:border-primary focus:outline-none"
+                                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:border-primary focus:outline-none"
                                 placeholder="League"
                                 maxLength={20}
                             />
-                            <p className="text-xs text-slate-500 mt-1">Second part (colored)</p>
+                            <p className="text-xs text-muted-foreground mt-1">Second part (colored)</p>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                            <label className="block text-sm font-medium text-muted-foreground mb-2">
                                 Theme Color (Light Mode)
                             </label>
                             <div className="flex gap-3">
@@ -271,20 +271,20 @@ export function BrandingSettingsRenderer() {
                                     type="color"
                                     value={themeColorLight}
                                     onChange={(e) => setThemeColorLight(e.target.value)}
-                                    className="h-12 w-16 rounded-lg border border-slate-700 bg-slate-900 cursor-pointer"
+                                    className="h-12 w-16 rounded-lg border border-border bg-card cursor-pointer"
                                 />
                                 <input
                                     type="text"
                                     value={themeColorLight}
                                     onChange={(e) => setThemeColorLight(e.target.value)}
-                                    className="flex-1 rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 focus:border-primary focus:outline-none font-mono text-sm"
+                                    className="flex-1 rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:border-primary focus:outline-none font-mono text-sm"
                                     placeholder="#ffffff"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                            <label className="block text-sm font-medium text-muted-foreground mb-2">
                                 Theme Color (Dark Mode)
                             </label>
                             <div className="flex gap-3">
@@ -292,13 +292,13 @@ export function BrandingSettingsRenderer() {
                                     type="color"
                                     value={themeColorDark}
                                     onChange={(e) => setThemeColorDark(e.target.value)}
-                                    className="h-12 w-16 rounded-lg border border-slate-700 bg-slate-900 cursor-pointer"
+                                    className="h-12 w-16 rounded-lg border border-border bg-card cursor-pointer"
                                 />
                                 <input
                                     type="text"
                                     value={themeColorDark}
                                     onChange={(e) => setThemeColorDark(e.target.value)}
-                                    className="flex-1 rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 focus:border-primary focus:outline-none font-mono text-sm"
+                                    className="flex-1 rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:border-primary focus:outline-none font-mono text-sm"
                                     placeholder="#020617"
                                 />
                             </div>
@@ -326,7 +326,7 @@ export function BrandingSettingsRenderer() {
 
             {/* Custom Logo Image Section */}
             <div>
-                <h3 className="text-sm font-medium text-slate-300 mb-4">Custom Logo Image (Optional)</h3>
+                <h3 className="text-sm font-medium text-muted-foreground mb-4">Custom Logo Image (Optional)</h3>
                 <div className="space-y-6">
                     <Alert>
                         <AlertDescription>
@@ -336,9 +336,9 @@ export function BrandingSettingsRenderer() {
                     </Alert>
 
                     {hasCustomLogo && (
-                        <div className="p-4 bg-slate-900 rounded-lg border border-slate-700 flex items-center justify-between">
+                        <div className="p-4 bg-card rounded-lg border border-border flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 bg-slate-800 rounded flex items-center justify-center">
+                                <div className="w-12 h-12 bg-secondary rounded flex items-center justify-center">
                                     {(previewImageLight || branding.logo.imageUrl) && (
                                         <img
                                             src={previewImageLight || branding.logo.imageUrl}
@@ -348,8 +348,8 @@ export function BrandingSettingsRenderer() {
                                     )}
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium text-slate-200">Custom logo active</p>
-                                    <p className="text-xs text-slate-500">Using uploaded image instead of emoji</p>
+                                    <p className="text-sm font-medium text-foreground">Custom logo active</p>
+                                    <p className="text-xs text-muted-foreground">Using uploaded image instead of emoji</p>
                                 </div>
                             </div>
                             <button
@@ -365,10 +365,10 @@ export function BrandingSettingsRenderer() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                            <label className="block text-sm font-medium text-muted-foreground mb-2">
                                 Logo (Light Mode)
                             </label>
-                            <div className="border-2 border-dashed border-slate-700 rounded-lg p-6 text-center hover:border-primary transition-colors">
+                            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors">
                                 <input
                                     type="file"
                                     accept="image/*"
@@ -390,10 +390,10 @@ export function BrandingSettingsRenderer() {
                                     ) : (
                                         <div className="text-4xl mb-3">📁</div>
                                     )}
-                                    <p className="text-sm text-slate-400">
+                                    <p className="text-sm text-muted-foreground">
                                         {isUploading ? "Uploading..." : "Click to upload"}
                                     </p>
-                                    <p className="text-xs text-slate-500 mt-1">
+                                    <p className="text-xs text-muted-foreground mt-1">
                                         PNG, JPG, WebP (max 5MB)
                                     </p>
                                 </label>
@@ -401,10 +401,10 @@ export function BrandingSettingsRenderer() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                            <label className="block text-sm font-medium text-muted-foreground mb-2">
                                 Logo (Dark Mode) - Optional
                             </label>
-                            <div className="border-2 border-dashed border-slate-700 rounded-lg p-6 text-center hover:border-primary transition-colors">
+                            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors">
                                 <input
                                     type="file"
                                     accept="image/*"
@@ -426,10 +426,10 @@ export function BrandingSettingsRenderer() {
                                     ) : (
                                         <div className="text-4xl mb-3">📁</div>
                                     )}
-                                    <p className="text-sm text-slate-400">
+                                    <p className="text-sm text-muted-foreground">
                                         {isUploading ? "Uploading..." : "Click to upload"}
                                     </p>
-                                    <p className="text-xs text-slate-500 mt-1">
+                                    <p className="text-xs text-muted-foreground mt-1">
                                         Falls back to light if not set
                                     </p>
                                 </label>
@@ -440,9 +440,9 @@ export function BrandingSettingsRenderer() {
             </div>
 
             {/* Favicon Notice */}
-            <div className="p-6 border-l-4 border-primary bg-slate-900/50 rounded-lg">
+            <div className="p-6 border-l-4 border-primary bg-card/50 rounded-lg">
                 <h4 className="text-lg font-semibold text-primary mb-2">🔄 Automatic Assets</h4>
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-muted-foreground">
                     Favicons and PWA icons are automatically generated from your logo settings.
                     Changes take effect immediately across the entire app, including browser tabs,
                     bookmarks, and home screen icons.

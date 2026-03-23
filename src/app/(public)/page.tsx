@@ -22,8 +22,8 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
-        <div className="text-slate-400 animate-pulse">Loading...</div>
+      <main className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-muted-foreground animate-pulse">Loading...</div>
       </main>
     );
   }
@@ -93,7 +93,7 @@ export default function HomePage() {
 
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <svg className="w-6 h-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-6 h-6 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
           </svg>
         </div>
@@ -129,12 +129,12 @@ export default function HomePage() {
             {/* Step 2 */}
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition duration-500" />
-              <div className="relative bg-slate-800/50 border border-slate-700/50 rounded-2xl p-8 h-full">
+              <div className="relative bg-card/50 border border-border/50 rounded-2xl p-8 h-full">
                 <div className="w-14 h-14 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center text-2xl font-bold text-black mb-6">
                   2
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-3">AI Verifies</h3>
-                <p className="text-slate-400">
+                <h3 className="text-xl font-semibold text-foreground mb-3">AI Verifies</h3>
+                <p className="text-muted-foreground">
                   Our AI instantly reads your screenshot and verifies the step count - ensuring fair play and accurate tracking for everyone.
                 </p>
               </div>
@@ -143,12 +143,12 @@ export default function HomePage() {
             {/* Step 3 */}
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition duration-500" />
-              <div className="relative bg-slate-800/50 border border-slate-700/50 rounded-2xl p-8 h-full">
+              <div className="relative bg-card/50 border border-border/50 rounded-2xl p-8 h-full">
                 <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center text-2xl font-bold text-black mb-6">
                   3
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-3">Reach Your Goals</h3>
-                <p className="text-slate-400">
+                <h3 className="text-xl font-semibold text-foreground mb-3">Reach Your Goals</h3>
+                <p className="text-muted-foreground">
                   Celebrate milestones and see your group's progress. Connect with friends and build healthy habits together.
                 </p>
               </div>
@@ -190,8 +190,8 @@ export default function HomePage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white">Real-time Progress</h3>
-                    <p className="text-slate-400 mt-1">Daily and weekly stats update instantly. Visualize your journey and celebrate consistency.</p>
+                    <h3 className="text-lg font-semibold text-foreground">Real-time Progress</h3>
+                    <p className="text-muted-foreground mt-1">Daily and weekly stats update instantly. Visualize your journey and celebrate consistency.</p>
                   </div>
                 </div>
 
@@ -202,8 +202,8 @@ export default function HomePage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white">Private Leagues</h3>
-                    <p className="text-slate-400 mt-1">Create invite-only leagues and share a simple code with friends and family.</p>
+                    <h3 className="text-lg font-semibold text-foreground">Private Leagues</h3>
+                    <p className="text-muted-foreground mt-1">Create invite-only leagues and share a simple code with friends and family.</p>
                   </div>
                 </div>
 
@@ -214,8 +214,8 @@ export default function HomePage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white">Analytics & Insights</h3>
-                    <p className="text-slate-400 mt-1">Track your progress with calendar heatmaps, streaks, and personal bests.</p>
+                    <h3 className="text-lg font-semibold text-foreground">Analytics & Insights</h3>
+                    <p className="text-muted-foreground mt-1">Track your progress with calendar heatmaps, streaks, and personal bests.</p>
                   </div>
                 </div>
               </div>
@@ -224,31 +224,31 @@ export default function HomePage() {
             {/* Right: Value props showcase */}
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-sky-500/10 to-purple-500/10 blur-3xl" />
-              <div className="relative bg-slate-800/50 border border-slate-700/50 rounded-3xl p-8 lg:p-12">
+              <div className="relative bg-card/50 border border-border/50 rounded-3xl p-8 lg:p-12">
                 <div className="grid grid-cols-2 gap-8">
                   <div className="text-center">
                     <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-sky-400 to-cyan-400 bg-clip-text text-transparent">
                       Free
                     </div>
-                    <div className="mt-2 text-sm text-slate-400 uppercase tracking-wider">To Join</div>
+                    <div className="mt-2 text-sm text-muted-foreground uppercase tracking-wider">To Join</div>
                   </div>
                   <div className="text-center">
                     <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
                       AI
                     </div>
-                    <div className="mt-2 text-sm text-slate-400 uppercase tracking-wider">Verified Steps</div>
+                    <div className="mt-2 text-sm text-muted-foreground uppercase tracking-wider">Verified Steps</div>
                   </div>
                   <div className="text-center">
                     <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                       Daily
                     </div>
-                    <div className="mt-2 text-sm text-slate-400 uppercase tracking-wider">Leaderboards</div>
+                    <div className="mt-2 text-sm text-muted-foreground uppercase tracking-wider">Leaderboards</div>
                   </div>
                   <div className="text-center">
                     <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                       Global
                     </div>
-                    <div className="mt-2 text-sm text-slate-400 uppercase tracking-wider">World League</div>
+                    <div className="mt-2 text-sm text-muted-foreground uppercase tracking-wider">World League</div>
                   </div>
                 </div>
               </div>

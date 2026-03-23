@@ -45,7 +45,7 @@ export default function DashboardError({
                 <div className="flex flex-col gap-2 w-full">
                     <button
                         onClick={reset}
-                        className="w-full py-2.5 px-4 rounded-lg bg-primary text-white font-medium hover:bg-primary/90 transition"
+                        className="w-full py-2.5 px-4 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition"
                     >
                         Try Again
                     </button>

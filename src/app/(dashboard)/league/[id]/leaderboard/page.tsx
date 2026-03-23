@@ -465,7 +465,7 @@ function LeaderboardContent() {
                     <th className="px-3 py-3 text-center text-muted-foreground font-medium">Badges</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800">
+                <tbody className="divide-y divide-border">
                   {entries.map((entry) => (
                     <tr
                       key={entry.user_id}

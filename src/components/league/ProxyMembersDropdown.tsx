@@ -138,7 +138,7 @@ export function ProxyMembersDropdown({
                 onClick={() => setIsOpen(!isOpen)}
                 className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition ${selectedProxy
                         ? "border-[hsl(var(--warning)/0.5)] bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))] hover:bg-[hsl(var(--warning)/0.15)]"
-                        : "border-slate-700 bg-slate-900/50 text-slate-300 hover:border-slate-500 hover:bg-slate-800"
+                        : "border-border bg-card/50 text-muted-foreground hover:border-border/80 hover:bg-card"
                     }`}
             >
                 <span>👤</span>
@@ -147,12 +147,12 @@ export function ProxyMembersDropdown({
                 ) : (
                     <span>Submit for Proxy</span>
                 )}
-                <span className="text-xs text-slate-500 ml-1">▼</span>
+                <span className="text-xs text-muted-foreground ml-1">▼</span>
             </button>
 
             {isOpen && (
-                <div className="absolute left-0 top-full z-20 mt-2 w-72 rounded-xl border border-slate-700 bg-slate-800 p-2 shadow-xl ring-1 ring-black/5">
-                    <div className="mb-2 px-2 py-1.5 text-xs text-slate-500 font-semibold uppercase tracking-wider flex items-center justify-between">
+                <div className="absolute left-0 top-full z-20 mt-2 w-72 rounded-xl border border-border bg-card p-2 shadow-xl ring-1 ring-black/5">
+                    <div className="mb-2 px-2 py-1.5 text-xs text-muted-foreground font-semibold uppercase tracking-wider flex items-center justify-between">
                         <span>Proxy Members</span>
                         {selectedProxy && (
                             <button
@@ -168,9 +168,9 @@ export function ProxyMembersDropdown({
                     </div>
 
                     {loading ? (
-                        <div className="py-4 text-center text-sm text-slate-500">Loading...</div>
+                        <div className="py-4 text-center text-sm text-muted-foreground">Loading...</div>
                     ) : proxyMembers.length === 0 ? (
-                        <div className="py-3 px-2 text-sm text-slate-500 text-center">
+                        <div className="py-3 px-2 text-sm text-muted-foreground text-center">
                             No proxy members yet
                         </div>
                     ) : (
@@ -185,7 +185,7 @@ export function ProxyMembersDropdown({
                                     }}
                                     className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition ${selectedProxy?.id === proxy.id
                                             ? "bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]"
-                                            : "text-slate-200 hover:bg-slate-700 hover:text-white"
+                                            : "text-foreground hover:bg-secondary hover:text-foreground"
                                         }`}
                                 >
                                     <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[hsl(var(--warning))] to-orange-600 flex items-center justify-center text-white text-sm font-medium shrink-0">
@@ -193,7 +193,7 @@ export function ProxyMembersDropdown({
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="truncate font-medium">{proxy.display_name}</div>
-                                        <div className="text-xs text-slate-500">{proxy.submission_count} submissions</div>
+                                        <div className="text-xs text-muted-foreground">{proxy.submission_count} submissions</div>
                                     </div>
                                     {selectedProxy?.id === proxy.id && (
                                         <span className="text-[hsl(var(--warning))]">✓</span>
@@ -203,7 +203,7 @@ export function ProxyMembersDropdown({
                         </div>
                     )}
 
-                    <div className="mt-2 border-t border-slate-700 pt-2">
+                    <div className="mt-2 border-t border-border pt-2">
                         {showCreateInput ? (
                             <div className="space-y-2 p-2">
                                 <input
@@ -214,7 +214,7 @@ export function ProxyMembersDropdown({
                                         if (error) setError(null); // Clear error on input change
                                     }}
                                     placeholder="Name (e.g., Joe Soap)"
-                                    className="w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-sky-500 focus:outline-none"
+                                    className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-sky-500 focus:outline-none"
                                     autoFocus
                                     onKeyDown={(e) => {
                                         if (e.key === "Enter") handleCreate();
@@ -228,7 +228,7 @@ export function ProxyMembersDropdown({
                                     <button
                                         type="button"
                                         onClick={() => setShowCreateInput(false)}
-                                        className="flex-1 rounded-lg border border-slate-600 px-3 py-1.5 text-xs text-slate-400 hover:bg-slate-700"
+                                        className="flex-1 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-secondary"
                                     >
                                         Cancel
                                     </button>

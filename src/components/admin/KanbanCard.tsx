@@ -57,11 +57,11 @@ const KanbanCard = memo(function KanbanCard({
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     onDoubleClick={handleDoubleClick}
-                    className={`p-3 mb-2 bg-slate-800/80 rounded-lg border transition-all cursor-pointer ${snapshot.isDragging
+                    className={`p-3 mb-2 bg-card/80 rounded-lg border transition-all cursor-pointer ${snapshot.isDragging
                         ? "border-primary shadow-lg shadow-primary/20"
                         : isSelected
                             ? "border-primary ring-1 ring-primary/30 bg-primary/10"
-                            : "border-slate-700 hover:border-slate-600"
+                            : "border-border hover:border-border/80"
                         }`}
                     title="Double-click to open details"
                 >
@@ -73,7 +73,7 @@ const KanbanCard = memo(function KanbanCard({
                                 checked={isSelected}
                                 onChange={(e) => onToggleSelection(item.id, e as unknown as React.MouseEvent)}
                                 onClick={(e) => e.stopPropagation()}
-                                className="w-3.5 h-3.5 rounded border-slate-600 bg-slate-800 text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
+                                className="w-3.5 h-3.5 rounded border-border bg-card text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
                                 title="Select item"
                             />
                             <span
@@ -96,7 +96,7 @@ const KanbanCard = memo(function KanbanCard({
                                 onClick={() => onTogglePublic(item.id, item.is_public)}
                                 className={`text-xs px-1.5 py-0.5 rounded transition-colors ${item.is_public
                                     ? "bg-emerald-500/20 text-emerald-400"
-                                    : "bg-slate-700 text-slate-400 hover:text-slate-300"
+                                    : "bg-secondary text-muted-foreground hover:text-foreground"
                                     }`}
                                 title={item.is_public ? "Public on roadmap" : "Private"}
                             >
@@ -122,7 +122,7 @@ const KanbanCard = memo(function KanbanCard({
                                         </button>
                                         <button
                                             onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(false); }}
-                                            className="text-[9px] px-1 py-0.5 text-slate-400 hover:text-slate-200 rounded transition-colors"
+                                            className="text-[9px] px-1 py-0.5 text-muted-foreground hover:text-foreground rounded transition-colors"
                                             title="Cancel"
                                         >
                                             ✕
@@ -131,7 +131,7 @@ const KanbanCard = memo(function KanbanCard({
                                 ) : (
                                     <button
                                         onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(true); }}
-                                        className="text-xs px-1.5 py-0.5 rounded bg-slate-700/50 text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                                        className="text-xs px-1.5 py-0.5 rounded bg-secondary/50 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-colors"
                                         title="Delete or archive"
                                     >
                                         🗑️
@@ -142,7 +142,7 @@ const KanbanCard = memo(function KanbanCard({
                     </div>
 
                     <div className="flex items-center justify-between mb-1">
-                        <h4 className={`text-sm font-medium text-slate-200 ${!isExpanded && "line-clamp-2"}`}>
+                        <h4 className={`text-sm font-medium text-foreground ${!isExpanded && "line-clamp-2"}`}>
                             {item.subject}
                         </h4>
                         <button
@@ -150,7 +150,7 @@ const KanbanCard = memo(function KanbanCard({
                                 e.stopPropagation();
                                 setIsExpanded(!isExpanded);
                             }}
-                            className="p-1 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded transition-colors"
+                            className="p-1 text-muted-foreground hover:text-foreground hover:bg-secondary rounded transition-colors"
                             title={isExpanded ? "Collapse" : "Expand"}
                         >
                             <svg
@@ -169,21 +169,21 @@ const KanbanCard = memo(function KanbanCard({
                         </button>
                     </div>
 
-                    <p className={`text-xs text-slate-400 ${!isExpanded && "line-clamp-2"}`}>
+                    <p className={`text-xs text-muted-foreground ${!isExpanded && "line-clamp-2"}`}>
                         {item.description}
                     </p>
 
                     {isExpanded && item.screenshot_url && (
-                        <div className="mt-2 text-[10px] text-slate-500">
+                        <div className="mt-2 text-[10px] text-muted-foreground">
                             <img
                                 src={item.screenshot_url}
                                 alt="Feedback screenshot"
-                                className="w-full rounded-md border border-slate-700 mt-1 max-h-48 object-contain bg-black/20"
+                                className="w-full rounded-md border border-border mt-1 max-h-48 object-contain bg-black/20"
                             />
                         </div>
                     )}
 
-                    <div className="mt-2 text-[10px] text-slate-500 flex items-center justify-between">
+                    <div className="mt-2 text-[10px] text-muted-foreground flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <span>{new Date(item.created_at).toLocaleDateString()}</span>
                             {/* Attachment count badge */}
@@ -209,7 +209,7 @@ const KanbanCard = memo(function KanbanCard({
                             )}
                         </div>
                         {item.users?.display_name && (
-                            <span className="text-slate-400">
+                            <span className="text-muted-foreground">
                                 👤 {item.users.display_name}
                             </span>
                         )}

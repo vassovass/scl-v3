@@ -61,8 +61,8 @@ export function DangerZone({ league, disabled }: DangerZoneProps) {
             >
                 <div className="flex items-center justify-between gap-4">
                     <div>
-                        <p className="font-medium text-slate-300">Delete League</p>
-                        <p className="text-xs text-slate-500 mt-1">
+                        <p className="font-medium text-muted-foreground">Delete League</p>
+                        <p className="text-xs text-muted-foreground mt-1">
                             Permanently delete this league and all its data. This action cannot be undone.
                         </p>
                     </div>

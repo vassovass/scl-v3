@@ -93,14 +93,14 @@ export default async function InvitePage({ params }: InvitePageProps) {
 
     if (!league) {
         return (
-            <div className="flex min-h-screen flex-col items-center justify-center bg-slate-950 p-4">
+            <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
                 <div className="text-center">
                     <div className="text-6xl mb-4">😕</div>
-                    <h1 className="text-2xl font-bold text-slate-50">League Not Found</h1>
-                    <p className="mt-2 text-slate-400">This invite link seems to be invalid.</p>
+                    <h1 className="text-2xl font-bold text-foreground">League Not Found</h1>
+                    <p className="mt-2 text-muted-foreground">This invite link seems to be invalid.</p>
                     <Link
                         href="/dashboard"
-                        className="mt-6 inline-block rounded-xl bg-sky-600 px-6 py-3 text-sm font-semibold text-white hover:bg-sky-500 transition"
+                        className="mt-6 inline-block rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition"
                     >
                         Go to Dashboard
                     </Link>
@@ -110,21 +110,21 @@ export default async function InvitePage({ params }: InvitePageProps) {
     }
 
     return (
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
             <div className="w-full max-w-md">
                 {/* League Card */}
-                <div className="rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 border border-slate-700 shadow-2xl text-center">
+                <div className="rounded-2xl bg-gradient-to-br from-card via-secondary to-card p-8 border border-border shadow-2xl text-center">
                     <div className="text-6xl mb-6">✉️</div>
 
                     <h2 className="text-sm font-semibold text-sky-400 uppercase tracking-wider mb-2">
                         You&apos;ve been invited to
                     </h2>
 
-                    <h1 className="text-3xl font-bold text-white mb-6">
+                    <h1 className="text-3xl font-bold text-foreground mb-6">
                         {league.name}
                     </h1>
 
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-sm mb-8">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary border border-border text-muted-foreground text-sm mb-8">
                         <span>👥 {league.member_count} members</span>
                     </div>
 
@@ -136,7 +136,7 @@ export default async function InvitePage({ params }: InvitePageProps) {
                                 </div>
                                 <Link
                                     href={`/league/${league.id}`}
-                                    className="block w-full rounded-lg bg-sky-600 px-4 py-3 text-sm font-semibold text-white hover:bg-sky-500 transition"
+                                    className="block w-full rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition"
                                 >
                                     Go to League Dashboard
                                 </Link>
@@ -145,7 +145,7 @@ export default async function InvitePage({ params }: InvitePageProps) {
                             <>
                                 {/* We reuse the Logic from Join Page but pre-fill code */}
                                 <JoinLeagueForm prefilledCode={params.code} />
-                                <p className="text-xs text-slate-500 mt-6">
+                                <p className="text-xs text-muted-foreground mt-6">
                                     Step<span className="text-sky-500">League</span> is the best place to track steps with friends.
                                 </p>
                             </>
@@ -154,7 +154,7 @@ export default async function InvitePage({ params }: InvitePageProps) {
                 </div>
 
                 <div className="mt-6 text-center">
-                    <Link href="/dashboard" className="text-sm text-slate-500 hover:text-slate-300 transition">
+                    <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground transition">
                         Already have an account? Go to Dashboard
                     </Link>
                 </div>

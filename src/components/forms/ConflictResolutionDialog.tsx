@@ -119,10 +119,10 @@ export function ConflictResolutionDialog({
                     {/* Existing Entry */}
                     <div className={`rounded-lg border p-4 ${recommendation.action === "keep_existing"
                             ? "border-emerald-500/50 bg-emerald-500/10"
-                            : "border-slate-700 bg-slate-800/50"
+                            : "border-border bg-card/50"
                         }`}>
                         <div className="mb-2 flex items-center justify-between">
-                            <span className="text-xs font-medium uppercase text-slate-400">
+                            <span className="text-xs font-medium uppercase text-muted-foreground">
                                 Existing
                             </span>
                             {recommendation.action === "keep_existing" && (
@@ -131,7 +131,7 @@ export function ConflictResolutionDialog({
                                 </span>
                             )}
                         </div>
-                        <div className="text-2xl font-bold text-slate-100">
+                        <div className="text-2xl font-bold text-foreground">
                             {conflict.existing.steps.toLocaleString()}
                         </div>
                         <div className="mt-2 flex flex-wrap gap-2">
@@ -153,7 +153,7 @@ export function ConflictResolutionDialog({
                                     📷 Screenshot
                                 </span>
                             ) : (
-                                <span className="rounded-full bg-slate-500/20 px-2 py-0.5 text-xs text-slate-400">
+                                <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                                     ✎ Manual
                                 </span>
                             )}
@@ -163,10 +163,10 @@ export function ConflictResolutionDialog({
                     {/* Incoming Entry */}
                     <div className={`rounded-lg border p-4 ${recommendation.action === "use_incoming"
                             ? "border-emerald-500/50 bg-emerald-500/10"
-                            : "border-slate-700 bg-slate-800/50"
+                            : "border-border bg-card/50"
                         }`}>
                         <div className="mb-2 flex items-center justify-between">
-                            <span className="text-xs font-medium uppercase text-slate-400">
+                            <span className="text-xs font-medium uppercase text-muted-foreground">
                                 New Entry
                             </span>
                             {recommendation.action === "use_incoming" && (
@@ -175,7 +175,7 @@ export function ConflictResolutionDialog({
                                 </span>
                             )}
                         </div>
-                        <div className="text-2xl font-bold text-slate-100">
+                        <div className="text-2xl font-bold text-foreground">
                             {conflict.incoming.steps.toLocaleString()}
                         </div>
                         <div className="mt-2 flex flex-wrap gap-2">
@@ -187,7 +187,7 @@ export function ConflictResolutionDialog({
                                     📷 Screenshot
                                 </span>
                             ) : (
-                                <span className="rounded-full bg-slate-500/20 px-2 py-0.5 text-xs text-slate-400">
+                                <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                                     ✎ Manual
                                 </span>
                             )}
@@ -209,7 +209,7 @@ export function ConflictResolutionDialog({
                         disabled={isLoading}
                         className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition ${recommendation.action === "keep_existing"
                                 ? "bg-emerald-600 text-white hover:bg-emerald-500"
-                                : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                                : "bg-secondary text-muted-foreground hover:bg-secondary/80"
                             } disabled:cursor-not-allowed disabled:opacity-50`}
                     >
                         Keep Existing
@@ -222,7 +222,7 @@ export function ConflictResolutionDialog({
                         disabled={isLoading}
                         className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition ${recommendation.action === "use_incoming"
                                 ? "bg-emerald-600 text-white hover:bg-emerald-500"
-                                : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                                : "bg-secondary text-muted-foreground hover:bg-secondary/80"
                             } disabled:cursor-not-allowed disabled:opacity-50`}
                     >
                         {isLoading ? "Saving..." : "Use New Entry"}

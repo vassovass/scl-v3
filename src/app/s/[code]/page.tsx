@@ -212,7 +212,7 @@ export default async function ShareCardPage({ params }: ShareCardPageProps) {
                 return { emoji: "🚀", text: "Rank Up!", color: "text-green-400" };
             case "rank":
                 if (card.rank === 1) return { emoji: "👑", text: "1st Place!", color: "text-[hsl(var(--warning))]" };
-                if (card.rank === 2) return { emoji: "🥈", text: "2nd Place!", color: "text-slate-300" };
+                if (card.rank === 2) return { emoji: "🥈", text: "2nd Place!", color: "text-muted-foreground" };
                 if (card.rank === 3) return { emoji: "🥉", text: "3rd Place!", color: "text-amber-500" };
                 return { emoji: "🏆", text: `#${card.rank}`, color: "text-primary" };
             default:
@@ -225,23 +225,23 @@ export default async function ShareCardPage({ params }: ShareCardPageProps) {
     const isStreak = card.card_type === "streak";
 
     return (
-        <div className={`min-h-screen flex items-center justify-center p-6 ${card.theme === "dark" ? "bg-slate-950" : "bg-slate-100"}`}>
+        <div className={`min-h-screen flex items-center justify-center p-6 ${card.theme === "dark" ? "bg-background" : "bg-muted"}`}>
             <div className="w-full max-w-md text-center">
                 {/* Achievement Card */}
                 <div className={`rounded-2xl p-8 border shadow-2xl ${card.theme === "dark"
-                    ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-slate-700"
-                    : "bg-gradient-to-br from-white via-slate-50 to-white border-slate-200"
+                    ? "bg-gradient-to-br from-card via-secondary to-card border-border"
+                    : "bg-gradient-to-br from-card via-muted to-card border-border"
                     }`}>
                     <div className="text-6xl mb-4">{display.emoji}</div>
                     <h1 className={`text-3xl font-bold ${display.color}`}>
                         {display.text}
                     </h1>
-                    <p className={`text-lg mt-2 ${card.theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
+                    <p className="text-lg mt-2 text-muted-foreground">
                         {userName}
                     </p>
 
                     {card.league_name && (
-                        <p className={`text-sm mt-1 ${card.theme === "dark" ? "text-slate-500" : "text-slate-400"}`}>
+                        <p className="text-sm mt-1 text-muted-foreground">
                             in {card.league_name}
                         </p>
                     )}
@@ -249,10 +249,10 @@ export default async function ShareCardPage({ params }: ShareCardPageProps) {
                     {/* Value display (not for streak cards which show days in title) */}
                     {!isStreak && (
                         <div className="mt-6 py-6 rounded-xl bg-gradient-to-r from-primary/20 to-emerald-600/20 border border-primary/30">
-                            <div className={`text-4xl font-bold ${card.theme === "dark" ? "text-white" : "text-slate-900"}`}>
+                            <div className="text-4xl font-bold text-foreground">
                                 {formattedValue}
                             </div>
-                            <div className={`text-sm mt-1 ${card.theme === "dark" ? "text-slate-300" : "text-slate-500"}`}>
+                            <div className="text-sm mt-1 text-muted-foreground">
                                 {metricConfig.unit} {periodText}
                             </div>
                         </div>
@@ -260,7 +260,7 @@ export default async function ShareCardPage({ params }: ShareCardPageProps) {
 
                     {/* Custom message */}
                     {card.custom_message && (
-                        <div className={`mt-4 text-sm italic ${card.theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+                        <div className="mt-4 text-sm italic text-muted-foreground">
                             "{card.custom_message}"
                         </div>
                     )}
@@ -275,8 +275,8 @@ export default async function ShareCardPage({ params }: ShareCardPageProps) {
                     )}
 
                     {/* Branding */}
-                    <div className={`mt-8 pt-4 border-t ${card.theme === "dark" ? "border-slate-700" : "border-slate-200"}`}>
-                        <div className={`text-sm font-semibold ${card.theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
+                    <div className="mt-8 pt-4 border-t border-border">
+                        <div className="text-sm font-semibold text-muted-foreground">
                             Step<span className="text-primary">League</span>
                         </div>
                     </div>

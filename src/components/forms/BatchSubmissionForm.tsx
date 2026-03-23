@@ -691,7 +691,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
 
     const getStatusColor = (status: ImageFile["status"]) => {
         switch (status) {
-            case "pending": return "border-slate-700";
+            case "pending": return "border-border";
             case "extracting": return "border-amber-600";
             case "review": return "border-primary";
             case "submitting": return "border-amber-600";
@@ -725,12 +725,12 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
     }, [images]);
 
     return (
-        <div className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/60 p-4 shadow-lg">
+        <div className="space-y-4 rounded-lg border border-border bg-card p-4 shadow-lg">
             <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-slate-300">
+                <h3 className="text-sm font-medium text-muted-foreground">
                     Batch Upload (up to {maxFiles} images)
                 </h3>
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-muted-foreground">
                     {images.length}/{maxFiles} selected
                 </span>
             </div>
@@ -746,9 +746,9 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                     onChange={handleFilesSelected}
                     disabled={processing || images.length >= maxFiles}
                     data-tour="batch-file-upload"
-                    className="text-sm text-slate-300 file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90 disabled:opacity-50"
+                    className="text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90 disabled:opacity-50"
                 />
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                     Images will be auto-compressed. AI extracts date and steps - you can review and edit before submitting.
                 </p>
                 {limitWarning && (
@@ -792,16 +792,16 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                             )}
 
                             {/* Status & Data */}
-                            <div className="bg-slate-800 p-2 space-y-2">
+                            <div className="bg-secondary p-2 space-y-2">
                                 <div className="flex items-center justify-between">
                                     <span className={`text-xs font-medium ${img.status === "success" ? "text-emerald-400" :
                                         img.status === "error" ? "text-rose-400" :
                                             img.status === "review" ? "text-primary" :
-                                                "text-slate-400"
+                                                "text-muted-foreground"
                                         }`}>
                                         {getStatusText(img.status)}
                                     </span>
-                                    <span className="text-xs text-slate-500">
+                                    <span className="text-xs text-muted-foreground">
                                         Click image to expand
                                     </span>
                                 </div>
@@ -810,7 +810,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                 {img.status === "review" && (
                                     <div className="space-y-2">
                                         <div className="flex items-center gap-2">
-                                            <label className="text-xs text-slate-400 w-12">Date:</label>
+                                            <label className="text-xs text-muted-foreground w-12">Date:</label>
                                             <input
                                                 id={`batch-date-${img.id}`}
                                                 name={`batch-date-${img.id}`}
@@ -818,11 +818,11 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                                 value={img.editedDate || ""}
                                                 onChange={(e) => updateEditedValue(img.id, "editedDate", e.target.value)}
                                                 data-tour={index === 0 ? "batch-date-input" : undefined}
-                                                className="flex-1 rounded border border-slate-600 bg-slate-900 px-2 py-1 text-xs text-slate-200"
+                                                className="flex-1 rounded border border-border bg-card px-2 py-1 text-xs text-foreground"
                                             />
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <label className="text-xs text-slate-400 w-12">Steps:</label>
+                                            <label className="text-xs text-muted-foreground w-12">Steps:</label>
                                             <input
                                                 id={`batch-steps-${img.id}`}
                                                 name={`batch-steps-${img.id}`}
@@ -830,7 +830,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                                 value={img.editedSteps || ""}
                                                 onChange={(e) => updateEditedValue(img.id, "editedSteps", e.target.value)}
                                                 data-tour={index === 0 ? "batch-steps-input" : undefined}
-                                                className="flex-1 rounded border border-slate-600 bg-slate-900 px-2 py-1 text-xs text-slate-200"
+                                                className="flex-1 rounded border border-border bg-card px-2 py-1 text-xs text-foreground"
                                             />
                                         </div>
 
@@ -851,10 +851,10 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                         {/* AI notes */}
                                         {img.extractedData?.notes && (
                                             <details className="text-xs">
-                                                <summary className="cursor-pointer text-slate-400 hover:text-slate-300">
+                                                <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
                                                     AI Notes
                                                 </summary>
-                                                <p className="mt-1 text-slate-300 bg-slate-950 p-2 rounded">
+                                                <p className="mt-1 text-foreground bg-card p-2 rounded">
                                                     {img.extractedData.notes}
                                                 </p>
                                             </details>
@@ -928,10 +928,10 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
 
                                         {img.errorDetails && (
                                             <details className="text-xs">
-                                                <summary className="cursor-pointer text-slate-400 hover:text-slate-300">
+                                                <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
                                                     Technical Details
                                                 </summary>
-                                                <pre className="mt-2 rounded bg-slate-950 p-2 text-xs text-slate-400 overflow-x-auto max-h-32 overflow-y-auto">
+                                                <pre className="mt-2 rounded bg-card p-2 text-xs text-muted-foreground overflow-x-auto max-h-32 overflow-y-auto">
                                                     {img.errorDetails}
                                                 </pre>
                                                 <button
@@ -966,12 +966,12 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
 
             {/* Overall Status with detailed step */}
             {(overallStatus || extractionStep) && (
-                <div className="space-y-1 p-3 bg-slate-800/50 rounded-lg border border-slate-700" data-tour="batch-status-display">
+                <div className="space-y-1 p-3 bg-secondary/50 rounded-lg border border-border" data-tour="batch-status-display">
                     {overallStatus && (
                         <p className="text-sm text-[hsl(var(--info))] font-medium">{overallStatus}</p>
                     )}
                     {extractionStep && (
-                        <p className="text-xs text-slate-400 font-mono">{extractionStep}</p>
+                        <p className="text-xs text-muted-foreground font-mono">{extractionStep}</p>
                     )}
                 </div>
             )}
@@ -1035,7 +1035,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                         />
                         <button
                             onClick={() => setPreviewImage(null)}
-                            className="absolute -top-2 -right-2 rounded-full bg-slate-800 p-2 text-white hover:bg-slate-700"
+                            className="absolute -top-2 -right-2 rounded-full bg-secondary p-2 text-foreground hover:bg-muted"
                         >
                             ✕
                         </button>

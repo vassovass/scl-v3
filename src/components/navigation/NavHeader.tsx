@@ -352,7 +352,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
 
                 {/* Loading skeleton during auth initialization */}
                 {loading && locationConfig.showSignIn && (
-                    <div className="h-10 w-20 animate-pulse bg-gray-200 dark:bg-gray-700 rounded-lg" />
+                    <div className="h-10 w-20 animate-pulse bg-muted rounded-lg" />
                 )}
 
                 {/* Sign in button - only show after loading completes */}
@@ -403,7 +403,7 @@ export function NavHeader({ location: locationOverride, variant = 'default' }: N
 
                         {/* Loading skeleton during auth initialization */}
                         {loading && (
-                            <div className="mt-4 h-12 animate-pulse bg-gray-200 dark:bg-gray-700 rounded-lg mx-4" />
+                            <div className="mt-4 h-12 animate-pulse bg-muted rounded-lg mx-4" />
                         )}
 
                         {/* Sign in button - only show after loading completes */}

@@ -2,6 +2,7 @@
 
 import { SettingsLayout, SettingsSection, SettingsSelect, SettingsRadioGroup } from "@/components/settings";
 import { usePreferences } from "@/hooks/usePreferences";
+import { useUserTheme } from "@/hooks/useUserTheme";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useEffect, useState } from "react";
 
@@ -14,6 +15,7 @@ const NAV_ITEMS = [
 export default function PreferencesPage() {
     const { user } = useAuth();
     const { preferences, isLoading, updatePreference } = usePreferences();
+    const { theme: currentTheme, updateTheme } = useUserTheme();
     const [userLeagues, setUserLeagues] = useState<Array<{ value: string; label: string }>>([]);
 
     // Fetch user's leagues for primary league selector
@@ -128,7 +130,7 @@ export default function PreferencesPage() {
                 />
             </SettingsSection>
 
-            {/* Appearance - Commented out until light mode is fully implemented
+            {/* Appearance */}
             <SettingsSection
                 title="Appearance"
                 description="Customize the look and feel"
@@ -136,8 +138,8 @@ export default function PreferencesPage() {
                 <SettingsRadioGroup
                     label="Theme"
                     description="Choose your preferred color scheme"
-                    value={preferences.theme}
-                    onChange={(value) => updatePreference("theme", value as any)}
+                    value={currentTheme || "dark"}
+                    onChange={(value) => updateTheme(value as "dark" | "light" | "system")}
                     options={[
                         { value: "dark", label: "Dark", description: "Dark theme" },
                         { value: "light", label: "Light", description: "Light theme" },
@@ -145,7 +147,6 @@ export default function PreferencesPage() {
                     ]}
                 />
             </SettingsSection>
-            */}
         </SettingsLayout>
     );
 }

@@ -222,7 +222,7 @@ export function ImagePasteZone({
           p-6 rounded-xl border-2 border-dashed transition-all cursor-pointer
           ${isDragOver
                         ? 'border-primary bg-primary/10'
-                        : 'border-slate-600 hover:border-slate-500 bg-slate-800/30 hover:bg-slate-800/50'
+                        : 'border-border hover:border-muted-foreground/50 bg-secondary/30 hover:bg-secondary/50'
                     }
           ${disabled || isUploading ? 'opacity-50 cursor-not-allowed' : ''}
         `}
@@ -231,21 +231,21 @@ export function ImagePasteZone({
                 {isUploading ? (
                     <>
                         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                        <span className="text-sm text-slate-400">Uploading...</span>
+                        <span className="text-sm text-muted-foreground">Uploading...</span>
                     </>
                 ) : (
                     <>
-                        <div className="flex items-center gap-4 text-slate-500">
+                        <div className="flex items-center gap-4 text-muted-foreground">
                             <span className="text-2xl">📋</span>
                             <span className="text-xl">+</span>
                             <span className="text-2xl">📁</span>
                         </div>
                         <div className="text-center">
-                            <p className="text-sm text-slate-300">
+                            <p className="text-sm text-foreground">
                                 <span className="font-medium text-primary">Paste</span> an image or{' '}
                                 <span className="font-medium text-primary">drag & drop</span>
                             </p>
-                            <p className="text-xs text-slate-500 mt-1">
+                            <p className="text-xs text-muted-foreground mt-1">
                                 Ctrl+V / Cmd+V • Max {MAX_FILE_SIZE_DISPLAY}
                             </p>
                         </div>

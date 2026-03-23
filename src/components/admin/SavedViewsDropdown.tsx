@@ -128,7 +128,7 @@ export default function SavedViewsDropdown({
                 aria-haspopup="menu"
                 aria-expanded={isOpen ? "true" : "false"}
                 aria-controls="saved-views-menu"
-                className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-slate-200 hover:border-slate-600 hover:bg-slate-800 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 transition"
+                className="flex items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-2 text-sm text-foreground hover:border-border/80 hover:bg-card focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 transition"
             >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 4h14M5 8h14M5 12h14M5 16h8M5 20h8" />
@@ -144,12 +144,12 @@ export default function SavedViewsDropdown({
                 <div
                     id="saved-views-menu"
                     role="menu"
-                    className="absolute left-0 top-full mt-2 w-72 rounded-lg border border-slate-700 bg-slate-900 shadow-xl z-50 animate-fade-in"
+                    className="absolute left-0 top-full mt-2 w-72 rounded-lg border border-border bg-card shadow-xl z-50 animate-fade-in"
                 >
                     {/* Preset Views */}
                     {presetViews.length > 0 && (
-                        <div className="border-b border-slate-800">
-                            <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        <div className="border-b border-border">
+                            <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Presets
                             </div>
                             {presetViews.map((view) => (
@@ -157,7 +157,7 @@ export default function SavedViewsDropdown({
                                     key={view.id}
                                     role="menuitem"
                                     onClick={() => handleApplyView(view)}
-                                    className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-slate-800 focus:bg-slate-800 focus:outline-none transition ${activeViewId === view.id ? 'bg-sky-500/10 text-sky-400' : 'text-slate-300'
+                                    className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-secondary focus:bg-secondary focus:outline-none transition ${activeViewId === view.id ? 'bg-sky-500/10 text-sky-400' : 'text-foreground'
                                         }`}
                                     tabIndex={0}
                                 >
@@ -172,8 +172,8 @@ export default function SavedViewsDropdown({
 
                     {/* User Views */}
                     {userViews.length > 0 && (
-                        <div className="border-b border-slate-800">
-                            <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        <div className="border-b border-border">
+                            <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Your Views
                             </div>
                             {userViews.map((view) => (
@@ -181,7 +181,7 @@ export default function SavedViewsDropdown({
                                     key={view.id}
                                     role="menuitem"
                                     onClick={() => handleApplyView(view)}
-                                    className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-slate-800 focus:bg-slate-800 focus:outline-none transition group ${activeViewId === view.id ? 'bg-sky-500/10 text-sky-400' : 'text-slate-300'
+                                    className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-secondary focus:bg-secondary focus:outline-none transition group ${activeViewId === view.id ? 'bg-sky-500/10 text-sky-400' : 'text-foreground'
                                         }`}
                                     tabIndex={0}
                                 >
@@ -191,7 +191,7 @@ export default function SavedViewsDropdown({
                                     </span>
                                     <button
                                         onClick={(e) => handleDeleteView(e, view.id)}
-                                        className="opacity-0 group-hover:opacity-100 ml-2 p-1 rounded hover:bg-red-500/20 text-slate-500 hover:text-red-400 transition"
+                                        className="opacity-0 group-hover:opacity-100 ml-2 p-1 rounded hover:bg-red-500/20 text-muted-foreground hover:text-red-400 transition"
                                         aria-label={`Delete ${view.name}`}
                                         tabIndex={-1}
                                     >
@@ -209,7 +209,7 @@ export default function SavedViewsDropdown({
                         <button
                             onClick={handleSaveView}
                             role="menuitem"
-                            className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-sky-400 hover:bg-slate-800 focus:bg-slate-800 focus:outline-none transition"
+                            className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-sky-400 hover:bg-secondary focus:bg-secondary focus:outline-none transition"
                             tabIndex={0}
                         >
                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -218,7 +218,7 @@ export default function SavedViewsDropdown({
                             <span>Save Current View...</span>
                         </button>
                     ) : (
-                        <div className="p-3 border-t border-slate-800">
+                        <div className="p-3 border-t border-border">
                             <input
                                 ref={saveInputRef}
                                 type="text"
@@ -233,7 +233,7 @@ export default function SavedViewsDropdown({
                                     }
                                 }}
                                 placeholder="View name..."
-                                className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 mb-2"
+                                className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 mb-2"
                                 maxLength={50}
                             />
                             {saveError && (
@@ -252,7 +252,7 @@ export default function SavedViewsDropdown({
                                         setNewViewName("");
                                         setSaveError("");
                                     }}
-                                    className="flex-1 rounded-lg bg-slate-700 px-3 py-1.5 text-sm font-medium text-slate-200 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-500 transition"
+                                    className="flex-1 rounded-lg bg-secondary px-3 py-1.5 text-sm font-medium text-foreground hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-border transition"
                                 >
                                     Cancel
                                 </button>

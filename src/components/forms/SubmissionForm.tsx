@@ -626,7 +626,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                                     type="checkbox"
                                     checked={overwrite}
                                     onChange={(e) => setOverwrite(e.target.checked)}
-                                    className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-primary focus:ring-primary"
+                                    className="h-4 w-4 rounded border-border bg-background text-primary focus:ring-primary"
                                 />
                                 <label htmlFor="submission-overwrite" className="text-sm text-primary font-medium cursor-pointer">
                                     Overwrite existing submission

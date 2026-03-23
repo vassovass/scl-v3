@@ -79,12 +79,12 @@ export default function FeedbackPage() {
     };
 
     return (
-        <main className="min-h-screen bg-slate-950 text-slate-300">
+        <main className="min-h-screen bg-background text-muted-foreground">
             <div className="mx-auto max-w-2xl px-6 py-12">
                 <Link href="/" className="text-sm text-sky-400 hover:text-sky-300">← Back to Home</Link>
 
-                <h1 className="mt-8 text-3xl font-bold text-slate-100">Send Feedback</h1>
-                <p className="mt-2 text-slate-400">
+                <h1 className="mt-8 text-3xl font-bold text-foreground">Send Feedback</h1>
+                <p className="mt-2 text-muted-foreground">
                     Help us improve! Report bugs, suggest features, or share your thoughts.
                 </p>
 
@@ -95,7 +95,7 @@ export default function FeedbackPage() {
                         <p className="mt-2 text-emerald-200/80">Your feedback has been submitted successfully.</p>
                         <button
                             onClick={() => setStatus("idle")}
-                            className="mt-6 rounded-lg bg-slate-800 px-6 py-2 text-sm hover:bg-slate-700"
+                            className="mt-6 rounded-lg bg-secondary px-6 py-2 text-sm hover:bg-secondary/80"
                         >
                             Submit another
                         </button>
@@ -104,7 +104,7 @@ export default function FeedbackPage() {
                     <form onSubmit={handleSubmit} className="mt-8 space-y-6">
                         {/* Feedback Type */}
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Type</label>
+                            <label className="block text-sm font-medium text-foreground mb-2">Type</label>
                             <div className="flex gap-3">
                                 {(["bug", "feature", "general"] as const).map((t) => (
                                     <button
@@ -116,8 +116,8 @@ export default function FeedbackPage() {
                                                 ? "bg-rose-600/20 text-rose-400 border border-rose-600"
                                                 : t === "feature"
                                                     ? "bg-sky-600/20 text-sky-400 border border-sky-600"
-                                                    : "bg-slate-600/20 text-slate-300 border border-slate-600"
-                                            : "bg-slate-800 text-slate-400 border border-slate-700"
+                                                    : "bg-secondary/20 text-foreground border border-border"
+                                            : "bg-secondary text-muted-foreground border border-border"
                                             }`}
                                     >
                                         {t === "bug" ? "🐛 Bug" : t === "feature" ? "💡 Feature" : "💬 General"}
@@ -128,40 +128,40 @@ export default function FeedbackPage() {
 
                         {/* Email */}
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">
-                                Email <span className="text-slate-500">(for follow-up)</span>
+                            <label className="block text-sm font-medium text-foreground mb-2">
+                                Email <span className="text-muted-foreground">(for follow-up)</span>
                             </label>
                             <input
                                 type="email"
                                 value={form.email}
                                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                                className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-slate-100 focus:border-sky-500 focus:outline-none"
+                                className="w-full rounded-lg border border-border bg-card px-4 py-2 text-foreground focus:border-primary focus:outline-none"
                                 placeholder="your@email.com"
                             />
                         </div>
 
                         {/* Subject */}
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Subject *</label>
+                            <label className="block text-sm font-medium text-foreground mb-2">Subject *</label>
                             <input
                                 type="text"
                                 required
                                 value={form.subject}
                                 onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                                className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-slate-100 focus:border-sky-500 focus:outline-none"
+                                className="w-full rounded-lg border border-border bg-card px-4 py-2 text-foreground focus:border-primary focus:outline-none"
                                 placeholder="Brief summary of your feedback"
                             />
                         </div>
 
                         {/* Description */}
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Description *</label>
+                            <label className="block text-sm font-medium text-foreground mb-2">Description *</label>
                             <textarea
                                 required
                                 rows={5}
                                 value={form.description}
                                 onChange={(e) => setForm({ ...form, description: e.target.value })}
-                                className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-slate-100 focus:border-sky-500 focus:outline-none resize-none"
+                                className="w-full rounded-lg border border-border bg-card px-4 py-2 text-foreground focus:border-primary focus:outline-none resize-none"
                                 placeholder={
                                     form.type === "bug"
                                         ? "What happened? What did you expect? Steps to reproduce..."
@@ -174,12 +174,12 @@ export default function FeedbackPage() {
 
                         {/* Screenshot Upload */}
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">
-                                Screenshot <span className="text-slate-500">(optional)</span>
+                            <label className="block text-sm font-medium text-foreground mb-2">
+                                Screenshot <span className="text-muted-foreground">(optional)</span>
                             </label>
                             <div
                                 onClick={() => fileInputRef.current?.click()}
-                                className="border-2 border-dashed border-slate-700 rounded-lg p-6 text-center cursor-pointer hover:border-slate-600 transition"
+                                className="border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-muted-foreground transition"
                             >
                                 {previewUrl ? (
                                     <div className="relative">
@@ -191,7 +191,7 @@ export default function FeedbackPage() {
                                                 setForm({ ...form, screenshot: null });
                                                 setPreviewUrl(null);
                                             }}
-                                            className="absolute top-2 right-2 bg-slate-900/80 rounded-full p-1 hover:bg-slate-800"
+                                            className="absolute top-2 right-2 bg-card/80 rounded-full p-1 hover:bg-secondary"
                                         >
                                             ✕
                                         </button>
@@ -199,8 +199,8 @@ export default function FeedbackPage() {
                                 ) : (
                                     <>
                                         <span className="text-3xl">📷</span>
-                                        <p className="mt-2 text-sm text-slate-400">Click to upload a screenshot</p>
-                                        <p className="text-xs text-slate-500">PNG, JPG up to 5MB</p>
+                                        <p className="mt-2 text-sm text-muted-foreground">Click to upload a screenshot</p>
+                                        <p className="text-xs text-muted-foreground">PNG, JPG up to 5MB</p>
                                     </>
                                 )}
                             </div>
@@ -224,7 +224,7 @@ export default function FeedbackPage() {
                         <button
                             type="submit"
                             disabled={status === "submitting"}
-                            className="w-full rounded-lg bg-sky-600 py-3 font-medium text-white hover:bg-sky-500 disabled:opacity-50 transition"
+                            className="w-full rounded-lg bg-primary py-3 font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition"
                         >
                             {status === "submitting" ? "Submitting..." : "Submit Feedback"}
                         </button>

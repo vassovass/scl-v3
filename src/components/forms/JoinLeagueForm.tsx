@@ -64,7 +64,7 @@ export function JoinLeagueForm({ prefilledCode = "" }: JoinLeagueFormProps) {
             )}
 
             <div>
-                <label htmlFor="code" className="block text-sm font-medium text-slate-300 sr-only">
+                <label htmlFor="code" className="block text-sm font-medium text-muted-foreground sr-only">
                     Invite Code
                 </label>
                 <input
@@ -74,7 +74,7 @@ export function JoinLeagueForm({ prefilledCode = "" }: JoinLeagueFormProps) {
                     onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
                     required
                     placeholder="ABC123"
-                    className="mt-1 block w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-center text-2xl font-mono tracking-widest text-slate-50 uppercase placeholder:text-slate-600 focus:border-primary focus:outline-none"
+                    className="mt-1 block w-full rounded-lg border border-border bg-background px-4 py-3 text-center text-2xl font-mono tracking-widest text-foreground uppercase placeholder:text-muted-foreground focus:border-primary focus:outline-none"
                     maxLength={10}
                 />
             </div>

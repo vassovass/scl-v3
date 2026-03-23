@@ -332,7 +332,7 @@ export default function ClaimPage() {
                         <button
                             onClick={() => setShowConfirm(true)}
                             disabled={claiming}
-                            className="w-full py-3 rounded-lg bg-primary text-white font-semibold hover:bg-primary/90 transition disabled:opacity-50"
+                            className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition disabled:opacity-50"
                         >
                             {claiming ? "Claiming..." : "Claim This Profile"}
                         </button>

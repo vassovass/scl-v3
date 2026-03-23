@@ -24,8 +24,8 @@ export function RulesSettings({ league, onChange, disabled }: RulesSettingsProps
     }) => (
         <div className="flex items-start justify-between gap-4 py-3">
             <div>
-                <p className="font-medium text-slate-300">{label}</p>
-                <p className="text-xs text-slate-500 mt-0.5">{description}</p>
+                <p className="font-medium text-muted-foreground">{label}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
             </div>
             <button
                 type="button"
@@ -33,7 +33,7 @@ export function RulesSettings({ league, onChange, disabled }: RulesSettingsProps
                 aria-checked={checked}
                 onClick={() => !disabled && onToggle(!checked)}
                 disabled={disabled}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${checked ? "bg-sky-500" : "bg-slate-700"
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${checked ? "bg-sky-500" : "bg-secondary"
                     } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
             >
                 <span className="sr-only">Use setting</span>
@@ -50,7 +50,7 @@ export function RulesSettings({ league, onChange, disabled }: RulesSettingsProps
             title="League Rules & Visibility"
             description="Set permissions for submissions and privacy."
         >
-            <div className="divide-y divide-slate-800/50">
+            <div className="divide-y divide-border">
                 <Toggle
                     label="Allow Manual Entry"
                     description="If disabled, members cannot manually type their step counts and must use verified upload methods (if available)."

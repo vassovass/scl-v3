@@ -140,31 +140,31 @@ export function BatchConflictTable({
                     {conflicts.length} {conflicts.length === 1 ? "Conflict" : "Conflicts"} Found
                 </h3>
             </div>
-            <p className="mb-4 text-sm text-slate-400">
+            <p className="mb-4 text-sm text-muted-foreground">
                 Select which data to keep for each date. Rows with new screenshots are pre-selected to use the new value.
             </p>
 
             {/* Bulk Actions - shown when rows selected */}
             {someSelected && (
-                <div className="mb-4 flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 p-2">
-                    <span className="text-sm text-slate-400">
+                <div className="mb-4 flex items-center gap-2 rounded-lg border border-border bg-secondary p-2">
+                    <span className="text-sm text-muted-foreground">
                         {selectedRows.size} selected:
                     </span>
                     <button
                         onClick={() => applyBulkAction("keep_existing")}
-                        className="rounded-md bg-slate-700 px-3 py-1 text-xs font-medium text-slate-300 transition hover:bg-slate-600"
+                        className="rounded-md bg-muted px-3 py-1 text-xs font-medium text-muted-foreground transition hover:bg-muted/80"
                     >
                         Keep All Existing
                     </button>
                     <button
                         onClick={() => applyBulkAction("use_incoming")}
-                        className="rounded-md bg-slate-700 px-3 py-1 text-xs font-medium text-slate-300 transition hover:bg-slate-600"
+                        className="rounded-md bg-muted px-3 py-1 text-xs font-medium text-muted-foreground transition hover:bg-muted/80"
                     >
                         Use All New
                     </button>
                     <button
                         onClick={() => applyBulkAction("skip")}
-                        className="rounded-md bg-slate-700 px-3 py-1 text-xs font-medium text-slate-300 transition hover:bg-slate-600"
+                        className="rounded-md bg-muted px-3 py-1 text-xs font-medium text-muted-foreground transition hover:bg-muted/80"
                     >
                         Skip All
                     </button>
@@ -172,25 +172,25 @@ export function BatchConflictTable({
             )}
 
             {/* Table */}
-            <div className="overflow-hidden rounded-lg border border-slate-700">
+            <div className="overflow-hidden rounded-lg border border-border">
                 <table className="w-full text-sm">
-                    <thead className="bg-slate-800">
+                    <thead className="bg-secondary">
                         <tr>
                             <th className="w-10 px-3 py-2">
                                 <input
                                     type="checkbox"
                                     checked={allSelected}
                                     onChange={toggleAll}
-                                    className="rounded border-slate-600 bg-slate-700 text-primary focus:ring-primary"
+                                    className="rounded border-border bg-muted text-primary focus:ring-primary"
                                 />
                             </th>
-                            <th className="px-3 py-2 text-left font-medium text-slate-400">Date</th>
-                            <th className="px-3 py-2 text-right font-medium text-slate-400">Existing</th>
-                            <th className="px-3 py-2 text-right font-medium text-slate-400">New</th>
-                            <th className="px-3 py-2 text-left font-medium text-slate-400">Action</th>
+                            <th className="px-3 py-2 text-left font-medium text-muted-foreground">Date</th>
+                            <th className="px-3 py-2 text-right font-medium text-muted-foreground">Existing</th>
+                            <th className="px-3 py-2 text-right font-medium text-muted-foreground">New</th>
+                            <th className="px-3 py-2 text-left font-medium text-muted-foreground">Action</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-700">
+                    <tbody className="divide-y divide-border">
                         {conflicts.map(conflict => {
                             const existingHasProof = !!conflict.existing.proof_path;
                             const existingVerified = conflict.existing.verified === true;
@@ -202,7 +202,7 @@ export function BatchConflictTable({
                                     key={conflict.date}
                                     className={`transition ${selectedRows.has(conflict.date)
                                             ? "bg-primary/10"
-                                            : "hover:bg-slate-800/50"
+                                            : "hover:bg-secondary/50"
                                         }`}
                                 >
                                     <td className="px-3 py-2">
@@ -210,17 +210,17 @@ export function BatchConflictTable({
                                             type="checkbox"
                                             checked={selectedRows.has(conflict.date)}
                                             onChange={() => toggleRow(conflict.date)}
-                                            className="rounded border-slate-600 bg-slate-700 text-primary focus:ring-primary"
+                                            className="rounded border-border bg-muted text-primary focus:ring-primary"
                                         />
                                     </td>
-                                    <td className="px-3 py-2 font-medium text-slate-200">
+                                    <td className="px-3 py-2 font-medium text-foreground">
                                         {formatDate(conflict.date)}
                                     </td>
                                     <td className="px-3 py-2 text-right">
                                         <div className="flex items-center justify-end gap-1">
                                             <span className={`font-mono ${action === "keep_existing"
                                                     ? "text-emerald-400"
-                                                    : "text-slate-400"
+                                                    : "text-muted-foreground"
                                                 }`}>
                                                 {conflict.existing.steps.toLocaleString()}
                                             </span>
@@ -236,7 +236,7 @@ export function BatchConflictTable({
                                         <div className="flex items-center justify-end gap-1">
                                             <span className={`font-mono ${action === "use_incoming"
                                                     ? "text-emerald-400"
-                                                    : "text-slate-400"
+                                                    : "text-muted-foreground"
                                                 }`}>
                                                 {conflict.incoming.steps.toLocaleString()}
                                             </span>
@@ -252,7 +252,7 @@ export function BatchConflictTable({
                                                 ...prev,
                                                 [conflict.date]: e.target.value as ConflictAction,
                                             }))}
-                                            className="rounded-md border border-slate-600 bg-slate-700 px-2 py-1 text-xs text-slate-200 focus:border-primary focus:outline-none"
+                                            className="rounded-md border border-border bg-muted px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
                                         >
                                             <option value="keep_existing">Keep Existing</option>
                                             <option value="use_incoming">Use New</option>
@@ -267,27 +267,27 @@ export function BatchConflictTable({
             </div>
 
             {/* Legend */}
-            <div className="mt-3 flex items-center gap-4 text-xs text-slate-500">
+            <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
                 <span><span className="text-emerald-400">✓</span> = Verified</span>
                 <span><span className="text-[hsl(var(--info))]">📷</span> = Has Screenshot</span>
             </div>
 
             {/* Summary */}
-            <div className="mt-4 rounded-lg border border-slate-700 bg-slate-800/50 p-3 text-sm">
-                <span className="text-slate-400">Summary: </span>
+            <div className="mt-4 rounded-lg border border-border bg-secondary/50 p-3 text-sm">
+                <span className="text-muted-foreground">Summary: </span>
                 {summary.keep_existing > 0 && (
-                    <span className="text-slate-300">
+                    <span className="text-foreground">
                         {summary.keep_existing} keep existing
                     </span>
                 )}
                 {summary.use_incoming > 0 && (
-                    <span className="text-slate-300">
+                    <span className="text-foreground">
                         {summary.keep_existing > 0 ? ", " : ""}
                         {summary.use_incoming} use new
                     </span>
                 )}
                 {summary.skip > 0 && (
-                    <span className="text-slate-300">
+                    <span className="text-foreground">
                         {(summary.keep_existing > 0 || summary.use_incoming > 0) ? ", " : ""}
                         {summary.skip} skip
                     </span>
@@ -299,14 +299,14 @@ export function BatchConflictTable({
                 <button
                     onClick={onCancel}
                     disabled={isLoading}
-                    className="rounded-lg border border-slate-600 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-slate-800 disabled:opacity-50"
+                    className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition hover:bg-secondary disabled:opacity-50"
                 >
                     Cancel
                 </button>
                 <button
                     onClick={handleSubmit}
                     disabled={isLoading}
-                    className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary/90 disabled:opacity-50"
+                    className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50"
                 >
                     {isLoading ? "Applying..." : "Apply Selections"}
                 </button>

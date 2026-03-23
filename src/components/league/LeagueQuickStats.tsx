@@ -21,7 +21,7 @@ export function LeagueQuickStats({
     const getRankBadgeColor = (rank: number | null) => {
         if (!rank) return "text-muted-foreground";
         if (rank === 1) return "text-yellow-500";
-        if (rank === 2) return "text-slate-300";
+        if (rank === 2) return "text-muted-foreground";
         if (rank === 3) return "text-amber-600";
         return "text-primary";
     };

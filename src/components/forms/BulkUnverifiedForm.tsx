@@ -139,8 +139,8 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
     // Show results view after submission
     if (result) {
         return (
-            <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-6">
-                <h3 className="text-lg font-semibold text-slate-100">Submission Complete</h3>
+            <div className="rounded-lg border border-border bg-secondary/50 p-6">
+                <h3 className="text-lg font-semibold text-foreground">Submission Complete</h3>
 
                 <div className="mt-4 space-y-3">
                     {/* Success count */}
@@ -155,7 +155,7 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
 
                     {/* Skipped count */}
                     {result.skipped > 0 && (
-                        <div className="flex items-center gap-2 text-slate-400">
+                        <div className="flex items-center gap-2 text-muted-foreground">
                             <span className="text-lg">○</span>
                             <span>
                                 {result.skipped} {result.skipped === 1 ? "entry" : "entries"} skipped (already exists)
@@ -170,14 +170,14 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
                                 <span>⚠️</span>
                                 Conflicts with Verified Submissions
                             </h4>
-                            <p className="mt-1 text-sm text-slate-300">
+                            <p className="mt-1 text-sm text-muted-foreground">
                                 The following dates already have verified submissions and were not overwritten:
                             </p>
-                            <ul className="mt-2 space-y-1 text-sm text-slate-400">
+                            <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
                                 {result.conflicts.map((c, i) => (
                                     <li key={i}>
                                         <span className="font-mono">{c.date}</span>
-                                        <span className="text-slate-500"> — existing: </span>
+                                        <span className="text-muted-foreground"> — existing: </span>
                                         <span className="font-medium text-emerald-400">{c.existing_steps.toLocaleString()} steps (verified)</span>
                                     </li>
                                 ))}
@@ -192,11 +192,11 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
                                 <span>✗</span>
                                 Some entries could not be submitted
                             </h4>
-                            <ul className="mt-2 space-y-1 text-sm text-slate-400">
+                            <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
                                 {result.errors.map((e, i) => (
                                     <li key={i}>
                                         <span className="font-mono">{e.date}</span>
-                                        <span className="text-slate-500"> — </span>
+                                        <span className="text-muted-foreground"> — </span>
                                         <span className="text-rose-300">{e.reason}</span>
                                     </li>
                                 ))}
@@ -216,20 +216,20 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
     }
 
     return (
-        <form onSubmit={handleSubmit} className="rounded-lg border border-slate-700 bg-slate-800/50 p-6">
+        <form onSubmit={handleSubmit} className="rounded-lg border border-border bg-secondary/50 p-6">
             {/* Reason field */}
             <div className="mb-6">
-                <label className="block text-sm font-medium text-slate-300">
+                <label className="block text-sm font-medium text-foreground">
                     Reason for Manual Entry <span className="text-rose-400">*</span>
                 </label>
-                <p className="mt-1 text-xs text-slate-500">
+                <p className="mt-1 text-xs text-muted-foreground">
                     This will be visible to league administrators.
                 </p>
                 <textarea
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
                     placeholder="e.g., Forgot to submit last week, tracking app was broken, etc."
-                    className="mt-2 w-full rounded-md border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                    className="mt-2 w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                     rows={2}
                     required
                 />
@@ -238,11 +238,11 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
             {/* Entries table */}
             <div className="mb-4">
                 <div className="flex items-center justify-between">
-                    <label className="block text-sm font-medium text-slate-300">Step Entries</label>
+                    <label className="block text-sm font-medium text-foreground">Step Entries</label>
                     <button
                         type="button"
                         onClick={addRow}
-                        className="rounded-md bg-slate-700 px-3 py-1 text-xs font-medium text-slate-300 transition hover:bg-slate-600"
+                        className="rounded-md bg-muted px-3 py-1 text-xs font-medium text-muted-foreground transition hover:bg-muted/80"
                     >
                         + Add Row
                     </button>
@@ -251,14 +251,14 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
                 <div className="mt-3 space-y-2">
                     {entries.map((entry, index) => (
                         <div key={entry.id} className="flex items-center gap-3">
-                            <span className="w-6 text-center text-sm text-slate-500">{index + 1}.</span>
+                            <span className="w-6 text-center text-sm text-muted-foreground">{index + 1}.</span>
                             <input
                                 id={`bulk-date-${entry.id}`}
                                 name={`bulk-date-${entry.id}`}
                                 type="date"
                                 value={entry.date}
                                 onChange={(e) => updateEntry(entry.id, "date", e.target.value)}
-                                className="rounded-md border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-slate-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                                className="rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                                 required
                             />
                             <input
@@ -269,14 +269,14 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
                                 onChange={(e) => updateEntry(entry.id, "steps", e.target.value)}
                                 placeholder="Steps"
                                 min={1}
-                                className="w-32 rounded-md border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                                className="w-32 rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                                 required
                             />
                             <button
                                 type="button"
                                 onClick={() => removeRow(entry.id)}
                                 disabled={entries.length <= 1}
-                                className="rounded-md px-2 py-1 text-sm text-slate-500 transition hover:text-rose-400 disabled:opacity-30 disabled:hover:text-slate-500"
+                                className="rounded-md px-2 py-1 text-sm text-muted-foreground transition hover:text-rose-400 disabled:opacity-30 disabled:hover:text-muted-foreground"
                             >
                                 ✕
                             </button>

@@ -56,7 +56,7 @@ export function CompetitionSettings({ league, onChange, disabled }: CompetitionS
                         presets={presets}
                     />
                 </div>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                     select <strong>Custom</strong> by picking a specific date from the calendar.
                     Only steps submitted for dates <strong>on or after</strong> this date will count towards the leaderboard.
                     Steps before this date are excluded from league stats but remain in user history.
@@ -66,7 +66,7 @@ export function CompetitionSettings({ league, onChange, disabled }: CompetitionS
 
             {/* Max Members */}
             <div>
-                <label htmlFor="max_members" className="block text-sm font-medium text-slate-300">
+                <label htmlFor="max_members" className="block text-sm font-medium text-muted-foreground">
                     Max Members
                 </label>
                 <div className="relative mt-2">
@@ -77,13 +77,13 @@ export function CompetitionSettings({ league, onChange, disabled }: CompetitionS
                         value={league.max_members || 50}
                         onChange={(e) => onChange({ max_members: parseInt(e.target.value) || 50 })}
                         disabled={disabled}
-                        className="block w-full max-w-xs rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-slate-50 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 disabled:opacity-50 transition"
+                        className="block w-full max-w-xs rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 disabled:opacity-50 transition"
                     />
                     <div className="pointer-events-none absolute inset-y-0 left-[160px] flex items-center pr-4">
                         {/* Adjust positioning or just use text after? Using max-w-xs roughly 320px */}
                     </div>
                 </div>
-                <p className="mt-1 text-xs text-slate-500">
+                <p className="mt-1 text-xs text-muted-foreground">
                     Limit the number of members who can join.
                 </p>
             </div>

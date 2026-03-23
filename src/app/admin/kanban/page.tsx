@@ -77,7 +77,7 @@ export default async function AdminKanbanPage() {
 
     // Legend component for afterContent slot
     const Legend = () => (
-        <div className="text-xs text-slate-500 mt-4 animate-fade-in animate-delay-300">
+        <div className="text-xs text-muted-foreground mt-4 animate-fade-in animate-delay-300">
             <strong>Legend:</strong>{" "}
             <span className="inline-block px-1.5 py-0.5 bg-rose-500/20 text-rose-400 rounded mr-2">Bug</span>
             <span className="inline-block px-1.5 py-0.5 bg-[hsl(var(--warning)/0.2)] text-[hsl(var(--warning))] rounded mr-2">Feature</span>

@@ -51,7 +51,7 @@ export function ShareButton({
         <div className="relative inline-block">
             <button
                 onClick={() => supportsNativeShare ? handleShareClick("native") : setShowMenu(!showMenu)}
-                className={`inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 transition ${className}`}
+                className={`inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-sky-500 transition ${className}`}
             >
                 <span>📤</span>
                 {children || "Share"}
@@ -59,24 +59,24 @@ export function ShareButton({
 
             {/* Fallback dropdown menu */}
             {showMenu && !supportsNativeShare && (
-                <div className="absolute right-0 mt-2 w-48 rounded-lg border border-slate-700 bg-slate-900 shadow-xl z-50">
+                <div className="absolute right-0 mt-2 w-48 rounded-lg border border-border bg-card shadow-xl z-50">
                     <button
                         onClick={() => handleShareClick("whatsapp")}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800 rounded-t-lg"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-secondary rounded-t-lg"
                     >
                         <span className="text-lg">💬</span>
                         WhatsApp
                     </button>
                     <button
                         onClick={() => handleShareClick("x")}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-secondary"
                     >
                         <span className="text-lg font-bold">𝕏</span>
                         X
                     </button>
                     <button
                         onClick={() => handleShareClick("copy")}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800 rounded-b-lg"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-secondary rounded-b-lg"
                     >
                         <span className="text-lg">{copied ? "✓" : "📋"}</span>
                         {copied ? "Copied!" : "Copy Link"}

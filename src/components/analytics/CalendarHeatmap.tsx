@@ -32,8 +32,8 @@ const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 function getCoverageColor(pct: number): string {
-    if (pct === 0) return "bg-slate-800";
-    if (pct < 25) return "bg-slate-700";
+    if (pct === 0) return "bg-secondary";
+    if (pct < 25) return "bg-muted";
     if (pct < 50) return "bg-sky-900";
     if (pct < 75) return "bg-sky-700";
     if (pct < 100) return "bg-emerald-700";
@@ -82,7 +82,7 @@ export function CalendarHeatmap({ leagueId, onDayClick }: CalendarHeatmapProps) 
 
     if (loading) {
         return (
-            <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 text-center text-slate-400">
+            <div className="rounded-xl border border-border bg-card p-6 text-center text-muted-foreground">
                 Loading calendar...
             </div>
         );
@@ -99,21 +99,21 @@ export function CalendarHeatmap({ leagueId, onDayClick }: CalendarHeatmapProps) 
     if (!data) return null;
 
     return (
-        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+        <div className="rounded-xl border border-border bg-card p-4">
             {/* Header with month navigation */}
             <div className="flex items-center justify-between mb-4">
                 <button
                     onClick={() => navigateMonth(-1)}
-                    className="p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-slate-200"
+                    className="p-2 rounded hover:bg-secondary text-muted-foreground hover:text-foreground"
                 >
                     ◀
                 </button>
-                <h3 className="text-lg font-semibold text-slate-100">
+                <h3 className="text-lg font-semibold text-foreground">
                     {monthName} {year}
                 </h3>
                 <button
                     onClick={() => navigateMonth(1)}
-                    className="p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-slate-200"
+                    className="p-2 rounded hover:bg-secondary text-muted-foreground hover:text-foreground"
                 >
                     ▶
                 </button>
@@ -121,28 +121,28 @@ export function CalendarHeatmap({ leagueId, onDayClick }: CalendarHeatmapProps) 
 
             {/* Summary stats */}
             <div className="grid grid-cols-4 gap-2 mb-4 text-center">
-                <div className="p-2 rounded bg-slate-800">
-                    <div className="text-xs text-slate-500">Total</div>
-                    <div className="text-sm font-semibold text-slate-200">{data.summary.total_steps.toLocaleString()}</div>
+                <div className="p-2 rounded bg-secondary">
+                    <div className="text-xs text-muted-foreground">Total</div>
+                    <div className="text-sm font-semibold text-foreground">{data.summary.total_steps.toLocaleString()}</div>
                 </div>
-                <div className="p-2 rounded bg-slate-800">
-                    <div className="text-xs text-slate-500">Avg/Day</div>
-                    <div className="text-sm font-semibold text-slate-200">{data.summary.avg_per_day.toLocaleString()}</div>
+                <div className="p-2 rounded bg-secondary">
+                    <div className="text-xs text-muted-foreground">Avg/Day</div>
+                    <div className="text-sm font-semibold text-foreground">{data.summary.avg_per_day.toLocaleString()}</div>
                 </div>
-                <div className="p-2 rounded bg-slate-800">
-                    <div className="text-xs text-slate-500">Active Days</div>
-                    <div className="text-sm font-semibold text-slate-200">{data.summary.days_with_activity}</div>
+                <div className="p-2 rounded bg-secondary">
+                    <div className="text-xs text-muted-foreground">Active Days</div>
+                    <div className="text-sm font-semibold text-foreground">{data.summary.days_with_activity}</div>
                 </div>
-                <div className="p-2 rounded bg-slate-800">
-                    <div className="text-xs text-slate-500">Coverage</div>
-                    <div className="text-sm font-semibold text-slate-200">{data.summary.coverage_pct}%</div>
+                <div className="p-2 rounded bg-secondary">
+                    <div className="text-xs text-muted-foreground">Coverage</div>
+                    <div className="text-sm font-semibold text-foreground">{data.summary.coverage_pct}%</div>
                 </div>
             </div>
 
             {/* Weekday headers */}
             <div className="grid grid-cols-7 gap-0.5 mb-0.5">
                 {WEEKDAYS.map((day) => (
-                    <div key={day} className="text-center text-[10px] text-slate-500 py-0.5">
+                    <div key={day} className="text-center text-[10px] text-muted-foreground py-0.5">
                         {day.charAt(0)}
                     </div>
                 ))}
@@ -163,17 +163,17 @@ export function CalendarHeatmap({ leagueId, onDayClick }: CalendarHeatmapProps) 
                         title={`${day.date}: ${day.submitted_count}/${day.total_members} submitted (${day.coverage_pct}%)`}
                         className={`h-6 sm:h-8 w-full rounded-sm text-[10px] sm:text-xs transition hover:ring-1 hover:ring-sky-500 flex items-center justify-center ${getCoverageColor(day.coverage_pct)}`}
                     >
-                        <span className="text-slate-300 font-medium">{day.day_of_month}</span>
+                        <span className="text-muted-foreground font-medium">{day.day_of_month}</span>
                     </button>
                 ))}
             </div>
 
             {/* Legend */}
-            <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-500">
+            <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
                 <span>Less</span>
                 <div className="flex gap-1">
-                    <div className="w-3 h-3 rounded bg-slate-800" />
-                    <div className="w-3 h-3 rounded bg-slate-700" />
+                    <div className="w-3 h-3 rounded bg-secondary" />
+                    <div className="w-3 h-3 rounded bg-muted" />
                     <div className="w-3 h-3 rounded bg-sky-900" />
                     <div className="w-3 h-3 rounded bg-sky-700" />
                     <div className="w-3 h-3 rounded bg-emerald-700" />
