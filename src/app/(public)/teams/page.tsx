@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Link from "next/link";
 import {
   Users,
   Trophy,
@@ -176,6 +177,25 @@ export default function TeamsLandingPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Setup Guide Link */}
+      <section className="py-12 px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <Link href="/workplace-step-challenge" className="group block bg-card border border-border rounded-2xl p-6 lg:p-8 hover:border-primary/50 transition-all">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+              <div className="flex-1">
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  Workplace Step Challenge: Complete Setup Guide
+                </h3>
+                <p className="text-muted-foreground">
+                  Step-by-step setup instructions, platform comparison, goal-setting by role type, engagement tactics, and ROI measurement.
+                </p>
+              </div>
+              <ArrowRight className="h-6 w-6 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
+            </div>
+          </Link>
         </div>
       </section>
 

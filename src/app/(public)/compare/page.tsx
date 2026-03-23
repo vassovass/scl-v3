@@ -86,6 +86,25 @@ export default function ComparePage() {
                 </div>
             </div>
 
+            {/* Related Guides */}
+            <div className="max-w-5xl mx-auto mb-16">
+                <h2 className="text-xl font-bold text-center mb-6">More Guides</h2>
+                <div className="grid sm:grid-cols-3 gap-4">
+                    <Link href="/step-challenge-app" className="group bg-card border border-border rounded-xl p-5 hover:border-primary/50 transition-all">
+                        <h3 className="font-bold mb-1 group-hover:text-primary transition-colors">Best Step Challenge Apps (2026)</h3>
+                        <p className="text-sm text-muted-foreground">Full comparison with pricing, features, and honest tradeoffs</p>
+                    </Link>
+                    <Link href="/walking-challenge-with-friends" className="group bg-card border border-border rounded-xl p-5 hover:border-primary/50 transition-all">
+                        <h3 className="font-bold mb-1 group-hover:text-primary transition-colors">Walking Challenge With Friends</h3>
+                        <p className="text-sm text-muted-foreground">Setup guide, challenge ideas, and motivation tips</p>
+                    </Link>
+                    <Link href="/workplace-step-challenge" className="group bg-card border border-border rounded-xl p-5 hover:border-primary/50 transition-all">
+                        <h3 className="font-bold mb-1 group-hover:text-primary transition-colors">Workplace Step Challenge</h3>
+                        <p className="text-sm text-muted-foreground">HR setup guide, platform comparison, and ROI tracking</p>
+                    </Link>
+                </div>
+            </div>
+
             {/* CTA */}
             <div className="text-center">
                 <Link

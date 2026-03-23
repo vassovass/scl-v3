@@ -4,8 +4,8 @@
 >
 > These PRDs describe WHAT is needed, not HOW to implement. The implementing agent decides the best approach.
 >
-> **Last Updated:** 2026-03-14
-> **Total PRDs:** 68 (64 complete, 0 partial, 1 in-progress, 3 proposed)
+> **Last Updated:** 2026-03-23
+> **Total PRDs:** 69 (64 complete, 0 partial, 1 in-progress, 4 proposed)
 
 ---
 
@@ -171,6 +171,7 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 | 66 | [Fix Broken Tests](./PRD_66_Fix_Broken_Tests.md) | Fix 40 pre-existing test failures (env mocks) | ✅ Complete |
 | 67 | [Artifacts Cleanup](../prd-67-artifacts-cleanup.md) | Organize docs/artifacts/ with naming conventions and archive | 📋 Proposed |
 | 68 | [Database Schema Docs](../prd-68-database-schema-docs.md) | Comprehensive schema documentation from Supabase MCP | 📋 Proposed |
+| 69 | [SEO Content Pages](./PRD_69_SEO_Content_Pages.md) | SEO content marketing pages for organic growth (3 keyword angles) | 📋 Proposed |
 
 ---
 
@@ -269,8 +270,8 @@ Available MCP servers for PRD verification:
 |----------|-------|------|
 | ✅ Complete | 64 | 1-38, 40-48, 50-58, 59-66 |
 | 🔄 In Progress | 1 | 49 |
-| 📋 Proposed | 3 | 67, 68 |
-| **Total** | **68** | |
+| 📋 Proposed | 4 | 67, 68, 69 |
+| **Total** | **69** | |
 
 ---
 
@@ -364,3 +365,4 @@ graph TD
 | 2026-02-27 | PRD 62 (Security Headers & CSP) → ✅ Complete. OWASP baseline headers via `next.config.js` `headers()`. 14 unit tests + E2E. |
 | 2026-03-14 | Added PRD 67 (Artifacts Cleanup) and PRD 68 (Database Schema Docs) from context engineering audit |
 | 2026-03-14 | **Major status correction:** PRDs 59, 61, 63, 66 marked ✅ Complete (code committed but index was stale). Sprints A, B, C all marked complete. Updated counts: 64 complete, 1 in-progress, 3 proposed. |
+| 2026-03-23 | Added PRD 69 (SEO Content Pages) — 3 keyword-angle content marketing pages for organic growth. Updated counts: 4 proposed, 69 total. |
