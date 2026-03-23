@@ -257,6 +257,70 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* === GUIDES SECTION === */}
+      <section className="py-24 bg-muted/20">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
+              Step Challenge Guides
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Everything you need to start and run successful step challenges
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Link
+              href="/step-challenge-app"
+              className="group relative bg-card border border-border rounded-2xl p-6 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
+            >
+              <div className="text-3xl mb-4">📱</div>
+              <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors mb-2">
+                Best Step Challenge Apps
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Compare the top apps for 2026 with honest tradeoffs, pricing, and device compatibility.
+              </p>
+              <span className="mt-4 inline-flex items-center gap-1 text-sm text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                Read guide →
+              </span>
+            </Link>
+
+            <Link
+              href="/walking-challenge-with-friends"
+              className="group relative bg-card border border-border rounded-2xl p-6 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
+            >
+              <div className="text-3xl mb-4">👟</div>
+              <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors mb-2">
+                Walking Challenge With Friends
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Setup guide, challenge format ideas, and tips for keeping your group motivated.
+              </p>
+              <span className="mt-4 inline-flex items-center gap-1 text-sm text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                Read guide →
+              </span>
+            </Link>
+
+            <Link
+              href="/workplace-step-challenge"
+              className="group relative bg-card border border-border rounded-2xl p-6 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
+            >
+              <div className="text-3xl mb-4">🏢</div>
+              <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors mb-2">
+                Workplace Step Challenge
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                HR setup guide with platform comparison, engagement tactics, and ROI tracking.
+              </p>
+              <span className="mt-4 inline-flex items-center gap-1 text-sm text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                Read guide →
+              </span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* === FINAL CTA === */}
       <section className="py-24 relative overflow-hidden">
         {/* Background effects */}

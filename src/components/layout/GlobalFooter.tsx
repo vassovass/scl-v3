@@ -13,13 +13,14 @@ export function GlobalFooter() {
     const { menus } = useMenuConfig();
 
     const navigationItems = menus.footerNavigation?.items || [];
+    const guidesItems = menus.footerGuides?.items || [];
     const accountItems = menus.footerAccount?.items || [];
     const legalItems = menus.footerLegal?.items || [];
 
     return (
         <footer className="border-t border-border bg-background mt-auto">
             <div className="mx-auto max-w-6xl px-4 py-8">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
                     {/* Brand */}
                     <div className="col-span-2 md:col-span-1">
                         <Logo size="sm" />
@@ -35,6 +36,27 @@ export function GlobalFooter() {
                         </h4>
                         <ul className="space-y-2">
                             {navigationItems.map(item => (
+                                <li key={item.id}>
+                                    <Link
+                                        href={item.href || '#'}
+                                        className="text-sm text-muted-foreground hover:text-primary transition"
+                                        data-module-id={`footer-${item.id}`}
+                                        data-module-name={item.label}
+                                    >
+                                        {item.label}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Guides Column */}
+                    <div>
+                        <h4 className="text-sm font-medium text-foreground mb-3">
+                            Guides
+                        </h4>
+                        <ul className="space-y-2">
+                            {guidesItems.map(item => (
                                 <li key={item.id}>
                                     <Link
                                         href={item.href || '#'}

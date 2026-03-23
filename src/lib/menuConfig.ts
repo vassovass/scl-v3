@@ -339,6 +339,20 @@ export const FOOTER_NAVIGATION: MenuDefinition = {
 };
 
 /**
+ * Footer guides column - SEO content pages
+ */
+export const FOOTER_GUIDES: MenuDefinition = {
+    id: 'footer-guides',
+    label: 'Guides',
+    items: [
+        { id: 'footer-step-challenge-app', label: 'Best Step Challenge Apps', href: '/step-challenge-app' },
+        { id: 'footer-walking-friends', label: 'Walking Challenge With Friends', href: '/walking-challenge-with-friends' },
+        { id: 'footer-workplace', label: 'Workplace Step Challenge', href: '/workplace-step-challenge' },
+        { id: 'footer-compare', label: 'Compare Apps', href: '/compare' },
+    ]
+};
+
+/**
  * Footer account column
  */
 export const FOOTER_ACCOUNT: MenuDefinition = {
@@ -376,6 +390,18 @@ export const PUBLIC_MENU: MenuDefinition = {
         { id: 'public-how-it-works', label: 'How It Works', href: '/how-it-works', icon: '⚡', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
         { id: 'public-pricing', label: 'Pricing', href: '/pricing', icon: '💎', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
         { id: 'public-teams', label: 'For Teams', href: '/teams', icon: '🏢', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
+        {
+            id: 'public-guides',
+            label: 'Guides',
+            icon: '📖',
+            visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'],
+            children: [
+                { id: 'guide-step-challenge-app', label: 'Best Step Challenge Apps', href: '/step-challenge-app', icon: '📱', description: '2026 comparison guide', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
+                { id: 'guide-walking-friends', label: 'Walking Challenge With Friends', href: '/walking-challenge-with-friends', icon: '👟', description: 'Setup guide & challenge ideas', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
+                { id: 'guide-workplace', label: 'Workplace Step Challenge', href: '/workplace-step-challenge', icon: '🏢', description: 'HR setup & ROI guide', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
+                { id: 'guide-compare', label: 'Compare All Apps', href: '/compare', icon: '⚖️', description: 'Side-by-side comparisons', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
+            ],
+        },
         { id: 'public-roadmap', label: 'Roadmap', href: '/roadmap', icon: '🗺️', visibleTo: ['guest', 'member', 'admin', 'owner', 'superadmin'] },
     ]
 };
@@ -412,6 +438,7 @@ export const MENUS = {
     public: PUBLIC_MENU,
     league_nav: LEAGUE_NAV_MENU,
     footerNavigation: FOOTER_NAVIGATION,
+    footerGuides: FOOTER_GUIDES,
     footerAccount: FOOTER_ACCOUNT,
     footerLegal: FOOTER_LEGAL,
 } as const;
@@ -448,7 +475,7 @@ export const MENU_LOCATIONS: Record<MenuLocation, MenuLocationConfig> = {
         className: 'admin-header',
     },
     footer: {
-        menus: ['footerNavigation', 'footerAccount', 'footerLegal'],
+        menus: ['footerNavigation', 'footerGuides', 'footerAccount', 'footerLegal'],
         showLogo: true,
         showSignIn: false,
         showUserMenu: false,
@@ -477,7 +504,7 @@ export function detectMenuLocation(pathname: string): MenuLocation {
     }
 
     // Public/marketing pages
-    const publicPages = ['/', '/pricing', '/how-it-works', '/how-to-share', '/why-upload', '/compare', '/privacy', '/terms', '/security', '/stage-info', '/beta', '/roadmap', '/feedback'];
+    const publicPages = ['/', '/pricing', '/how-it-works', '/how-to-share', '/why-upload', '/compare', '/privacy', '/terms', '/security', '/stage-info', '/beta', '/roadmap', '/feedback', '/step-challenge-app', '/walking-challenge-with-friends', '/workplace-step-challenge'];
     if (publicPages.includes(pathname) || publicPages.some(p => pathname === p) || pathname.startsWith('/teams')) {
         return 'public_header';
     }
