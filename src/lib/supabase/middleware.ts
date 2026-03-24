@@ -106,7 +106,7 @@ export async function updateSession(request: NextRequest) {
     const secure = request.nextUrl.protocol === "https:";
     const common = {
       path: "/",
-      httpOnly: true,
+      httpOnly: false, // MUST be false — browser Supabase SDK needs to read auth cookies via document.cookie
       sameSite: "lax" as const,
       secure,
       maxAge: 60 * 60 * 24 * 7, // 7 days

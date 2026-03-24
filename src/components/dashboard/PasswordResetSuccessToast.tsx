@@ -1,13 +1,19 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
-export function PasswordResetSuccessToast() {
+/**
+ * Inner component that reads search params.
+ * Must be wrapped in Suspense per hooks rule:
+ * "useSearchParams — any component using it MUST be wrapped in <Suspense>"
+ */
+function PasswordResetSuccessToastInner() {
   const { toast } = useToast();
   const searchParams = useSearchParams();
-  const passwordUpdated = searchParams.get("password_updated") === "true";
+  // Null-safe: useSearchParams() can return null during SSR/pre-rendering
+  const passwordUpdated = searchParams?.get("password_updated") === "true";
 
   useEffect(() => {
     if (passwordUpdated) {
@@ -25,4 +31,12 @@ export function PasswordResetSuccessToast() {
   }, [passwordUpdated, toast]);
 
   return null;
+}
+
+export function PasswordResetSuccessToast() {
+  return (
+    <Suspense fallback={null}>
+      <PasswordResetSuccessToastInner />
+    </Suspense>
+  );
 }
