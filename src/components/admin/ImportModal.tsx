@@ -84,13 +84,13 @@ export default function ImportModal<T extends { id?: string }>({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-slate-900 border border-slate-700 rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden flex flex-col">
+            <div className="bg-background border border-border rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden flex flex-col">
                 {/* Header */}
-                <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
-                    <h2 className="text-lg font-semibold text-slate-100">{title}</h2>
+                <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+                    <h2 className="text-lg font-semibold text-foreground">{title}</h2>
                     <button
                         onClick={handleClose}
-                        className="text-slate-500 hover:text-slate-300 transition-colors"
+                        className="text-muted-foreground hover:text-foreground transition-colors"
                     >
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -109,7 +109,7 @@ export default function ImportModal<T extends { id?: string }>({
                                 border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer
                                 ${isDragging
                                     ? 'border-primary bg-primary/10'
-                                    : 'border-slate-700 hover:border-slate-600 bg-slate-800/30'
+                                    : 'border-border hover:border-primary/30 bg-card/30'
                                 }
                             `}
                             onClick={() => fileInputRef.current?.click()}
@@ -125,17 +125,17 @@ export default function ImportModal<T extends { id?: string }>({
                             {isParsing ? (
                                 <div className="flex flex-col items-center gap-3">
                                     <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
-                                    <span className="text-slate-400">Parsing CSV...</span>
+                                    <span className="text-muted-foreground">Parsing CSV...</span>
                                 </div>
                             ) : (
                                 <>
-                                    <svg className="mx-auto h-12 w-12 text-slate-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg className="mx-auto h-12 w-12 text-muted-foreground mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
-                                    <p className="text-slate-300 mb-2">
+                                    <p className="text-foreground mb-2">
                                         Drag and drop a CSV file here
                                     </p>
-                                    <p className="text-sm text-slate-500">
+                                    <p className="text-sm text-muted-foreground">
                                         or click to browse files
                                     </p>
                                 </>
@@ -164,19 +164,19 @@ export default function ImportModal<T extends { id?: string }>({
                     {/* Preview */}
                     {preview && !result && (
                         <div className="mt-4 space-y-4">
-                            <h3 className="text-sm font-medium text-slate-300">Import Preview</h3>
+                            <h3 className="text-sm font-medium text-foreground">Import Preview</h3>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="p-4 bg-[hsl(var(--info)/0.2)] border border-[hsl(var(--info)/0.5)] rounded-lg">
                                     <div className="text-2xl font-bold text-[hsl(var(--info))]">{preview.toUpdate.length}</div>
                                     <div className="text-sm text-[hsl(var(--info))]">Items to Update</div>
-                                    <div className="text-xs text-slate-500 mt-1">Existing items with matching IDs</div>
+                                    <div className="text-xs text-muted-foreground mt-1">Existing items with matching IDs</div>
                                 </div>
 
                                 <div className="p-4 bg-emerald-900/20 border border-emerald-800/50 rounded-lg">
                                     <div className="text-2xl font-bold text-emerald-400">{preview.toCreate.length}</div>
                                     <div className="text-sm text-emerald-300">Items to Create</div>
-                                    <div className="text-xs text-slate-500 mt-1">New items without IDs</div>
+                                    <div className="text-xs text-muted-foreground mt-1">New items without IDs</div>
                                 </div>
                             </div>
 
@@ -202,7 +202,7 @@ export default function ImportModal<T extends { id?: string }>({
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     <h3 className="text-lg font-semibold text-emerald-400 mb-2">Import Complete!</h3>
-                                    <div className="text-sm text-slate-300 space-y-1">
+                                    <div className="text-sm text-foreground space-y-1">
                                         <p>{result.summary.updated} items updated</p>
                                         <p>{result.summary.created} items created</p>
                                         {result.summary.errors > 0 && (
@@ -228,7 +228,7 @@ export default function ImportModal<T extends { id?: string }>({
                 </div>
 
                 {/* Footer */}
-                <div className="px-6 py-4 border-t border-slate-800 flex justify-end gap-3">
+                <div className="px-6 py-4 border-t border-border flex justify-end gap-3">
                     {result ? (
                         <button
                             onClick={handleClose}
@@ -240,7 +240,7 @@ export default function ImportModal<T extends { id?: string }>({
                         <>
                             <button
                                 onClick={handleClose}
-                                className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors"
+                                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                             >
                                 Cancel
                             </button>

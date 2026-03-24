@@ -56,15 +56,15 @@ function FeedbackSkeleton() {
     return (
         <div className="animate-pulse space-y-4">
             {[1, 2, 3].map((i) => (
-                <div key={i} className="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+                <div key={i} className="rounded-xl border border-border bg-background/50 p-5">
                     <div className="flex items-center gap-2 mb-3">
-                        <div className="h-5 w-16 bg-slate-700 rounded" />
-                        <div className="h-5 w-20 bg-slate-700 rounded" />
-                        <div className="h-5 w-24 bg-slate-700 rounded" />
+                        <div className="h-5 w-16 bg-secondary rounded" />
+                        <div className="h-5 w-20 bg-secondary rounded" />
+                        <div className="h-5 w-24 bg-secondary rounded" />
                     </div>
-                    <div className="h-5 w-3/4 bg-slate-700 rounded mb-2" />
-                    <div className="h-4 w-full bg-slate-800 rounded" />
-                    <div className="h-4 w-2/3 bg-slate-800 rounded mt-1" />
+                    <div className="h-5 w-3/4 bg-secondary rounded mb-2" />
+                    <div className="h-4 w-full bg-card rounded" />
+                    <div className="h-4 w-2/3 bg-card rounded mt-1" />
                 </div>
             ))}
         </div>
@@ -283,13 +283,13 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
 
             {/* Select All Header */}
             {!loading && items.length > 0 && (
-                <div className="flex items-center gap-3 text-sm text-slate-400">
-                    <label className="flex items-center gap-2 cursor-pointer hover:text-slate-200 transition">
+                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                    <label className="flex items-center gap-2 cursor-pointer hover:text-foreground transition">
                         <input
                             type="checkbox"
                             checked={selectedIds.size === items.length && items.length > 0}
                             onChange={toggleSelectAll}
-                            className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-primary focus:ring-primary focus:ring-offset-0"
+                            className="w-4 h-4 rounded border-border bg-card text-primary focus:ring-primary focus:ring-offset-0"
                         />
                         Select All ({items.length})
                     </label>
@@ -312,11 +312,11 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                         return (
                             <div
                                 key={item.id}
-                                className={`rounded-xl border bg-slate-900/50 p-5 transition hover:border-slate-700 ${isNew
+                                className={`rounded-xl border bg-background/50 p-5 transition hover:border-border ${isNew
                                     ? "border-[hsl(var(--info)/0.5)] ring-1 ring-[hsl(var(--info)/0.2)]"
                                     : isSelected
                                         ? "border-primary ring-1 ring-primary/30 bg-primary/5"
-                                        : "border-slate-800"
+                                        : "border-border"
                                     } ${isUpdating ? "opacity-60" : ""} cursor-pointer`}
                                 onClick={() => handleOpenDetail(item)}
                             >
@@ -327,7 +327,7 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                                             type="checkbox"
                                             checked={isSelected}
                                             onChange={() => toggleSelection(item.id)}
-                                            className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
+                                            className="w-4 h-4 rounded border-border bg-card text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
                                             onClick={(e) => e.stopPropagation()}
                                         />
 
@@ -346,7 +346,7 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                                             value={item.board_status || "backlog"}
                                             onChange={(e) => changeStatus(item.id, e.target.value)}
                                             disabled={isUpdating}
-                                            className="text-xs uppercase bg-slate-800/80 border border-slate-700 rounded px-2 py-1 text-slate-300 focus:border-primary focus:outline-none cursor-pointer hover:border-slate-600 transition"
+                                            className="text-xs uppercase bg-card/80 border border-border rounded px-2 py-1 text-muted-foreground focus:border-primary focus:outline-none cursor-pointer hover:border-primary/30 transition"
                                             title="Change status"
                                         >
                                             {BOARD_STATUS_OPTIONS.filter(opt => opt.value).map(opt => (
@@ -357,13 +357,13 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                                         </select>
 
                                         {/* Date */}
-                                        <span className="text-xs text-slate-500">
+                                        <span className="text-xs text-muted-foreground">
                                             {new Date(item.created_at).toLocaleDateString()}
                                         </span>
 
                                         {/* User */}
                                         {item.user_id && item.users && (
-                                            <span className="text-xs text-slate-400">
+                                            <span className="text-xs text-muted-foreground">
                                                 by {item.users.display_name || "User"}
                                             </span>
                                         )}
@@ -377,7 +377,7 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                                             disabled={isUpdating}
                                             className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium transition ${item.is_public
                                                 ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-                                                : "bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-300"
+                                                : "bg-secondary/50 text-muted-foreground hover:bg-accent hover:text-foreground"
                                                 }`}
                                             title={item.is_public ? "Remove from roadmap" : "Add to roadmap"}
                                         >
@@ -388,17 +388,17 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
 
                                 {/* Subject */}
                                 {item.subject && (
-                                    <h3 className="mb-2 font-semibold text-slate-200">{item.subject}</h3>
+                                    <h3 className="mb-2 font-semibold text-foreground">{item.subject}</h3>
                                 )}
 
                                 {/* Description */}
-                                <p className="whitespace-pre-wrap text-sm text-slate-300 line-clamp-3">
+                                <p className="whitespace-pre-wrap text-sm text-muted-foreground line-clamp-3">
                                     {item.description}
                                 </p>
 
                                 {/* Page URL */}
                                 {item.page_url && (
-                                    <div className="mt-3 text-xs text-slate-500">
+                                    <div className="mt-3 text-xs text-muted-foreground">
                                         Page:{" "}
                                         <a
                                             href={item.page_url}
@@ -418,7 +418,7 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                                             <summary className="cursor-pointer text-xs font-medium text-primary hover:text-primary/80">
                                                 View Screenshot
                                             </summary>
-                                            <div className="mt-2 overflow-hidden rounded-lg border border-slate-700">
+                                            <div className="mt-2 overflow-hidden rounded-lg border border-border">
                                                 <img
                                                     src={item.screenshot_url}
                                                     alt="Feedback screenshot"
@@ -436,8 +436,8 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                     {items.length === 0 && (
                         <div className="py-12 text-center">
                             <div className="text-4xl mb-3">📭</div>
-                            <p className="text-slate-400 font-medium">No feedback found</p>
-                            <p className="text-sm text-slate-500 mt-1">
+                            <p className="text-muted-foreground font-medium">No feedback found</p>
+                            <p className="text-sm text-muted-foreground mt-1">
                                 {userFeedbackOnly
                                     ? "No user feedback matches your filters."
                                     : "Try adjusting your filters to see more items."}
@@ -453,17 +453,17 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                     <button
                         onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
                         disabled={pagination.page === 1}
-                        className="rounded-lg bg-slate-800 px-3 py-2 text-sm text-slate-300 disabled:opacity-50 hover:bg-slate-700 disabled:hover:bg-slate-800"
+                        className="rounded-lg bg-card px-3 py-2 text-sm text-muted-foreground disabled:opacity-50 hover:bg-accent disabled:hover:bg-card"
                     >
                         Previous
                     </button>
-                    <span className="text-sm text-slate-400">
+                    <span className="text-sm text-muted-foreground">
                         Page {pagination.page} of {totalPages}
                     </span>
                     <button
                         onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
                         disabled={pagination.page >= totalPages}
-                        className="rounded-lg bg-slate-800 px-3 py-2 text-sm text-slate-300 disabled:opacity-50 hover:bg-slate-700 disabled:hover:bg-slate-800"
+                        className="rounded-lg bg-card px-3 py-2 text-sm text-muted-foreground disabled:opacity-50 hover:bg-accent disabled:hover:bg-card"
                     >
                         Next
                     </button>

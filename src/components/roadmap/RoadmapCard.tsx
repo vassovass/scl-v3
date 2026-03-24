@@ -61,8 +61,8 @@ export default function RoadmapCard({ item, isLoggedIn, isCompleted }: RoadmapCa
             <div
                 onClick={handleCardClick}
                 className={`p-4 rounded-xl border transition-all cursor-pointer ${isCompleted
-                    ? "bg-slate-900/30 border-slate-800/50 hover:border-slate-700/50"
-                    : "bg-slate-900/50 border-slate-800 hover:border-slate-700"
+                    ? "bg-background/30 border-border/50 hover:border-border/50"
+                    : "bg-background/50 border-border hover:border-border"
                     }`}
                 title="Click to view details"
             >
@@ -90,7 +90,7 @@ export default function RoadmapCard({ item, isLoggedIn, isCompleted }: RoadmapCa
                         <div className="flex items-center gap-2 mb-1">
                             <Badge category="type" value={item.type} size="sm" />
                             {isCompleted && item.completed_at && (
-                                <span className="text-xs text-slate-500">
+                                <span className="text-xs text-muted-foreground">
                                     {new Date(item.completed_at).toLocaleDateString()}
                                 </span>
                             )}
@@ -102,20 +102,20 @@ export default function RoadmapCard({ item, isLoggedIn, isCompleted }: RoadmapCa
                             )}
                         </div>
 
-                        <h3 className={`font-medium mb-1 ${isCompleted ? "text-slate-400" : "text-slate-200"}`}>
+                        <h3 className={`font-medium mb-1 ${isCompleted ? "text-muted-foreground" : "text-foreground"}`}>
                             {item.subject}
                         </h3>
 
-                        <p className="text-sm text-slate-400 line-clamp-2">{item.description}</p>
+                        <p className="text-sm text-muted-foreground line-clamp-2">{item.description}</p>
 
                         {/* Actions */}
-                        <div className="flex items-center gap-4 mt-3 text-xs text-slate-500">
+                        <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setShowComments(!showComments);
                                 }}
-                                className="hover:text-slate-300 transition-colors"
+                                className="hover:text-foreground transition-colors"
                             >
                                 💬 {item.comment_count} comments
                             </button>
@@ -125,19 +125,19 @@ export default function RoadmapCard({ item, isLoggedIn, isCompleted }: RoadmapCa
 
                 {/* Comments section (placeholder for now) */}
                 {showComments && (
-                    <div className="mt-4 pt-4 border-t border-slate-800" onClick={(e) => e.stopPropagation()}>
-                        <p className="text-sm text-slate-500">Comments coming soon...</p>
+                    <div className="mt-4 pt-4 border-t border-border" onClick={(e) => e.stopPropagation()}>
+                        <p className="text-sm text-muted-foreground">Comments coming soon...</p>
                     </div>
                 )}
             </div>
 
             {/* Detail Modal (View Only) */}
             <Dialog open={showDetailModal} onOpenChange={(open) => !open && setShowDetailModal(false)}>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background border-border">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Badge category="type" value={item.type} size="sm" />
-                            <span className="text-lg font-semibold text-slate-200">{item.subject}</span>
+                            <span className="text-lg font-semibold text-foreground">{item.subject}</span>
                         </DialogTitle>
                     </DialogHeader>
 
@@ -153,11 +153,11 @@ export default function RoadmapCard({ item, isLoggedIn, isCompleted }: RoadmapCa
                                     In Progress
                                 </span>
                             )}
-                            <span className="text-slate-500 text-xs">
+                            <span className="text-muted-foreground text-xs">
                                 Created: {new Date(item.created_at).toLocaleDateString()}
                             </span>
                             {isCompleted && item.completed_at && (
-                                <span className="text-slate-500 text-xs">
+                                <span className="text-muted-foreground text-xs">
                                     Completed: {new Date(item.completed_at).toLocaleDateString()}
                                 </span>
                             )}
@@ -165,15 +165,15 @@ export default function RoadmapCard({ item, isLoggedIn, isCompleted }: RoadmapCa
 
                         {/* Full Description */}
                         <div>
-                            <label className="block text-xs text-slate-500 mb-1">Description</label>
-                            <p className="text-slate-300 whitespace-pre-wrap">
+                            <label className="block text-xs text-muted-foreground mb-1">Description</label>
+                            <p className="text-muted-foreground whitespace-pre-wrap">
                                 {item.description || 'No description'}
                             </p>
                         </div>
 
                         {/* Voting (interactive if logged in) */}
                         {!isCompleted && (
-                            <div className="flex items-center gap-4 p-3 bg-slate-800/50 rounded-lg">
+                            <div className="flex items-center gap-4 p-3 bg-card/50 rounded-lg">
                                 <PriorityVote
                                     feedbackId={item.id}
                                     currentVote={currentVote}
@@ -182,7 +182,7 @@ export default function RoadmapCard({ item, isLoggedIn, isCompleted }: RoadmapCa
                                     isLoggedIn={isLoggedIn}
                                     onVoteUpdate={handleVoteUpdate}
                                 />
-                                <div className="text-sm text-slate-400">
+                                <div className="text-sm text-muted-foreground">
                                     {isLoggedIn
                                         ? "Click to vote on priority"
                                         : "Sign in to vote on priority"}
@@ -193,11 +193,11 @@ export default function RoadmapCard({ item, isLoggedIn, isCompleted }: RoadmapCa
                         {/* Attachments section (view-only) */}
                         {(attachments.length > 0 || isLoadingAttachments) && (
                             <div>
-                                <label className="block text-xs text-slate-500 mb-2">
+                                <label className="block text-xs text-muted-foreground mb-2">
                                     Attachments {attachments.length > 0 && `(${attachments.length})`}
                                 </label>
                                 {isLoadingAttachments ? (
-                                    <p className="text-sm text-slate-500">Loading attachments...</p>
+                                    <p className="text-sm text-muted-foreground">Loading attachments...</p>
                                 ) : (
                                     <AttachmentGallery
                                         attachments={attachments}

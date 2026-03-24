@@ -43,9 +43,9 @@ export function ModeToggle() {
     }
 
     const items = [
-        { value: "light", label: "Light", icon: Sun, comingSoon: "Light mode coming soon" },
-        { value: "dark", label: "Dark", icon: Moon, comingSoon: "Dark mode coming soon" },
-        { value: "system", label: "System", icon: Monitor, comingSoon: "System mode coming soon" },
+        { value: "light", label: "Light", icon: Sun, disabledHint: "Light mode disabled by admin" },
+        { value: "dark", label: "Dark", icon: Moon, disabledHint: "Dark mode disabled by admin" },
+        { value: "system", label: "System", icon: Monitor, disabledHint: "System mode disabled by admin" },
     ];
 
     return (
@@ -74,7 +74,7 @@ export function ModeToggle() {
                                 }
                             }}
                             disabled={isDisabled}
-                            title={isDisabled ? item.comingSoon : undefined}
+                            title={isDisabled ? item.disabledHint : undefined}
                             className={[
                                 theme === item.value ? "bg-accent" : "",
                                 isDisabled ? "text-muted-foreground opacity-60" : "",

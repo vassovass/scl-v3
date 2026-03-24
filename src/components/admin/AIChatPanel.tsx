@@ -76,9 +76,9 @@ export default function AIChatPanel() {
     }
 
     return (
-        <div className="fixed bottom-6 right-6 w-96 h-[600px] max-h-[80vh] bg-[#1C1C1E] border border-white/10 rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300">
+        <div className="fixed bottom-6 right-6 w-96 h-[600px] max-h-[80vh] bg-card border border-border rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300">
             {/* Header */}
-            <div className="p-4 border-b border-white/10 bg-black/20 flex items-center justify-between">
+            <div className="p-4 border-b border-border bg-black/20 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -133,14 +133,14 @@ export default function AIChatPanel() {
             </div>
 
             {/* Input */}
-            <form onSubmit={handleSubmit} className="p-4 border-t border-white/10 bg-black/20">
+            <form onSubmit={handleSubmit} className="p-4 border-t border-border bg-black/20">
                 <div className="relative">
                     <input
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Ask anything..."
-                        className="w-full bg-white/5 border border-white/10 rounded-xl pl-4 pr-10 py-3 text-sm text-white focus:outline-none focus:border-purple-500/50 transition-colors placeholder:text-white/20"
+                        className="w-full bg-white/5 border border-border rounded-xl pl-4 pr-10 py-3 text-sm text-white focus:outline-none focus:border-purple-500/50 transition-colors placeholder:text-white/20"
                     />
                     <button
                         type="submit"

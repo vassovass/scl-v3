@@ -59,20 +59,20 @@ export default function BulkActionsBar({
 
     return (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
-            <div className="flex items-center gap-2 rounded-xl bg-slate-900/95 backdrop-blur-sm border border-slate-700 shadow-xl shadow-black/20 px-4 py-2">
+            <div className="flex items-center gap-2 rounded-xl bg-background/95 backdrop-blur-sm border border-border shadow-xl shadow-black/20 px-4 py-2">
                 {/* Selected count */}
                 <span className="text-sm font-medium text-[hsl(var(--info))]">
                     {selectedCount} selected
                 </span>
 
-                <div className="w-px h-5 bg-slate-700" />
+                <div className="w-px h-5 bg-border" />
 
                 {/* Status dropdown */}
                 <div className="relative">
                     <button
                         onClick={() => setShowStatusDropdown(!showStatusDropdown)}
                         disabled={isLoading}
-                        className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-slate-200 bg-slate-800 hover:bg-slate-700 rounded-lg transition disabled:opacity-50"
+                        className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-foreground bg-card hover:bg-accent rounded-lg transition disabled:opacity-50"
                     >
                         Status
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,12 +81,12 @@ export default function BulkActionsBar({
                     </button>
 
                     {showStatusDropdown && (
-                        <div className="absolute bottom-full left-0 mb-2 w-40 bg-slate-800 border border-slate-700 rounded-lg shadow-lg overflow-hidden">
+                        <div className="absolute bottom-full left-0 mb-2 w-40 bg-card border border-border rounded-lg shadow-lg overflow-hidden">
                             {BOARD_STATUS_OPTIONS.filter(opt => opt.value).map(opt => (
                                 <button
                                     key={opt.value}
                                     onClick={() => handleStatusChange(opt.value)}
-                                    className="block w-full px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-700 transition"
+                                    className="block w-full px-3 py-2 text-left text-sm text-foreground hover:bg-accent transition"
                                 >
                                     {opt.label}
                                 </button>
@@ -119,7 +119,7 @@ export default function BulkActionsBar({
                 <button
                     onClick={() => handleTogglePublic(false)}
                     disabled={isLoading}
-                    className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-slate-400 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition disabled:opacity-50"
+                    className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-muted-foreground bg-secondary/50 hover:bg-accent rounded-lg transition disabled:opacity-50"
                     title="Make all selected private"
                 >
                     🔒
@@ -145,13 +145,13 @@ export default function BulkActionsBar({
                     🗑️
                 </button>
 
-                <div className="w-px h-5 bg-slate-700" />
+                <div className="w-px h-5 bg-border" />
 
                 {/* Clear selection */}
                 <button
                     onClick={onClear}
                     disabled={isLoading}
-                    className="px-3 py-1.5 text-sm font-medium text-slate-400 hover:text-slate-200 transition disabled:opacity-50"
+                    className="px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition disabled:opacity-50"
                 >
                     ✕ Clear
                 </button>

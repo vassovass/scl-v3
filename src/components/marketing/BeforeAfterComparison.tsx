@@ -28,7 +28,7 @@ export function BeforeAfterComparison() {
                         </div>
                         <div className="bg-card border border-border rounded-2xl p-6 opacity-80">
                             {/* Simulated raw screenshot look */}
-                            <div className="bg-gray-900 rounded-xl p-4 space-y-4">
+                            <div className="bg-card rounded-xl p-4 space-y-4">
                                 <div className="flex items-center justify-between text-white/50 text-xs">
                                     <span>9:41 AM</span>
                                     <div className="flex gap-1">

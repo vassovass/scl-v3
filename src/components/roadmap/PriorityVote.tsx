@@ -52,7 +52,7 @@ export default function PriorityVote({
     const getPriorityColor = (priority: number) => {
         if (priority >= 7) return "text-emerald-400";
         if (priority >= 4) return "text-[hsl(var(--warning))]";
-        return "text-slate-400";
+        return "text-muted-foreground";
     };
 
     return (
@@ -62,23 +62,23 @@ export default function PriorityVote({
                 onClick={() => isLoggedIn && setShowSlider(!showSlider)}
                 disabled={!isLoggedIn}
                 className={`w-12 h-12 rounded-lg flex flex-col items-center justify-center transition-all ${isLoggedIn
-                        ? "hover:bg-slate-800 cursor-pointer"
+                        ? "hover:bg-card cursor-pointer"
                         : "cursor-not-allowed opacity-60"
-                    } ${currentVote ? "bg-primary/20 border border-primary/30" : "bg-slate-800/50"}`}
+                    } ${currentVote ? "bg-primary/20 border border-primary/30" : "bg-card/50"}`}
                 title={isLoggedIn ? "Click to vote" : "Sign in to vote"}
             >
                 <span className={`text-lg font-bold ${getPriorityColor(avgPriority)}`}>
                     {avgPriority > 0 ? avgPriority.toFixed(1) : "—"}
                 </span>
             </button>
-            <span className="text-[10px] text-slate-500 mt-1">
+            <span className="text-[10px] text-muted-foreground mt-1">
                 {voteCount} {voteCount === 1 ? "vote" : "votes"}
             </span>
 
             {/* Slider popup */}
             {showSlider && (
-                <div className="absolute mt-16 z-10 bg-slate-800 border border-slate-700 rounded-lg p-3 shadow-xl">
-                    <p className="text-xs text-slate-400 mb-2">
+                <div className="absolute mt-16 z-10 bg-card border border-border rounded-lg p-3 shadow-xl">
+                    <p className="text-xs text-muted-foreground mb-2">
                         How important is this? (1-10)
                     </p>
                     <div className="flex items-center gap-3">
@@ -104,7 +104,7 @@ export default function PriorityVote({
                         </button>
                         <button
                             onClick={() => setShowSlider(false)}
-                            className="px-3 py-1 text-xs text-slate-400 hover:text-slate-300"
+                            className="px-3 py-1 text-xs text-muted-foreground hover:text-foreground"
                         >
                             Cancel
                         </button>

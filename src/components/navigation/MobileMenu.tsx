@@ -6,6 +6,7 @@ import { User } from "@supabase/supabase-js";
 import { MenuItem, UserRole, prepareMenuItems } from "@/lib/menuConfig";
 import { useMenuConfig } from "@/hooks/useMenuConfig";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
+import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 
 interface MobileMenuProps {
@@ -190,6 +191,12 @@ export function MobileMenu({
                             {link.label}
                         </Link>
                     ))}
+                </div>
+
+                {/* Theme Toggle */}
+                <div className="flex items-center justify-between px-4 py-3">
+                    <span className="text-sm font-medium text-muted-foreground">Theme</span>
+                    <ModeToggle />
                 </div>
 
                 {/* Install App Button */}

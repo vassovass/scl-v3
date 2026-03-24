@@ -39,8 +39,8 @@ export const STREAK_TIERS: Record<StreakTier, StreakTierConfig> = {
         minDays: 14,
         label: 'Silver Sharer',
         emoji: '🔥',
-        colorClass: 'text-slate-400',
-        bgClass: 'bg-slate-400/10',
+        colorClass: 'text-muted-foreground',
+        bgClass: 'bg-muted',
     },
     gold: {
         tier: 'gold',

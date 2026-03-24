@@ -436,7 +436,7 @@ export default function KanbanBoard({ initialItems, archivedItems = [] }: Kanban
                             onClick={() => setShowArchived(!showArchived)}
                             className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors ${showArchived
                                 ? "bg-amber-500/20 text-amber-400 border-amber-500/40"
-                                : "bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200"
+                                : "bg-card text-muted-foreground border-border hover:text-foreground"
                                 }`}
                             title={showArchived ? "Hide archived items" : "Show archived items"}
                         >
@@ -451,30 +451,30 @@ export default function KanbanBoard({ initialItems, archivedItems = [] }: Kanban
                     {/* Help tooltip explaining Kanban → Roadmap mapping */}
                     <div className="relative group">
                         <button
-                            className="flex items-center justify-center w-7 h-7 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 text-sm rounded-lg border border-slate-700 hover:border-slate-600 transition-colors"
+                            className="flex items-center justify-center w-7 h-7 bg-card hover:bg-accent text-muted-foreground hover:text-foreground text-sm rounded-lg border border-border hover:border-primary/30 transition-colors"
                             title="How this maps to public roadmap"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </button>
-                        <div className="absolute right-0 top-full mt-2 w-72 p-3 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                            <h4 className="text-sm font-semibold text-slate-200 mb-2">📋 Kanban → 🗺️ Roadmap</h4>
-                            <div className="text-xs text-slate-400 space-y-1.5">
+                        <div className="absolute right-0 top-full mt-2 w-72 p-3 bg-card border border-border rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                            <h4 className="text-sm font-semibold text-foreground mb-2">📋 Kanban → 🗺️ Roadmap</h4>
+                            <div className="text-xs text-muted-foreground space-y-1.5">
                                 <p><span className="text-primary">🌐 Public items</span> appear on /roadmap</p>
-                                <div className="border-t border-slate-700 pt-1.5 mt-1.5">
-                                    <p className="font-medium text-slate-300 mb-1">Column Mapping:</p>
+                                <div className="border-t border-border pt-1.5 mt-1.5">
+                                    <p className="font-medium text-foreground mb-1">Column Mapping:</p>
                                     <p>• <span className="text-[hsl(var(--warning))]">In Progress</span> → <span className="text-orange-400">🔥 Now</span></p>
-                                    <p>• <span className="text-slate-300">Release tag</span> → Roadmap column</p>
+                                    <p>• <span className="text-foreground">Release tag</span> → Roadmap column</p>
                                     <p>• <span className="text-emerald-400">Done</span> → <span className="text-emerald-400">✅ Done</span></p>
                                 </div>
-                                <p className="text-slate-500 pt-1">Click 🔒/🌐 to toggle visibility</p>
+                                <p className="text-muted-foreground pt-1">Click 🔒/🌐 to toggle visibility</p>
                             </div>
                         </div>
                     </div>
                     <button
                         onClick={() => setShowImportModal(true)}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-slate-200 text-sm font-medium rounded-lg border border-emerald-600 hover:border-emerald-500 transition-colors"
+                        className="flex items-center gap-2 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white text-sm font-medium rounded-lg border border-emerald-600 hover:border-emerald-500 transition-colors"
                         title="Import items from CSV"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -485,7 +485,7 @@ export default function KanbanBoard({ initialItems, archivedItems = [] }: Kanban
                     <button
                         onClick={() => exportCSV(getAllItems())}
                         disabled={isExportingCSV}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-lg border border-slate-700 hover:border-slate-600 transition-colors disabled:opacity-50"
+                        className="flex items-center gap-2 px-3 py-1.5 bg-card hover:bg-accent text-foreground text-sm font-medium rounded-lg border border-border hover:border-primary/30 transition-colors disabled:opacity-50"
                         title="Export all items to CSV"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -510,14 +510,14 @@ export default function KanbanBoard({ initialItems, archivedItems = [] }: Kanban
                                         <div
                                             ref={provided.innerRef}
                                             {...provided.draggableProps}
-                                            className="flex-shrink-0 w-72 bg-slate-900/50 rounded-xl border border-slate-800 flex flex-col max-h-full"
+                                            className="flex-shrink-0 w-72 bg-background/50 rounded-xl border border-border flex flex-col max-h-full"
                                         >
                                             <div
                                                 {...provided.dragHandleProps}
-                                                className="p-3 border-b border-slate-800 flex items-center justify-between cursor-grab active:cursor-grabbing hover:bg-slate-800/50 rounded-t-xl transition-colors"
+                                                className="p-3 border-b border-border flex items-center justify-between cursor-grab active:cursor-grabbing hover:bg-card/50 rounded-t-xl transition-colors"
                                             >
-                                                <h3 className="font-semibold text-slate-200">{column.title}</h3>
-                                                <span className="text-xs text-slate-500 bg-slate-800 px-2 py-0.5 rounded-full">
+                                                <h3 className="font-semibold text-foreground">{column.title}</h3>
+                                                <span className="text-xs text-muted-foreground bg-card px-2 py-0.5 rounded-full">
                                                     {column.items.length}
                                                 </span>
                                             </div>
@@ -527,7 +527,7 @@ export default function KanbanBoard({ initialItems, archivedItems = [] }: Kanban
                                                     <div
                                                         ref={provided.innerRef}
                                                         {...provided.droppableProps}
-                                                        className={`p-2 flex-1 overflow-y-auto min-h-[100px] transition-colors ${snapshot.isDraggingOver ? "bg-slate-800/30" : ""
+                                                        className={`p-2 flex-1 overflow-y-auto min-h-[100px] transition-colors ${snapshot.isDraggingOver ? "bg-card/30" : ""
                                                             }`}
                                                     >
                                                         {column.items.map((item, index) => (
@@ -610,7 +610,7 @@ export default function KanbanBoard({ initialItems, archivedItems = [] }: Kanban
                 <div className="mt-6 p-4 bg-amber-500/5 border border-amber-500/20 rounded-lg animate-fade-in">
                     <h3 className="text-sm font-semibold text-amber-400 mb-3 flex items-center gap-2">
                         📦 Archived Items ({archivedItems.length})
-                        <span className="text-xs font-normal text-slate-500">
+                        <span className="text-xs font-normal text-muted-foreground">
                             Click restore to bring back to board
                         </span>
                     </h3>
@@ -618,13 +618,13 @@ export default function KanbanBoard({ initialItems, archivedItems = [] }: Kanban
                         {archivedItems.map((item) => (
                             <div
                                 key={item.id}
-                                className="flex items-center justify-between p-2 bg-slate-800/50 rounded-lg border border-slate-700"
+                                className="flex items-center justify-between p-2 bg-card/50 rounded-lg border border-border"
                             >
                                 <div className="flex items-center gap-2 min-w-0 flex-1">
                                     <span className={`text-xs px-1.5 py-0.5 rounded ${TYPE_COLORS[item.type as keyof typeof TYPE_COLORS] || TYPE_COLORS.general}`}>
                                         {item.type}
                                     </span>
-                                    <span className="text-sm text-slate-300 truncate">
+                                    <span className="text-sm text-foreground truncate">
                                         {item.subject}
                                     </span>
                                 </div>

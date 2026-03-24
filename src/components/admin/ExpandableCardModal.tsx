@@ -170,7 +170,7 @@ export function ExpandableCardModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background border-border">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <Badge category="type" value={item.type} size="sm" />
@@ -179,11 +179,11 @@ export function ExpandableCardModal({
                                 type="text"
                                 value={subject}
                                 onChange={(e) => { setSubject(e.target.value); handleFieldChange(); }}
-                                className="flex-1 bg-transparent border-b border-transparent hover:border-slate-600 focus:border-sky-500 outline-none text-lg font-semibold"
+                                className="flex-1 bg-transparent border-b border-transparent hover:border-primary/30 focus:border-primary outline-none text-lg font-semibold"
                                 placeholder="Title..."
                             />
                         ) : (
-                            <span className="text-lg font-semibold text-slate-200">{item.subject}</span>
+                            <span className="text-lg font-semibold text-foreground">{item.subject}</span>
                         )}
                     </DialogTitle>
                 </DialogHeader>
@@ -196,7 +196,7 @@ export function ExpandableCardModal({
                             <select
                                 value={boardStatus}
                                 onChange={(e) => { setBoardStatus(e.target.value); handleFieldChange(); }}
-                                className="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300 text-sm"
+                                className="px-2 py-1 rounded bg-card border border-border text-muted-foreground text-sm"
                             >
                                 {BOARD_STATUS_OPTIONS.map((opt) => (
                                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -211,7 +211,7 @@ export function ExpandableCardModal({
                             <select
                                 value={targetRelease}
                                 onChange={(e) => { setTargetRelease(e.target.value); handleFieldChange(); }}
-                                className="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300 text-sm"
+                                className="px-2 py-1 rounded bg-card border border-border text-muted-foreground text-sm"
                             >
                                 {RELEASE_OPTIONS.map((opt) => (
                                     <option key={opt.id} value={opt.id}>{opt.label}</option>
@@ -229,7 +229,7 @@ export function ExpandableCardModal({
                                 onClick={() => { setIsPublic(!isPublic); handleFieldChange(); }}
                                 className={`px-2 py-0.5 rounded text-xs transition-colors ${isPublic
                                     ? 'bg-emerald-500/20 text-emerald-400'
-                                    : 'bg-slate-700 text-slate-400'
+                                    : 'bg-secondary text-muted-foreground'
                                     }`}
                             >
                                 {isPublic ? '🌐 Public' : '🔒 Private'}
@@ -237,24 +237,24 @@ export function ExpandableCardModal({
                         )}
 
                         {/* Date */}
-                        <span className="text-slate-500 text-xs ml-auto">
+                        <span className="text-muted-foreground text-xs ml-auto">
                             Created: {new Date(item.created_at).toLocaleDateString()}
                         </span>
                     </div>
 
                     {/* Description */}
                     <div>
-                        <label className="block text-xs text-slate-500 mb-1">Description</label>
+                        <label className="block text-xs text-muted-foreground mb-1">Description</label>
                         {canEdit ? (
                             <textarea
                                 value={description}
                                 onChange={(e) => { setDescription(e.target.value); handleFieldChange(); }}
                                 rows={4}
-                                className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 resize-none focus:border-sky-500 outline-none"
+                                className="w-full px-3 py-2 rounded-lg bg-card border border-border text-muted-foreground resize-none focus:border-primary outline-none"
                                 placeholder="Add a description..."
                             />
                         ) : (
-                            <p className="text-slate-300 whitespace-pre-wrap">
+                            <p className="text-muted-foreground whitespace-pre-wrap">
                                 {item.description || 'No description'}
                             </p>
                         )}
@@ -263,11 +263,11 @@ export function ExpandableCardModal({
                     {/* Attachments section */}
                     <div>
                         <div className="flex items-center justify-between mb-2">
-                            <label className="text-xs text-slate-500">
+                            <label className="text-xs text-muted-foreground">
                                 Attachments {attachments.length > 0 && `(${attachments.length})`}
                             </label>
                             {isLoadingAttachments && (
-                                <span className="text-xs text-slate-500">Loading...</span>
+                                <span className="text-xs text-muted-foreground">Loading...</span>
                             )}
                         </div>
 
@@ -287,9 +287,9 @@ export function ExpandableCardModal({
                                 <img
                                     src={item.screenshot_url}
                                     alt="Original screenshot"
-                                    className="max-w-full max-h-48 rounded-lg border border-slate-700"
+                                    className="max-w-full max-h-48 rounded-lg border border-border"
                                 />
-                                <p className="text-xs text-slate-500 mt-1">Original screenshot</p>
+                                <p className="text-xs text-muted-foreground mt-1">Original screenshot</p>
                             </div>
                         )}
 
@@ -310,8 +310,8 @@ export function ExpandableCardModal({
 
                     {/* Submitted by */}
                     {item.users?.display_name && (
-                        <div className="text-xs text-slate-500">
-                            Submitted by: <span className="text-slate-400">{item.users.display_name}</span>
+                        <div className="text-xs text-muted-foreground">
+                            Submitted by: <span className="text-muted-foreground">{item.users.display_name}</span>
                         </div>
                     )}
                 </div>
@@ -322,7 +322,7 @@ export function ExpandableCardModal({
                         {canEdit && onDelete && (
                             showDeleteConfirm ? (
                                 <div className="flex items-center gap-1 animate-fade-in">
-                                    <span className="text-xs text-slate-400 mr-1">Delete?</span>
+                                    <span className="text-xs text-muted-foreground mr-1">Delete?</span>
                                     <button
                                         onClick={() => { onDelete(item.id, false); onClose(); }}
                                         className="px-2 py-1 text-xs bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 rounded transition-colors"
@@ -339,7 +339,7 @@ export function ExpandableCardModal({
                                     </button>
                                     <button
                                         onClick={() => setShowDeleteConfirm(false)}
-                                        className="px-2 py-1 text-xs text-slate-400 hover:text-slate-200 rounded transition-colors"
+                                        className="px-2 py-1 text-xs text-muted-foreground hover:text-foreground rounded transition-colors"
                                     >
                                         Cancel
                                     </button>
@@ -347,7 +347,7 @@ export function ExpandableCardModal({
                             ) : (
                                 <button
                                     onClick={() => setShowDeleteConfirm(true)}
-                                    className="px-3 py-1.5 text-sm text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                    className="px-3 py-1.5 text-sm text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                                 >
                                     🗑️ Delete
                                 </button>
@@ -359,7 +359,7 @@ export function ExpandableCardModal({
                     <div className="flex items-center gap-2">
                         <button
                             onClick={onClose}
-                            className="px-4 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+                            className="px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
                         >
                             {hasChanges ? 'Cancel' : 'Close'}
                         </button>
@@ -367,7 +367,7 @@ export function ExpandableCardModal({
                             <button
                                 onClick={handleSave}
                                 disabled={isSaving}
-                                className="px-4 py-2 rounded-lg bg-sky-600 text-white hover:bg-sky-500 disabled:opacity-50 transition-colors"
+                                className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
                             >
                                 {isSaving ? 'Saving...' : 'Save Changes'}
                             </button>

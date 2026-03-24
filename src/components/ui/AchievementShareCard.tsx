@@ -151,18 +151,18 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
             <div className="w-full max-w-sm">
                 {/* Preview card */}
-                <div className="rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 border border-slate-700 shadow-2xl">
+                <div className="rounded-2xl bg-gradient-to-br from-background via-card to-background p-6 border border-border shadow-2xl">
                     <div className="text-center mb-4">
                         <div className="text-5xl mb-2">{getEmoji()}</div>
                         <h2 className="text-2xl font-bold text-white">{getTitle()}</h2>
-                        <p className="text-sm text-slate-400 mt-1">{achievement.userName || "You"}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{achievement.userName || "You"}</p>
                     </div>
 
                     <div className="text-center py-6 rounded-xl bg-gradient-to-r from-primary/20 to-emerald-600/20 border border-primary/30">
                         <div className="text-4xl font-bold text-white">
                             {achievement.value.toLocaleString()}
                         </div>
-                        <div className="text-sm text-slate-300 mt-1">steps {getPeriodText()}</div>
+                        <div className="text-sm text-muted-foreground mt-1">steps {getPeriodText()}</div>
                     </div>
 
                     {achievement.improvementPct !== undefined && (
@@ -173,7 +173,7 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
                         </div>
                     )}
 
-                    <div className="mt-4 text-center text-xs text-slate-500">
+                    <div className="mt-4 text-center text-xs text-muted-foreground">
                         {achievement.leagueName} • #{achievement.rank} of {achievement.totalMembers}
                     </div>
                 </div>
@@ -200,14 +200,14 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
                         </button>
                         <button
                             onClick={shareToX}
-                            className="flex flex-col items-center gap-1 rounded-xl bg-slate-700 px-3 py-2 text-xs font-medium text-white hover:bg-slate-600 transition"
+                            className="flex flex-col items-center gap-1 rounded-xl bg-secondary px-3 py-2 text-xs font-medium text-white hover:bg-accent transition"
                         >
                             <span className="text-lg font-bold">𝕏</span>
                             X
                         </button>
                         <button
                             onClick={copyLink}
-                            className="flex flex-col items-center gap-1 rounded-xl bg-slate-700 px-3 py-2 text-xs font-medium text-white hover:bg-slate-600 transition"
+                            className="flex flex-col items-center gap-1 rounded-xl bg-secondary px-3 py-2 text-xs font-medium text-white hover:bg-accent transition"
                         >
                             <span className="text-lg">{copied ? "✓" : "📋"}</span>
                             {copied ? "Copied!" : "Copy"}
@@ -216,7 +216,7 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
 
                     <button
                         onClick={onClose}
-                        className="w-full rounded-xl border border-slate-700 px-4 py-2 text-sm text-slate-400 hover:text-white hover:border-slate-500 transition"
+                        className="w-full rounded-xl border border-border px-4 py-2 text-sm text-muted-foreground hover:text-white hover:border-primary/30 transition"
                     >
                         Close
                     </button>

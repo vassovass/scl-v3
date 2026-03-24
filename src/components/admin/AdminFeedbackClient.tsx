@@ -10,7 +10,7 @@ const KanbanBoard = dynamic(() => import("./KanbanBoard"), {
     ssr: false,
     loading: () => (
         <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-500"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
     ),
 });
@@ -61,7 +61,7 @@ export default function AdminFeedbackClient({ initialItems }: AdminFeedbackClien
     if (!isHydrated) {
         return (
             <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-500"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
         );
     }
@@ -70,12 +70,12 @@ export default function AdminFeedbackClient({ initialItems }: AdminFeedbackClien
         <div className="space-y-4">
             {/* View Toggle */}
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 p-1 bg-slate-800/50 rounded-lg border border-slate-700">
+                <div className="flex items-center gap-2 p-1 bg-card/50 rounded-lg border border-border">
                     <button
                         onClick={() => handleViewChange("list")}
                         className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${view === "list"
-                            ? "bg-sky-500/20 text-sky-400 border border-sky-500/30"
-                            : "text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
+                            ? "bg-primary/20 text-primary border border-primary/30"
+                            : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                             }`}
                         title="List View"
                     >
@@ -87,8 +87,8 @@ export default function AdminFeedbackClient({ initialItems }: AdminFeedbackClien
                     <button
                         onClick={() => handleViewChange("kanban")}
                         className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${view === "kanban"
-                            ? "bg-sky-500/20 text-sky-400 border border-sky-500/30"
-                            : "text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
+                            ? "bg-primary/20 text-primary border border-primary/30"
+                            : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                             }`}
                         title="Kanban View"
                     >
@@ -99,7 +99,7 @@ export default function AdminFeedbackClient({ initialItems }: AdminFeedbackClien
                     </button>
                 </div>
 
-                <div className="text-sm text-slate-500">
+                <div className="text-sm text-muted-foreground">
                     {initialItems.length} user feedback items
                 </div>
             </div>

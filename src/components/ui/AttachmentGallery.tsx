@@ -76,7 +76,7 @@ export function AttachmentGallery({
     if (attachments.length === 0) {
         if (!showEmpty) return null;
         return (
-            <div className={`text-center py-8 text-slate-500 ${className}`}>
+            <div className={`text-center py-8 text-muted-foreground ${className}`}>
                 <span className="text-3xl mb-2 block">🖼️</span>
                 <p className="text-sm">No attachments</p>
             </div>
@@ -97,9 +97,9 @@ export function AttachmentGallery({
                         <div
                             key={attachment.id}
                             className={`
-                relative group rounded-lg overflow-hidden bg-slate-800 border border-slate-700
+                relative group rounded-lg overflow-hidden bg-card border border-border
                 aspect-video
-                ${isUploading ? 'opacity-60' : 'cursor-pointer hover:border-slate-600'}
+                ${isUploading ? 'opacity-60' : 'cursor-pointer hover:border-primary/30'}
               `}
                             onClick={() => !isUploading && setLightboxImage(imageUrl)}
                         >

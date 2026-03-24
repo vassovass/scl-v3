@@ -97,10 +97,10 @@ export default function MergeModal({ items, isOpen, onClose, onSuccess }: MergeM
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div className="bg-[#1C1C1E] border border-white/10 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+            <div className="bg-card border border-border rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
 
                 {/* Header */}
-                <div className="p-6 border-b border-white/10 flex items-center justify-between">
+                <div className="p-6 border-b border-border flex items-center justify-between">
                     <div>
                         <h2 className="text-xl font-bold text-white flex items-center gap-2">
                             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 text-sm">
@@ -124,7 +124,7 @@ export default function MergeModal({ items, isOpen, onClose, onSuccess }: MergeM
 
                 <div className="flex flex-1 overflow-hidden">
                     {/* Left: Item Selection */}
-                    <div className="w-1/3 border-r border-white/10 overflow-y-auto p-4 space-y-4 bg-black/20">
+                    <div className="w-1/3 border-r border-border overflow-y-auto p-4 space-y-4 bg-black/20">
                         <h3 className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Select Primary Item</h3>
                         {items.map(item => (
                             <div
@@ -164,7 +164,7 @@ export default function MergeModal({ items, isOpen, onClose, onSuccess }: MergeM
                             </div>
                         ))}
 
-                        <div className="pt-4 border-t border-white/10">
+                        <div className="pt-4 border-t border-border">
                             <h3 className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Wait, what happens?</h3>
                             <ul className="text-xs text-white/40 space-y-2 list-disc pl-4">
                                 <li>Primary item keeps its ID and history</li>
@@ -213,7 +213,7 @@ export default function MergeModal({ items, isOpen, onClose, onSuccess }: MergeM
                                 <textarea
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
-                                    className="w-full h-full bg-black/20 border border-white/10 rounded-lg p-4 text-white text-sm focus:outline-none focus:border-white/30 resize-none font-mono"
+                                    className="w-full h-full bg-black/20 border border-border rounded-lg p-4 text-white text-sm focus:outline-none focus:border-white/30 resize-none font-mono"
                                     placeholder="Merged description will appear here..."
                                 />
                             </div>
@@ -224,13 +224,13 @@ export default function MergeModal({ items, isOpen, onClose, onSuccess }: MergeM
                                     <h4 className="text-xs font-semibold text-white/60 mb-3 uppercase tracking-wider">Attachments to be Merged</h4>
                                     <div className="flex gap-2 overflow-x-auto pb-2">
                                         {primaryItem?.screenshot_url && (
-                                            <div className="relative shrink-0 w-20 h-20 rounded border border-white/10 overflow-hidden group">
+                                            <div className="relative shrink-0 w-20 h-20 rounded border border-border overflow-hidden group">
                                                 <img src={primaryItem.screenshot_url} className="w-full h-full object-cover" alt="Primary visual" />
                                                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity">Primary</div>
                                             </div>
                                         )}
                                         {secondaryItems.filter(i => i.screenshot_url).map(item => (
-                                            <div key={item.id} className="relative shrink-0 w-20 h-20 rounded border border-white/10 overflow-hidden group border-blue-500/30">
+                                            <div key={item.id} className="relative shrink-0 w-20 h-20 rounded border border-border overflow-hidden group border-blue-500/30">
                                                 <img src={item.screenshot_url!} className="w-full h-full object-cover" alt={`Attachment from ${item.subject} `} />
                                                 <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center text-[8px] text-white shadow-sm">+</div>
                                             </div>
@@ -243,7 +243,7 @@ export default function MergeModal({ items, isOpen, onClose, onSuccess }: MergeM
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-white/10 flex items-center justify-end gap-3 bg-black/20">
+                <div className="p-4 border-t border-border flex items-center justify-end gap-3 bg-black/20">
                     <button
                         onClick={onClose}
                         className="px-4 py-2 text-white/60 hover:text-white text-sm font-medium transition-colors"

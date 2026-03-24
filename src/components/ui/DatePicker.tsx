@@ -84,13 +84,13 @@ export function DatePicker({
     return (
         <div ref={containerRef} className={`relative ${className}`}>
             {label && (
-                <label className="block text-sm font-medium text-slate-300 mb-1">
+                <label className="block text-sm font-medium text-muted-foreground mb-1">
                     {label}
                 </label>
             )}
 
             <div className="flex gap-2">
-                {/* Native date input (styled for dark mode) */}
+                {/* Native date input */}
                 <input
                     type="date"
                     value={value}
@@ -99,10 +99,7 @@ export function DatePicker({
                     onChange={(e) => onChange(e.target.value)}
                     required={required}
                     disabled={disabled}
-                    className="flex-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-slate-50 focus:border-primary focus:outline-none disabled:opacity-50"
-                    style={{
-                        colorScheme: "dark",
-                    }}
+                    className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-none disabled:opacity-50"
                 />
 
                 {/* Quick select button */}
@@ -110,7 +107,7 @@ export function DatePicker({
                     type="button"
                     onClick={() => setShowQuickSelect(!showQuickSelect)}
                     disabled={disabled}
-                    className="rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:border-slate-600 transition disabled:opacity-50"
+                    className="rounded-md border border-border bg-card px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:border-primary/30 transition disabled:opacity-50"
                     title="Quick select"
                 >
                     📅
@@ -119,15 +116,15 @@ export function DatePicker({
 
             {/* Quick select dropdown */}
             {showQuickSelect && (
-                <div className="absolute right-0 top-full mt-1 z-20 rounded-md border border-slate-700 bg-slate-800 shadow-lg overflow-hidden min-w-[150px]">
+                <div className="absolute right-0 top-full mt-1 z-20 rounded-md border border-border bg-card shadow-lg overflow-hidden min-w-[150px]">
                     {activePresets.map(({ label, date }) => (
                         <button
                             key={label}
                             type="button"
                             onClick={() => handleQuickSelect(date)}
-                            className={`w-full px-3 py-2 text-left text-sm transition hover:bg-slate-700 ${value === date.toISOString().slice(0, 10)
+                            className={`w-full px-3 py-2 text-left text-sm transition hover:bg-accent ${value === date.toISOString().slice(0, 10)
                                 ? "bg-primary/20 text-primary"
-                                : "text-slate-300"
+                                : "text-muted-foreground"
                                 }`}
                         >
                             {label}
@@ -138,7 +135,7 @@ export function DatePicker({
 
             {/* Display relative date label */}
             {selectedDate && (
-                <p className="mt-1 text-xs text-slate-500">
+                <p className="mt-1 text-xs text-muted-foreground">
                     {displayLabel} • {selectedDate.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
                 </p>
             )}

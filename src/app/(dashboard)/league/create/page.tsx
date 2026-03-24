@@ -177,7 +177,7 @@ export default function CreateLeaguePage() {
                         {/* Future fields placeholder - uncomment when needed */}
                         {/* 
           <div>
-            <label className="block text-sm font-medium text-slate-300">
+            <label className="block text-sm font-medium text-muted-foreground">
               Description (optional)
             </label>
             <textarea

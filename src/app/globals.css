@@ -151,21 +151,21 @@
 /* === LIGHT THEME === */
 /* Palette generated with tonal surface approach for softer, professional look */
 [data-theme="light"] {
-  /* Core Brand Colors - Teal/Cyan primary from user's palette */
-  --brand-primary: 189 35% 43%;
-  /* #468594 - teal primary */
-  --brand-primary-dark: 189 35% 38%;
-  /* #3f7582 - darker */
-  --brand-primary-light: 189 35% 48%;
+  /* Core Brand Colors - Teal/Cyan primary (darkened for WCAG AA contrast) */
+  --brand-primary: 189 42% 32%;
+  /* #2f6b7b - teal primary (contrast-safe) */
+  --brand-primary-dark: 189 42% 27%;
+  /* #285a68 - darker */
+  --brand-primary-light: 189 40% 38%;
   /* lighter teal */
   --brand-accent: 271 91% 65%;
   /* purple-500 - keep accent */
-  --glow-primary: 189 35% 43%;
+  --glow-primary: 189 42% 32%;
   --glow-accent: 271 91% 65%;
 
-  /* Page Backgrounds - Tonal surface (NOT pure white) */
-  --background: 192 15% 95%;
-  /* #ecf2f4 - tonal surface a0 */
+  /* Page Backgrounds - Tonal surface with card-lift differentiation */
+  --background: 192 15% 94%;
+  /* ~#e8eff1 - tonal surface (slightly darker for card pop) */
   --foreground: 189 30% 20%;
   /* #2b4950 - primary a40 for text */
 
@@ -181,9 +181,9 @@
   --popover-foreground: 189 30% 20%;
   /* dark teal text */
 
-  /* Primary Actions - Teal brand */
-  --primary: 189 35% 43%;
-  /* #468594 */
+  /* Primary Actions - Teal brand (WCAG AA: 6.1:1 on white, 5.4:1 on bg) */
+  --primary: 189 42% 32%;
+  /* #2f6b7b */
   --primary-foreground: 0 0% 100%;
   /* white */
 
@@ -199,9 +199,9 @@
   --muted-foreground: 189 20% 35%;
   /* #57777e - medium teal-gray */
 
-  /* Accents - Tonal hover state */
-  --accent: 192 8% 85%;
-  /* #d3d8d9 - tonal a20 */
+  /* Accents - Tonal hover state (visible on both card and bg) */
+  --accent: 192 10% 88%;
+  /* #dce3e5 - subtle hover */
   --accent-foreground: 189 30% 20%;
   /* dark teal */
 
@@ -211,23 +211,23 @@
   --destructive-foreground: 0 0% 100%;
   /* white */
 
-  /* Borders - Subtle tonal */
-  --border: 192 8% 85%;
-  /* #d3d8d9 - tonal a20 */
-  --input: 192 8% 85%;
+  /* Borders - Visible on both bg and card (1.8:1 on bg, 2.0:1 on card) */
+  --border: 192 12% 70%;
+  /* ~#a6b5b9 - darker for visibility */
+  --input: 192 12% 70%;
   /* same */
-  --ring: 189 35% 43%;
+  --ring: 189 42% 32%;
   /* teal primary */
 
   /* Link System */
-  --link-text: 189 35% 38%;
-  /* #3f7582 - primary a10 */
-  --link-hover: 189 35% 30%;
-  /* #325760 - primary a30 */
+  --link-text: 189 42% 32%;
+  /* #2f6b7b - matches primary */
+  --link-hover: 189 42% 25%;
+  /* #264f5b - darker hover */
 
   /* Legacy alignment */
-  --bg-base: 192 15% 95%;
-  /* tonal surface */
+  --bg-base: 192 15% 94%;
+  /* tonal surface (matches --background) */
   --bg-elevated: 0 0% 100%;
   /* white */
   --bg-card: 0 0% 100%;
@@ -238,16 +238,16 @@
   /* dark teal */
   --text-secondary: 189 20% 35%;
   /* medium teal-gray */
-  --border-subtle: 192 8% 85%;
-  /* tonal a20 */
-  --border-default: 192 5% 75%;
-  /* tonal a40 */
+  --border-subtle: 192 12% 70%;
+  /* matches --border */
+  --border-default: 192 10% 65%;
+  /* slightly darker for emphasis */
 
   /* Menu System */
   --menu-bg: 0 0% 100%;
   /* white */
-  --menu-border: 192 8% 85%;
-  /* tonal border */
+  --menu-border: 192 12% 70%;
+  /* matches --border */
   --menu-item-text: 189 20% 35%;
   /* medium teal-gray */
   --menu-item-hover-bg: 192 10% 90%;
@@ -257,9 +257,9 @@
 
   /* Date Picker */
   --date-picker-bg: 0 0% 100%;
-  --date-picker-border: 192 8% 85%;
+  --date-picker-border: 192 12% 70%;
   --date-picker-text: 189 30% 20%;
-  --date-picker-accent: 189 35% 43%;
+  --date-picker-accent: 189 42% 32%;
 
   /* Semantic Status Colors - Darker for proper contrast */
   --success: 160 65% 30%;

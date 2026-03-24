@@ -57,7 +57,7 @@ export default function DesignSystemPage() {
     if (loading) {
         return (
             <main className="min-h-screen bg-gradient-mesh flex items-center justify-center">
-                <div className="text-slate-400 animate-pulse">Checking access...</div>
+                <div className="text-muted-foreground animate-pulse">Checking access...</div>
             </main>
         );
     }
@@ -73,7 +73,7 @@ export default function DesignSystemPage() {
                 <div className="flex items-center justify-between mb-12">
                     <div>
                         <h1 className="text-3xl font-bold text-white">Design System</h1>
-                        <p className="text-slate-400 mt-1">Brand guidelines & component library</p>
+                        <p className="text-muted-foreground mt-1">Brand guidelines & component library</p>
                     </div>
                     <Link href="/dashboard" className="btn-ghost text-sm">
                         ← Back to Dashboard
@@ -88,8 +88,8 @@ export default function DesignSystemPage() {
                     </h2>
 
                     <div className="glass-card p-6">
-                        <h3 className="text-sm font-medium text-slate-300 mb-4">Logo Component (Modular)</h3>
-                        <p className="text-xs text-slate-400 mb-6">
+                        <h3 className="text-sm font-medium text-foreground mb-4">Logo Component (Modular)</h3>
+                        <p className="text-xs text-muted-foreground mb-6">
                             The Logo component is database-driven and supports custom images or emoji+text logos.
                             SuperAdmins can customize via <Link href="/admin/branding" className="text-primary hover:underline">/admin/branding</Link>.
                         </p>
@@ -97,47 +97,47 @@ export default function DesignSystemPage() {
                         {/* Live Demos */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
                             <div className="space-y-3">
-                                <p className="text-xs text-slate-500">Size: Small</p>
-                                <div className="p-4 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center">
+                                <p className="text-xs text-muted-foreground">Size: Small</p>
+                                <div className="p-4 rounded-lg bg-card border border-border flex items-center justify-center">
                                     <Logo size="sm" href="" />
                                 </div>
                             </div>
                             <div className="space-y-3">
-                                <p className="text-xs text-slate-500">Size: Medium (Default)</p>
-                                <div className="p-4 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center">
+                                <p className="text-xs text-muted-foreground">Size: Medium (Default)</p>
+                                <div className="p-4 rounded-lg bg-card border border-border flex items-center justify-center">
                                     <Logo size="md" href="" />
                                 </div>
                             </div>
                             <div className="space-y-3">
-                                <p className="text-xs text-slate-500">Size: Large</p>
-                                <div className="p-4 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center">
+                                <p className="text-xs text-muted-foreground">Size: Large</p>
+                                <div className="p-4 rounded-lg bg-card border border-border flex items-center justify-center">
                                     <Logo size="lg" href="" />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 pt-6 border-t border-slate-700">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 pt-6 border-t border-border">
                             <div className="space-y-3">
-                                <p className="text-xs text-slate-500">Icon Only (no text)</p>
-                                <div className="p-4 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center">
+                                <p className="text-xs text-muted-foreground">Icon Only (no text)</p>
+                                <div className="p-4 rounded-lg bg-card border border-border flex items-center justify-center">
                                     <Logo size="md" showText={false} href="" />
                                 </div>
                             </div>
                             <div className="space-y-3">
-                                <p className="text-xs text-slate-500">With Link (hover me)</p>
-                                <div className="p-4 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center">
+                                <p className="text-xs text-muted-foreground">With Link (hover me)</p>
+                                <div className="p-4 rounded-lg bg-card border border-border flex items-center justify-center">
                                     <Logo size="md" href="/dashboard" />
                                 </div>
-                                <p className="text-xs text-slate-400">
+                                <p className="text-xs text-muted-foreground">
                                     Hover effect: colors swap + emoji glow
                                 </p>
                             </div>
                         </div>
 
                         {/* Features */}
-                        <div className="pt-6 border-t border-slate-700 mb-6">
-                            <h4 className="text-xs font-medium text-slate-300 mb-3">Features</h4>
-                            <ul className="text-xs text-slate-400 space-y-2 list-disc list-inside">
+                        <div className="pt-6 border-t border-border mb-6">
+                            <h4 className="text-xs font-medium text-foreground mb-3">Features</h4>
+                            <ul className="text-xs text-muted-foreground space-y-2 list-disc list-inside">
                                 <li>Database-driven: Reads from <code className="text-primary">brand_settings</code> table</li>
                                 <li>Theme-aware: Separate images for light/dark mode</li>
                                 <li>Size variants: <code className="text-primary">sm</code>, <code className="text-primary">md</code>, <code className="text-primary">lg</code></li>
@@ -148,9 +148,9 @@ export default function DesignSystemPage() {
                         </div>
 
                         {/* Usage Examples */}
-                        <div className="pt-6 border-t border-slate-700">
-                            <p className="text-xs text-slate-500 mb-4">Usage:</p>
-                            <pre className="text-xs text-slate-400 bg-slate-900 p-4 rounded-lg overflow-x-auto">
+                        <div className="pt-6 border-t border-border">
+                            <p className="text-xs text-muted-foreground mb-4">Usage:</p>
+                            <pre className="text-xs text-muted-foreground bg-card p-4 rounded-lg overflow-x-auto">
                                 {`import { Logo } from "@/components/ui/Logo";
 
 // Full logo in header
@@ -165,13 +165,13 @@ export default function DesignSystemPage() {
 // Without link
 <Logo size="md" href="" />`}
                             </pre>
-                            <p className="text-xs text-slate-500 mt-4">
+                            <p className="text-xs text-muted-foreground mt-4">
                                 Component: <code className="text-primary">src/components/ui/Logo.tsx</code>
                             </p>
-                            <p className="text-xs text-slate-500 mt-1">
+                            <p className="text-xs text-muted-foreground mt-1">
                                 Hook: <code className="text-primary">src/hooks/useBranding.ts</code> (SWR-cached branding data)
                             </p>
-                            <p className="text-xs text-slate-500 mt-1">
+                            <p className="text-xs text-muted-foreground mt-1">
                                 Config: <code className="text-primary">src/lib/branding.ts</code> (defaults + types)
                             </p>
                         </div>
@@ -184,67 +184,67 @@ export default function DesignSystemPage() {
                     </h2>
 
                     <div className="glass-card p-6">
-                        <h3 className="text-sm font-medium text-slate-300 mb-4">Brand Colors</h3>
+                        <h3 className="text-sm font-medium text-foreground mb-4">Brand Colors</h3>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                             <div className="space-y-2">
                                 <div className="h-16 rounded-lg bg-sky-500"></div>
-                                <p className="text-xs text-slate-400">Primary (sky-500)</p>
+                                <p className="text-xs text-muted-foreground">Primary (sky-500)</p>
                                 <code className="text-xs text-primary">--brand-primary</code>
                             </div>
                             <div className="space-y-2">
                                 <div className="h-16 rounded-lg bg-sky-400"></div>
-                                <p className="text-xs text-slate-400">Primary Light</p>
+                                <p className="text-xs text-muted-foreground">Primary Light</p>
                                 <code className="text-xs text-primary">--brand-primary-light</code>
                             </div>
                             <div className="space-y-2">
                                 <div className="h-16 rounded-lg bg-purple-500"></div>
-                                <p className="text-xs text-slate-400">Accent (purple-500)</p>
+                                <p className="text-xs text-muted-foreground">Accent (purple-500)</p>
                                 <code className="text-xs text-primary">--brand-accent</code>
                             </div>
                             <div className="space-y-2">
                                 <div className="h-16 rounded-lg bg-blue-500"></div>
-                                <p className="text-xs text-slate-400">Accent Alt (blue-500)</p>
+                                <p className="text-xs text-muted-foreground">Accent Alt (blue-500)</p>
                                 <code className="text-xs text-primary">--brand-accent-alt</code>
                             </div>
                         </div>
 
-                        <h3 className="text-sm font-medium text-slate-300 mt-8 mb-4">Background Colors</h3>
+                        <h3 className="text-sm font-medium text-foreground mt-8 mb-4">Background Colors</h3>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                             <div className="space-y-2">
-                                <div className="h-16 rounded-lg bg-[rgb(10,10,10)] border border-slate-700"></div>
-                                <p className="text-xs text-slate-400">Base</p>
-                                <code className="text-xs text-primary">--bg-base</code>
+                                <div className="h-16 rounded-lg bg-background border border-border"></div>
+                                <p className="text-xs text-muted-foreground">Background</p>
+                                <code className="text-xs text-primary">bg-background</code>
                             </div>
                             <div className="space-y-2">
-                                <div className="h-16 rounded-lg bg-slate-900"></div>
-                                <p className="text-xs text-slate-400">Elevated</p>
-                                <code className="text-xs text-primary">--bg-elevated</code>
+                                <div className="h-16 rounded-lg bg-muted border border-border"></div>
+                                <p className="text-xs text-muted-foreground">Muted</p>
+                                <code className="text-xs text-primary">bg-muted</code>
                             </div>
                             <div className="space-y-2">
-                                <div className="h-16 rounded-lg bg-slate-800"></div>
-                                <p className="text-xs text-slate-400">Card</p>
-                                <code className="text-xs text-primary">--bg-card</code>
+                                <div className="h-16 rounded-lg bg-card border border-border"></div>
+                                <p className="text-xs text-muted-foreground">Card</p>
+                                <code className="text-xs text-primary">bg-card</code>
                             </div>
                             <div className="space-y-2">
-                                <div className="h-16 rounded-lg bg-slate-700"></div>
-                                <p className="text-xs text-slate-400">Card Hover</p>
-                                <code className="text-xs text-primary">--bg-card-hover</code>
+                                <div className="h-16 rounded-lg bg-secondary border border-border"></div>
+                                <p className="text-xs text-muted-foreground">Secondary</p>
+                                <code className="text-xs text-primary">bg-secondary</code>
                             </div>
                         </div>
 
-                        <h3 className="text-sm font-medium text-slate-300 mt-8 mb-4">Status Colors</h3>
+                        <h3 className="text-sm font-medium text-foreground mt-8 mb-4">Status Colors</h3>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                             <div className="space-y-2">
                                 <div className="h-12 rounded-lg bg-green-500"></div>
-                                <p className="text-xs text-slate-400">Success</p>
+                                <p className="text-xs text-muted-foreground">Success</p>
                             </div>
                             <div className="space-y-2">
                                 <div className="h-12 rounded-lg bg-[hsl(var(--warning))]"></div>
-                                <p className="text-xs text-slate-400">Warning</p>
+                                <p className="text-xs text-muted-foreground">Warning</p>
                             </div>
                             <div className="space-y-2">
                                 <div className="h-12 rounded-lg bg-red-500"></div>
-                                <p className="text-xs text-slate-400">Error</p>
+                                <p className="text-xs text-muted-foreground">Error</p>
                             </div>
                         </div>
                     </div>
@@ -259,7 +259,7 @@ export default function DesignSystemPage() {
 
                     <div className="glass-card p-6 space-y-6">
                         <div>
-                            <p className="text-xs text-slate-500 mb-2">Font: Inter</p>
+                            <p className="text-xs text-muted-foreground mb-2">Font: Inter</p>
                             <h1 className="text-4xl font-extrabold text-white">Heading 1 - Extra Bold</h1>
                         </div>
                         <div>
@@ -269,22 +269,22 @@ export default function DesignSystemPage() {
                             <h3 className="text-xl font-semibold text-white">Heading 3 - Semibold</h3>
                         </div>
                         <div>
-                            <p className="text-base text-slate-300">Body text - Regular weight, slate-300</p>
+                            <p className="text-base text-foreground">Body text - Regular weight, text-foreground</p>
                         </div>
                         <div>
-                            <p className="text-sm text-slate-400">Small text - slate-400 for secondary info</p>
+                            <p className="text-sm text-muted-foreground">Small text - text-muted-foreground for secondary info</p>
                         </div>
                         <div>
-                            <p className="text-xs text-slate-500">Extra small - slate-500 for muted content</p>
+                            <p className="text-xs text-muted-foreground">Extra small - text-muted-foreground for muted content</p>
                         </div>
 
-                        <div className="pt-4 border-t border-slate-700">
-                            <p className="text-xs text-slate-500 mb-2">Gradient Text Effect</p>
+                        <div className="pt-4 border-t border-border">
+                            <p className="text-xs text-muted-foreground mb-2">Gradient Text Effect</p>
                             <span className="text-3xl font-bold text-gradient">Gradient Text</span>
                         </div>
 
                         <div>
-                            <p className="text-xs text-slate-500 mb-2">Glow Text Effect</p>
+                            <p className="text-xs text-muted-foreground mb-2">Glow Text Effect</p>
                             <span className="text-3xl font-bold text-white glow-text">Glow Text</span>
                         </div>
                     </div>
@@ -305,9 +305,9 @@ export default function DesignSystemPage() {
                             <button className="btn-primary animate-pulse-glow">Pulse Glow</button>
                         </div>
 
-                        <div className="mt-6 pt-6 border-t border-slate-700">
-                            <p className="text-xs text-slate-500 mb-4">Usage:</p>
-                            <pre className="text-xs text-slate-400 bg-slate-900 p-4 rounded-lg overflow-x-auto">
+                        <div className="mt-6 pt-6 border-t border-border">
+                            <p className="text-xs text-muted-foreground mb-4">Usage:</p>
+                            <pre className="text-xs text-muted-foreground bg-card p-4 rounded-lg overflow-x-auto">
                                 {`<button className="btn-primary">Primary</button>
 <button className="btn-ghost">Ghost</button>
 <button className="btn-primary animate-float">Floating</button>`}
@@ -326,7 +326,7 @@ export default function DesignSystemPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         <div className="glass-card p-6">
                             <h3 className="text-lg font-semibold text-white mb-2">Glass Card</h3>
-                            <p className="text-sm text-slate-400">
+                            <p className="text-sm text-muted-foreground">
                                 Uses backdrop-blur for frosted glass effect. Perfect for content sections.
                             </p>
                             <code className="text-xs text-primary mt-4 block">.glass-card</code>
@@ -334,18 +334,18 @@ export default function DesignSystemPage() {
 
                         <div className="glass-card card-glow p-6">
                             <h3 className="text-lg font-semibold text-white mb-2">Glow Card</h3>
-                            <p className="text-sm text-slate-400">
+                            <p className="text-sm text-muted-foreground">
                                 Glass card with gradient glow on hover. Good for interactive elements.
                             </p>
                             <code className="text-xs text-primary mt-4 block">.glass-card .card-glow</code>
                         </div>
 
-                        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 hover:border-slate-700 transition">
+                        <div className="rounded-xl border border-border bg-card/50 p-6 hover:border-border transition">
                             <h3 className="text-lg font-semibold text-white mb-2">Simple Card</h3>
-                            <p className="text-sm text-slate-400">
+                            <p className="text-sm text-muted-foreground">
                                 Basic bordered card without blur. Use for simpler UIs.
                             </p>
-                            <code className="text-xs text-primary mt-4 block">border + bg-slate-900/50</code>
+                            <code className="text-xs text-primary mt-4 block">border + bg-card/50</code>
                         </div>
                     </div>
                 </section>
@@ -361,25 +361,25 @@ export default function DesignSystemPage() {
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
                             <div className="text-center">
                                 <div className="w-16 h-16 mx-auto bg-gradient-primary rounded-lg animate-float"></div>
-                                <p className="text-xs text-slate-400 mt-2">Float</p>
+                                <p className="text-xs text-muted-foreground mt-2">Float</p>
                                 <code className="text-xs text-primary">.animate-float</code>
                             </div>
 
                             <div className="text-center">
                                 <div className="w-16 h-16 mx-auto bg-gradient-primary rounded-lg animate-pulse"></div>
-                                <p className="text-xs text-slate-400 mt-2">Pulse</p>
+                                <p className="text-xs text-muted-foreground mt-2">Pulse</p>
                                 <code className="text-xs text-primary">.animate-pulse</code>
                             </div>
 
                             <div className="text-center">
                                 <div className="w-16 h-16 mx-auto bg-gradient-primary rounded-lg animate-pulse-glow"></div>
-                                <p className="text-xs text-slate-400 mt-2">Pulse Glow</p>
+                                <p className="text-xs text-muted-foreground mt-2">Pulse Glow</p>
                                 <code className="text-xs text-primary">.animate-pulse-glow</code>
                             </div>
 
                             <div className="text-center">
                                 <div className="w-16 h-16 mx-auto bg-gradient-primary rounded-lg animate-fade-in"></div>
-                                <p className="text-xs text-slate-400 mt-2">Fade In</p>
+                                <p className="text-xs text-muted-foreground mt-2">Fade In</p>
                                 <code className="text-xs text-primary">.animate-fade-in</code>
                             </div>
                         </div>
@@ -394,7 +394,7 @@ export default function DesignSystemPage() {
                     </h2>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div className="h-48 rounded-xl bg-gradient-mesh flex items-center justify-center border border-slate-700">
+                        <div className="h-48 rounded-xl bg-gradient-mesh flex items-center justify-center border border-border">
                             <div className="text-center">
                                 <p className="text-sm font-medium text-white">Gradient Mesh</p>
                                 <code className="text-xs text-primary">.bg-gradient-mesh</code>
@@ -403,8 +403,8 @@ export default function DesignSystemPage() {
 
                         <div className="h-48 rounded-xl bg-gradient-primary flex items-center justify-center">
                             <div className="text-center">
-                                <p className="text-sm font-medium text-slate-950">Gradient Primary</p>
-                                <code className="text-xs text-slate-800">.bg-gradient-primary</code>
+                                <p className="text-sm font-medium text-foreground">Gradient Primary</p>
+                                <code className="text-xs text-muted-foreground">.bg-gradient-primary</code>
                             </div>
                         </div>
                     </div>
@@ -450,7 +450,7 @@ export default function DesignSystemPage() {
                     </h2>
 
                     <div className="glass-card py-8 px-4">
-                        <div className="grid grid-cols-3 divide-x divide-slate-700/50">
+                        <div className="grid grid-cols-3 divide-x divide-border/50">
                             <div className="stat-badge">
                                 <span className="stat-value">10K+</span>
                                 <span className="stat-label">Steps Tracked</span>
@@ -475,13 +475,13 @@ export default function DesignSystemPage() {
                     </h2>
 
                     <div className="glass-card p-6">
-                        <p className="text-sm text-slate-400 mb-6">
+                        <p className="text-sm text-muted-foreground mb-6">
                             Centralized badge system used across Kanban, Roadmap, and Leaderboard. All badges are defined in <code className="text-primary">src/lib/badges.ts</code>.
                         </p>
 
                         {/* Type Badges */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-slate-300 mb-3">Type Badges</h3>
+                            <h3 className="text-sm font-medium text-foreground mb-3">Type Badges</h3>
                             <div className="flex flex-wrap gap-2">
                                 <Badge category="type" value="bug" />
                                 <Badge category="type" value="feature" />
@@ -494,7 +494,7 @@ export default function DesignSystemPage() {
 
                         {/* Status Badges (Workflow) */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-slate-300 mb-3">Status Badges (Workflow)</h3>
+                            <h3 className="text-sm font-medium text-foreground mb-3">Status Badges (Workflow)</h3>
                             <div className="flex flex-wrap gap-2">
                                 <Badge category="status" value="backlog" />
                                 <Badge category="status" value="todo" />
@@ -507,21 +507,21 @@ export default function DesignSystemPage() {
 
                         {/* Status Badges (Submission States) */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-slate-300 mb-3">Status Badges (Submission States)</h3>
+                            <h3 className="text-sm font-medium text-foreground mb-3">Status Badges (Submission States)</h3>
                             <div className="flex flex-wrap gap-2">
                                 <Badge category="status" value="verified" />
                                 <Badge category="status" value="pending" />
                                 <Badge category="status" value="failed" />
                                 <Badge category="status" value="pending_review" />
                             </div>
-                            <p className="text-xs text-slate-500 mt-2">
+                            <p className="text-xs text-muted-foreground mt-2">
                                 Uses semantic CSS variables: <code className="text-primary">--success</code>, <code className="text-primary">--warning</code>, <code className="text-primary">--destructive</code>
                             </p>
                         </div>
 
                         {/* Release Badges */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-slate-300 mb-3">Release Badges</h3>
+                            <h3 className="text-sm font-medium text-foreground mb-3">Release Badges</h3>
                             <div className="flex flex-wrap gap-2">
                                 <Badge category="release" value="now" />
                                 <Badge category="release" value="next" />
@@ -532,7 +532,7 @@ export default function DesignSystemPage() {
 
                         {/* Achievement Badges */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-slate-300 mb-3">Achievement Badges</h3>
+                            <h3 className="text-sm font-medium text-foreground mb-3">Achievement Badges</h3>
                             <div className="flex flex-wrap gap-2">
                                 <Badge category="achievement" value="leader" />
                                 <Badge category="achievement" value="most_improved" />
@@ -543,28 +543,28 @@ export default function DesignSystemPage() {
                         </div>
 
                         {/* Size Variants */}
-                        <div className="mb-6 pt-6 border-t border-slate-700">
-                            <h3 className="text-sm font-medium text-slate-300 mb-3">Size Variants</h3>
+                        <div className="mb-6 pt-6 border-t border-border">
+                            <h3 className="text-sm font-medium text-foreground mb-3">Size Variants</h3>
                             <div className="flex flex-wrap items-center gap-4">
                                 <div className="text-center">
                                     <Badge category="type" value="bug" size="sm" />
-                                    <p className="text-xs text-slate-500 mt-1">sm</p>
+                                    <p className="text-xs text-muted-foreground mt-1">sm</p>
                                 </div>
                                 <div className="text-center">
                                     <Badge category="type" value="bug" size="md" />
-                                    <p className="text-xs text-slate-500 mt-1">md (default)</p>
+                                    <p className="text-xs text-muted-foreground mt-1">md (default)</p>
                                 </div>
                                 <div className="text-center">
                                     <Badge category="type" value="bug" size="lg" />
-                                    <p className="text-xs text-slate-500 mt-1">lg</p>
+                                    <p className="text-xs text-muted-foreground mt-1">lg</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Usage */}
-                        <div className="pt-6 border-t border-slate-700">
-                            <p className="text-xs text-slate-500 mb-4">Usage:</p>
-                            <pre className="text-xs text-slate-400 bg-slate-900 p-4 rounded-lg overflow-x-auto">
+                        <div className="pt-6 border-t border-border">
+                            <p className="text-xs text-muted-foreground mb-4">Usage:</p>
+                            <pre className="text-xs text-muted-foreground bg-card p-4 rounded-lg overflow-x-auto">
                                 {`import { SystemBadge } from "@/components/ui/SystemBadge";
 
 <SystemBadge category="type" value="bug" />
@@ -572,7 +572,7 @@ export default function DesignSystemPage() {
 <SystemBadge category="release" value="now" showLabel={false} />
 <SystemBadge category="achievement" value="leader" />`}
                             </pre>
-                            <p className="text-xs text-slate-500 mt-4">
+                            <p className="text-xs text-muted-foreground mt-4">
                                 All badge colors defined in <code className="text-primary">src/lib/badges.ts</code> - Status badges (verified/pending/failed) use semantic CSS variables for theme adaptation.
                             </p>
                         </div>
@@ -587,204 +587,204 @@ export default function DesignSystemPage() {
                     </h2>
 
                     <div className="glass-card p-6">
-                        <p className="text-sm text-slate-400 mb-6">
+                        <p className="text-sm text-muted-foreground mb-6">
                             Reusable components organized by category. All components use CSS variables for theme compatibility.
                         </p>
 
                         {/* UI Components */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
+                            <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
                                 <span className="text-sky-400">📦</span> UI Components
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">DatePicker</code>
-                                    <p className="text-xs text-slate-500 mt-1">Calendar date selection with range support</p>
-                                    <p className="text-xs text-slate-600 mt-1">ui/DatePicker.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Calendar date selection with range support</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">ui/DatePicker.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">DateRangePicker</code>
-                                    <p className="text-xs text-slate-500 mt-1">Calendar date range selection with custom styles</p>
-                                    <p className="text-xs text-slate-600 mt-1">ui/DateRangePicker.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Calendar date range selection with custom styles</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">ui/DateRangePicker.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">ShareButton</code>
-                                    <p className="text-xs text-slate-500 mt-1">Social sharing with Web Share API fallback</p>
-                                    <p className="text-xs text-slate-600 mt-1">ui/ShareButton.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Social sharing with Web Share API fallback</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">ui/ShareButton.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">ModuleFeedback</code>
-                                    <p className="text-xs text-slate-500 mt-1">Floating feedback button for any page section</p>
-                                    <p className="text-xs text-slate-600 mt-1">ui/ModuleFeedback.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Floating feedback button for any page section</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">ui/ModuleFeedback.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">Spinner</code>
-                                    <p className="text-xs text-slate-500 mt-1">Loading indicator with sizes</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Loading indicator with sizes</p>
                                     <div className="flex items-center gap-4 mt-2 text-sky-400">
                                         <Spinner size="sm" />
                                         <Spinner size="md" />
                                         <Spinner size="lg" />
                                     </div>
-                                    <p className="text-xs text-slate-600 mt-1">ui/Spinner.tsx</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">ui/Spinner.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">AchievementShareCard</code>
-                                    <p className="text-xs text-slate-500 mt-1">Shareable achievement/stats card with download</p>
-                                    <p className="text-xs text-slate-600 mt-1">ui/AchievementShareCard.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Shareable achievement/stats card with download</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">ui/AchievementShareCard.tsx</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Form Components */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
+                            <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
                                 <span className="text-purple-400">📝</span> Form Components
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">SubmissionForm</code>
-                                    <p className="text-xs text-slate-500 mt-1">Single step entry with AI verification</p>
-                                    <p className="text-xs text-slate-600 mt-1">forms/SubmissionForm.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Single step entry with AI verification</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">forms/SubmissionForm.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">BatchSubmissionForm</code>
-                                    <p className="text-xs text-slate-500 mt-1">Multi-image upload with bulk processing</p>
-                                    <p className="text-xs text-slate-600 mt-1">forms/BatchSubmissionForm.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Multi-image upload with bulk processing</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">forms/BatchSubmissionForm.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">BulkUnverifiedForm</code>
-                                    <p className="text-xs text-slate-500 mt-1">Quick manual entry for multiple dates</p>
-                                    <p className="text-xs text-slate-600 mt-1">forms/BulkUnverifiedForm.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Quick manual entry for multiple dates</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">forms/BulkUnverifiedForm.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">JoinLeagueForm</code>
-                                    <p className="text-xs text-slate-500 mt-1">Invite code entry form</p>
-                                    <p className="text-xs text-slate-600 mt-1">forms/JoinLeagueForm.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Invite code entry form</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">forms/JoinLeagueForm.tsx</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Analytics Components */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
+                            <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
                                 <span className="text-[hsl(var(--warning))]">📊</span> Analytics Components
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">CalendarHeatmap</code>
-                                    <p className="text-xs text-slate-500 mt-1">GitHub-style activity heatmap</p>
-                                    <p className="text-xs text-slate-600 mt-1">analytics/CalendarHeatmap.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">GitHub-style activity heatmap</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">analytics/CalendarHeatmap.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">DailyBreakdownTable</code>
-                                    <p className="text-xs text-slate-500 mt-1">Tabular view with period grouping</p>
-                                    <p className="text-xs text-slate-600 mt-1">analytics/DailyBreakdownTable.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Tabular view with period grouping</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">analytics/DailyBreakdownTable.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">PersonalStatsCard</code>
-                                    <p className="text-xs text-slate-500 mt-1">User achievements and records</p>
-                                    <p className="text-xs text-slate-600 mt-1">analytics/PersonalStatsCard.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">User achievements and records</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">analytics/PersonalStatsCard.tsx</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* League Components */}
                         <div>
-                            <h3 className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
+                            <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
                                 <span className="text-rose-400">🏆</span> League Components
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">LeagueInviteControl</code>
-                                    <p className="text-xs text-slate-500 mt-1">Invite code display and sharing</p>
-                                    <p className="text-xs text-slate-600 mt-1">league/LeagueInviteControl.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Invite code display and sharing</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">league/LeagueInviteControl.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">ProxyMembersDropdown</code>
-                                    <p className="text-xs text-slate-500 mt-1">Select user for proxy submissions</p>
-                                    <p className="text-xs text-slate-600 mt-1">league/ProxyMembersDropdown.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Select user for proxy submissions</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">league/ProxyMembersDropdown.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">ProxyMemberManagement</code>
-                                    <p className="text-xs text-slate-500 mt-1">Admin panel for proxy users</p>
-                                    <p className="text-xs text-slate-600 mt-1">league/ProxyMemberManagement.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Admin panel for proxy users</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">league/ProxyMemberManagement.tsx</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Layout Components */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
+                            <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
                                 <span className="text-cyan-400">🖼️</span> Layout Components
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">PageLayout</code>
-                                    <p className="text-xs text-slate-500 mt-1">Orchestrator for header, loading, empty, and content states</p>
-                                    <p className="text-xs text-slate-600 mt-1">layout/PageLayout.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Orchestrator for header, loading, empty, and content states</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">layout/PageLayout.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">PageHeader</code>
-                                    <p className="text-xs text-slate-500 mt-1">Title, subtitle, actions, breadcrumbs with analytics</p>
-                                    <p className="text-xs text-slate-600 mt-1">layout/PageHeader.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Title, subtitle, actions, breadcrumbs with analytics</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">layout/PageHeader.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">EmptyState</code>
-                                    <p className="text-xs text-slate-500 mt-1">Configurable empty state with icons, descriptions, CTAs</p>
-                                    <p className="text-xs text-slate-600 mt-1">layout/EmptyState.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Configurable empty state with icons, descriptions, CTAs</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">layout/EmptyState.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">LoadingSkeleton</code>
-                                    <p className="text-xs text-slate-500 mt-1">Multiple variants: list, cards, table, content</p>
-                                    <p className="text-xs text-slate-600 mt-1">layout/LoadingSkeleton.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Multiple variants: list, cards, table, content</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">layout/LoadingSkeleton.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">GlobalFooter</code>
-                                    <p className="text-xs text-slate-500 mt-1">Site-wide footer with navigation links</p>
-                                    <p className="text-xs text-slate-600 mt-1">layout/GlobalFooter.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Site-wide footer with navigation links</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">layout/GlobalFooter.tsx</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Navigation Components */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
+                            <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
                                 <span className="text-indigo-400">🧭</span> Navigation Components
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">NavHeader</code>
-                                    <p className="text-xs text-slate-500 mt-1">Main navigation with dropdowns and mobile menu</p>
-                                    <p className="text-xs text-slate-600 mt-1">navigation/NavHeader.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Main navigation with dropdowns and mobile menu</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">navigation/NavHeader.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">NavDropdown</code>
-                                    <p className="text-xs text-slate-500 mt-1">Reusable animated dropdown menu</p>
-                                    <p className="text-xs text-slate-600 mt-1">navigation/NavDropdown.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Reusable animated dropdown menu</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">navigation/NavDropdown.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">MobileMenu</code>
-                                    <p className="text-xs text-slate-500 mt-1">Responsive drawer for small screens</p>
-                                    <p className="text-xs text-slate-600 mt-1">navigation/MobileMenu.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Responsive drawer for small screens</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">navigation/MobileMenu.tsx</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Provider Components */}
                         <div>
-                            <h3 className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
+                            <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
                                 <span className="text-pink-400">⚙️</span> Provider Components
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">AuthProvider</code>
-                                    <p className="text-xs text-slate-500 mt-1">Supabase auth context and session management</p>
-                                    <p className="text-xs text-slate-600 mt-1">providers/AuthProvider.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Supabase auth context and session management</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">providers/AuthProvider.tsx</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">TourProvider</code>
-                                    <p className="text-xs text-slate-500 mt-1">Modular guided tour system with analytics</p>
-                                    <p className="text-xs text-slate-600 mt-1">components/tours/TourProvider.tsx</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Modular guided tour system with analytics</p>
+                                    <p className="text-xs text-muted-foreground/70 mt-1">components/tours/TourProvider.tsx</p>
                                 </div>
                             </div>
                         </div>
@@ -799,40 +799,40 @@ export default function DesignSystemPage() {
                     </h2>
 
                     <div className="glass-card p-6">
-                        <p className="text-sm text-slate-400 mb-6">
+                        <p className="text-sm text-muted-foreground mb-6">
                             Common page layout patterns used across the application.
                         </p>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                            <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                            <div className="p-3 rounded-lg bg-muted border border-border">
                                 <code className="text-primary">Dashboard Layout</code>
-                                <p className="text-xs text-slate-500 mt-1">NavHeader + content + GlobalFooter wrapper</p>
-                                <p className="text-xs text-slate-600 mt-1">(dashboard)/layout.tsx</p>
+                                <p className="text-xs text-muted-foreground mt-1">NavHeader + content + GlobalFooter wrapper</p>
+                                <p className="text-xs text-muted-foreground/70 mt-1">(dashboard)/layout.tsx</p>
                             </div>
-                            <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                            <div className="p-3 rounded-lg bg-muted border border-border">
                                 <code className="text-primary">Auth Layout</code>
-                                <p className="text-xs text-slate-500 mt-1">Centered card for sign-in/sign-up</p>
-                                <p className="text-xs text-slate-600 mt-1">(auth)/sign-in, sign-up</p>
+                                <p className="text-xs text-muted-foreground mt-1">Centered card for sign-in/sign-up</p>
+                                <p className="text-xs text-muted-foreground/70 mt-1">(auth)/sign-in, sign-up</p>
                             </div>
-                            <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                            <div className="p-3 rounded-lg bg-muted border border-border">
                                 <code className="text-primary">League Detail</code>
-                                <p className="text-xs text-slate-500 mt-1">Submission form + leaderboard + analytics tabs</p>
-                                <p className="text-xs text-slate-600 mt-1">league/[id]/*</p>
+                                <p className="text-xs text-muted-foreground mt-1">Submission form + leaderboard + analytics tabs</p>
+                                <p className="text-xs text-muted-foreground/70 mt-1">league/[id]/*</p>
                             </div>
-                            <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                            <div className="p-3 rounded-lg bg-muted border border-border">
                                 <code className="text-primary">Static Page</code>
-                                <p className="text-xs text-slate-500 mt-1">section-container with prose content</p>
-                                <p className="text-xs text-slate-600 mt-1">privacy, terms, security, beta</p>
+                                <p className="text-xs text-muted-foreground mt-1">section-container with prose content</p>
+                                <p className="text-xs text-muted-foreground/70 mt-1">privacy, terms, security, beta</p>
                             </div>
-                            <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                            <div className="p-3 rounded-lg bg-muted border border-border">
                                 <code className="text-primary">Settings Page</code>
-                                <p className="text-xs text-slate-500 mt-1">Form sections with glass-card containers</p>
-                                <p className="text-xs text-slate-600 mt-1">settings/profile</p>
+                                <p className="text-xs text-muted-foreground mt-1">Form sections with glass-card containers</p>
+                                <p className="text-xs text-muted-foreground/70 mt-1">settings/profile</p>
                             </div>
-                            <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                            <div className="p-3 rounded-lg bg-muted border border-border">
                                 <code className="text-primary">Share Page</code>
-                                <p className="text-xs text-slate-500 mt-1">Public shareable content with OG images</p>
-                                <p className="text-xs text-slate-600 mt-1">share/[id], invite/[code]</p>
+                                <p className="text-xs text-muted-foreground mt-1">Public shareable content with OG images</p>
+                                <p className="text-xs text-muted-foreground/70 mt-1">share/[id], invite/[code]</p>
                             </div>
                         </div>
                     </div>
@@ -846,34 +846,34 @@ export default function DesignSystemPage() {
                     </h2>
 
                     <div className="glass-card p-6">
-                        <p className="text-sm text-slate-400 mb-6">
+                        <p className="text-sm text-muted-foreground mb-6">
                             Consistent styling patterns used across forms and UI elements. Use these exact patterns for consistency.
                         </p>
 
                         {/* Form Inputs */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-slate-300 mb-3">Form Inputs</h3>
+                            <h3 className="text-sm font-medium text-foreground mb-3">Form Inputs</h3>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-xs text-slate-500 mb-1">Text Input</label>
+                                    <label className="block text-xs text-muted-foreground mb-1">Text Input</label>
                                     <input
                                         type="text"
                                         placeholder="Example input..."
-                                        className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 focus:border-primary focus:outline-none"
+                                        className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:border-primary focus:outline-none"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs text-slate-500 mb-1">Disabled Input</label>
+                                    <label className="block text-xs text-muted-foreground mb-1">Disabled Input</label>
                                     <input
                                         type="text"
                                         value="Read-only value"
                                         disabled
-                                        className="w-full rounded-lg border border-slate-700 bg-slate-800/50 px-4 py-3 text-slate-400 cursor-not-allowed"
+                                        className="w-full rounded-lg border border-border bg-muted px-4 py-3 text-muted-foreground cursor-not-allowed"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs text-slate-500 mb-1">Select</label>
-                                    <select className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 focus:border-primary focus:outline-none">
+                                    <label className="block text-xs text-muted-foreground mb-1">Select</label>
+                                    <select className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:border-primary focus:outline-none">
                                         <option>Option 1</option>
                                         <option>Option 2</option>
                                     </select>
@@ -883,7 +883,7 @@ export default function DesignSystemPage() {
 
                         {/* Alerts/Messages */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-slate-300 mb-3">Alert Component</h3>
+                            <h3 className="text-sm font-medium text-foreground mb-3">Alert Component</h3>
                             <div className="space-y-3">
                                 <Alert variant="success">
                                     <AlertDescription>
@@ -911,18 +911,18 @@ export default function DesignSystemPage() {
                                     </AlertDescription>
                                 </Alert>
                             </div>
-                            <p className="text-xs text-slate-500 mt-4">
+                            <p className="text-xs text-muted-foreground mt-4">
                                 Usage: <code className="text-primary">{'<Alert variant="success|destructive|warning|info">'}</code>
                             </p>
-                            <p className="text-xs text-slate-500 mt-1">
+                            <p className="text-xs text-muted-foreground mt-1">
                                 Uses semantic CSS variables for automatic light/dark mode adaptation
                             </p>
                         </div>
 
                         {/* Usage Note */}
-                        <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700">
-                            <p className="text-xs text-slate-500">
-                                <strong className="text-slate-400">Modularization Note:</strong> If you find these patterns repeated 3+ times,
+                        <div className="p-4 rounded-lg bg-muted border border-border">
+                            <p className="text-xs text-muted-foreground">
+                                <strong className="text-muted-foreground">Modularization Note:</strong> If you find these patterns repeated 3+ times,
                                 extract into a reusable component (e.g., Input, Select, Alert).
                             </p>
                         </div>
@@ -937,16 +937,16 @@ export default function DesignSystemPage() {
                     </h2>
 
                     <div className="glass-card p-6">
-                        <p className="text-sm text-slate-400 mb-6">
+                        <p className="text-sm text-muted-foreground mb-6">
                             Production-ready, accessible components from shadcn/ui. All components in <code className="text-primary">src/components/ui/</code>.
                         </p>
 
                         {/* Toast Notifications */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-slate-300 mb-3">Toast Notifications</h3>
-                            <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700">
-                                <p className="text-xs text-slate-400 mb-3">Replace all <code className="text-rose-400">alert()</code> calls with <code className="text-primary">toast()</code>:</p>
-                                <pre className="text-xs text-slate-400 bg-slate-900 p-3 rounded-lg overflow-x-auto">
+                            <h3 className="text-sm font-medium text-foreground mb-3">Toast Notifications</h3>
+                            <div className="p-4 rounded-lg bg-muted border border-border">
+                                <p className="text-xs text-muted-foreground mb-3">Replace all <code className="text-rose-400">alert()</code> calls with <code className="text-primary">toast()</code>:</p>
+                                <pre className="text-xs text-muted-foreground bg-card p-3 rounded-lg overflow-x-auto">
                                     {`import { toast } from "@/hooks/use-toast";
 
 // Success
@@ -960,10 +960,10 @@ toast({ title: "Warning", description: "Check input", variant: "destructive" });
 
                         {/* Confirmation Dialog */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-slate-300 mb-3">Confirmation Dialogs</h3>
-                            <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700">
-                                <p className="text-xs text-slate-400 mb-3">Replace <code className="text-rose-400">confirm()</code> with <code className="text-primary">ConfirmDialog</code>:</p>
-                                <pre className="text-xs text-slate-400 bg-slate-900 p-3 rounded-lg overflow-x-auto">
+                            <h3 className="text-sm font-medium text-foreground mb-3">Confirmation Dialogs</h3>
+                            <div className="p-4 rounded-lg bg-muted border border-border">
+                                <p className="text-xs text-muted-foreground mb-3">Replace <code className="text-rose-400">confirm()</code> with <code className="text-primary">ConfirmDialog</code>:</p>
+                                <pre className="text-xs text-muted-foreground bg-card p-3 rounded-lg overflow-x-auto">
                                     {`import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 <ConfirmDialog
@@ -981,46 +981,46 @@ toast({ title: "Warning", description: "Check input", variant: "destructive" });
 
                         {/* Form Components */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-slate-300 mb-3">Form Components</h3>
+                            <h3 className="text-sm font-medium text-foreground mb-3">Form Components</h3>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">input.tsx</code>
-                                    <p className="text-xs text-slate-500 mt-1">Text input field</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Text input field</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">select.tsx</code>
-                                    <p className="text-xs text-slate-500 mt-1">Dropdown select</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Dropdown select</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">checkbox.tsx</code>
-                                    <p className="text-xs text-slate-500 mt-1">Checkbox input</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Checkbox input</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">label.tsx</code>
-                                    <p className="text-xs text-slate-500 mt-1">Form labels</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Form labels</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">textarea.tsx</code>
-                                    <p className="text-xs text-slate-500 mt-1">Multi-line text</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Multi-line text</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">tooltip.tsx</code>
-                                    <p className="text-xs text-slate-500 mt-1">Hover tooltips</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Hover tooltips</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Other Components */}
                         <div>
-                            <h3 className="text-sm font-medium text-slate-300 mb-3">Other Components</h3>
+                            <h3 className="text-sm font-medium text-foreground mb-3">Other Components</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">dialog.tsx</code>
-                                    <p className="text-xs text-slate-500 mt-1">Modal dialogs (used by ExpandableCardModal)</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Modal dialogs (used by ExpandableCardModal)</p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                <div className="p-3 rounded-lg bg-muted border border-border">
                                     <code className="text-primary">dropdown-menu.tsx</code>
-                                    <p className="text-xs text-slate-500 mt-1">Dropdown menus (used by ModeToggle)</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Dropdown menus (used by ModeToggle)</p>
                                 </div>
                             </div>
                         </div>
@@ -1036,19 +1036,19 @@ toast({ title: "Warning", description: "Check input", variant: "destructive" });
 
                     <div className="space-y-6">
                         <div className="glass-card p-6">
-                            <h3 className="text-sm font-medium text-slate-300 mb-4">Unified Settings Architecture</h3>
-                            <p className="text-sm text-slate-400 mb-6">
+                            <h3 className="text-sm font-medium text-foreground mb-4">Unified Settings Architecture</h3>
+                            <p className="text-sm text-muted-foreground mb-6">
                                 Reusable settings components for User Preferences, League Settings, and Admin Settings.
                                 All components use shadcn/ui primitives with consistent styling.
                             </p>
 
                             <div className="space-y-4">
-                                <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                                <div className="p-4 bg-card/50 rounded-lg border border-border">
                                     <code className="text-primary text-sm">SettingsLayout</code>
-                                    <p className="text-xs text-slate-500 mt-2">
+                                    <p className="text-xs text-muted-foreground mt-2">
                                         Main layout wrapper with header, back link, and optional tabbed navigation.
                                     </p>
-                                    <pre className="text-xs text-slate-400 mt-3 bg-slate-950 p-3 rounded overflow-x-auto">
+                                    <pre className="text-xs text-muted-foreground mt-3 bg-background p-3 rounded overflow-x-auto">
                                         {`<SettingsLayout
   title="Settings"
   navItems={[
@@ -1061,48 +1061,48 @@ toast({ title: "Warning", description: "Check input", variant: "destructive" });
                                     </pre>
                                 </div>
 
-                                <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                                <div className="p-4 bg-card/50 rounded-lg border border-border">
                                     <code className="text-primary text-sm">SettingsSection</code>
-                                    <p className="text-xs text-slate-500 mt-2">
+                                    <p className="text-xs text-muted-foreground mt-2">
                                         Groups related settings with title and description. Supports danger mode.
                                     </p>
                                 </div>
 
-                                <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                                <div className="p-4 bg-card/50 rounded-lg border border-border">
                                     <code className="text-primary text-sm">SettingsField</code>
-                                    <p className="text-xs text-slate-500 mt-2">
+                                    <p className="text-xs text-muted-foreground mt-2">
                                         Text/textarea input with label, description, and character count.
                                     </p>
                                 </div>
 
-                                <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                                <div className="p-4 bg-card/50 rounded-lg border border-border">
                                     <code className="text-primary text-sm">SettingsToggle</code>
-                                    <p className="text-xs text-slate-500 mt-2">
+                                    <p className="text-xs text-muted-foreground mt-2">
                                         Boolean switch field (wraps shadcn Switch).
                                     </p>
                                 </div>
 
-                                <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                                <div className="p-4 bg-card/50 rounded-lg border border-border">
                                     <code className="text-primary text-sm">SettingsSelect</code>
-                                    <p className="text-xs text-slate-500 mt-2">
+                                    <p className="text-xs text-muted-foreground mt-2">
                                         Dropdown selector (wraps shadcn Select).
                                     </p>
                                 </div>
 
-                                <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                                <div className="p-4 bg-card/50 rounded-lg border border-border">
                                     <code className="text-primary text-sm">SettingsRadioGroup</code>
-                                    <p className="text-xs text-slate-500 mt-2">
+                                    <p className="text-xs text-muted-foreground mt-2">
                                         Radio button group with optional descriptions per option.
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="mt-6 pt-6 border-t border-slate-700">
-                                <h4 className="text-xs font-medium text-slate-300 mb-3">Registry Pattern</h4>
-                                <p className="text-xs text-slate-400 mb-3">
+                            <div className="mt-6 pt-6 border-t border-border">
+                                <h4 className="text-xs font-medium text-foreground mb-3">Registry Pattern</h4>
+                                <p className="text-xs text-muted-foreground mb-3">
                                     Settings are defined in type-safe registries following industry best practices:
                                 </p>
-                                <ul className="text-xs text-slate-500 space-y-2 list-disc list-inside">
+                                <ul className="text-xs text-muted-foreground space-y-2 list-disc list-inside">
                                     <li><code className="text-primary">src/lib/settings/userPreferences.ts</code> - User settings registry</li>
                                     <li><code className="text-primary">src/lib/settings/types.ts</code> - Type-safe setting definitions</li>
                                     <li><code className="text-primary">src/hooks/usePreferences.ts</code> - Hook with optimistic updates</li>
@@ -1115,10 +1115,10 @@ toast({ title: "Warning", description: "Check input", variant: "destructive" });
                 {/* Theme Support Note */}
                 <section className="glass-card p-6 border-l-4 border-primary mb-16">
                     <h3 className="text-lg font-semibold text-primary mb-2">🌓 Theme Support</h3>
-                    <p className="text-sm text-slate-400 mb-3">
+                    <p className="text-sm text-muted-foreground mb-3">
                         All components use CSS variables for light/dark mode. Use the <strong>theme toggle</strong> in the navigation header to switch between Light, Dark, and System modes.
                     </p>
-                    <div className="text-xs text-slate-500">
+                    <div className="text-xs text-muted-foreground">
                         <strong>When adding new components:</strong> Always use CSS variables from <code className="text-primary">globals.css</code> instead of hardcoded Tailwind colors.
                     </div>
                 </section>
@@ -1126,7 +1126,7 @@ toast({ title: "Warning", description: "Check input", variant: "destructive" });
                 {/* Documentation Note */}
                 <section className="glass-card p-6 border-l-4 border-amber-500">
                     <h3 className="text-lg font-semibold text-[hsl(var(--warning))] mb-2">⚠️ Maintenance Note</h3>
-                    <p className="text-sm text-slate-400">
+                    <p className="text-sm text-muted-foreground">
                         This design system page must be updated whenever new design tokens, utility classes,
                         or reusable components are added. See <code className="text-primary">AGENTS.md</code> for documentation rules.
                     </p>

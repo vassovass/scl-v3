@@ -278,7 +278,7 @@ export function DateRangePicker({
             <button
               type="button"
               onClick={handleReset}
-              className="text-slate-500 hover:text-slate-300 text-sm px-2"
+              className="text-muted-foreground hover:text-foreground text-sm px-2"
               title="Clear dates"
             >
               ✕
