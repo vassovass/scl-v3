@@ -1,0 +1,36 @@
+# StepLeague
+
+> StepLeague is a competitive step-tracking league platform where users form leagues with friends, family, or coworkers and compete weekly using daily step counts. Available as a progressive web app at stepleague.app.
+
+## Core Pages
+- [How It Works](https://stepleague.app/how-it-works): Step-by-step guide to creating leagues, inviting friends, and competing in weekly step challenges
+- [Pricing](https://stepleague.app/pricing): Free and premium plan details for individuals and teams
+- [Step Challenge App](https://stepleague.app/step-challenge-app): Main landing page — create step challenges, track progress, compete with friends
+
+## Team & Workplace
+- [Teams](https://stepleague.app/teams): Team step challenge features for organizations and corporate wellness programs
+- [Team Features](https://stepleague.app/teams/features): Detailed breakdown of team functionality including analytics and leaderboards
+- [Workplace Step Challenge](https://stepleague.app/workplace-step-challenge): Corporate wellness step challenge solution for employee engagement
+
+## SEO Landing Pages
+- [Walking Challenge with Friends](https://stepleague.app/walking-challenge-with-friends): How to set up and run walking challenges with friends using StepLeague
+- [Why Upload Steps](https://stepleague.app/why-upload): Benefits of uploading step proof screenshots for fair competition
+
+## Comparisons
+- [Compare Step Challenge Apps](https://stepleague.app/compare): Side-by-side comparison of StepLeague with other step challenge apps
+- [StepLeague vs Fitbit](https://stepleague.app/compare/stepleague-vs-fitbit): Feature comparison with Fitbit challenges
+- [StepLeague vs Strava](https://stepleague.app/compare/stepleague-vs-strava): Feature comparison with Strava challenges
+- [StepLeague vs Yumuuv](https://stepleague.app/compare/stepleague-vs-yumuuv): Feature comparison with Yumuuv
+- [StepLeague vs Garmin](https://stepleague.app/compare/stepleague-vs-garmin): Feature comparison with Garmin Connect challenges
+- [StepLeague vs Apple Fitness](https://stepleague.app/compare/stepleague-vs-apple-fitness): Feature comparison with Apple Fitness competitions
+- [StepLeague vs Stridekick](https://stepleague.app/compare/stepleague-vs-stridekick): Feature comparison with Stridekick
+
+## Legal
+- [Privacy Policy](https://stepleague.app/privacy): Privacy policy and data handling practices
+- [Terms of Service](https://stepleague.app/terms): Terms and conditions of use
+- [Security](https://stepleague.app/security): Security practices and data protection measures
+
+## Optional
+- [Roadmap](https://stepleague.app/roadmap): Public product roadmap and upcoming features
+- [How to Share](https://stepleague.app/how-to-share): Guide to sharing achievements and stats on social media
+- [Stage Info](https://stepleague.app/stage-info): Information about competition stages and progression system

@@ -1,0 +1,59 @@
+# StepLeague
+
+> StepLeague is a competitive step-tracking league platform where users form leagues with friends, family, or coworkers and compete weekly using daily step counts. Users submit steps once and they count across all their leagues. The platform features weekly competitions, leaderboards, achievement badges, social sharing, and proof-based verification. Available as a progressive web app at stepleague.app.
+
+StepLeague is device-agnostic — it works with any step counter, fitness tracker, or smartphone. Users upload screenshots of their step counts as proof, ensuring fair competition without requiring API integrations with specific fitness platforms.
+
+## Core Pages
+
+- [How It Works](https://stepleague.app/how-it-works): Complete walkthrough of the StepLeague experience — creating a league, inviting friends via shareable link, submitting daily steps with proof screenshots, climbing the weekly leaderboard, and earning achievement badges. Covers the weekly competition cycle from Monday to Sunday.
+
+- [Pricing](https://stepleague.app/pricing): Detailed breakdown of free and premium plans. Free tier includes league creation, weekly competitions, and basic leaderboards. Premium adds advanced analytics, team features, and enhanced customization options.
+
+- [Step Challenge App](https://stepleague.app/step-challenge-app): Primary landing page explaining what StepLeague is and why it's the best step challenge app for groups. Covers key differentiators: device-agnostic design, proof-based verification, weekly league format, and social competition features.
+
+## Team & Workplace
+
+- [Teams](https://stepleague.app/teams): Overview of team step challenge capabilities for organizations. Explains how companies can use StepLeague for corporate wellness programs, department competitions, and employee engagement initiatives.
+
+- [Team Features](https://stepleague.app/teams/features): Detailed feature breakdown for team administrators including team analytics dashboards, member management, custom league settings, leaderboard configurations, and reporting capabilities.
+
+- [Workplace Step Challenge](https://stepleague.app/workplace-step-challenge): Dedicated page for HR managers and wellness coordinators looking to implement workplace step challenges. Covers ROI of employee wellness programs, implementation guide, and success stories.
+
+## SEO Landing Pages
+
+- [Walking Challenge with Friends](https://stepleague.app/walking-challenge-with-friends): Comprehensive guide to organizing walking challenges with friends. Explains how StepLeague makes it easy to create friendly competitions, stay motivated, and track progress together regardless of which fitness device each person uses.
+
+- [Why Upload Steps](https://stepleague.app/why-upload): Explains the proof-based verification system — why uploading step count screenshots ensures fair competition and prevents cheating. Covers how the system works and why it's better than automatic syncing for competitive integrity.
+
+## Comparisons
+
+- [Compare Step Challenge Apps](https://stepleague.app/compare): Hub page comparing StepLeague with major fitness and step challenge platforms. Includes feature matrix, pricing comparison, and use case recommendations for different types of users.
+
+- [StepLeague vs Fitbit](https://stepleague.app/compare/stepleague-vs-fitbit): Detailed comparison of StepLeague and Fitbit challenges. Covers device requirements (StepLeague works with any device vs Fitbit-only), social features, competition formats, and pricing.
+
+- [StepLeague vs Strava](https://stepleague.app/compare/stepleague-vs-strava): Comparison focusing on step-specific challenges vs Strava's multi-sport approach. Highlights StepLeague's purpose-built step competition features vs Strava's broader but less focused challenge system.
+
+- [StepLeague vs Yumuuv](https://stepleague.app/compare/stepleague-vs-yumuuv): Feature comparison with Yumuuv's corporate wellness platform. Compares team features, pricing models, and suitability for different organization sizes.
+
+- [StepLeague vs Garmin](https://stepleague.app/compare/stepleague-vs-garmin): Comparison of StepLeague with Garmin Connect challenges. Emphasizes device-agnostic advantage and more structured weekly competition format.
+
+- [StepLeague vs Apple Fitness](https://stepleague.app/compare/stepleague-vs-apple-fitness): Comparison highlighting cross-platform advantage over Apple's ecosystem-locked competitions. Covers feature depth for step-specific challenges.
+
+- [StepLeague vs Stridekick](https://stepleague.app/compare/stepleague-vs-stridekick): Direct competitor comparison covering league formats, social features, proof verification, and pricing differences.
+
+## Legal
+
+- [Privacy Policy](https://stepleague.app/privacy): Comprehensive privacy policy covering data collection, storage, processing, and user rights. StepLeague uses Supabase for secure data storage with row-level security policies.
+
+- [Terms of Service](https://stepleague.app/terms): Terms and conditions governing use of the StepLeague platform, including user responsibilities, content policies, and dispute resolution.
+
+- [Security](https://stepleague.app/security): Overview of security practices including HTTPS enforcement, httpOnly authentication cookies, content security policies, and OWASP-aligned security headers.
+
+## Optional
+
+- [Roadmap](https://stepleague.app/roadmap): Public product roadmap showing planned features, current development priorities, and recently shipped improvements. Updated regularly.
+
+- [How to Share](https://stepleague.app/how-to-share): Guide to sharing achievements, stats, and league invitations on social media platforms including WhatsApp, Twitter, and direct link sharing.
+
+- [Stage Info](https://stepleague.app/stage-info): Explanation of the progression and stage system within StepLeague competitions, including how stages work and what milestones unlock.
