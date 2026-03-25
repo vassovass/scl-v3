@@ -7,6 +7,15 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-03-24]
+
+### Fixed
+
+- **CSP:** Add `us-assets.i.posthog.com` to `connect-src` directive — fixes PostHog sub-resource blocks (source maps, session recorder, web-vitals, surveys)
+- **Tests:** Sync security headers unit test CSP mirror with actual `next.config.js` config (was missing all analytics domains)
+
+---
+
 ## [2026-03-14]
 
 ### Added

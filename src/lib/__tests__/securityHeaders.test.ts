@@ -25,11 +25,11 @@ const SECURITY_HEADERS = [
         key: 'Content-Security-Policy',
         value: [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-            "style-src 'self' 'unsafe-inline'",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://us-assets.i.posthog.com",
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
             "img-src 'self' data: blob: https: *.supabase.co",
-            "font-src 'self' data:",
-            "connect-src 'self' *.supabase.co",
+            "font-src 'self' data: https://fonts.gstatic.com",
+            "connect-src 'self' *.supabase.co https://us.i.posthog.com https://us-assets.i.posthog.com https://www.google-analytics.com https://www.googletagmanager.com",
             "frame-ancestors 'none'",
             "base-uri 'self'",
             "form-action 'self'",
@@ -107,8 +107,12 @@ describe('Content-Security-Policy directives', () => {
         expect(csp).toContain('*.supabase.co');
     });
 
-    it('has connect-src allowing self and Supabase', () => {
+    it('has connect-src allowing self, Supabase, and analytics proxies', () => {
         expect(csp).toContain("connect-src 'self' *.supabase.co");
+        expect(csp).toContain('https://us.i.posthog.com');
+        expect(csp).toContain('https://us-assets.i.posthog.com');
+        expect(csp).toContain('https://www.google-analytics.com');
+        expect(csp).toContain('https://www.googletagmanager.com');
     });
 
     it('has frame-ancestors none (anti-clickjacking)', () => {
