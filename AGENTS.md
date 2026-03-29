@@ -170,4 +170,4 @@ Reference docs (read on demand when needed):
 - `docs/` — Reference documentation
 - `.agent/skills/` — Detailed patterns and workflows (source of truth)
 - `.claude/rules/` — Behavioral rules (auto-loaded by file path)
-- `docs/prds/` — Product requirement documents (PRD 01-68)
+- `docs/prds/` — Product requirement documents (PRD 01-80)

@@ -1,3 +1,12 @@
+---
+## Document Context
+**What**: Documentation for reusable form components (FormInput, FormSelect, FormCheckbox, FormTextarea, FormFileInput) with auto-generated accessibility attributes
+**Why**: Reference when building any form UI to use the standardized components from `src/components/ui/form-fields.tsx`
+**Status**: Current
+**Last verified**: 2026-03-29
+**Agent note**: This summary should be sufficient to assess relevance. Only read further if this document matches your current task.
+---
+
 # Form System Documentation
 
 > **Reusable form components with automatic accessibility attributes**

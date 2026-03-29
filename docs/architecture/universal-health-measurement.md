@@ -1,3 +1,12 @@
+---
+## Document Context
+**What**: Architecture for StepLeague Points (SLP) — a universal unit converting steps, calories, swimming, cycling, and running into a single comparable metric
+**Why**: Reference for implementing multi-activity support (PRD 48) — covers conversion table, DB schema, validation thresholds, AI extraction, and phased rollout plan
+**Status**: Reference
+**Last verified**: 2026-03-29
+**Agent note**: This summary should be sufficient to assess relevance. Only read further if this document matches your current task.
+---
+
 # Universal Health Measurement Architecture
 
 > PRD 48 | Architecture Document | 2026-02-28

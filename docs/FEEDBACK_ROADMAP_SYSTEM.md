@@ -1,3 +1,12 @@
+---
+## Document Context
+**What**: Architecture and API reference for the feedback-to-roadmap loop: user submission, admin triage, Kanban tracking, public roadmap voting, and completion flow
+**Why**: Understand the full feedback system when working on feedback widgets, admin Kanban, public roadmap, or related API routes
+**Status**: Reference
+**Last verified**: 2026-03-29
+**Agent note**: This summary should be sufficient to assess relevance. Only read further if this document matches your current task.
+---
+
 # Feedback & Roadmap System Documentation
 
 > **Last Updated:** 2026-01-03  

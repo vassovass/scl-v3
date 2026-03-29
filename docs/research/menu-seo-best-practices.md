@@ -1,3 +1,12 @@
+---
+## Document Context
+**What**: Research compilation on database-driven menu systems with SEO optimization, covering admin UX patterns, Next.js 14 metadata APIs, caching strategies, and menu versioning
+**Why**: Informs StepLeague's menu system expansion with industry best practices from WordPress, Webflow, Shopify, and modern frameworks
+**Status**: Reference
+**Last verified**: 2026-03-29
+**Agent note**: This summary should be sufficient to assess relevance. Only read further if this document matches your current task.
+---
+
 # Database-Driven Menu Systems with SEO Optimization - Best Practices Research
 
 ## Executive Summary

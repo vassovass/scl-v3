@@ -1,3 +1,12 @@
+---
+## Document Context
+**What**: Decision record for building an in-house Kanban board and public roadmap instead of adopting an external platform (Intercom, Zendesk, etc.)
+**Why**: Documents the rationale for the lightweight, modular approach chosen during alpha; covers options considered and trade-offs
+**Status**: Reference
+**Last verified**: 2026-03-29
+**Agent note**: This summary should be sufficient to assess relevance. Only read further if this document matches your current task.
+---
+
 # Decision Document: Internal Kanban & Public Roadmap System
 
 > **Date**: 2025-12-24  

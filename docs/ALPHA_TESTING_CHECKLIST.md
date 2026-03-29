@@ -1,3 +1,12 @@
+---
+## Document Context
+**What**: Manual and automated testing checklist for pre-alpha QA, covering sign-up, step submission, leaderboards, browser compatibility, and E2E test commands
+**Why**: Run through this checklist before inviting alpha testers to catch critical regressions
+**Status**: Stale
+**Last verified**: 2026-03-29
+**Agent note**: This summary should be sufficient to assess relevance. Only read further if this document matches your current task.
+---
+
 # Alpha Testing Checklist
 
 > **Purpose:** Manual + automated testing checklist before inviting alpha testers

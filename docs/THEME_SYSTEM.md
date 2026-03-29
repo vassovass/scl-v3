@@ -1,3 +1,12 @@
+---
+## Document Context
+**What**: Canonical theme system reference covering CSS variables, dark/light mode architecture, color system (HSL), component patterns, accessibility rules, and common pitfalls
+**Why**: Required reading before making any styling or color changes; defines how themes work end-to-end via next-themes and CSS custom properties
+**Status**: Current
+**Last verified**: 2026-03-29
+**Agent note**: This summary should be sufficient to assess relevance. Only read further if this document matches your current task.
+---
+
 # Theme System Documentation
 
 > **MUST READ for AI Agents**

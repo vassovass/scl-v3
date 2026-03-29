@@ -1,3 +1,12 @@
+---
+## Document Context
+**What**: Developer setup guide with CLI commands, local environment configuration, production URLs, common error fixes, and coding conventions
+**Why**: Onboarding reference for local dev setup and quick troubleshooting of common build/auth issues
+**Status**: Current
+**Last verified**: 2026-03-29
+**Agent note**: This summary should be sufficient to assess relevance. Only read further if this document matches your current task.
+---
+
 # Development Guide
 
 ## Commands

@@ -1,3 +1,12 @@
+---
+## Document Context
+**What**: Research and specification for light/dark mode color palettes, based on industry analysis of Strava, Nike, Apple Fitness, and modern SaaS (Linear, Vercel)
+**Why**: Documents the design decisions behind the theme system's HSL color values and the fix for the broken RGB-to-HSL CSS variables
+**Status**: Reference
+**Last verified**: 2026-03-29
+**Agent note**: This summary should be sufficient to assess relevance. Only read further if this document matches your current task.
+---
+
 # Light Mode Design Research & Specification
 
 ## 1. Executive Summary

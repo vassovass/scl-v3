@@ -1,3 +1,12 @@
+---
+## Document Context
+**What**: Decision record for shifting StepLeague's brand tone from competitive ("Compete. Track. Win.") to supportive/community-focused ("Motivate. Connect. Thrive.")
+**Why**: Documents the strategic UX copy changes across landing page, CTAs, and verification messaging to improve retention with target segments
+**Status**: Reference
+**Last verified**: 2026-03-29
+**Agent note**: This summary should be sufficient to assess relevance. Only read further if this document matches your current task.
+---
+
 # Decision Record: Strategic Tone Shift ("Softening")
 
 > **Date**: 2026-01-12

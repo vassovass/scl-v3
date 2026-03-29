@@ -1,9 +1,10 @@
 # PRD 67 — Documentation Artifacts Cleanup
 
 > **Order:** 67
-> **Status:** Proposed
+> **Status:** ~~Proposed~~ Superseded by PRD 70
 > **Priority:** Low
 > **Type:** Housekeeping
+> **Superseded by:** [PRD 70 — Docs Cleanup & Context Headers](admin-feedback-system/PRD_70_Docs_Cleanup_Context_Headers.md)
 
 ---
 

@@ -1,3 +1,12 @@
+---
+## Document Context
+**What**: Supabase database schema reference covering core tables (users, leagues, memberships, submissions), menu system, proxy user model, and key relationships
+**Why**: Quick lookup for table structures, column names, and foreign key relationships when writing queries or migrations
+**Status**: Current
+**Last verified**: 2026-03-29
+**Agent note**: This summary should be sufficient to assess relevance. Only read further if this document matches your current task.
+---
+
 # Database Schema Reference
 
 ## Core Tables

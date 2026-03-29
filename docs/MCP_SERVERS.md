@@ -1,3 +1,12 @@
+---
+## Document Context
+**What**: Reference for available MCP servers (GTM, GA4, PostHog, Perplexity) with account IDs, access levels, and quick commands
+**Why**: Look up MCP server configuration, account identifiers, and usage patterns when working with analytics or tag management
+**Status**: Current
+**Last verified**: 2026-03-29
+**Agent note**: This summary should be sufficient to assess relevance. Only read further if this document matches your current task.
+---
+
 # MCP Server Reference
 
 ## Available Servers

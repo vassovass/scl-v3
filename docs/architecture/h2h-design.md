@@ -1,3 +1,12 @@
+---
+## Document Context
+**What**: Architecture design for FPL-style head-to-head weekly 1v1 matchups within leagues, including schema, fixture generation (circle method round-robin), match resolution, and season lifecycle
+**Why**: Reference for implementing H2H league mode (PRD 47) — covers DB tables, algorithm, edge cases, and scalability considerations
+**Status**: Reference
+**Last verified**: 2026-03-29
+**Agent note**: This summary should be sufficient to assess relevance. Only read further if this document matches your current task.
+---
+
 # Head-to-Head League Architecture
 
 > PRD 47 | Design Document | 2026-02-28

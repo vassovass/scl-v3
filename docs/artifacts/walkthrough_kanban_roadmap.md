@@ -1,3 +1,12 @@
+---
+## Document Context
+**What**: Post-implementation walkthrough of the internal Kanban board (/admin/kanban) and public roadmap page (/roadmap)
+**Why**: Documents what was built, how drag-and-drop task management works, and how public visibility toggling functions
+**Status**: Reference
+**Last verified**: 2026-03-29
+**Agent note**: This summary should be sufficient to assess relevance. Only read further if this document matches your current task.
+---
+
 # Walkthrough: Internal Kanban & Public Roadmap
 
 > **Date**: 2025-12-24  

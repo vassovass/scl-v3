@@ -1,3 +1,12 @@
+---
+## Document Context
+**What**: Directory layout showing Next.js App Router structure, route groups, key lib files, and where components/configs/migrations live
+**Why**: Navigate the codebase quickly; understand where to place new files based on established conventions
+**Status**: Current
+**Last verified**: 2026-03-29
+**Agent note**: This summary should be sufficient to assess relevance. Only read further if this document matches your current task.
+---
+
 # Project Structure
 
 ```
