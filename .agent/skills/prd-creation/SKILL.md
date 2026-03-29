@@ -3,7 +3,7 @@ name: prd-creation
 description: Creates outcome-based PRDs that define WHAT to achieve, not HOW to implement. Covers the PRD template, numbering scheme, database migration format, and integration with the roadmap system. Use when planning new features, writing requirements documents, or defining feature specifications.
 compatibility: Antigravity, Claude Code, Cursor
 metadata:
-  version: "2.1"
+  version: "2.2"
   project: "stepleague"
 ---
 
@@ -163,6 +163,72 @@ Include only servers relevant to the specific PRD:
 
 For the full PRD template, git commit format, sprint planning structure, and PRD index/dependency details, see:
 - **[references/prd-template.md](./references/prd-template.md)** — Complete template and examples
+
+---
+
+---
+
+## Parallel PRD Execution (Orchestrator/Worker Pattern)
+
+When multiple PRDs run in parallel across separate Claude Code sessions:
+
+### Orchestrator Role (Main Session)
+The orchestrator coordinates sprint execution:
+1. **Pre-flight**: Ask user which tracks to run in parallel before launching
+2. **Launch**: Start parallel agents (subagents or background agents) for independent PRDs
+3. **Quality gate**: After each batch — verify PRD files exist, check for conflicts, validate cross-references
+4. **Consolidate**: Merge index updates, update CHANGELOG, check dependency graph consistency
+5. **Gate check**: Verify sprint gate criteria before starting next sprint
+
+### Worker Role (PRD Sessions)
+Each PRD worker session must:
+1. Read `AGENTS.md` first
+2. Read the sprint shared context file (e.g., `docs/prds/SPRINT_EFG_CONTEXT.md`)
+3. Read the specific PRD file for task details
+4. Execute the PRD's task-optimized phases
+5. Add emergent items to `docs/prds/PRD_BACKLOG.md` (append-only)
+6. **Do NOT update PRD_00_Index.md or CHANGELOG.md** — orchestrator handles these
+
+### Conflict Prevention Rules
+| File | Who Edits | Why |
+|------|-----------|-----|
+| `PRD_00_Index.md` | Orchestrator only | Prevents merge conflicts from parallel writes |
+| `CHANGELOG.md` | Orchestrator only | Single consolidated update |
+| `PRD_BACKLOG.md` | Any worker (append-only) | Append-only = no conflicts |
+| Individual PRD files | Owning worker only | Each worker owns its PRD |
+| Source code | Workers in same sprint must not overlap | Orchestrator resolves if detected |
+
+### Shared Context Pattern
+For sprints with multiple PRDs, create a shared context file:
+- **Location**: `docs/prds/SPRINT_[X]_CONTEXT.md`
+- **Contains**: Business decisions, cross-PRD dependencies, architectural patterns, orchestrator protocol
+- **Referenced by**: Every PRD in that sprint via Agent Context table (first row, marked **READ FIRST**)
+- **Purpose**: Fresh agents get full context without reading all sibling PRDs
+
+### PRD Research-First Mandate
+Every PRD must include a **Research-First Mandate** section after the Objective:
+> Before implementing this PRD, the agent MUST conduct intensive research into all relevant aspects — [domain-specific research areas]. This research phase should directly inform [decisions/implementation] and produce the best possible outcome. Do not skip or shortcut the research phase.
+
+### Parallel Agent Batching
+Group PRDs into batches by dependency:
+- **Batch 1**: All independent PRDs (no dependencies) — run in parallel
+- **Batch 2**: PRDs that depend only on Batch 1 outputs — run after Batch 1
+- **Batch N**: Continue until all PRDs are scheduled
+- **Max batch size**: 3-5 agents (balances speed vs. coordination overhead)
+
+### Emergent PRD Tracking
+During any work, agents will discover new items that need PRDs. These go in `docs/prds/PRD_BACKLOG.md`:
+```markdown
+| Date | Discovered During | Item | Priority | Notes |
+|------|-------------------|------|----------|-------|
+| 2026-03-29 | PRD 74 | Need email notification when payment fails | Medium | Ties into PRD 38 |
+```
+
+### Session Note Template
+Add to every PRD that will run in its own session:
+```markdown
+> **Session note**: This PRD runs in its own Claude Code session. Read the shared context file first. Do NOT update PRD_00_Index.md or CHANGELOG.md — the orchestrator session handles those to prevent conflicts.
+```
 
 ---
 
