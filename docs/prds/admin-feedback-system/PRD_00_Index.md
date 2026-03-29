@@ -5,7 +5,7 @@
 > These PRDs describe WHAT is needed, not HOW to implement. The implementing agent decides the best approach.
 >
 > **Last Updated:** 2026-03-29
-> **Total PRDs:** 80 (64 complete, 0 partial, 1 in-progress, 15 proposed, 1 superseded)
+> **Total PRDs:** 80 (65 complete, 0 partial, 1 in-progress, 14 proposed, 1 superseded)
 
 ---
 
@@ -171,7 +171,7 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 | 66 | [Fix Broken Tests](./PRD_66_Fix_Broken_Tests.md) | Fix 40 pre-existing test failures (env mocks) | ✅ Complete |
 | 67 | [Artifacts Cleanup](../prd-67-artifacts-cleanup.md) | ~~Organize docs/artifacts/~~ Superseded by PRD 70 | 📋 Superseded |
 | 68 | [Database Schema Docs](../prd-68-database-schema-docs.md) | Comprehensive schema documentation from Supabase MCP | 📋 Proposed |
-| 69 | [SEO Content Pages](./PRD_69_SEO_Content_Pages.md) | SEO content marketing pages for organic growth (3 keyword angles) | 📋 Proposed |
+| 69 | [SEO Content Pages](./PRD_69_SEO_Content_Pages.md) | SEO content marketing pages for organic growth (3 keyword angles) | ✅ Complete |
 | 70 | [Docs Cleanup & Context Headers](./PRD_70_Docs_Cleanup_Context_Headers.md) | Context headers on all docs, archive stale files, delete ephemeral artifacts | 📋 Proposed |
 | 71 | [Alpha Verification Gate](./PRD_71_Alpha_Verification_Gate.md) | Verify all PRD 49 unchecked items, close or document blockers | 📋 Proposed |
 | 72 | [Payment Provider Research](./PRD_72_Payment_Provider_Research.md) | Research & select payment provider for Vietnam dev / SA bank / per-league billing | 📋 Proposed |
@@ -321,7 +321,7 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 | G1.1 | **79** | [Launch Marketing Content](./PRD_79_Launch_Marketing_Content.md) | PRDs 77, 78 | 📋 Proposed |
 | G1.2 | **80** | [Product Hunt Launch Plan](./PRD_80_Product_Hunt_Launch.md) | PRD 79 | 📋 Proposed |
 
-**Also execute:** PRD 69 (SEO Content Pages, already proposed) — can run parallel to G1.1
+**Also completed:** PRD 69 (SEO Content Pages) — ✅ Complete (3 pages deployed to production)
 
 **Gate:** First paying user acquired. At least one public channel driving signups.
 
@@ -345,9 +345,9 @@ Available MCP servers for PRD verification:
 
 | Category | Count | PRDs |
 |----------|-------|------|
-| ✅ Complete | 64 | 1-38, 40-48, 50-58, 59-66 |
+| ✅ Complete | 65 | 1-38, 40-48, 50-58, 59-66, 69 |
 | 🔄 In Progress | 1 | 49 |
-| 📋 Proposed | 14 | 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80 |
+| 📋 Proposed | 13 | 68, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80 |
 | ❌ Superseded | 1 | 67 |
 | **Total** | **80** | |
 
@@ -390,7 +390,7 @@ graph TD
     subgraph "📋 Sprint G: Public Launch"
         PRD79[79. Marketing Content]
         PRD80[80. Product Hunt]
-        PRD69[69. SEO Pages]
+        PRD69[69. SEO Pages ✅]
     end
 
     %% Sprint E → F dependencies
@@ -461,3 +461,4 @@ graph TD
 | 2026-03-29 | Created `docs/prds/SPRINT_EFG_CONTEXT.md` — shared context for PRDs 70-80 with business decisions, orchestrator/worker protocol, conflict prevention rules. All PRDs 70-80 reference this file. |
 | 2026-03-29 | Created `docs/prds/PRD_BACKLOG.md` — emergent PRD tracking for items discovered during implementation. |
 | 2026-03-29 | Created `docs/artifacts/paperclip_assessment.md` — Paperclip (AI agent orchestration) assessed and deferred with agent triggers for future adoption. |
+| 2026-03-29 | PRD 69 (SEO Content Pages) → ✅ Complete. All 3 SEO pages implemented and deployed (`/step-challenge-app`, `/walking-challenge-with-friends`, `/workplace-step-challenge`). Updated counts: 65 complete, 13 proposed. |
