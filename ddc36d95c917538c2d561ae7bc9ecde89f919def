@@ -1,0 +1,10 @@
+Contains PRD 73 (Business Analysis Refresh) work:
+- docs/artifacts/stepleague_business_analysis.md: Full rewrite from Dec 2025 to March 2026
+  - Free tier revised 5→3 members
+  - Marketing strategy: practical channels (Facebook, LinkedIn, WhatsApp, Reddit)
+  - Crowdfunding platform recommended: Indiegogo (flexible) + Ko-fi Gold
+  - Competitor landscape updated with differentiation matrix
+  - Revenue projections revised ($3K-$15K ARR)
+- docs/prds/PRD_BACKLOG.md: Added 4 emergent items (LinkedIn Insight Tag, Threads, PPP pricing, social media monitoring agent)
+
+PRD 73 changes were swept into this PRD 70 commit because the parallel session ran a broad git add. Should have been a separate commit: docs(prd): PRD 73 — business analysis refresh
