@@ -150,6 +150,7 @@ Each PRD worker session must:
 - **PRD_BACKLOG.md**: Workers CAN append rows (append-only, no conflicts)
 - **Individual PRD files**: Each worker owns its own PRD file (no shared writes)
 - **Source code**: Workers in the same sprint MUST NOT edit the same files. If overlap is detected, the orchestrator resolves it.
+- **Commit immediately**: Workers MUST commit their own files with a PRD-specific commit message (e.g., `docs(prd): PRD 73 — business analysis refresh`) BEFORE finishing their session. Do NOT leave changes unstaged — a parallel session's broad `git add` will sweep them into the wrong commit, breaking audit traceability. If this happens, use `git notes add <sha>` to annotate the commit with the correct PRD attribution.
 
 ### Emergent PRDs
 Any time during work you discover something that needs its own PRD, add a row to `docs/prds/PRD_BACKLOG.md` immediately. Do NOT wait until the session ends.
