@@ -12,6 +12,13 @@ All notable changes to StepLeague v3.
 ### Added
 
 - **PRD 72 — Payment Provider Research**: Research document evaluating Stripe, Paddle, Lemon Squeezy, PayPal, Gumroad, and Paystack across 10 criteria for a South African developer (FNB bank) physically based in Vietnam. Recommendation: **Paystack** (primary — zero setup cost, 3.1% + R1 fees, direct FNB T+1 settlement) / **Paddle** (fallback — MoR handles global tax compliance at scale). Deliverable: `docs/artifacts/decisions_payment_provider.md`. Unblocks PRD 74 (Pay Gate Schema) and PRD 78 (Crowdfunding).
+- **PRD 71 — Alpha Verification Gate**: Systematic verification of all 24 PRD 49 checklist items. **Alpha is GO** — no blocking issues. All 5 original audit blockers confirmed resolved. 93 test files / 1979 tests pass, `tsc --noEmit` clean. 2 known limitations: signup page missing leaderboard disclosure text (15-min fix), production console errors unverifiable without deployed instance. PRD 49 closed as ✅ Complete.
+- **PRD 73 — Business Analysis Refresh**: Updated Dec 2025 business analysis to Mar 2026. Free tier corrected to ≤3 members. Marketing revised to practical bootstrapped approach: Facebook/LinkedIn/WhatsApp for personal network, Reddit for community + SEO backlinks, Product Hunt as one-time launch event (~3-5 hrs/week total). Crowdfunding: Indiegogo (flexible funding) + Ko-fi Gold recommended. Revenue projections revised to $3K-$15K ARR Year 1. B2B deferred to post-traction.
+
+### Changed
+
+- **PRD 70 — Docs Cleanup & Context Headers**: Standardized context headers on all ~23 docs/ files. Created `docs/archive/` and moved 10 stale files. Deleted 3 ephemeral task files + 1 PDF duplicate. Renamed 2 files for clarity. All docs now agent-scannable without reading full content. Supersedes PRD 67.
+- **Sprint E — Complete**: All 4 parallel tracks finished. Sprint E gate passed: docs cleaned, alpha verified (GO), payment provider chosen (Paystack), business analysis current. Sprint F unblocked.
 
 ---
 

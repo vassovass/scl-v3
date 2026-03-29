@@ -4,8 +4,8 @@
 >
 > These PRDs describe WHAT is needed, not HOW to implement. The implementing agent decides the best approach.
 >
-> **Last Updated:** 2026-03-29
-> **Total PRDs:** 80 (65 complete, 0 partial, 1 in-progress, 14 proposed, 1 superseded)
+> **Last Updated:** 2026-03-30
+> **Total PRDs:** 80 (69 complete, 0 partial, 0 in-progress, 10 proposed, 1 superseded)
 
 ---
 
@@ -148,7 +148,7 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 | # | PRD Title | Status |
 |---|-----------|--------|
 | 36 | [Technical Debt](./PRD_36_Technical_Debt.md) | ✅ Complete |
-| 49 | [Alpha Launch Checklist](./PRD_49_Alpha_Launch_Checklist.md) | 🔄 In Progress |
+| 49 | [Alpha Launch Checklist](./PRD_49_Alpha_Launch_Checklist.md) | ✅ Complete |
 
 ### Proposed
 | # | PRD Title | Outcome | Status |
@@ -172,10 +172,10 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 | 67 | [Artifacts Cleanup](../prd-67-artifacts-cleanup.md) | ~~Organize docs/artifacts/~~ Superseded by PRD 70 | 📋 Superseded |
 | 68 | [Database Schema Docs](../prd-68-database-schema-docs.md) | Comprehensive schema documentation from Supabase MCP | 📋 Proposed |
 | 69 | [SEO Content Pages](./PRD_69_SEO_Content_Pages.md) | SEO content marketing pages for organic growth (3 keyword angles) | ✅ Complete |
-| 70 | [Docs Cleanup & Context Headers](./PRD_70_Docs_Cleanup_Context_Headers.md) | Context headers on all docs, archive stale files, delete ephemeral artifacts | 📋 Proposed |
-| 71 | [Alpha Verification Gate](./PRD_71_Alpha_Verification_Gate.md) | Verify all PRD 49 unchecked items, close or document blockers | 📋 Proposed |
+| 70 | [Docs Cleanup & Context Headers](./PRD_70_Docs_Cleanup_Context_Headers.md) | Context headers on all docs, archive stale files, delete ephemeral artifacts | ✅ Complete |
+| 71 | [Alpha Verification Gate](./PRD_71_Alpha_Verification_Gate.md) | Verify all PRD 49 unchecked items, close or document blockers | ✅ Complete |
 | 72 | [Payment Provider Research](./PRD_72_Payment_Provider_Research.md) | Research & select payment provider for Vietnam dev / SA bank / per-league billing | ✅ Complete |
-| 73 | [Business Analysis Refresh](./PRD_73_Business_Analysis_Refresh.md) | Update Dec 2025 business analysis with current pricing, channels, projections | 📋 Proposed |
+| 73 | [Business Analysis Refresh](./PRD_73_Business_Analysis_Refresh.md) | Update Dec 2025 business analysis with current pricing, channels, projections | ✅ Complete |
 | 74 | [Pay Gate Schema & Config](./PRD_74_Pay_Gate_Schema_Config.md) | SuperAdmin-configurable tier system, subscription DB schema, pay gate toggle | 📋 Proposed |
 | 75 | [Pay Gate UI & Enforcement](./PRD_75_Pay_Gate_UI_Enforcement.md) | User-facing paywall, payment flow, webhook handling, league flow integration | 📋 Proposed |
 | 76 | [Subscription & Grandfathering](./PRD_76_Subscription_Grandfathering.md) | Subscription lifecycle, grandfathering, billing history, cancellation | 📋 Proposed |
@@ -261,20 +261,20 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 
 ---
 
-### Sprint E: Foundation & Cleanup (4 parallel tracks)
+### Sprint E: Foundation & Cleanup ✅ COMPLETE (4 parallel tracks)
 *Goal: Clean house, verify alpha readiness, research revenue infrastructure. All independent — maximum parallelization.*
 *Shared context: `docs/prds/SPRINT_EFG_CONTEXT.md`*
 
 **Track 1 — Documentation**
 | Order | PRD | Title | Dependencies | Status |
 |-------|-----|-------|--------------|--------|
-| E1.1 | **70** | [Docs Cleanup & Context Headers](./PRD_70_Docs_Cleanup_Context_Headers.md) | None | 📋 Proposed |
+| E1.1 | **70** | [Docs Cleanup & Context Headers](./PRD_70_Docs_Cleanup_Context_Headers.md) | None | ✅ Complete |
 | E1.2 | **68** | [Database Schema Docs](../prd-68-database-schema-docs.md) | None | 📋 Proposed |
 
 **Track 2 — Alpha Verification**
 | Order | PRD | Title | Dependencies | Status |
 |-------|-----|-------|--------------|--------|
-| E2.1 | **71** | [Alpha Verification Gate](./PRD_71_Alpha_Verification_Gate.md) | None | 📋 Proposed |
+| E2.1 | **71** | [Alpha Verification Gate](./PRD_71_Alpha_Verification_Gate.md) | None | ✅ Complete |
 
 **Track 3 — Revenue Research**
 | Order | PRD | Title | Dependencies | Status |
@@ -284,9 +284,9 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 **Track 4 — Strategy Refresh**
 | Order | PRD | Title | Dependencies | Status |
 |-------|-----|-------|--------------|--------|
-| E4.1 | **73** | [Business Analysis Refresh](./PRD_73_Business_Analysis_Refresh.md) | None | 📋 Proposed |
+| E4.1 | **73** | [Business Analysis Refresh](./PRD_73_Business_Analysis_Refresh.md) | None | ✅ Complete |
 
-**Gate:** Docs cleaned with context headers. Alpha items verified. Payment provider chosen. Business analysis current.
+**Gate:** ✅ Docs cleaned with context headers (PRD 70). Alpha items verified — GO (PRD 71). Payment provider chosen — Paystack primary / Paddle fallback (PRD 72). Business analysis refreshed to Mar 2026 (PRD 73). PRD 68 (DB Schema Docs) remains proposed — not blocking Sprint F.
 
 ---
 
@@ -345,9 +345,8 @@ Available MCP servers for PRD verification:
 
 | Category | Count | PRDs |
 |----------|-------|------|
-| ✅ Complete | 66 | 1-38, 40-48, 50-58, 59-66, 69, 72 |
-| 🔄 In Progress | 1 | 49 |
-| 📋 Proposed | 12 | 68, 70, 71, 73, 74, 75, 76, 77, 78, 79, 80 |
+| ✅ Complete | 69 | 1-38, 40-58, 59-66, 69, 70, 71, 72, 73 |
+| 📋 Proposed | 10 | 68, 74, 75, 76, 77, 78, 79, 80 |
 | ❌ Superseded | 1 | 67 |
 | **Total** | **80** | |
 
@@ -361,8 +360,8 @@ graph TD
         DONE[64 PRDs Complete]
     end
 
-    subgraph "🔄 Active"
-        PRD49[49. Alpha Checklist 🔄]
+    subgraph "✅ Active (Complete)"
+        PRD49[49. Alpha Checklist ✅]
     end
 
     subgraph "🔮 Sprint D: Future (trigger-based)"
@@ -462,4 +461,5 @@ graph TD
 | 2026-03-29 | Created `docs/prds/PRD_BACKLOG.md` — emergent PRD tracking for items discovered during implementation. |
 | 2026-03-29 | Created `docs/artifacts/paperclip_assessment.md` — Paperclip (AI agent orchestration) assessed and deferred with agent triggers for future adoption. |
 | 2026-03-29 | PRD 69 (SEO Content Pages) → ✅ Complete. All 3 SEO pages implemented and deployed (`/step-challenge-app`, `/walking-challenge-with-friends`, `/workplace-step-challenge`). Updated counts: 65 complete, 13 proposed. |
-| 2026-03-30 | PRD 72 (Payment Provider Research) → ✅ Complete. Deliverable: `docs/artifacts/decisions_payment_provider.md`. Recommendation: Paystack (primary — zero setup, 3.1% intl, direct FNB T+1), Paddle (fallback — MoR, tax compliance). Unblocks PRD 74 and PRD 78. Updated counts: 66 complete, 12 proposed. |
+| 2026-03-30 | PRD 72 (Payment Provider Research) → ✅ Complete. Deliverable: `docs/artifacts/decisions_payment_provider.md`. Recommendation: Paystack (primary — zero setup, 3.1% intl, direct FNB T+1), Paddle (fallback — MoR, tax compliance). Unblocks PRD 74 and PRD 78. |
+| 2026-03-30 | **Sprint E Consolidation**: PRDs 49, 70, 71, 73 → ✅ Complete. PRD 49 closed (Alpha GO — all 24 items verified, no blockers). PRD 70: context headers on all docs, 10 files archived, 4 deleted. PRD 71: full verification pass, 1979 tests pass, 2 known limitations (non-blocking). PRD 73: business analysis refreshed with practical marketing (Facebook/LinkedIn/WhatsApp/Reddit), revised pricing (free ≤3 members), Indiegogo+Ko-fi crowdfunding recommendation. Sprint E gate PASSED. Updated counts: 69 complete, 0 in-progress, 10 proposed. |
