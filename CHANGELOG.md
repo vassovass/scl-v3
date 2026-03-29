@@ -7,6 +7,14 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-03-30]
+
+### Added
+
+- **PRD 72 — Payment Provider Research**: Research document evaluating Stripe, Paddle, Lemon Squeezy, PayPal, Gumroad, and Paystack across 10 criteria for a South African developer (FNB bank) physically based in Vietnam. Recommendation: **Paystack** (primary — zero setup cost, 3.1% + R1 fees, direct FNB T+1 settlement) / **Paddle** (fallback — MoR handles global tax compliance at scale). Deliverable: `docs/artifacts/decisions_payment_provider.md`. Unblocks PRD 74 (Pay Gate Schema) and PRD 78 (Crowdfunding).
+
+---
+
 ## [2026-03-24]
 
 ### Fixed

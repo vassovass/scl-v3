@@ -174,7 +174,7 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 | 69 | [SEO Content Pages](./PRD_69_SEO_Content_Pages.md) | SEO content marketing pages for organic growth (3 keyword angles) | ✅ Complete |
 | 70 | [Docs Cleanup & Context Headers](./PRD_70_Docs_Cleanup_Context_Headers.md) | Context headers on all docs, archive stale files, delete ephemeral artifacts | 📋 Proposed |
 | 71 | [Alpha Verification Gate](./PRD_71_Alpha_Verification_Gate.md) | Verify all PRD 49 unchecked items, close or document blockers | 📋 Proposed |
-| 72 | [Payment Provider Research](./PRD_72_Payment_Provider_Research.md) | Research & select payment provider for Vietnam dev / SA bank / per-league billing | 📋 Proposed |
+| 72 | [Payment Provider Research](./PRD_72_Payment_Provider_Research.md) | Research & select payment provider for Vietnam dev / SA bank / per-league billing | ✅ Complete |
 | 73 | [Business Analysis Refresh](./PRD_73_Business_Analysis_Refresh.md) | Update Dec 2025 business analysis with current pricing, channels, projections | 📋 Proposed |
 | 74 | [Pay Gate Schema & Config](./PRD_74_Pay_Gate_Schema_Config.md) | SuperAdmin-configurable tier system, subscription DB schema, pay gate toggle | 📋 Proposed |
 | 75 | [Pay Gate UI & Enforcement](./PRD_75_Pay_Gate_UI_Enforcement.md) | User-facing paywall, payment flow, webhook handling, league flow integration | 📋 Proposed |
@@ -279,7 +279,7 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 **Track 3 — Revenue Research**
 | Order | PRD | Title | Dependencies | Status |
 |-------|-----|-------|--------------|--------|
-| E3.1 | **72** | [Payment Provider Research](./PRD_72_Payment_Provider_Research.md) | None | 📋 Proposed |
+| E3.1 | **72** | [Payment Provider Research](./PRD_72_Payment_Provider_Research.md) | None | ✅ Complete |
 
 **Track 4 — Strategy Refresh**
 | Order | PRD | Title | Dependencies | Status |
@@ -345,9 +345,9 @@ Available MCP servers for PRD verification:
 
 | Category | Count | PRDs |
 |----------|-------|------|
-| ✅ Complete | 65 | 1-38, 40-48, 50-58, 59-66, 69 |
+| ✅ Complete | 66 | 1-38, 40-48, 50-58, 59-66, 69, 72 |
 | 🔄 In Progress | 1 | 49 |
-| 📋 Proposed | 13 | 68, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80 |
+| 📋 Proposed | 12 | 68, 70, 71, 73, 74, 75, 76, 77, 78, 79, 80 |
 | ❌ Superseded | 1 | 67 |
 | **Total** | **80** | |
 
@@ -462,3 +462,4 @@ graph TD
 | 2026-03-29 | Created `docs/prds/PRD_BACKLOG.md` — emergent PRD tracking for items discovered during implementation. |
 | 2026-03-29 | Created `docs/artifacts/paperclip_assessment.md` — Paperclip (AI agent orchestration) assessed and deferred with agent triggers for future adoption. |
 | 2026-03-29 | PRD 69 (SEO Content Pages) → ✅ Complete. All 3 SEO pages implemented and deployed (`/step-challenge-app`, `/walking-challenge-with-friends`, `/workplace-step-challenge`). Updated counts: 65 complete, 13 proposed. |
+| 2026-03-30 | PRD 72 (Payment Provider Research) → ✅ Complete. Deliverable: `docs/artifacts/decisions_payment_provider.md`. Recommendation: Paystack (primary — zero setup, 3.1% intl, direct FNB T+1), Paddle (fallback — MoR, tax compliance). Unblocks PRD 74 and PRD 78. Updated counts: 66 complete, 12 proposed. |
