@@ -1,7 +1,7 @@
 # PRD 72: Payment Provider Research & Selection
 
 > **Order:** 72
-> **Status:** 📋 Proposed
+> **Status:** ✅ Complete
 > **Type:** Architecture (Research)
 > **Dependencies:** None
 > **Blocks:** PRD 74 (Pay Gate Schema), PRD 78 (Crowdfunding)
@@ -192,3 +192,4 @@ _None required — this PRD produces a research document, not code._
 | Date | Section | Change |
 |------|---------|--------|
 | 2026-03-29 | Initial | Created PRD |
+| 2026-03-30 | Complete | Research complete. Deliverable: `docs/artifacts/decisions_payment_provider.md`. Recommendation: Paystack (primary), Paddle (fallback). Revised based on zero-budget bootstrap constraint. |
