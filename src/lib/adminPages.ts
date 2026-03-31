@@ -55,6 +55,11 @@ export const SUPERADMIN_PAGES: AdminPage[] = [
         label: "📈 Tour Analytics",
         description: "Completion rates, drop-off analysis, and feedback summary",
     },
+    {
+        href: "/admin/subscription-tiers",
+        label: "💰 Subscription Tiers",
+        description: "Manage pricing tiers, pay gate toggles, and free tier limits (PRD 74)",
+    },
     // Add more superadmin pages here:
     // {
     //     href: "/admin/users",

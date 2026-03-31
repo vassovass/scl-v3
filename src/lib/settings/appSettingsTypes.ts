@@ -41,7 +41,11 @@ export type AppSettingKey =
   | "allow_theme_light"
   | "allow_theme_system"
   // Branding (links to dedicated branding interface)
-  | "branding_settings";
+  | "branding_settings"
+  // Pay Gate (PRD 74)
+  | "feature_pay_gate"
+  | "pay_gate_global"
+  | "free_tier_member_limit";
 
 /**
  * Setting categories for organization

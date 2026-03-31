@@ -1,9 +1,9 @@
 ---
 ## Document Context
-**What**: Supabase database schema reference covering core tables (users, leagues, memberships, submissions), menu system, proxy user model, and key relationships
+**What**: Supabase database schema reference covering core tables (users, leagues, memberships, submissions), menu system, proxy user model, subscription/billing tables, and key relationships
 **Why**: Quick lookup for table structures, column names, and foreign key relationships when writing queries or migrations
 **Status**: Current
-**Last verified**: 2026-03-29
+**Last verified**: 2026-03-31
 **Agent note**: This summary should be sufficient to assess relevance. Only read further if this document matches your current task.
 ---
 
@@ -56,3 +56,49 @@ Steps are submitted ONCE and apply to ALL leagues a user belongs to. There is no
 ## Soft Deletes
 
 Leagues use `deleted_at` timestamp for soft deletion. Always filter `WHERE deleted_at IS NULL` in queries.
+
+## Subscription & Billing Tables (PRD 74)
+
+Provider-agnostic schema. `external_*` columns work with Paystack, Paddle, or Stripe. All prices in cents (integer).
+
+| Table | Key Columns |
+|-------|------------|
+| `subscription_tiers` | id, slug (unique), name, description, monthly_price_cents, annual_price_cents, member_limit (null=unlimited), is_active, sort_order, features (JSONB), grace_period_days, updated_by, created_at, updated_at |
+| `league_subscriptions` | id, league_id (FK→leagues CASCADE), tier_id (FK→subscription_tiers RESTRICT), status, billing_interval, current_period_start, current_period_end, trial_ends_at, external_subscription_id, external_customer_id, metadata (JSONB), created_at, updated_at |
+| `payment_history` | id, league_subscription_id (FK CASCADE), amount_cents, currency, status, external_payment_id, external_invoice_id, payment_method_summary, failure_reason, metadata (JSONB), created_at |
+
+### leagues table additions (PRD 74)
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| `pay_gate_override` | BOOLEAN (nullable) | null=follow global, true=force gate on, false=force free |
+
+### RLS Policies (billing tables)
+
+| Role | subscription_tiers | league_subscriptions | payment_history |
+|------|--------------------|----------------------|-----------------|
+| Anonymous / authenticated | Read active tiers only | No access | No access |
+| League owner | Read active tiers | Read own league's row | Read own league's payments |
+| SuperAdmin | Full CRUD | Full CRUD | Full CRUD |
+
+### Indexes
+
+| Index | Purpose |
+|-------|---------|
+| `idx_subscription_tiers_active_sort` | Public pricing page (active tiers, sorted) |
+| `idx_league_subscriptions_one_active` | Partial unique: one active/trialing/past_due per league |
+| `idx_league_subscriptions_league_id` | League subscription lookups |
+| `idx_league_subscriptions_status` | Status-based queries |
+| `idx_payment_history_subscription` | Payment history per subscription |
+
+### App Settings Added (PRD 74)
+
+| Key | Type | Default | Purpose |
+|-----|------|---------|---------|
+| `feature_pay_gate` | boolean | false | Master switch for billing system |
+| `pay_gate_global` | boolean | false | Enforce pay gate platform-wide |
+| `free_tier_member_limit` | number | 3 | Max members on free tier (1–100) |
+
+### Convention: Missing subscription row = Free tier
+
+Leagues without a `league_subscriptions` row are treated as Free tier. No backfill migration needed when pay gate activates. PRD 75 gate logic should handle `null` subscription gracefully.

@@ -53,6 +53,19 @@ const limitsSettings: AppSettingDefinition[] = [
     editableBy: ["superadmin"],
     showInLeagueSettings: false,
   },
+  // PRD 74: Free tier member threshold
+  {
+    key: "free_tier_member_limit",
+    type: "number",
+    label: "Free Tier Member Limit",
+    description: "Maximum members allowed in a league on the free tier. Leagues exceeding this see the pay gate when joining or inviting (PRD 74).",
+    default: 3,
+    constraints: { min: 1, max: 100 },
+    category: "limits",
+    visibleTo: ["superadmin"],
+    editableBy: ["superadmin"],
+    showInLeagueSettings: false,
+  },
   // PRD 41: Proxy quota
   {
     key: "max_proxies_per_user",
@@ -132,6 +145,28 @@ const featureSettings: AppSettingDefinition[] = [
     label: "User Activity Tracking",
     description: "Enable anonymous user activity tracking via GA4 and PostHog. When disabled, no analytics events are sent. Users who haven't consented are never tracked regardless of this setting.",
     default: true,
+    category: "features",
+    visibleTo: ["superadmin"],
+    editableBy: ["superadmin"],
+  },
+  // PRD 74: Pay gate master switch
+  {
+    key: "feature_pay_gate",
+    type: "toggle",
+    label: "Pay Gate Feature",
+    description: "Master switch: enables the entire pay gate system. When false, all leagues behave as free tier regardless of subscription status (PRD 74).",
+    default: false,
+    category: "features",
+    visibleTo: ["superadmin"],
+    editableBy: ["superadmin"],
+  },
+  // PRD 74: Global pay gate toggle
+  {
+    key: "pay_gate_global",
+    type: "toggle",
+    label: "Global Pay Gate",
+    description: "When enabled, all leagues without an active paid subscription are subject to pay gate enforcement. Requires feature_pay_gate to also be true (PRD 74).",
+    default: false,
     category: "features",
     visibleTo: ["superadmin"],
     editableBy: ["superadmin"],
