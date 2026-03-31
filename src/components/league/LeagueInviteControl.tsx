@@ -3,6 +3,9 @@
 import { useState, useRef, useEffect } from "react";
 import { APP_CONFIG } from "@/lib/config";
 import { useShare } from "@/hooks/useShare";
+import { useLeagueSubscription } from "@/hooks/useLeagueSubscription";
+import { usePayGate } from "@/hooks/usePayGate";
+import { UpgradePrompt } from "@/components/billing/UpgradePrompt";
 
 /**
  * LeagueInviteControl - Theme-aware invite code dropdown with share options
@@ -24,12 +27,19 @@ import { useShare } from "@/hooks/useShare";
 interface LeagueInviteControlProps {
     inviteCode: string;
     leagueName: string;
+    leagueId?: string;
     className?: string;
 }
 
-export function LeagueInviteControl({ inviteCode, leagueName, className = "" }: LeagueInviteControlProps) {
+export function LeagueInviteControl({ inviteCode, leagueName, leagueId, className = "" }: LeagueInviteControlProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Pay gate capacity check (only when leagueId is provided)
+    const { isAtCapacity, payGateOverride } = useLeagueSubscription(leagueId);
+    const { isPayGateActive } = usePayGate(payGateOverride);
+    const isBlocked = isPayGateActive && isAtCapacity && !!leagueId;
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -62,11 +72,26 @@ export function LeagueInviteControl({ inviteCode, leagueName, className = "" }: 
         }, platform);
     };
 
+    const handleInviteClick = () => {
+        if (isBlocked) {
+            setShowUpgradePrompt(true);
+            return;
+        }
+        setIsOpen(!isOpen);
+    };
+
     return (
         <div className={`relative ${className}`} ref={dropdownRef}>
+            {leagueId && (
+                <UpgradePrompt
+                    open={showUpgradePrompt}
+                    onOpenChange={setShowUpgradePrompt}
+                    leagueId={leagueId}
+                />
+            )}
             <button
-                onClick={() => setIsOpen(!isOpen)}
-                onMouseEnter={() => setIsOpen(true)}
+                onClick={handleInviteClick}
+                onMouseEnter={() => !isBlocked && setIsOpen(true)}
                 className="flex items-center gap-2 rounded-lg border border-border bg-card px-6 py-3 text-sm font-medium text-foreground transition hover:border-primary/50 hover:bg-secondary"
                 data-tour="invite-button"
             >

@@ -7,6 +7,7 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { Spinner } from "@/components/ui/Spinner";
 import { ModuleFeedback } from "@/components/ui/ModuleFeedback";
 import { analytics } from "@/lib/analytics";
+import { usePayGate } from "@/hooks/usePayGate";
 
 // Form field configuration - easy to extend for future fields
 interface LeagueFormData {
@@ -22,6 +23,7 @@ const initialFormData: LeagueFormData = {
 export default function CreateLeaguePage() {
     const router = useRouter();
     const { session } = useAuth();
+    const { isPayGateActive, freeTierLimit } = usePayGate();
 
     const [formData, setFormData] = useState<LeagueFormData>(initialFormData);
     const [loading, setLoading] = useState(false);
@@ -203,6 +205,12 @@ export default function CreateLeaguePage() {
                         <p className="text-center text-xs text-muted-foreground" data-tour="league-invite-info">
                             Once created, you&apos;ll get an invite code to share with friends
                         </p>
+
+                        {isPayGateActive && (
+                            <p className="text-center text-xs text-muted-foreground border border-border rounded-lg px-3 py-2 bg-card/50">
+                                Free leagues support up to {freeTierLimit} members. Upgrade anytime for more.
+                            </p>
+                        )}
                     </form>
                 </div>
             </ModuleFeedback>

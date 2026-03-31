@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, Suspense } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { UserRole } from "@/lib/menuConfig";
 import { LeagueNav } from "@/components/league/LeagueNav";
@@ -10,7 +10,9 @@ import { LeagueQuickStats } from "@/components/league/LeagueQuickStats";
 import { SubmissionStatusCard } from "@/components/league/SubmissionStatusCard";
 import { LeagueInviteControl } from "@/components/league/LeagueInviteControl";
 import { useSubmissionStatus } from "@/hooks/useSubmissionStatus";
-import { analytics } from "@/lib/analytics";
+import { analytics, trackEvent } from "@/lib/analytics";
+import { PaywallBanner } from "@/components/billing/PaywallBanner";
+import { UpgradePrompt } from "@/components/billing/UpgradePrompt";
 
 interface League {
     id: string;
@@ -30,6 +32,38 @@ interface UserStats {
  * League Hub Overview Page
  * Central landing page when viewing a league - shows stats, quick actions, and navigation
  */
+/** Track checkout results from URL params */
+function CheckoutResultTracker({ leagueId }: { leagueId: string }) {
+    const searchParams = useSearchParams();
+    const checkoutResult = searchParams.get("checkout");
+    const tierSlug = searchParams.get("tier");
+
+    useEffect(() => {
+        if (checkoutResult === "success") {
+            trackEvent("checkout_completed", {
+                league_id: leagueId,
+                tier: tierSlug || "unknown",
+                category: "conversion",
+            });
+        } else if (checkoutResult === "cancelled") {
+            trackEvent("checkout_abandoned", {
+                league_id: leagueId,
+                category: "conversion",
+            });
+        }
+    }, [checkoutResult, tierSlug, leagueId]);
+
+    if (checkoutResult === "success") {
+        return (
+            <div className="rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-sm text-foreground">
+                Payment successful! Your league has been upgraded{tierSlug ? ` to ${tierSlug}` : ""}.
+            </div>
+        );
+    }
+
+    return null;
+}
+
 export default function LeagueOverviewPage() {
     const params = useParams();
     const leagueId = params.id as string;
@@ -42,6 +76,7 @@ export default function LeagueOverviewPage() {
         currentStreak: 0,
     });
     const [loading, setLoading] = useState(true);
+    const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
 
     // Use the modular hook for checking yesterday's submission status
     const {
@@ -143,6 +178,7 @@ export default function LeagueOverviewPage() {
                         <LeagueInviteControl
                             inviteCode={league.invite_code}
                             leagueName={league.name}
+                            leagueId={leagueId}
                         />
                     </div>
                 </div>
@@ -153,6 +189,23 @@ export default function LeagueOverviewPage() {
 
             {/* Main Content */}
             <main className="mx-auto max-w-5xl px-4 sm:px-6 py-8 space-y-6">
+                {/* Checkout result feedback */}
+                <Suspense fallback={null}>
+                    <CheckoutResultTracker leagueId={leagueId} />
+                </Suspense>
+
+                {/* Paywall Banner */}
+                <PaywallBanner
+                    leagueId={leagueId}
+                    onUpgradeClick={() => setShowUpgradePrompt(true)}
+                />
+
+                <UpgradePrompt
+                    open={showUpgradePrompt}
+                    onOpenChange={setShowUpgradePrompt}
+                    leagueId={leagueId}
+                />
+
                 {/* Quick Stats */}
                 <LeagueQuickStats
                     rank={stats.rank}
