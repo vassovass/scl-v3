@@ -14,6 +14,11 @@ import type { PaymentProvider } from "./provider";
 import type {
   CheckoutSessionRequest,
   CheckoutSessionResponse,
+  CreatePlanRequest,
+  CreatePlanResponse,
+  CancelSubscriptionRequest,
+  PauseSubscriptionRequest,
+  ResumeSubscriptionRequest,
   PaymentEventType,
   WebhookEvent,
   WebhookEventData,
@@ -107,6 +112,102 @@ export class PaystackProvider implements PaymentProvider {
       raw: payload,
     };
   }
+
+  async createSubscriptionPlan(
+    request: CreatePlanRequest
+  ): Promise<CreatePlanResponse> {
+    const secretKey = getSecretKey();
+
+    // Paystack uses "monthly" / "annually" for interval
+    const response = await fetch(`${PAYSTACK_API_BASE}/plan`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${secretKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: request.name,
+        amount: request.amount_cents,
+        interval: request.interval,
+        currency: request.currency,
+        description: request.description || "",
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        `Paystack create plan failed: ${response.status} ${errorData?.message || response.statusText}`
+      );
+    }
+
+    const result = await response.json();
+    return {
+      plan_code: result.data.plan_code,
+      name: result.data.name,
+    };
+  }
+
+  async cancelSubscription(
+    request: CancelSubscriptionRequest
+  ): Promise<void> {
+    const secretKey = getSecretKey();
+
+    // Paystack: disable subscription
+    const response = await fetch(`${PAYSTACK_API_BASE}/subscription/disable`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${secretKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        code: request.subscription_code,
+        token: request.email_token,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        `Paystack cancel subscription failed: ${response.status} ${errorData?.message || response.statusText}`
+      );
+    }
+  }
+
+  async pauseSubscription(
+    _request: PauseSubscriptionRequest
+  ): Promise<void> {
+    // Paystack does not natively support pause/resume.
+    // We handle pause at the application level by disabling the subscription
+    // and tracking the paused state in our DB. When resumed, a new subscription is created.
+    // For now, this is a no-op on the provider side — pause is app-level only.
+  }
+
+  async resumeSubscription(
+    request: ResumeSubscriptionRequest
+  ): Promise<void> {
+    const secretKey = getSecretKey();
+
+    // Paystack: enable subscription
+    const response = await fetch(`${PAYSTACK_API_BASE}/subscription/enable`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${secretKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        code: request.subscription_code,
+        token: request.email_token,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        `Paystack resume subscription failed: ${response.status} ${errorData?.message || response.statusText}`
+      );
+    }
+  }
 }
 
 // ============================================================================
@@ -121,6 +222,7 @@ function mapPaystackEvent(event: string): PaymentEventType {
     "subscription.not_renew": "subscription.not_renew",
     "subscription.disable": "subscription.disable",
     "invoice.update": "invoice.update",
+    "refund.processed": "refund.success",
   };
   return mapping[event] || "unknown";
 }

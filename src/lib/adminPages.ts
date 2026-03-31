@@ -60,6 +60,11 @@ export const SUPERADMIN_PAGES: AdminPage[] = [
         label: "💰 Subscription Tiers",
         description: "Manage pricing tiers, pay gate toggles, and free tier limits (PRD 74)",
     },
+    {
+        href: "/admin/billing",
+        label: "\uD83D\uDCB3 Billing",
+        description: "Subscription management, MRR, and billing history (PRD 76)",
+    },
     // Add more superadmin pages here:
     // {
     //     href: "/admin/users",

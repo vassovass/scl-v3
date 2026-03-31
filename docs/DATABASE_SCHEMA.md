@@ -64,7 +64,7 @@ Provider-agnostic schema. `external_*` columns work with Paystack, Paddle, or St
 | Table | Key Columns |
 |-------|------------|
 | `subscription_tiers` | id, slug (unique), name, description, monthly_price_cents, annual_price_cents, member_limit (null=unlimited), is_active, sort_order, features (JSONB), grace_period_days, updated_by, created_at, updated_at |
-| `league_subscriptions` | id, league_id (FK→leagues CASCADE), tier_id (FK→subscription_tiers RESTRICT), status, billing_interval, current_period_start, current_period_end, trial_ends_at, external_subscription_id, external_customer_id, metadata (JSONB), created_at, updated_at |
+| `league_subscriptions` | id, league_id (FK→leagues CASCADE), tier_id (FK→subscription_tiers RESTRICT), status, billing_interval, current_period_start, current_period_end, trial_ends_at, price_locked_at_cents, canceled_at, external_subscription_id, external_customer_id, metadata (JSONB), created_at, updated_at |
 | `payment_history` | id, league_subscription_id (FK CASCADE), amount_cents, currency, status, external_payment_id, external_invoice_id, payment_method_summary, failure_reason, metadata (JSONB), created_at |
 
 ### leagues table additions (PRD 74)
@@ -98,6 +98,40 @@ Provider-agnostic schema. `external_*` columns work with Paystack, Paddle, or St
 | `feature_pay_gate` | boolean | false | Master switch for billing system |
 | `pay_gate_global` | boolean | false | Enforce pay gate platform-wide |
 | `free_tier_member_limit` | number | 3 | Max members on free tier (1–100) |
+
+### PRD 76 Additions
+
+#### New columns on `league_subscriptions`
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| `price_locked_at_cents` | INTEGER (nullable) | Grandfathered price locked at subscription creation. Renewals honor this, not current tier price. |
+| `canceled_at` | TIMESTAMPTZ (nullable) | When the user requested cancellation. Access continues until current_period_end. |
+
+Status check constraint now includes: `active`, `past_due`, `canceled`, `trialing`, `paused`, `expired`.
+
+#### New tables (PRD 76)
+
+| Table | Key Columns |
+|-------|------------|
+| `subscription_events` | id, league_subscription_id (FK CASCADE), from_status, to_status, reason, metadata (JSONB), triggered_by, created_at |
+| `webhook_events` | id, provider, event_id, event_type, payload (JSONB), processed_at, error, created_at |
+
+#### RLS Policies (PRD 76 tables)
+
+| Role | subscription_events | webhook_events |
+|------|--------------------|--------------------|
+| League owner | Read own subscription events | No access |
+| SuperAdmin | Full CRUD | Full CRUD |
+
+#### Indexes (PRD 76)
+
+| Index | Purpose |
+|-------|---------|
+| `idx_subscription_events_subscription` | Event lookup per subscription |
+| `idx_subscription_events_created` | Chronological event queries |
+| `idx_webhook_events_provider_event_id` | Unique per provider+event_id for idempotency |
+| `idx_webhook_events_created` | Chronological webhook queries |
 
 ### Convention: Missing subscription row = Free tier
 

@@ -50,9 +50,56 @@ export type PaymentEventType =
   | "subscription.create"
   | "subscription.not_renew"
   | "subscription.disable"
+  | "subscription.renewed"
   | "invoice.update"
   | "charge.failed"
+  | "refund.success"
   | "unknown";
+
+// ============================================================================
+// Subscription Plan Management (PRD 76)
+// ============================================================================
+
+export interface CreatePlanRequest {
+  /** Unique plan name */
+  name: string;
+  /** Amount in smallest currency unit */
+  amount_cents: number;
+  /** Billing interval */
+  interval: "monthly" | "annually";
+  /** Currency code */
+  currency: string;
+  /** Plan description */
+  description?: string;
+}
+
+export interface CreatePlanResponse {
+  /** Provider's plan/product ID */
+  plan_code: string;
+  /** Provider's plan name */
+  name: string;
+}
+
+export interface CancelSubscriptionRequest {
+  /** Provider subscription code */
+  subscription_code: string;
+  /** Provider email token (Paystack requires this) */
+  email_token: string;
+}
+
+export interface PauseSubscriptionRequest {
+  /** Provider subscription code */
+  subscription_code: string;
+  /** Provider email token */
+  email_token: string;
+}
+
+export interface ResumeSubscriptionRequest {
+  /** Provider subscription code */
+  subscription_code: string;
+  /** Provider email token */
+  email_token: string;
+}
 
 export interface WebhookEvent {
   /** The event type */

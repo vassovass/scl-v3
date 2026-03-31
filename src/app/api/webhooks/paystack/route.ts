@@ -2,7 +2,9 @@ import { NextRequest } from "next/server";
 import { getPaymentProvider } from "@/lib/payments/provider";
 import { createAdminClient } from "@/lib/supabase/server";
 import { log } from "@/lib/server/logger";
+import { transition } from "@/lib/subscriptions/stateMachine";
 import type { WebhookEvent } from "@/lib/payments/types";
+import type { LeagueSubscription, SubscriptionStatus } from "@/lib/subscriptions/types";
 
 export const dynamic = "force-dynamic";
 
@@ -10,10 +12,12 @@ export const dynamic = "force-dynamic";
  * POST /api/webhooks/paystack
  * Handles Paystack webhook events.
  * PRD 75: Pay Gate UI & Enforcement
+ * PRD 76: Subscription Management & Grandfathering
  *
  * Security: Verifies HMAC SHA-512 signature before processing.
  * Idempotency: Checks external_payment_id before creating records.
- * Events: charge.success, subscription.create, subscription.not_renew, charge.failed
+ * Dead letter: All raw webhooks logged to webhook_events table.
+ * State machine: All status transitions go through stateMachine.transition().
  *
  * Note: This route does NOT use withApiHandler because webhooks need
  * raw body access for signature verification. Auth is handled via HMAC.
@@ -49,8 +53,11 @@ export async function POST(request: NextRequest): Promise<Response> {
       event_id: event.event_id,
     }, undefined, requestId);
 
-    // 4. Process event
+    // 4. Log to webhook_events dead letter table
     const adminClient = createAdminClient();
+    await logWebhookEvent(adminClient, event, requestId);
+
+    // 5. Process event
     await processWebhookEvent(event, adminClient, requestId);
 
     // Always return 200 to acknowledge receipt
@@ -62,6 +69,33 @@ export async function POST(request: NextRequest): Promise<Response> {
     // Return 200 even on error to prevent Paystack retries for bad logic
     // Only return 4xx for signature failures (above)
     return new Response(JSON.stringify({ received: true, error: message }), { status: 200 });
+  }
+}
+
+// ============================================================================
+// Dead Letter Logging
+// ============================================================================
+
+async function logWebhookEvent(
+  adminClient: ReturnType<typeof createAdminClient>,
+  event: WebhookEvent,
+  requestId: string
+): Promise<void> {
+  try {
+    await adminClient
+      .from("webhook_events")
+      .insert({
+        provider: "paystack",
+        event_id: event.event_id,
+        event_type: event.type,
+        payload: event.raw,
+      });
+  } catch (err) {
+    // Don't fail the webhook processing if logging fails
+    log("error", "webhook_event_log_failed", {
+      error: err instanceof Error ? err.message : "Unknown",
+      event_id: event.event_id,
+    }, undefined, requestId);
   }
 }
 
@@ -88,19 +122,98 @@ async function processWebhookEvent(
     case "subscription.disable":
       await handleSubscriptionNotRenew(event, adminClient, requestId);
       break;
+    case "invoice.update":
+      await handleInvoiceUpdate(event, adminClient, requestId);
+      break;
+    case "refund.success":
+      await handleRefundSuccess(event, adminClient, requestId);
+      break;
     default:
       log("info", "webhook_unhandled_event", {
         event_type: event.type,
         event_id: event.event_id,
       }, undefined, requestId);
   }
+
+  // Mark webhook as processed
+  await adminClient
+    .from("webhook_events")
+    .update({ processed_at: new Date().toISOString() })
+    .eq("event_id", event.event_id)
+    .eq("provider", "paystack");
 }
+
+// ============================================================================
+// State Machine Transition Helper
+// ============================================================================
+
+async function transitionSubscription(
+  adminClient: ReturnType<typeof createAdminClient>,
+  subscription: LeagueSubscription,
+  toStatus: SubscriptionStatus,
+  reason: string,
+  metadata: Record<string, unknown> = {},
+  requestId: string
+): Promise<boolean> {
+  const result = transition({
+    subscription,
+    to: toStatus,
+    reason,
+    triggered_by: "webhook",
+    metadata,
+  });
+
+  if (!result.success) {
+    log("warn", "webhook_transition_blocked", {
+      subscription_id: subscription.id,
+      from: subscription.status,
+      to: toStatus,
+      error: result.error,
+    }, undefined, requestId);
+    return false;
+  }
+
+  // Apply the transition
+  const updateData: Record<string, unknown> = {
+    status: toStatus,
+    updated_at: new Date().toISOString(),
+  };
+
+  // Side effects based on transition
+  if (toStatus === "canceled") {
+    updateData.canceled_at = new Date().toISOString();
+  }
+
+  const { error: updateError } = await adminClient
+    .from("league_subscriptions")
+    .update(updateData)
+    .eq("id", subscription.id);
+
+  if (updateError) {
+    log("error", "webhook_transition_update_failed", {
+      error: updateError.message,
+      subscription_id: subscription.id,
+    }, undefined, requestId);
+    return false;
+  }
+
+  // Log the event
+  if (result.event) {
+    await adminClient.from("subscription_events").insert(result.event);
+  }
+
+  return true;
+}
+
+// ============================================================================
+// Event Handlers
+// ============================================================================
 
 /**
  * charge.success: Payment completed.
- * - Check idempotency via external_payment_id
- * - Create payment_history record
- * - Activate or create league_subscription
+ * - Idempotency check via external_payment_id
+ * - If existing subscription: this is a renewal — extend period, transition to active
+ * - If no subscription: initial checkout — create subscription with price lock
  */
 async function handleChargeSuccess(
   event: WebhookEvent,
@@ -139,27 +252,57 @@ async function handleChargeSuccess(
     return;
   }
 
-  // Find or create league subscription
+  // Get tier info for price locking
+  const { data: tier } = await adminClient
+    .from("subscription_tiers")
+    .select("monthly_price_cents, annual_price_cents")
+    .eq("id", tierId)
+    .single();
+
+  const interval = billingInterval || "monthly";
+  const lockedPrice = tier
+    ? (interval === "annual" ? tier.annual_price_cents : tier.monthly_price_cents)
+    : (amount_cents || 0);
+
+  // Find existing subscription for this league
   const { data: existingSub } = await adminClient
     .from("league_subscriptions")
-    .select("id")
+    .select("*")
     .eq("league_id", leagueId)
-    .in("status", ["active", "trialing", "past_due"])
+    .in("status", ["active", "trialing", "past_due", "canceled"])
+    .order("created_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   let subscriptionId: string;
 
   if (existingSub) {
-    // Update existing subscription
+    // Renewal or recovery — transition back to active via state machine
+    const sub = existingSub as unknown as LeagueSubscription;
+    const newPeriodEnd = calculatePeriodEnd(interval);
+
+    if (sub.status !== "active") {
+      await transitionSubscription(
+        adminClient,
+        sub,
+        "active",
+        sub.status === "past_due" ? "Payment recovered" : "Renewal payment succeeded",
+        { reference, amount_cents },
+        requestId
+      );
+    }
+
+    // Extend period
     const { error: updateError } = await adminClient
       .from("league_subscriptions")
       .update({
         status: "active",
         tier_id: tierId,
-        billing_interval: billingInterval || "monthly",
-        external_customer_id: customer_id || null,
+        billing_interval: interval,
+        external_customer_id: customer_id || existingSub.external_customer_id,
         current_period_start: new Date().toISOString(),
-        current_period_end: calculatePeriodEnd(billingInterval || "monthly"),
+        current_period_end: newPeriodEnd,
+        canceled_at: null, // Clear any cancellation
         updated_at: new Date().toISOString(),
       })
       .eq("id", existingSub.id);
@@ -170,17 +313,18 @@ async function handleChargeSuccess(
 
     subscriptionId = existingSub.id;
   } else {
-    // Create new subscription
+    // New subscription — lock the price
     const { data: newSub, error: insertError } = await adminClient
       .from("league_subscriptions")
       .insert({
         league_id: leagueId,
         tier_id: tierId,
         status: "active",
-        billing_interval: billingInterval || "monthly",
+        billing_interval: interval,
         external_customer_id: customer_id || null,
         current_period_start: new Date().toISOString(),
-        current_period_end: calculatePeriodEnd(billingInterval || "monthly"),
+        current_period_end: calculatePeriodEnd(interval),
+        price_locked_at_cents: lockedPrice,
         metadata: { provider: "paystack" },
       })
       .select("id")
@@ -192,6 +336,16 @@ async function handleChargeSuccess(
     }
 
     subscriptionId = newSub.id;
+
+    // Log creation event
+    await adminClient.from("subscription_events").insert({
+      league_subscription_id: subscriptionId,
+      from_status: null,
+      to_status: "active",
+      reason: "Initial subscription created via checkout",
+      metadata: { reference, tier_id: tierId, price_locked_at_cents: lockedPrice },
+      triggered_by: "webhook",
+    });
   }
 
   // Create payment history record
@@ -221,7 +375,7 @@ async function handleChargeSuccess(
 
 /**
  * charge.failed: Payment failed.
- * Record the failure in payment_history.
+ * Transition subscription to past_due via state machine.
  */
 async function handleChargeFailed(
   event: WebhookEvent,
@@ -247,10 +401,24 @@ async function handleChargeFailed(
   if (leagueId) {
     const { data: sub } = await adminClient
       .from("league_subscriptions")
-      .select("id")
+      .select("*")
       .eq("league_id", leagueId)
+      .in("status", ["active", "trialing"])
       .maybeSingle();
-    subscriptionId = sub?.id || null;
+
+    if (sub) {
+      subscriptionId = sub.id;
+
+      // Transition to past_due via state machine
+      await transitionSubscription(
+        adminClient,
+        sub as unknown as LeagueSubscription,
+        "past_due",
+        `Payment failed: ${failure_reason || "Unknown reason"}`,
+        { reference, failure_reason },
+        requestId
+      );
+    }
   }
 
   if (subscriptionId) {
@@ -316,7 +484,7 @@ async function handleSubscriptionCreate(
 
 /**
  * subscription.not_renew / subscription.disable: Subscription won't renew.
- * Mark league_subscription as past_due.
+ * Transition to past_due via state machine.
  */
 async function handleSubscriptionNotRenew(
   event: WebhookEvent,
@@ -328,13 +496,10 @@ async function handleSubscriptionNotRenew(
 
   if (!leagueId && !subscription_id) return;
 
-  // Find the subscription either by league_id or external_subscription_id
+  // Find the subscription
   let query = adminClient
     .from("league_subscriptions")
-    .update({
-      status: "past_due",
-      updated_at: new Date().toISOString(),
-    });
+    .select("*");
 
   if (subscription_id) {
     query = query.eq("external_subscription_id", subscription_id);
@@ -342,15 +507,106 @@ async function handleSubscriptionNotRenew(
     query = query.eq("league_id", leagueId).eq("status", "active");
   }
 
-  const { error } = await query;
+  const { data: sub } = await query.maybeSingle();
 
-  if (error) {
-    log("error", "webhook_subscription_not_renew_failed", { error: error.message }, undefined, requestId);
+  if (sub) {
+    await transitionSubscription(
+      adminClient,
+      sub as unknown as LeagueSubscription,
+      "past_due",
+      "Subscription will not renew (provider notification)",
+      { subscription_id, event_type: event.type },
+      requestId
+    );
   }
 
   log("info", "webhook_subscription_not_renew", {
     league_id: leagueId,
     subscription_id,
+  }, undefined, requestId);
+}
+
+/**
+ * invoice.update: Invoice status changed.
+ * Log the event for visibility.
+ */
+async function handleInvoiceUpdate(
+  event: WebhookEvent,
+  adminClient: ReturnType<typeof createAdminClient>,
+  requestId: string
+): Promise<void> {
+  const { metadata } = event.data;
+  const leagueId = metadata?.league_id;
+
+  if (leagueId) {
+    const { data: sub } = await adminClient
+      .from("league_subscriptions")
+      .select("id")
+      .eq("league_id", leagueId)
+      .maybeSingle();
+
+    if (sub) {
+      await adminClient.from("subscription_events").insert({
+        league_subscription_id: sub.id,
+        from_status: null,
+        to_status: "active", // Invoice events don't change status
+        reason: "Invoice updated by payment provider",
+        metadata: event.raw,
+        triggered_by: "webhook",
+      });
+    }
+  }
+
+  log("info", "webhook_invoice_update", {
+    league_id: leagueId,
+    event_id: event.event_id,
+  }, undefined, requestId);
+}
+
+/**
+ * refund.success: Refund processed.
+ * Record in payment_history.
+ */
+async function handleRefundSuccess(
+  event: WebhookEvent,
+  adminClient: ReturnType<typeof createAdminClient>,
+  requestId: string
+): Promise<void> {
+  const { reference, metadata, amount_cents, currency } = event.data;
+  const leagueId = metadata?.league_id;
+
+  if (!leagueId) return;
+
+  const { data: sub } = await adminClient
+    .from("league_subscriptions")
+    .select("id")
+    .eq("league_id", leagueId)
+    .maybeSingle();
+
+  if (sub) {
+    await adminClient.from("payment_history").insert({
+      league_subscription_id: sub.id,
+      amount_cents: -(amount_cents || 0), // Negative for refund
+      currency: currency || "ZAR",
+      status: "refunded",
+      external_payment_id: reference || event.event_id,
+      metadata: event.raw,
+    });
+
+    await adminClient.from("subscription_events").insert({
+      league_subscription_id: sub.id,
+      from_status: null,
+      to_status: "active",
+      reason: "Refund processed",
+      metadata: { reference, amount_cents },
+      triggered_by: "webhook",
+    });
+  }
+
+  log("info", "webhook_refund_processed", {
+    league_id: leagueId,
+    reference,
+    amount_cents,
   }, undefined, requestId);
 }
 

@@ -10,6 +10,11 @@
 import type {
   CheckoutSessionRequest,
   CheckoutSessionResponse,
+  CreatePlanRequest,
+  CreatePlanResponse,
+  CancelSubscriptionRequest,
+  PauseSubscriptionRequest,
+  ResumeSubscriptionRequest,
   WebhookEvent,
 } from "./types";
 
@@ -35,6 +40,38 @@ export interface PaymentProvider {
    * Parse a raw webhook payload into a normalized WebhookEvent.
    */
   parseWebhookEvent(rawBody: string): WebhookEvent;
+
+  /**
+   * Create a subscription plan/product on the provider.
+   * PRD 76: Subscription Management
+   */
+  createSubscriptionPlan(
+    request: CreatePlanRequest
+  ): Promise<CreatePlanResponse>;
+
+  /**
+   * Cancel a subscription on the provider.
+   * PRD 76: Subscription Management
+   */
+  cancelSubscription(
+    request: CancelSubscriptionRequest
+  ): Promise<void>;
+
+  /**
+   * Pause a subscription on the provider (if supported).
+   * PRD 76: Subscription Management
+   */
+  pauseSubscription(
+    request: PauseSubscriptionRequest
+  ): Promise<void>;
+
+  /**
+   * Resume a paused subscription on the provider (if supported).
+   * PRD 76: Subscription Management
+   */
+  resumeSubscription(
+    request: ResumeSubscriptionRequest
+  ): Promise<void>;
 }
 
 // ============================================================================
