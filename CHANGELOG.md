@@ -7,6 +7,14 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-03-31]
+
+### Added
+
+- **PRD 74 — Pay Gate Schema & Config**: Provider-agnostic billing foundation. 3 Supabase tables (`subscription_tiers`, `league_subscriptions`, `payment_history`) with RLS policies, partial unique indexes, and 4 seeded tiers (Free/Standard/Premium/Enterprise). Admin CRUD API (`/api/admin/subscription-tiers`), public tiers API (`/api/subscription-tiers`), SuperAdmin management UI at `/admin/subscription-tiers` with pay gate toggles (`feature_pay_gate`, `pay_gate_global`, `free_tier_member_limit`). `leagues.pay_gate_override` column for per-league control. All prices stored as cents, all tier values SuperAdmin-configurable. Unblocks PRD 75 (Pay Gate UI) and PRD 76 (Subscriptions).
+
+---
+
 ## [2026-03-30]
 
 ### Added

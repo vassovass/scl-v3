@@ -5,7 +5,7 @@
 > These PRDs describe WHAT is needed, not HOW to implement. The implementing agent decides the best approach.
 >
 > **Last Updated:** 2026-03-30
-> **Total PRDs:** 80 (69 complete, 0 partial, 0 in-progress, 10 proposed, 1 superseded)
+> **Total PRDs:** 80 (70 complete, 0 partial, 0 in-progress, 9 proposed, 1 superseded)
 
 ---
 
@@ -176,7 +176,7 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 | 71 | [Alpha Verification Gate](./PRD_71_Alpha_Verification_Gate.md) | Verify all PRD 49 unchecked items, close or document blockers | ✅ Complete |
 | 72 | [Payment Provider Research](./PRD_72_Payment_Provider_Research.md) | Research & select payment provider for Vietnam dev / SA bank / per-league billing | ✅ Complete |
 | 73 | [Business Analysis Refresh](./PRD_73_Business_Analysis_Refresh.md) | Update Dec 2025 business analysis with current pricing, channels, projections | ✅ Complete |
-| 74 | [Pay Gate Schema & Config](./PRD_74_Pay_Gate_Schema_Config.md) | SuperAdmin-configurable tier system, subscription DB schema, pay gate toggle | 📋 Proposed |
+| 74 | [Pay Gate Schema & Config](./PRD_74_Pay_Gate_Schema_Config.md) | SuperAdmin-configurable tier system, subscription DB schema, pay gate toggle | ✅ Complete |
 | 75 | [Pay Gate UI & Enforcement](./PRD_75_Pay_Gate_UI_Enforcement.md) | User-facing paywall, payment flow, webhook handling, league flow integration | 📋 Proposed |
 | 76 | [Subscription & Grandfathering](./PRD_76_Subscription_Grandfathering.md) | Subscription lifecycle, grandfathering, billing history, cancellation | 📋 Proposed |
 | 77 | [Alpha→Beta Gate Criteria](./PRD_77_Alpha_Beta_Gate_Criteria.md) | Measurable criteria for transitioning from alpha to public beta | 📋 Proposed |
@@ -297,7 +297,7 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 **Track 1 — Pay Gate (Sequential)**
 | Order | PRD | Title | Dependencies | Status |
 |-------|-----|-------|--------------|--------|
-| F1.1 | **74** | [Pay Gate Schema & Config](./PRD_74_Pay_Gate_Schema_Config.md) | PRD 72 | 📋 Proposed |
+| F1.1 | **74** | [Pay Gate Schema & Config](./PRD_74_Pay_Gate_Schema_Config.md) | PRD 72 | ✅ Complete |
 | F1.2 | **75** | [Pay Gate UI & Enforcement](./PRD_75_Pay_Gate_UI_Enforcement.md) | PRD 74 | 📋 Proposed |
 | F1.3 | **76** | [Subscription & Grandfathering](./PRD_76_Subscription_Grandfathering.md) | PRDs 74, 75 | 📋 Proposed |
 
@@ -345,8 +345,8 @@ Available MCP servers for PRD verification:
 
 | Category | Count | PRDs |
 |----------|-------|------|
-| ✅ Complete | 69 | 1-38, 40-58, 59-66, 69, 70, 71, 72, 73 |
-| 📋 Proposed | 10 | 68, 74, 75, 76, 77, 78, 79, 80 |
+| ✅ Complete | 70 | 1-38, 40-58, 59-66, 69, 70, 71, 72, 73, 74 |
+| 📋 Proposed | 9 | 68, 75, 76, 77, 78, 79, 80 |
 | ❌ Superseded | 1 | 67 |
 | **Total** | **80** | |
 
