@@ -7,6 +7,19 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-04-01]
+
+### Added
+
+- **PRD 76 — Subscription Management & Grandfathering**: Full subscription lifecycle implementation. Subscription state machine (`src/lib/subscriptions/stateMachine.ts`) with 6 states (trialing, active, past_due, paused, canceled, expired) and pure transition functions with guard conditions. Migration: `price_locked_at_cents` and `canceled_at` columns on `league_subscriptions`; `subscription_events` audit table; `webhook_events` dead letter table; `expired` status. Grandfathering: price locked at subscription creation via `price_locked_at_cents`, honored on renewal, reset on voluntary tier change. Pro-ration calculator (`src/lib/subscriptions/proration.ts`): day-based fraction, all cents, rounds in customer's favor. 10 API routes: `POST /api/subscriptions/{upgrade,downgrade,cancel,reactivate,pause,resume}`, `GET /api/subscriptions/billing-history{,/export}`, `GET /api/admin/billing{,/metrics}`. Extended `PaymentProvider` interface with `createSubscriptionPlan`, `cancelSubscription`, `pauseSubscription`, `resumeSubscription`. Extended Paystack webhook handler with dead letter logging, state machine transitions, renewal/refund/invoice handling. 4 UI components: `BillingHistory` (paginated table + CSV export), `CancellationFlow` (3-step modal: retention prompt → exit survey → confirm), `GracePeriodBanner` (urgency-colored with days remaining), `SubscriptionActions` (contextual buttons with status badge). SuperAdmin billing dashboard at `/admin/billing` with MRR widget, churn rate, grandfathering revenue impact, filterable subscription table. Registered in `adminPages.ts`.
+- **PRD 78 — Crowdfunding Campaign Strategy**: Comprehensive campaign plan (`docs/artifacts/plan_crowdfunding_campaign.md`, 759 lines). Critical finding: Kickstarter and Indiegogo do NOT support South African creators — pivoted to self-hosted Paystack campaign page + Ko-fi Shop dual strategy. 3 tiers: Early Bird $29 (50 units, $1,450), Supporter $49 (75 units, $3,675), Team Pack $99 (30 units, $2,970) — $8,095 full sell-through. Lifetime deal sustainability math (break-even 3-14 years). Timeline aligned to PRD 77 beta gates. Sections: platform comparison matrix, campaign story arc, visual asset checklist, video brief, FAQ (12 entries), AppSumo evaluation (not recommended — 60-70% revenue share), Build in Public strategy, Product Hunt timing (2-5 days after campaign start), post-campaign fulfillment workflow, backer communication cadence. 12 proactive items including currency conversion modeling, failed campaign pivot playbook, SA tax implications (worldwide income taxable, R1.25M exemption does NOT apply to business income).
+
+### Changed
+
+- **Sprint F — Complete**: All 5 PRDs (74, 75, 76, 77, 78) delivered across 2 parallel tracks. Pay gate track: schema → UI → subscription lifecycle. Beta readiness track: gate criteria → crowdfunding strategy. Sprint F gate passed. Sprint G (PRDs 79, 80: Marketing Content + Product Hunt Launch) unblocked.
+
+---
+
 ## [2026-03-31]
 
 ### Added

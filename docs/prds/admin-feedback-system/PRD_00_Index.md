@@ -4,8 +4,8 @@
 >
 > These PRDs describe WHAT is needed, not HOW to implement. The implementing agent decides the best approach.
 >
-> **Last Updated:** 2026-03-31
-> **Total PRDs:** 80 (72 complete, 0 partial, 0 in-progress, 7 proposed, 1 superseded)
+> **Last Updated:** 2026-04-01
+> **Total PRDs:** 80 (74 complete, 0 partial, 0 in-progress, 5 proposed, 1 superseded)
 
 ---
 
@@ -178,9 +178,9 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 | 73 | [Business Analysis Refresh](./PRD_73_Business_Analysis_Refresh.md) | Update Dec 2025 business analysis with current pricing, channels, projections | ✅ Complete |
 | 74 | [Pay Gate Schema & Config](./PRD_74_Pay_Gate_Schema_Config.md) | SuperAdmin-configurable tier system, subscription DB schema, pay gate toggle | ✅ Complete |
 | 75 | [Pay Gate UI & Enforcement](./PRD_75_Pay_Gate_UI_Enforcement.md) | User-facing paywall, payment flow, webhook handling, league flow integration | ✅ Complete |
-| 76 | [Subscription & Grandfathering](./PRD_76_Subscription_Grandfathering.md) | Subscription lifecycle, grandfathering, billing history, cancellation | 📋 Proposed |
+| 76 | [Subscription & Grandfathering](./PRD_76_Subscription_Grandfathering.md) | Subscription lifecycle, grandfathering, billing history, cancellation | ✅ Complete |
 | 77 | [Alpha→Beta Gate Criteria](./PRD_77_Alpha_Beta_Gate_Criteria.md) | Measurable criteria for transitioning from alpha to public beta | ✅ Complete |
-| 78 | [Crowdfunding Campaign Prep](./PRD_78_Crowdfunding_Campaign_Prep.md) | Platform comparison, campaign content, tier structure, timeline | 📋 Proposed |
+| 78 | [Crowdfunding Campaign Prep](./PRD_78_Crowdfunding_Campaign_Prep.md) | Platform comparison, campaign content, tier structure, timeline | ✅ Complete |
 | 79 | [Launch Marketing Content](./PRD_79_Launch_Marketing_Content.md) | LinkedIn, Reddit, content calendar, build-in-public narrative | 📋 Proposed |
 | 80 | [Product Hunt Launch Plan](./PRD_80_Product_Hunt_Launch.md) | Launch day checklist, maker story, follow-up plan, metrics | 📋 Proposed |
 
@@ -299,15 +299,15 @@ See `.agent/skills/prd-creation/SKILL.md` for full details on agent types, task 
 |-------|-----|-------|--------------|--------|
 | F1.1 | **74** | [Pay Gate Schema & Config](./PRD_74_Pay_Gate_Schema_Config.md) | PRD 72 | ✅ Complete |
 | F1.2 | **75** | [Pay Gate UI & Enforcement](./PRD_75_Pay_Gate_UI_Enforcement.md) | PRD 74 | ✅ Complete |
-| F1.3 | **76** | [Subscription & Grandfathering](./PRD_76_Subscription_Grandfathering.md) | PRDs 74, 75 | 📋 Proposed |
+| F1.3 | **76** | [Subscription & Grandfathering](./PRD_76_Subscription_Grandfathering.md) | PRDs 74, 75 | ✅ Complete |
 
 **Track 2 — Beta Readiness (Sequential)**
 | Order | PRD | Title | Dependencies | Status |
 |-------|-----|-------|--------------|--------|
 | F2.1 | **77** | [Alpha→Beta Gate Criteria](./PRD_77_Alpha_Beta_Gate_Criteria.md) | PRD 71 | ✅ Complete |
-| F2.2 | **78** | [Crowdfunding Campaign Prep](./PRD_78_Crowdfunding_Campaign_Prep.md) | PRDs 72, 73 | 📋 Proposed |
+| F2.2 | **78** | [Crowdfunding Campaign Prep](./PRD_78_Crowdfunding_Campaign_Prep.md) | PRDs 72, 73 | ✅ Complete |
 
-**Gate:** Payment works end-to-end. Free tier (≤3 members) enforced. Paid tiers purchasable. Alpha→beta criteria defined. Crowdfunding campaign drafted.
+**Gate:** ✅ Payment works end-to-end. Free tier (≤3 members) enforced. Paid tiers purchasable. Subscription lifecycle managed (upgrade/downgrade/cancel/reactivate/pause). Grandfathering locks price at subscription creation. State machine enforces valid transitions. Admin billing dashboard with MRR/churn. Alpha→beta criteria defined. Crowdfunding campaign strategy complete (pivoted to self-hosted Paystack + Ko-fi due to Kickstarter/Indiegogo SA ineligibility). Sprint F COMPLETE.
 
 ---
 
@@ -345,8 +345,8 @@ Available MCP servers for PRD verification:
 
 | Category | Count | PRDs |
 |----------|-------|------|
-| ✅ Complete | 72 | 1-38, 40-58, 59-66, 69, 70, 71, 72, 73, 74, 75, 77 |
-| 📋 Proposed | 7 | 68, 76, 78, 79, 80 |
+| ✅ Complete | 74 | 1-38, 40-58, 59-66, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78 |
+| 📋 Proposed | 5 | 68, 79, 80 |
 | ❌ Superseded | 1 | 67 |
 | **Total** | **80** | |
 
@@ -465,3 +465,6 @@ graph TD
 | 2026-03-30 | **Sprint E Consolidation**: PRDs 49, 70, 71, 73 → ✅ Complete. PRD 49 closed (Alpha GO — all 24 items verified, no blockers). PRD 70: context headers on all docs, 10 files archived, 4 deleted. PRD 71: full verification pass, 1979 tests pass, 2 known limitations (non-blocking). PRD 73: business analysis refreshed with practical marketing (Facebook/LinkedIn/WhatsApp/Reddit), revised pricing (free ≤3 members), Indiegogo+Ko-fi crowdfunding recommendation. Sprint E gate PASSED. Updated counts: 69 complete, 0 in-progress, 10 proposed. |
 | 2026-03-31 | PRD 75 (Pay Gate UI & Enforcement) → ✅ Complete. Paystack provider abstraction (`src/lib/payments/`), 5 billing UI components, `usePayGate` + `useLeagueSubscription` hooks, 3 API routes (checkout session, Paystack webhook with HMAC + idempotency, league subscription state). League create/overview/invite flows integrated. Pricing page transitioned to dynamic DB fetch. 6 analytics events for conversion funnel. 17 files, +1765 lines, tsc clean, 1979 tests pass. |
 | 2026-03-31 | PRD 77 (Alpha→Beta Gate Criteria) → ✅ Complete. Deliverable: `docs/BETA_GATE_CRITERIA.md`. 20 gates across 7 sections (quantitative, qualitative, infrastructure, feature completeness, decision framework, progressive expansion, PostHog dashboard). 10 HARD + 10 SOFT gates. Industry benchmarks cited. Progressive beta tiers: 50→200→1000→GA. Updated counts: 72 complete, 7 proposed. |
+| 2026-04-01 | PRD 76 (Subscription & Grandfathering) → ✅ Complete. Subscription state machine (6 states: trialing/active/past_due/paused/canceled/expired) with pure transition functions. Migration adds `price_locked_at_cents`, `canceled_at` to `league_subscriptions`; `subscription_events` and `webhook_events` tables. 10 API routes (upgrade/downgrade/cancel/reactivate/pause/resume/billing-history/export/admin-billing/admin-metrics). Grandfathering: price locked at subscription creation, honored on renewal, reset on voluntary tier change. Pro-ration: day-based fraction, round in customer's favor, all cents. 4 UI components (BillingHistory, CancellationFlow with 3-step retention, GracePeriodBanner, SubscriptionActions). Admin billing dashboard at `/admin/billing` with MRR/churn/grandfathering summary. Extended webhook handler with dead letter logging. Extended PaymentProvider interface with createSubscriptionPlan/cancelSubscription/pauseSubscription/resumeSubscription. tsc clean, 1979 tests pass. |
+| 2026-04-01 | PRD 78 (Crowdfunding Campaign Prep) → ✅ Complete. Deliverable: `docs/artifacts/plan_crowdfunding_campaign.md` (759 lines). Critical finding: Kickstarter and Indiegogo do NOT support SA creators; Indiegogo removed flexible funding Oct 2025. Pivoted to dual strategy: self-hosted Paystack campaign page (zero platform fees, direct FNB settlement) + Ko-fi Shop (discovery/international fallback). 3 tiers: Early Bird $29/50, Supporter $49/75, Team Pack $99/30. Full sell-through $8,095. Lifetime deal sustainability math included (break-even 3-14 years). Timeline aligned to PRD 77 beta gates. 12 proactive items including SA tax implications (worldwide income taxable), failed campaign pivot playbook, and post-campaign fulfillment workflow. Updated counts: 74 complete, 5 proposed. |
+| 2026-04-01 | **Sprint F — COMPLETE.** All 5 PRDs (74, 75, 76, 77, 78) delivered. Sprint F gate passed. Sprint G (PRDs 79, 80) unblocked. |
