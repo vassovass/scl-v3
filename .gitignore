@@ -52,6 +52,9 @@ next-env.d.ts
 # Claude Code local settings
 .claude/settings.local.json
 
+# Generated script outputs
+scripts/*.xlsx
+
 # Windows reserved names (can't be real files)
 nul
 NUL

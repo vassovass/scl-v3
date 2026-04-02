@@ -125,8 +125,13 @@ export const POST = withApiHandler({
     schema: createProxySchema,
     rateLimit: { maxRequests: 10, windowMs: 60_000 },
 }, async ({ user, body, adminClient }) => {
-    // Step 1: Check quota
-    const MAX_PROXIES = 50; // TODO: Get from settings when available
+    // Step 1: Check quota from app_settings
+    const { data: setting } = await adminClient
+        .from("app_settings")
+        .select("value")
+        .eq("key", "max_proxies_per_user")
+        .single();
+    const MAX_PROXIES = setting?.value ?? 50;
 
     const { count: currentCount } = await adminClient
         .from("users")

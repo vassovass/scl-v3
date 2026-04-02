@@ -12,6 +12,7 @@ import {
     validateCreateChallenge,
     canCreateChallengeWith,
     formatValidationErrors,
+    calculateChallengeStats,
 } from "@/lib/challenges";
 import type { ChallengeStatus, CreateChallengeRequest } from "@/lib/challenges";
 
@@ -84,38 +85,8 @@ export const GET = withApiHandler(
             (c: { status: string }) => ["completed", "declined", "cancelled", "expired"].includes(c.status)
         ) || [];
 
-        // Calculate stats
-        const completedChallenges = challenges?.filter((c: { status: string }) => c.status === "completed") || [];
-        let wins = 0;
-        let losses = 0;
-        let ties = 0;
-
-        for (const c of completedChallenges) {
-            const challenge = c as { winner_id: string | null; challenger_id: string; target_id: string };
-            if (challenge.winner_id === null) {
-                ties++;
-            } else if (challenge.winner_id === userId) {
-                wins++;
-            } else {
-                losses++;
-            }
-        }
-
-        const total_challenges = completedChallenges.length;
-        const win_rate = total_challenges > 0 ? Math.round((wins / total_challenges) * 100) : 0;
-
-        const stats = {
-            total_challenges,
-            wins,
-            losses,
-            ties,
-            pending_received: pending_received.length,
-            pending_sent: pending_sent.length,
-            active: active.length,
-            win_rate,
-            current_win_streak: 0, // TODO: Calculate from challenge history
-            best_win_streak: 0,
-        };
+        // Calculate stats (including win streaks)
+        const stats = calculateChallengeStats(challenges || [], userId);
 
         return {
             challenges,

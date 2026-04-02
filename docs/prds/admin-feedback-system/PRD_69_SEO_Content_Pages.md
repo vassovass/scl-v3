@@ -84,7 +84,7 @@ _None required — this PRD produces static content files, not code._
 
 | Metric | Target | Verification Method |
 |--------|--------|---------------------|
-| Pages created | 3 markdown files in `proposed-seo/` | `ls proposed-seo/` shows 3 .md files |
+| Pages created | 3 markdown files in `docs/proposed-seo/` | `ls docs/proposed-seo/` shows 3 .md files |
 | Quality score | Each page 16+/20 on seo-agi scorecard | Scorecard printed at end of each page |
 | Human-writer pass | No AI tell-tale words (delve, robust, crucial, etc.) | Grep for banned words returns 0 matches |
 | Internal links | Each page links to 2+ existing routes | Manual review of link targets |
@@ -106,7 +106,7 @@ _None required — this PRD produces static content files, not code._
 7. Run 20-point quality scorecard
 
 ### Phase 3: Output
-8. Save to `proposed-seo/` at project root
+8. Save to `docs/proposed-seo/` at project root
 
 ---
 
@@ -123,7 +123,7 @@ _None required — this PRD produces static content files, not code._
 | **Information gain** | AI verification as differentiator, device-agnostic comparison, real pricing data |
 | **Reddit test** | r/fitness — would a regular commenter find useful, specific recommendations? |
 | **Schema** | FAQPage + SoftwareApplication + BreadcrumbList |
-| **Output** | `proposed-seo/step-challenge-app.md` |
+| **Output** | `docs/proposed-seo/step-challenge-app.md` |
 
 ### Page 2: "walking challenge with friends"
 
@@ -136,7 +136,7 @@ _None required — this PRD produces static content files, not code._
 | **Information gain** | How to set up a challenge across mixed devices, motivation psychology, real group dynamics |
 | **Reddit test** | r/loseit or r/walking — would someone planning a friend challenge save this? |
 | **Schema** | FAQPage + HowTo + BreadcrumbList |
-| **Output** | `proposed-seo/walking-challenge-with-friends.md` |
+| **Output** | `docs/proposed-seo/walking-challenge-with-friends.md` |
 
 ### Page 3: "workplace step challenge"
 
@@ -149,7 +149,7 @@ _None required — this PRD produces static content files, not code._
 | **Information gain** | Setup logistics, participation rates, device compatibility across employees, free vs enterprise pricing |
 | **Reddit test** | r/humanresources — would an HR manager find actionable guidance? |
 | **Schema** | FAQPage + BreadcrumbList |
-| **Output** | `proposed-seo/workplace-step-challenge.md` |
+| **Output** | `docs/proposed-seo/workplace-step-challenge.md` |
 
 ---
 
@@ -206,7 +206,7 @@ _Track adjustments requested during execution so preferences carry forward._
 
 | Date | Amendment | Reason |
 |------|-----------|--------|
-| 2026-03-23 | Output to `proposed-seo/` folder, not `~/Documents/SEO-AGI/` | User wants side-by-side comparison with existing pages |
+| 2026-03-23 | Output to `docs/proposed-seo/` folder, not `~/Documents/SEO-AGI/` | User wants side-by-side comparison with existing pages |
 | 2026-03-23 | Determine multiple keyword angles instead of using literal keyword | User wants strategic keyword research, not literal execution |
 | 2026-03-23 | Apply human-writer skill pass to all output | Ensure content sounds natural, not AI-generated |
 | 2026-03-23 | Use markdown format, not .tsx components | Easier to review before integrating |
