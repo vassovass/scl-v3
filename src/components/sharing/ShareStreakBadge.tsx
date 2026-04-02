@@ -63,10 +63,10 @@ export function ShareStreakBadge({
     // Get tier-specific colors
     const tierColors = {
         none: 'bg-muted text-muted-foreground',
-        bronze: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
+        bronze: 'bg-warning/10 text-warning border-warning/20',
         silver: 'bg-muted text-muted-foreground border-border',
-        gold: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
-        diamond: 'bg-cyan-400/10 text-cyan-400 border-cyan-400/20',
+        gold: 'bg-warning/10 text-warning border-warning/20',
+        diamond: 'bg-info/10 text-info border-info/20',
     };
 
     return (

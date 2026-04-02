@@ -34,10 +34,10 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July", 
 function getCoverageColor(pct: number): string {
     if (pct === 0) return "bg-secondary";
     if (pct < 25) return "bg-muted";
-    if (pct < 50) return "bg-sky-900";
-    if (pct < 75) return "bg-sky-700";
-    if (pct < 100) return "bg-emerald-700";
-    return "bg-emerald-500";
+    if (pct < 50) return "bg-info/30";
+    if (pct < 75) return "bg-info/60";
+    if (pct < 100) return "bg-success/60";
+    return "bg-success";
 }
 
 export function CalendarHeatmap({ leagueId, onDayClick }: CalendarHeatmapProps) {
@@ -90,7 +90,7 @@ export function CalendarHeatmap({ leagueId, onDayClick }: CalendarHeatmapProps) 
 
     if (error) {
         return (
-            <div className="rounded-xl border border-rose-800 bg-rose-900/20 p-6 text-center text-rose-400">
+            <div className="rounded-xl border border-destructive bg-destructive/10 p-6 text-center text-destructive">
                 {error}
             </div>
         );
@@ -161,7 +161,7 @@ export function CalendarHeatmap({ leagueId, onDayClick }: CalendarHeatmapProps) 
                         key={day.date}
                         onClick={() => onDayClick?.(day)}
                         title={`${day.date}: ${day.submitted_count}/${day.total_members} submitted (${day.coverage_pct}%)`}
-                        className={`h-6 sm:h-8 w-full rounded-sm text-[10px] sm:text-xs transition hover:ring-1 hover:ring-sky-500 flex items-center justify-center ${getCoverageColor(day.coverage_pct)}`}
+                        className={`h-6 sm:h-8 w-full rounded-sm text-[10px] sm:text-xs transition hover:ring-1 hover:ring-info flex items-center justify-center ${getCoverageColor(day.coverage_pct)}`}
                     >
                         <span className="text-muted-foreground font-medium">{day.day_of_month}</span>
                     </button>
@@ -174,10 +174,10 @@ export function CalendarHeatmap({ leagueId, onDayClick }: CalendarHeatmapProps) 
                 <div className="flex gap-1">
                     <div className="w-3 h-3 rounded bg-secondary" />
                     <div className="w-3 h-3 rounded bg-muted" />
-                    <div className="w-3 h-3 rounded bg-sky-900" />
-                    <div className="w-3 h-3 rounded bg-sky-700" />
-                    <div className="w-3 h-3 rounded bg-emerald-700" />
-                    <div className="w-3 h-3 rounded bg-emerald-500" />
+                    <div className="w-3 h-3 rounded bg-info/30" />
+                    <div className="w-3 h-3 rounded bg-info/60" />
+                    <div className="w-3 h-3 rounded bg-success/60" />
+                    <div className="w-3 h-3 rounded bg-success" />
                 </div>
                 <span>More</span>
             </div>

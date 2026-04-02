@@ -123,7 +123,7 @@ The system is **designed to support unlimited custom themes** managed by SuperAd
 | `--foreground` | Primary text | `210 40% 98%` | `222.2 84% 4.9%` |
 | `--card` | Card backgrounds | `222.2 84% 4.9%` | `0 0% 100%` |
 | `--card-foreground` | Card text | `210 40% 98%` | `222.2 84% 4.9%` |
-| `--muted` | Muted backgrounds | `217.2 32.6% 17.5%` | `210 40% 96.1%` |
+| `--muted` | Muted backgrounds (recedes) | `217.2 32.6% 15.5%` | `192 10% 90%` |
 | `--muted-foreground` | Secondary text | `215 20.2% 65.1%` | `215.4 16.3% 46.9%` |
 | `--border` | Borders | `217.2 32.6% 17.5%` | `214.3 31.8% 91.4%` |
 | `--input` | Input borders | `217.2 32.6% 17.5%` | `214.3 31.8% 91.4%` |
@@ -136,7 +136,7 @@ The system is **designed to support unlimited custom themes** managed by SuperAd
 | `--primary-foreground` | Text on primary | `222.2 47.4% 11.2%` | `210 40% 98%` |
 | `--secondary` | Secondary actions | `217.2 32.6% 17.5%` | `210 40% 96.1%` |
 | `--secondary-foreground` | Text on secondary | `210 40% 98%` | `222.2 47.4% 11.2%` |
-| `--accent` | Accent elements | `217.2 32.6% 17.5%` | `210 40% 96.1%` |
+| `--accent` | Accent/hover (highlights) | `217.2 32.6% 22%` | `192 10% 88%` |
 | `--accent-foreground` | Text on accent | `210 40% 98%` | `222.2 47.4% 11.2%` |
 
 ### Status Variables
@@ -146,6 +146,9 @@ The system is **designed to support unlimited custom themes** managed by SuperAd
 | `--success` | Success states | `142 76% 36%` | `142 71% 45%` |
 | `--warning` | Warning states | `38 92% 50%` | `43 96% 56%` |
 | `--info` | Informational | `199 89% 48%` | `200 98% 39%` |
+| `--success-foreground` | Text on success bg | `0 0% 100%` | `0 0% 100%` |
+| `--warning-foreground` | Text on warning bg | `222.2 84% 4.9%` | `0 0% 100%` |
+| `--info-foreground` | Text on info bg | `222.2 47.4% 11.2%` | `0 0% 100%` |
 | `--destructive` | Destructive actions | `0 62.8% 30.6%` | `0 84.2% 60.2%` |
 | `--destructive-foreground` | Text on destructive | `210 40% 98%` | `210 40% 98%` |
 
@@ -159,12 +162,22 @@ The system is **designed to support unlimited custom themes** managed by SuperAd
 | `--chart-4` | Quaternary chart color | `280 65% 60%` |
 | `--chart-5` | Quinary chart color | `340 75% 55%` |
 
+### Sidebar Variables
+
+| Variable | Purpose | Dark Value | Light Value |
+|----------|---------|------------|-------------|
+| `--sidebar` | Sidebar background | `222.2 47.4% 11.2%` | `0 0% 100%` |
+| `--sidebar-foreground` | Sidebar text | `210 40% 98%` | `189 30% 20%` |
+| `--sidebar-primary` | Sidebar primary | `199 89% 48%` | `189 42% 32%` |
+| `--sidebar-accent` | Sidebar hover | `217.2 32.6% 22%` | `192 10% 90%` |
+| `--sidebar-border` | Sidebar border | `215 25% 27%` | `192 12% 70%` |
+
 ### Other Variables
 
 | Variable | Purpose | Value |
 |----------|---------|-------|
 | `--radius` | Border radius | `0.5rem` (8px) |
-| `--popover` | Popover background | Same as `--card` |
+| `--popover` | Popover background | Darker than `--card` (depth) |
 | `--popover-foreground` | Popover text | Same as `--card-foreground` |
 | `--ring` | Focus ring color | Same as `--primary` |
 
@@ -186,8 +199,15 @@ className="bg-primary/90"  // 90% opacity
 className="bg-destructive/10"  // 10% opacity for subtle backgrounds
 ```
 
-#### Custom HSL Variables
+#### Status Colors (First-Class Tailwind Tokens)
 ```tsx
+// Preferred — registered as Tailwind colors
+className="text-success"
+className="bg-warning/10"
+className="text-info"
+className="bg-destructive/20 text-destructive"
+
+// Also valid — HSL syntax for edge cases
 className="text-[hsl(var(--success))]"
 className="bg-[hsl(var(--warning)/0.1)]"  // 10% opacity warning background
 ```
@@ -511,5 +531,5 @@ When working with colors/themes, ensure:
 
 ---
 
-*Last updated: 2026-01-10*
+*Last updated: 2026-04-03*
 *This is the canonical theme documentation. All AI agents MUST read and follow these guidelines.*

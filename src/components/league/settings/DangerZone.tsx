@@ -70,7 +70,7 @@ export function DangerZone({ league, disabled }: DangerZoneProps) {
                         type="button"
                         onClick={() => setShowDeleteConfirm(true)}
                         disabled={disabled}
-                        className="rounded-lg border border-rose-900/50 bg-rose-950/30 px-4 py-2 text-sm font-medium text-rose-500 hover:bg-rose-900/50 hover:text-rose-400 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                        className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-2 text-sm font-medium text-destructive hover:bg-destructive/20 hover:text-destructive disabled:opacity-50 disabled:cursor-not-allowed transition"
                     >
                         Delete League
                     </button>

@@ -50,7 +50,7 @@ export default function PriorityVote({
 
     // Determine color based on average priority
     const getPriorityColor = (priority: number) => {
-        if (priority >= 7) return "text-emerald-400";
+        if (priority >= 7) return "text-success";
         if (priority >= 4) return "text-[hsl(var(--warning))]";
         return "text-muted-foreground";
     };

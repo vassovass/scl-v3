@@ -36,7 +36,7 @@ export function GracePeriodBanner({
       className={`w-full rounded-lg border px-4 py-3 ${
         isUrgent
           ? "border-destructive/50 bg-destructive/10 text-destructive"
-          : "border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+          : "border-warning/50 bg-warning/10 text-warning"
       }`}
     >
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -55,7 +55,7 @@ export function GracePeriodBanner({
           className={`inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
             isUrgent
               ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              : "bg-amber-600 text-white hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600"
+              : "bg-warning text-warning-foreground hover:bg-warning/90"
           }`}
         >
           Update payment method

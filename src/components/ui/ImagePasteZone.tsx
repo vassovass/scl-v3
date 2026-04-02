@@ -196,12 +196,12 @@ export function ImagePasteZone({
         <div className={`relative ${className}`}>
             {/* Error banner */}
             {error && (
-                <div className="mb-2 p-3 rounded-lg bg-red-500/10 border border-red-500/30 flex items-start gap-2">
-                    <span className="text-red-400 flex-1 text-sm">{error.toUserMessage?.() || error.message}</span>
+                <div className="mb-2 p-3 rounded-lg bg-destructive/10 border border-destructive/30 flex items-start gap-2">
+                    <span className="text-destructive flex-1 text-sm">{error.toUserMessage?.() || error.message}</span>
                     {error.recoverable && (
                         <button
                             onClick={handleClearError}
-                            className="text-xs text-red-400 hover:text-red-300 underline"
+                            className="text-xs text-destructive hover:text-destructive underline"
                         >
                             Dismiss
                         </button>

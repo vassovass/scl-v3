@@ -118,7 +118,7 @@ export function ConflictResolutionDialog({
                 <div className="mt-4 grid grid-cols-2 gap-4">
                     {/* Existing Entry */}
                     <div className={`rounded-lg border p-4 ${recommendation.action === "keep_existing"
-                            ? "border-emerald-500/50 bg-emerald-500/10"
+                            ? "border-success/50 bg-success/10"
                             : "border-border bg-card/50"
                         }`}>
                         <div className="mb-2 flex items-center justify-between">
@@ -126,7 +126,7 @@ export function ConflictResolutionDialog({
                                 Existing
                             </span>
                             {recommendation.action === "keep_existing" && (
-                                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs text-emerald-400">
+                                <span className="rounded-full bg-success/20 px-2 py-0.5 text-xs text-success">
                                     Recommended
                                 </span>
                             )}
@@ -136,11 +136,11 @@ export function ConflictResolutionDialog({
                         </div>
                         <div className="mt-2 flex flex-wrap gap-2">
                             {existingVerified ? (
-                                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs text-emerald-400">
+                                <span className="rounded-full bg-success/20 px-2 py-0.5 text-xs text-success">
                                     ✓ Verified
                                 </span>
                             ) : conflict.existing.verified === false ? (
-                                <span className="rounded-full bg-rose-500/20 px-2 py-0.5 text-xs text-rose-400">
+                                <span className="rounded-full bg-destructive/20 px-2 py-0.5 text-xs text-destructive">
                                     ✗ Failed
                                 </span>
                             ) : (
@@ -162,7 +162,7 @@ export function ConflictResolutionDialog({
 
                     {/* Incoming Entry */}
                     <div className={`rounded-lg border p-4 ${recommendation.action === "use_incoming"
-                            ? "border-emerald-500/50 bg-emerald-500/10"
+                            ? "border-success/50 bg-success/10"
                             : "border-border bg-card/50"
                         }`}>
                         <div className="mb-2 flex items-center justify-between">
@@ -170,7 +170,7 @@ export function ConflictResolutionDialog({
                                 New Entry
                             </span>
                             {recommendation.action === "use_incoming" && (
-                                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs text-emerald-400">
+                                <span className="rounded-full bg-success/20 px-2 py-0.5 text-xs text-success">
                                     Recommended
                                 </span>
                             )}
@@ -208,7 +208,7 @@ export function ConflictResolutionDialog({
                         onClick={() => onResolve("keep_existing")}
                         disabled={isLoading}
                         className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition ${recommendation.action === "keep_existing"
-                                ? "bg-emerald-600 text-white hover:bg-emerald-500"
+                                ? "bg-success text-success-foreground hover:bg-success/90"
                                 : "bg-secondary text-muted-foreground hover:bg-secondary/80"
                             } disabled:cursor-not-allowed disabled:opacity-50`}
                     >
@@ -221,7 +221,7 @@ export function ConflictResolutionDialog({
                         onClick={() => onResolve("use_incoming")}
                         disabled={isLoading}
                         className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition ${recommendation.action === "use_incoming"
-                                ? "bg-emerald-600 text-white hover:bg-emerald-500"
+                                ? "bg-success text-success-foreground hover:bg-success/90"
                                 : "bg-secondary text-muted-foreground hover:bg-secondary/80"
                             } disabled:cursor-not-allowed disabled:opacity-50`}
                     >

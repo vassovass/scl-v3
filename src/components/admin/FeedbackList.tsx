@@ -261,7 +261,7 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
 
     if (error) {
         return (
-            <div className="rounded-lg bg-rose-500/10 border border-rose-500/30 p-4 text-rose-400">
+            <div className="rounded-lg bg-destructive/10 border border-destructive/30 p-4 text-destructive">
                 Error: {error}
             </div>
         );
@@ -376,7 +376,7 @@ export default function FeedbackList({ userFeedbackOnly = false }: FeedbackListP
                                             onClick={() => togglePublic(item.id, item.is_public)}
                                             disabled={isUpdating}
                                             className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium transition ${item.is_public
-                                                ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                                                ? "bg-success/20 text-success hover:bg-success/30"
                                                 : "bg-secondary/50 text-muted-foreground hover:bg-accent hover:text-foreground"
                                                 }`}
                                             title={item.is_public ? "Remove from roadmap" : "Add to roadmap"}

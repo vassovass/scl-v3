@@ -158,7 +158,7 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
                         <p className="text-sm text-muted-foreground mt-1">{achievement.userName || "You"}</p>
                     </div>
 
-                    <div className="text-center py-6 rounded-xl bg-gradient-to-r from-primary/20 to-emerald-600/20 border border-primary/30">
+                    <div className="text-center py-6 rounded-xl bg-gradient-to-r from-primary/20 to-success/20 border border-primary/30">
                         <div className="text-4xl font-bold text-white">
                             {achievement.value.toLocaleString()}
                         </div>
@@ -167,7 +167,7 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
 
                     {achievement.improvementPct !== undefined && (
                         <div className="mt-4 text-center">
-                            <span className={`inline-block px-3 py-1 rounded-full text-sm ${achievement.improvementPct >= 0 ? "bg-emerald-900/50 text-emerald-400" : "bg-rose-900/50 text-rose-400"}`}>
+                            <span className={`inline-block px-3 py-1 rounded-full text-sm ${achievement.improvementPct >= 0 ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
                                 {achievement.improvementPct >= 0 ? "📈 +" : "📉 "}{achievement.improvementPct}% vs {achievement.comparisonDateRange || achievement.comparisonPeriod || "last period"}
                             </span>
                         </div>
@@ -193,7 +193,7 @@ export function AchievementShareCard({ achievement, onClose }: AchievementShareC
                     <div className="grid grid-cols-3 gap-2">
                         <button
                             onClick={shareToWhatsApp}
-                            className="flex flex-col items-center gap-1 rounded-xl bg-emerald-600 px-3 py-2 text-xs font-medium text-white hover:bg-emerald-500 transition"
+                            className="flex flex-col items-center gap-1 rounded-xl bg-success px-3 py-2 text-xs font-medium text-success-foreground hover:bg-success/90 transition"
                         >
                             <span className="text-lg">💬</span>
                             WhatsApp

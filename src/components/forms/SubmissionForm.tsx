@@ -564,9 +564,9 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                             type="checkbox"
                             checked={flagged}
                             onChange={(e) => setFlagged(e.target.checked)}
-                            className="h-4 w-4 rounded border-border bg-background text-rose-500 focus:ring-rose-500"
+                            className="h-4 w-4 rounded border-border bg-background text-destructive focus:ring-destructive"
                         />
-                        <label htmlFor="submission-flagged" className="text-sm text-rose-400">
+                        <label htmlFor="submission-flagged" className="text-sm text-destructive">
                             Image extraction is correct (Flag as incorrect)
                         </label>
                     </div>
@@ -577,7 +577,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                                 value={flagReason}
                                 onChange={(e) => setFlagReason(e.target.value)}
                                 placeholder="Describe what is wrong with the extraction..."
-                                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-rose-500 focus:outline-none"
+                                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-destructive focus:outline-none"
                                 rows={2}
                                 required={flagged}
                             />
@@ -605,15 +605,15 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                 </div>
 
                 {error && (
-                    <div className="rounded-md border border-rose-700 bg-rose-900/30 p-3">
+                    <div className="rounded-md border border-destructive bg-destructive/10 p-3">
                         <div className="flex items-start justify-between gap-2">
-                            <p className="text-sm text-rose-400 break-all whitespace-pre-wrap font-mono">{error}</p>
+                            <p className="text-sm text-destructive break-all whitespace-pre-wrap font-mono">{error}</p>
                             <button
                                 type="button"
                                 onClick={() => {
                                     navigator.clipboard.writeText(error);
                                 }}
-                                className="shrink-0 rounded px-2 py-1 text-xs text-rose-400 hover:bg-rose-800/50 transition"
+                                className="shrink-0 rounded px-2 py-1 text-xs text-destructive hover:bg-destructive/20 transition"
                                 title="Copy error message"
                             >
                                 Copy
@@ -640,14 +640,14 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                 {/* Verification details feedback */}
                 {verificationDetails && (
                     <div className={`rounded-md border p-4 ${verificationDetails.verified
-                        ? "border-emerald-700 bg-emerald-900/30"
-                        : "border-rose-700 bg-rose-900/30"
+                        ? "border-success bg-success/10"
+                        : "border-destructive bg-destructive/10"
                         }`}>
                         <div className="flex items-start justify-between gap-3">
                             <div className="flex-1 space-y-2">
                                 {verificationDetails.verified ? (
                                     <div className="flex items-center justify-between gap-2">
-                                        <p className="text-sm font-medium text-emerald-400">
+                                        <p className="text-sm font-medium text-success">
                                             ✓ Verification successful
                                         </p>
                                         <button
@@ -671,7 +671,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                                         </button>
                                     </div>
                                 ) : (
-                                    <p className="text-sm font-medium text-rose-400">
+                                    <p className="text-sm font-medium text-destructive">
                                         ✗ Verification failed
                                     </p>
                                 )}
@@ -679,7 +679,7 @@ export function SubmissionForm({ leagueId, proxyMemberId, proxyDisplayName, onSu
                                 {/* Step comparison */}
                                 <div className="text-sm space-y-1">
                                     {verificationDetails.extractedSteps !== null ? (
-                                        <p className={verificationDetails.verified ? "text-foreground" : "text-rose-300"}>
+                                        <p className={verificationDetails.verified ? "text-foreground" : "text-destructive"}>
                                             <span className="text-muted-foreground">Screenshot shows:</span>{" "}
                                             <span className="font-semibold">
                                                 {verificationDetails.extractedSteps.toLocaleString()} steps

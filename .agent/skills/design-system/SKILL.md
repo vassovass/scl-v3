@@ -55,21 +55,27 @@ This skill is a quick reference. The full theme documentation contains:
 | `text-muted-foreground` | Secondary/muted text |
 | `text-primary` | Emphasised text (brand color) |
 
-### Status Colors
+### Status Colors (First-Class Tailwind Tokens)
 
 ```tsx
-// Use HSL syntax for status colors
-className="text-[hsl(var(--success))]"  // Green
-className="text-[hsl(var(--warning))]"  // Amber
-className="text-[hsl(var(--info))]"     // Blue
-className="text-destructive"             // Red
+// Preferred — registered as Tailwind colors
+className="text-success"              // Green
+className="text-warning"              // Amber
+className="text-info"                 // Blue
+className="text-destructive"          // Red
+className="bg-success/20 text-success" // Badge pattern
+
+// Filled backgrounds with foreground text
+className="bg-success text-success-foreground"
+className="bg-warning text-warning-foreground"
 ```
 
 ### With Opacity
 
 ```tsx
-className="bg-primary/90"                    // 90% opacity
-className="bg-[hsl(var(--success)/0.1)]"     // 10% opacity
+className="bg-primary/90"        // 90% opacity
+className="bg-success/10"        // 10% opacity
+className="bg-warning/20"        // 20% opacity
 ```
 
 ---
@@ -399,13 +405,19 @@ className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-
 
 | Component | Location |
 |-----------|----------|
-| `toast`, `toaster` | Notifications |
-| `dialog` | Modals |
+| `toast`, `toaster`, `sonner` | Notifications |
+| `dialog`, `alert-dialog` | Modals & confirmations |
 | `dropdown-menu` | Dropdowns |
 | `input`, `label`, `textarea` | Form fields |
-| `select`, `checkbox` | Form controls |
+| `select`, `checkbox`, `radio-group` | Form controls |
 | `tooltip` | Tooltips |
 | `confirm-dialog` | Confirmation prompts |
+| `table` | Data tables |
+| `sheet` | Side panels / mobile drawers |
+| `separator` | Dividers |
+| `scroll-area` | Styled scrollable regions |
+| `skeleton` | Loading placeholders |
+| `tabs`, `switch`, `progress` | UI primitives |
 
 ### Usage
 

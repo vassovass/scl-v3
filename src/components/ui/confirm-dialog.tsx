@@ -65,8 +65,8 @@ export function ConfirmDialog({
 
     const confirmButtonClasses =
         variant === "destructive"
-            ? "bg-rose-600 text-white hover:bg-rose-500 focus:ring-rose-500"
-            : "bg-sky-600 text-white hover:bg-sky-500 focus:ring-sky-500";
+            ? "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:ring-destructive"
+            : "bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary";
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>

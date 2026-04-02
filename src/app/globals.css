@@ -59,9 +59,9 @@
   --card-foreground: 210 40% 98%;
   /* slate-50 */
 
-  /* Popovers / Modals */
-  --popover: 222.2 47.4% 11.2%;
-  /* slate-900 */
+  /* Popovers / Modals (darker than card for depth hierarchy) */
+  --popover: 222.2 50% 8%;
+  /* deeper than card — dropdowns/tooltips float with depth */
   --popover-foreground: 210 40% 98%;
   /* slate-50 */
 
@@ -77,15 +77,15 @@
   --secondary-foreground: 210 40% 98%;
   /* slate-50 */
 
-  /* Subtle / Muted Elements */
-  --muted: 217.2 32.6% 17.5%;
-  /* slate-800 */
+  /* Subtle / Muted Elements (lowest surface — recedes) */
+  --muted: 217.2 32.6% 15.5%;
+  /* slightly darker than secondary — visual hierarchy */
   --muted-foreground: 215 20.2% 65.1%;
   /* slate-400 */
 
-  /* Interactive Accents */
-  --accent: 217.2 32.6% 17.5%;
-  /* slate-800 */
+  /* Interactive Accents (highest surface — highlights on hover) */
+  --accent: 217.2 32.6% 22%;
+  /* lighter than secondary — visible hover state */
   --accent-foreground: 210 40% 98%;
   /* slate-50 */
 
@@ -130,7 +130,7 @@
   --menu-bg: 222.2 47.4% 11.2%;
   --menu-border: 215 25% 27%;
   --menu-item-text: 212.7 26.8% 83.9%;
-  --menu-item-hover-bg: 217.2 32.6% 17.5%;
+  --menu-item-hover-bg: 217.2 32.6% 22%;
   --menu-item-hover-text: 0 0% 100%;
 
   /* Date Picker */
@@ -142,10 +142,34 @@
   /* Semantic Status Colors */
   --success: 160 65% 45%;
   /* #1abc7b - Emerald-ish for dark mode */
+  --success-foreground: 0 0% 100%;
+  /* white on success bg */
   --warning: 45 93% 60%;
   /* #fbbf24 - Amber/yellow for dark mode, readable on dark */
+  --warning-foreground: 222.2 84% 4.9%;
+  /* dark text on warning bg */
   --info: 199 89% 48%;
   /* #0ea5e9 - Sky-500 (matches primary) */
+  --info-foreground: 222.2 47.4% 11.2%;
+  /* dark text on info bg */
+
+  /* Sidebar (future-proofing for shadcn sidebar component) */
+  --sidebar: 222.2 47.4% 11.2%;
+  /* slate-900 */
+  --sidebar-foreground: 210 40% 98%;
+  /* slate-50 */
+  --sidebar-primary: 199 89% 48%;
+  /* sky-500 */
+  --sidebar-primary-foreground: 222.2 47.4% 11.2%;
+  /* slate-900 */
+  --sidebar-accent: 217.2 32.6% 22%;
+  /* lighter surface for hover */
+  --sidebar-accent-foreground: 210 40% 98%;
+  /* slate-50 */
+  --sidebar-border: 215 25% 27%;
+  /* subtle border */
+  --sidebar-ring: 199 89% 48%;
+  /* sky-500 */
 }
 
 /* === LIGHT THEME === */
@@ -264,10 +288,34 @@
   /* Semantic Status Colors - Darker for proper contrast */
   --success: 160 65% 30%;
   /* #1b7f5c - Dark green (good) */
+  --success-foreground: 0 0% 100%;
+  /* white on success bg */
   --warning: 25 85% 40%;
   /* #c2610b - Dark orange (better than amber) */
+  --warning-foreground: 0 0% 100%;
+  /* white on warning bg */
   --info: 214 68% 35%;
   /* #1a4d8f - Dark blue (darker for better contrast) */
+  --info-foreground: 0 0% 100%;
+  /* white on info bg */
+
+  /* Sidebar */
+  --sidebar: 0 0% 100%;
+  /* white */
+  --sidebar-foreground: 189 30% 20%;
+  /* dark teal */
+  --sidebar-primary: 189 42% 32%;
+  /* teal primary */
+  --sidebar-primary-foreground: 0 0% 100%;
+  /* white */
+  --sidebar-accent: 192 10% 90%;
+  /* tonal a10 */
+  --sidebar-accent-foreground: 189 30% 20%;
+  /* dark teal */
+  --sidebar-border: 192 12% 70%;
+  /* matches --border */
+  --sidebar-ring: 189 42% 32%;
+  /* teal primary */
 }
 
 /* ============================================

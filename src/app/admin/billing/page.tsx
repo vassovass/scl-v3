@@ -332,7 +332,7 @@ export default function AdminBillingPage() {
                       </td>
                       <td className="px-4 py-3 font-mono text-foreground">
                         {s.price_locked_at_cents != null ? (
-                          <span className={isGrandfathered ? "text-green-600 dark:text-green-400" : ""}>
+                          <span className={isGrandfathered ? "text-success" : ""}>
                             {formatCents(s.price_locked_at_cents)}
                             {isGrandfathered && " *"}
                           </span>
@@ -412,12 +412,12 @@ function MetricCard({
 
 function StatusPill({ status }: { status: string }) {
   const colorMap: Record<string, string> = {
-    active: "bg-green-500/10 text-green-700 dark:text-green-400",
-    trialing: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
-    past_due: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
+    active: "bg-success/10 text-success",
+    trialing: "bg-info/10 text-info",
+    past_due: "bg-warning/10 text-warning",
     paused: "bg-muted text-muted-foreground",
-    canceled: "bg-red-500/10 text-red-700 dark:text-red-400",
-    expired: "bg-red-500/10 text-red-700 dark:text-red-400",
+    canceled: "bg-destructive/10 text-destructive",
+    expired: "bg-destructive/10 text-destructive",
   };
 
   return (

@@ -145,17 +145,17 @@ export default function ImportModal<T extends { id?: string }>({
 
                     {/* Parse Errors */}
                     {parseErrors.length > 0 && !result && (
-                        <div className="mt-4 p-4 bg-red-900/20 border border-red-800 rounded-lg">
-                            <h3 className="text-sm font-medium text-red-400 mb-2">Parse Errors</h3>
-                            <ul className="text-sm text-red-300 space-y-1">
+                        <div className="mt-4 p-4 bg-destructive/20 border border-destructive/50 rounded-lg">
+                            <h3 className="text-sm font-medium text-destructive mb-2">Parse Errors</h3>
+                            <ul className="text-sm text-destructive/80 space-y-1">
                                 {parseErrors.slice(0, 5).map((error, i) => (
                                     <li key={i}>
-                                        {error.row > 0 && <span className="text-red-400">Row {error.row}:</span>} {error.message}
-                                        {error.value && <span className="text-red-500 ml-1">("{error.value}")</span>}
+                                        {error.row > 0 && <span className="text-destructive">Row {error.row}:</span>} {error.message}
+                                        {error.value && <span className="text-destructive ml-1">("{error.value}")</span>}
                                     </li>
                                 ))}
                                 {parseErrors.length > 5 && (
-                                    <li className="text-red-400">...and {parseErrors.length - 5} more errors</li>
+                                    <li className="text-destructive">...and {parseErrors.length - 5} more errors</li>
                                 )}
                             </ul>
                         </div>
@@ -173,15 +173,15 @@ export default function ImportModal<T extends { id?: string }>({
                                     <div className="text-xs text-muted-foreground mt-1">Existing items with matching IDs</div>
                                 </div>
 
-                                <div className="p-4 bg-emerald-900/20 border border-emerald-800/50 rounded-lg">
-                                    <div className="text-2xl font-bold text-emerald-400">{preview.toCreate.length}</div>
-                                    <div className="text-sm text-emerald-300">Items to Create</div>
+                                <div className="p-4 bg-success/20 border border-success/50 rounded-lg">
+                                    <div className="text-2xl font-bold text-success">{preview.toCreate.length}</div>
+                                    <div className="text-sm text-success/80">Items to Create</div>
                                     <div className="text-xs text-muted-foreground mt-1">New items without IDs</div>
                                 </div>
                             </div>
 
                             {preview.errors.length > 0 && (
-                                <div className="p-3 bg-amber-900/20 border border-amber-800/50 rounded-lg">
+                                <div className="p-3 bg-warning/20 border border-warning/50 rounded-lg">
                                     <div className="flex items-center gap-2 text-sm text-[hsl(var(--warning))]">
                                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -197,11 +197,11 @@ export default function ImportModal<T extends { id?: string }>({
                     {result && (
                         <div className="space-y-4">
                             {result.success ? (
-                                <div className="p-6 bg-emerald-900/20 border border-emerald-800/50 rounded-lg text-center">
-                                    <svg className="mx-auto h-12 w-12 text-emerald-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <div className="p-6 bg-success/20 border border-success/50 rounded-lg text-center">
+                                    <svg className="mx-auto h-12 w-12 text-success mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <h3 className="text-lg font-semibold text-emerald-400 mb-2">Import Complete!</h3>
+                                    <h3 className="text-lg font-semibold text-success mb-2">Import Complete!</h3>
                                     <div className="text-sm text-foreground space-y-1">
                                         <p>{result.summary.updated} items updated</p>
                                         <p>{result.summary.created} items created</p>
@@ -211,13 +211,13 @@ export default function ImportModal<T extends { id?: string }>({
                                     </div>
                                 </div>
                             ) : (
-                                <div className="p-6 bg-red-900/20 border border-red-800/50 rounded-lg text-center">
-                                    <svg className="mx-auto h-12 w-12 text-red-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <div className="p-6 bg-destructive/20 border border-destructive/50 rounded-lg text-center">
+                                    <svg className="mx-auto h-12 w-12 text-destructive mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <h3 className="text-lg font-semibold text-red-400 mb-2">Import Failed</h3>
+                                    <h3 className="text-lg font-semibold text-destructive mb-2">Import Failed</h3>
                                     {result.errors.length > 0 && (
-                                        <div className="text-sm text-red-300">
+                                        <div className="text-sm text-destructive/80">
                                             {result.errors[0].message}
                                         </div>
                                     )}

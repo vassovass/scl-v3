@@ -100,7 +100,7 @@ export default function BulkActionsBar({
                     <button
                         onClick={onMerge}
                         disabled={isLoading}
-                        className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-purple-400 bg-purple-500/20 hover:bg-purple-500/30 rounded-lg transition disabled:opacity-50"
+                        className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-[hsl(var(--brand-accent))] bg-[hsl(var(--brand-accent))]/20 hover:bg-[hsl(var(--brand-accent))]/30 rounded-lg transition disabled:opacity-50"
                         title="Merge selected items"
                     >
                         ⚡ Merge
@@ -111,7 +111,7 @@ export default function BulkActionsBar({
                 <button
                     onClick={() => handleTogglePublic(true)}
                     disabled={isLoading}
-                    className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-emerald-400 bg-emerald-500/20 hover:bg-emerald-500/30 rounded-lg transition disabled:opacity-50"
+                    className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-success bg-success/20 hover:bg-success/30 rounded-lg transition disabled:opacity-50"
                     title="Make all selected public on roadmap"
                 >
                     🌐
@@ -129,7 +129,7 @@ export default function BulkActionsBar({
                 <button
                     onClick={() => handleArchive(false)}
                     disabled={isLoading}
-                    className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-[hsl(var(--warning))] bg-amber-500/20 hover:bg-amber-500/30 rounded-lg transition disabled:opacity-50"
+                    className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-warning bg-warning/20 hover:bg-warning/30 rounded-lg transition disabled:opacity-50"
                     title="Archive selected (can restore later)"
                 >
                     📦 Archive
@@ -139,7 +139,7 @@ export default function BulkActionsBar({
                 <button
                     onClick={() => handleArchive(true)}
                     disabled={isLoading}
-                    className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-red-400 bg-red-500/20 hover:bg-red-500/30 rounded-lg transition disabled:opacity-50"
+                    className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-destructive bg-destructive/20 hover:bg-destructive/30 rounded-lg transition disabled:opacity-50"
                     title="Delete forever (cannot undo)"
                 >
                     🗑️

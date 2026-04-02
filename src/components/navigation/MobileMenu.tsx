@@ -150,7 +150,7 @@ export function MobileMenu({
                     onClose={onClose}
                     onAction={handleAction}
                     isActive={isActive}
-                    itemClassName="text-[hsl(var(--warning)/0.8)] hover:bg-amber-900/10 hover:text-[hsl(var(--warning))]"
+                    itemClassName="text-[hsl(var(--warning)/0.8)] hover:bg-warning/10 hover:text-[hsl(var(--warning))]"
                 />
             )}
 
@@ -209,7 +209,7 @@ export function MobileMenu({
                     <button
                         onClick={onSignOut}
                         disabled={isSigningOut}
-                        className="w-full px-4 py-3 rounded-lg text-sm font-medium text-rose-400 hover:bg-rose-950/20 text-left disabled:opacity-50 transition-colors flex items-center gap-2"
+                        className="w-full px-4 py-3 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 text-left disabled:opacity-50 transition-colors flex items-center gap-2"
                         data-module-id="menu-sign-out"
                         data-module-name="Sign Out"
                     >

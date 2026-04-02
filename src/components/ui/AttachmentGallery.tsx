@@ -114,7 +114,7 @@ export function AttachmentGallery({
                             {/* Uploading overlay */}
                             {isUploading && (
                                 <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                                    <div className="w-6 h-6 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
+                                    <div className="w-6 h-6 border-2 border-info border-t-transparent rounded-full animate-spin" />
                                 </div>
                             )}
 
@@ -143,7 +143,7 @@ export function AttachmentGallery({
                                                 }}
                                                 disabled={deletingId === attachment.id}
                                                 className={`
-                          p-2 rounded-full bg-red-500/30 hover:bg-red-500/50 text-white transition-colors
+                          p-2 rounded-full bg-destructive/30 hover:bg-destructive/50 text-white transition-colors
                           ${deletingId === attachment.id ? 'opacity-50' : ''}
                         `}
                                                 title="Delete"

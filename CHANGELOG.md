@@ -7,6 +7,14 @@ All notable changes to StepLeague v3.
 
 ---
 
+## [2026-04-03]
+
+### Added
+
+- **Design System — Shadcn MCP-Driven Improvements**: Comprehensive design system upgrade leveraging the Shadcn UI MCP connector. **Token foundation**: Added `--success-foreground`, `--warning-foreground`, `--info-foreground` CSS variables; registered `success`, `warning`, `info`, `sidebar` as first-class Tailwind color families in `tailwind.config.ts`. Differentiated dark mode surface tokens (`--muted` at 15.5%, `--secondary` at 17.5%, `--accent` at 22%) for visible hover/muted hierarchy. Darkened `--popover` relative to `--card` for depth on dropdowns/tooltips. Added full sidebar token system (8 vars, both themes) for future shadcn sidebar component. **New components**: Installed 6 shadcn components via MCP `get_component` — `separator`, `table`, `sheet`, `scroll-area`, `skeleton`, `alert-dialog` — all adapted for existing `@radix-ui/react-*` package structure. **Hardcoded color cleanup**: Migrated 85+ hardcoded Tailwind color violations across 30+ files to semantic tokens (`text-success`, `bg-warning/20`, `text-destructive`, etc.). Key files: `badges.ts` (25 violations, cascades to KanbanBoard/RoadmapView/FeedbackList/Leaderboard), `confirm-dialog.tsx` (rose/sky → destructive/primary), billing components (removed all `dark:` prefix patterns), admin/form/roadmap/analytics components. Updated `badges.test.ts` assertions to match new class names. Updated `THEME_SYSTEM.md` and `design-system` skill documentation.
+
+---
+
 ## [2026-04-01]
 
 ### Added

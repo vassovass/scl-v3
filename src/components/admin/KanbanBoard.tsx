@@ -435,7 +435,7 @@ export default function KanbanBoard({ initialItems, archivedItems = [] }: Kanban
                         <button
                             onClick={() => setShowArchived(!showArchived)}
                             className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors ${showArchived
-                                ? "bg-amber-500/20 text-amber-400 border-amber-500/40"
+                                ? "bg-warning/20 text-warning border-warning/40"
                                 : "bg-card text-muted-foreground border-border hover:text-foreground"
                                 }`}
                             title={showArchived ? "Hide archived items" : "Show archived items"}
@@ -464,9 +464,9 @@ export default function KanbanBoard({ initialItems, archivedItems = [] }: Kanban
                                 <p><span className="text-primary">🌐 Public items</span> appear on /roadmap</p>
                                 <div className="border-t border-border pt-1.5 mt-1.5">
                                     <p className="font-medium text-foreground mb-1">Column Mapping:</p>
-                                    <p>• <span className="text-[hsl(var(--warning))]">In Progress</span> → <span className="text-orange-400">🔥 Now</span></p>
+                                    <p>• <span className="text-[hsl(var(--warning))]">In Progress</span> → <span className="text-warning">🔥 Now</span></p>
                                     <p>• <span className="text-foreground">Release tag</span> → Roadmap column</p>
-                                    <p>• <span className="text-emerald-400">Done</span> → <span className="text-emerald-400">✅ Done</span></p>
+                                    <p>• <span className="text-success">Done</span> → <span className="text-success">✅ Done</span></p>
                                 </div>
                                 <p className="text-muted-foreground pt-1">Click 🔒/🌐 to toggle visibility</p>
                             </div>
@@ -474,7 +474,7 @@ export default function KanbanBoard({ initialItems, archivedItems = [] }: Kanban
                     </div>
                     <button
                         onClick={() => setShowImportModal(true)}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white text-sm font-medium rounded-lg border border-emerald-600 hover:border-emerald-500 transition-colors"
+                        className="flex items-center gap-2 px-3 py-1.5 bg-success hover:bg-success/90 text-success-foreground text-sm font-medium rounded-lg border border-success/80 hover:border-success/70 transition-colors"
                         title="Import items from CSV"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -607,8 +607,8 @@ export default function KanbanBoard({ initialItems, archivedItems = [] }: Kanban
 
             {/* Archived Items Section */}
             {showArchived && archivedItems.length > 0 && (
-                <div className="mt-6 p-4 bg-amber-500/5 border border-amber-500/20 rounded-lg animate-fade-in">
-                    <h3 className="text-sm font-semibold text-amber-400 mb-3 flex items-center gap-2">
+                <div className="mt-6 p-4 bg-warning/5 border border-warning/20 rounded-lg animate-fade-in">
+                    <h3 className="text-sm font-semibold text-warning mb-3 flex items-center gap-2">
                         📦 Archived Items ({archivedItems.length})
                         <span className="text-xs font-normal text-muted-foreground">
                             Click restore to bring back to board
@@ -631,14 +631,14 @@ export default function KanbanBoard({ initialItems, archivedItems = [] }: Kanban
                                 <div className="flex items-center gap-1 shrink-0">
                                     <button
                                         onClick={() => handleRestore(item.id)}
-                                        className="px-2 py-1 text-xs bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 rounded transition-colors"
+                                        className="px-2 py-1 text-xs bg-success/20 text-success hover:bg-success/30 rounded transition-colors"
                                         title="Restore to board"
                                     >
                                         ↩️ Restore
                                     </button>
                                     <button
                                         onClick={() => handleDelete(item.id, true)}
-                                        className="px-2 py-1 text-xs bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded transition-colors"
+                                        className="px-2 py-1 text-xs bg-destructive/20 text-destructive hover:bg-destructive/30 rounded transition-colors"
                                         title="Delete forever"
                                     >
                                         🗑️

@@ -82,11 +82,11 @@ export function BillingHistory({ leagueId }: BillingHistoryProps) {
   const statusColor = (status: string) => {
     switch (status) {
       case "succeeded":
-        return "text-green-600 dark:text-green-400";
+        return "text-success";
       case "failed":
-        return "text-red-600 dark:text-red-400";
+        return "text-destructive";
       case "refunded":
-        return "text-amber-600 dark:text-amber-400";
+        return "text-warning";
       case "pending":
         return "text-muted-foreground";
       default:
@@ -138,7 +138,7 @@ export function BillingHistory({ leagueId }: BillingHistoryProps) {
                   </div>
                 )}
                 {p.failure_reason && (
-                  <div className="text-sm text-red-600 dark:text-red-400">
+                  <div className="text-sm text-destructive">
                     {p.failure_reason}
                   </div>
                 )}

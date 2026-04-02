@@ -228,7 +228,7 @@ export function ExpandableCardModal({
                             <button
                                 onClick={() => { setIsPublic(!isPublic); handleFieldChange(); }}
                                 className={`px-2 py-0.5 rounded text-xs transition-colors ${isPublic
-                                    ? 'bg-emerald-500/20 text-emerald-400'
+                                    ? 'bg-success/20 text-success'
                                     : 'bg-secondary text-muted-foreground'
                                     }`}
                             >
@@ -304,7 +304,7 @@ export function ExpandableCardModal({
 
                         {/* Attachment error */}
                         {attachmentError && (
-                            <p className="text-sm text-red-400 mt-2">{attachmentError.message}</p>
+                            <p className="text-sm text-destructive mt-2">{attachmentError.message}</p>
                         )}
                     </div>
 
@@ -325,14 +325,14 @@ export function ExpandableCardModal({
                                     <span className="text-xs text-muted-foreground mr-1">Delete?</span>
                                     <button
                                         onClick={() => { onDelete(item.id, false); onClose(); }}
-                                        className="px-2 py-1 text-xs bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 rounded transition-colors"
+                                        className="px-2 py-1 text-xs bg-warning/20 text-warning hover:bg-warning/30 rounded transition-colors"
                                         title="Archive (can restore later)"
                                     >
                                         📦 Archive
                                     </button>
                                     <button
                                         onClick={() => { onDelete(item.id, true); onClose(); }}
-                                        className="px-2 py-1 text-xs bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded transition-colors"
+                                        className="px-2 py-1 text-xs bg-destructive/20 text-destructive hover:bg-destructive/30 rounded transition-colors"
                                         title="Delete forever"
                                     >
                                         🗑️ Forever
@@ -347,7 +347,7 @@ export function ExpandableCardModal({
                             ) : (
                                 <button
                                     onClick={() => setShowDeleteConfirm(true)}
-                                    className="px-3 py-1.5 text-sm text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                    className="px-3 py-1.5 text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
                                 >
                                     🗑️ Delete
                                 </button>

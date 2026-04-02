@@ -25,17 +25,17 @@ export const BADGE_CONFIG: Record<string, Record<string, BadgeConfig>> = {
         bug: {
             label: '🐛 Bug',
             icon: '🐛',
-            className: 'bg-rose-500/20 text-rose-400 border-rose-500/30',
+            className: 'bg-destructive/20 text-destructive border-destructive/30',
         },
         feature: {
             label: '✨ Feature',
             icon: '✨',
-            className: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+            className: 'bg-warning/20 text-warning border-warning/30',
         },
         improvement: {
             label: '📈 Improvement',
             icon: '📈',
-            className: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
+            className: 'bg-info/20 text-info border-info/30',
         },
         general: {
             label: '💬 General',
@@ -45,12 +45,12 @@ export const BADGE_CONFIG: Record<string, Record<string, BadgeConfig>> = {
         positive: {
             label: '👍 Positive',
             icon: '👍',
-            className: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+            className: 'bg-success/20 text-success border-success/30',
         },
         negative: {
             label: '👎 Negative',
             icon: '👎',
-            className: 'bg-red-500/20 text-red-400 border-red-500/30',
+            className: 'bg-destructive/20 text-destructive border-destructive/30',
         },
     },
 
@@ -69,28 +69,28 @@ export const BADGE_CONFIG: Record<string, Record<string, BadgeConfig>> = {
         in_progress: {
             label: '🔨 In Progress',
             icon: '🔨',
-            className: 'bg-sky-500/20 text-sky-400',
+            className: 'bg-info/20 text-info',
             pulse: true,
         },
         review: {
             label: '👀 Review',
             icon: '👀',
-            className: 'bg-amber-500/20 text-amber-400',
+            className: 'bg-warning/20 text-warning',
         },
         pending_review: {
             label: '⏳ Awaiting Review',
             icon: '⏳',
-            className: 'bg-amber-500/20 text-amber-400',
+            className: 'bg-warning/20 text-warning',
         },
         verified: {
             label: '✓ Verified',
             icon: '✓',
-            className: 'bg-[hsl(var(--success)/0.2)] text-[hsl(var(--success))]',
+            className: 'bg-success/20 text-success',
         },
         pending: {
             label: '⏳ Pending',
             icon: '⏳',
-            className: 'bg-[hsl(var(--warning)/0.2)] text-[hsl(var(--warning))]',
+            className: 'bg-warning/20 text-warning',
         },
         failed: {
             label: '✗ Failed',
@@ -100,12 +100,12 @@ export const BADGE_CONFIG: Record<string, Record<string, BadgeConfig>> = {
         needs_work: {
             label: '⚠ Needs Work',
             icon: '⚠',
-            className: 'bg-rose-500/20 text-rose-400',
+            className: 'bg-destructive/20 text-destructive',
         },
         done: {
             label: '✅ Done',
             icon: '✅',
-            className: 'bg-emerald-500/20 text-emerald-400',
+            className: 'bg-success/20 text-success',
         },
     },
 
@@ -114,17 +114,17 @@ export const BADGE_CONFIG: Record<string, Record<string, BadgeConfig>> = {
         now: {
             label: '🔥 Now',
             icon: '🔥',
-            className: 'bg-rose-500/20 text-rose-400',
+            className: 'bg-destructive/20 text-destructive',
         },
         next: {
             label: '⏭️ Next',
             icon: '⏭️',
-            className: 'bg-amber-500/20 text-amber-400',
+            className: 'bg-warning/20 text-warning',
         },
         later: {
             label: '📅 Later',
             icon: '📅',
-            className: 'bg-sky-500/20 text-sky-400',
+            className: 'bg-info/20 text-info',
         },
         future: {
             label: '🔮 Future',
@@ -148,27 +148,27 @@ export const BADGE_CONFIG: Record<string, Record<string, BadgeConfig>> = {
         streak_30: {
             label: '30+ Day Streak',
             icon: '🔥',
-            className: 'text-red-500',
+            className: 'text-destructive',
         },
         streak_7: {
             label: '7+ Day Streak',
             icon: '🔥',
-            className: 'text-orange-400',
+            className: 'text-warning',
         },
         streak_3: {
             label: '3+ Day Streak',
             icon: '🔥',
-            className: 'text-orange-300',
+            className: 'text-warning/75',
         },
         million_club: {
             label: '1 Million Steps Club',
             icon: '💎',
-            className: 'text-purple-400',
+            className: 'text-[hsl(var(--brand-accent))]',
         },
         '500k_club': {
             label: '500k Steps Club',
             icon: '👟',
-            className: 'text-indigo-400',
+            className: 'text-info',
         },
         '100k_club': {
             label: '100k Steps Club',

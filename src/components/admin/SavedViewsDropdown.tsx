@@ -128,7 +128,7 @@ export default function SavedViewsDropdown({
                 aria-haspopup="menu"
                 aria-expanded={isOpen ? "true" : "false"}
                 aria-controls="saved-views-menu"
-                className="flex items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-2 text-sm text-foreground hover:border-border/80 hover:bg-card focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 transition"
+                className="flex items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-2 text-sm text-foreground hover:border-border/80 hover:bg-card focus:border-info focus:outline-none focus:ring-1 focus:ring-info transition"
             >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 4h14M5 8h14M5 12h14M5 16h8M5 20h8" />
@@ -157,12 +157,12 @@ export default function SavedViewsDropdown({
                                     key={view.id}
                                     role="menuitem"
                                     onClick={() => handleApplyView(view)}
-                                    className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-secondary focus:bg-secondary focus:outline-none transition ${activeViewId === view.id ? 'bg-sky-500/10 text-sky-400' : 'text-foreground'
+                                    className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-secondary focus:bg-secondary focus:outline-none transition ${activeViewId === view.id ? 'bg-info/10 text-info' : 'text-foreground'
                                         }`}
                                     tabIndex={0}
                                 >
                                     <span className="flex items-center gap-2">
-                                        <span className="text-amber-500">⭐</span>
+                                        <span className="text-warning">⭐</span>
                                         <span>{view.name}</span>
                                     </span>
                                 </button>
@@ -181,7 +181,7 @@ export default function SavedViewsDropdown({
                                     key={view.id}
                                     role="menuitem"
                                     onClick={() => handleApplyView(view)}
-                                    className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-secondary focus:bg-secondary focus:outline-none transition group ${activeViewId === view.id ? 'bg-sky-500/10 text-sky-400' : 'text-foreground'
+                                    className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-secondary focus:bg-secondary focus:outline-none transition group ${activeViewId === view.id ? 'bg-info/10 text-info' : 'text-foreground'
                                         }`}
                                     tabIndex={0}
                                 >
@@ -191,7 +191,7 @@ export default function SavedViewsDropdown({
                                     </span>
                                     <button
                                         onClick={(e) => handleDeleteView(e, view.id)}
-                                        className="opacity-0 group-hover:opacity-100 ml-2 p-1 rounded hover:bg-red-500/20 text-muted-foreground hover:text-red-400 transition"
+                                        className="opacity-0 group-hover:opacity-100 ml-2 p-1 rounded hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition"
                                         aria-label={`Delete ${view.name}`}
                                         tabIndex={-1}
                                     >
@@ -209,7 +209,7 @@ export default function SavedViewsDropdown({
                         <button
                             onClick={handleSaveView}
                             role="menuitem"
-                            className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-sky-400 hover:bg-secondary focus:bg-secondary focus:outline-none transition"
+                            className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-info hover:bg-secondary focus:bg-secondary focus:outline-none transition"
                             tabIndex={0}
                         >
                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -233,16 +233,16 @@ export default function SavedViewsDropdown({
                                     }
                                 }}
                                 placeholder="View name..."
-                                className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 mb-2"
+                                className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-info focus:outline-none focus:ring-1 focus:ring-info mb-2"
                                 maxLength={50}
                             />
                             {saveError && (
-                                <p className="text-xs text-red-400 mb-2">{saveError}</p>
+                                <p className="text-xs text-destructive mb-2">{saveError}</p>
                             )}
                             <div className="flex gap-2">
                                 <button
                                     onClick={handleSaveSubmit}
-                                    className="flex-1 rounded-lg bg-sky-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-500 transition"
+                                    className="flex-1 rounded-lg bg-info px-3 py-1.5 text-sm font-medium text-info-foreground hover:bg-info/90 focus:outline-none focus:ring-2 focus:ring-info transition"
                                 >
                                     Save
                                 </button>

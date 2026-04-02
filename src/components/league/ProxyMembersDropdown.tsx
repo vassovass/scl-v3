@@ -188,7 +188,7 @@ export function ProxyMembersDropdown({
                                             : "text-foreground hover:bg-secondary hover:text-foreground"
                                         }`}
                                 >
-                                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[hsl(var(--warning))] to-orange-600 flex items-center justify-center text-white text-sm font-medium shrink-0">
+                                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[hsl(var(--warning))] to-[hsl(var(--warning)/0.7)] flex items-center justify-center text-white text-sm font-medium shrink-0">
                                         {proxy.display_name.charAt(0).toUpperCase()}
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -214,7 +214,7 @@ export function ProxyMembersDropdown({
                                         if (error) setError(null); // Clear error on input change
                                     }}
                                     placeholder="Name (e.g., Joe Soap)"
-                                    className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-sky-500 focus:outline-none"
+                                    className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-info focus:outline-none"
                                     autoFocus
                                     onKeyDown={(e) => {
                                         if (e.key === "Enter") handleCreate();

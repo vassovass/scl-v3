@@ -23,7 +23,7 @@ export function BeforeAfterComparison() {
                 <div className="grid md:grid-cols-2 gap-8 items-center relative">
                     {/* BEFORE */}
                     <div className="relative">
-                        <div className="absolute -top-3 -left-3 px-3 py-1 bg-red-500/10 text-red-500 text-sm font-semibold rounded-full border border-red-500/20">
+                        <div className="absolute -top-3 -left-3 px-3 py-1 bg-destructive/10 text-destructive text-sm font-semibold rounded-full border border-destructive/20">
                             Before
                         </div>
                         <div className="bg-card border border-border rounded-2xl p-6 opacity-80">
@@ -63,15 +63,15 @@ export function BeforeAfterComparison() {
                             </div>
                             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
                                 <li className="flex items-center gap-2">
-                                    <X className="w-4 h-4 text-red-500" />
+                                    <X className="w-4 h-4 text-destructive" />
                                     Cluttered UI elements
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <X className="w-4 h-4 text-red-500" />
+                                    <X className="w-4 h-4 text-destructive" />
                                     No context or period
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <X className="w-4 h-4 text-red-500" />
+                                    <X className="w-4 h-4 text-destructive" />
                                     Boring, generic look
                                 </li>
                             </ul>
@@ -85,7 +85,7 @@ export function BeforeAfterComparison() {
 
                     {/* AFTER */}
                     <div className="relative">
-                        <div className="absolute -top-3 -left-3 px-3 py-1 bg-emerald-500/10 text-emerald-500 text-sm font-semibold rounded-full border border-emerald-500/20">
+                        <div className="absolute -top-3 -left-3 px-3 py-1 bg-success/10 text-success text-sm font-semibold rounded-full border border-success/20">
                             After
                         </div>
                         <div className="bg-card border border-border rounded-2xl p-6">
@@ -99,15 +99,15 @@ export function BeforeAfterComparison() {
                             />
                             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
                                 <li className="flex items-center gap-2">
-                                    <Check className="w-4 h-4 text-emerald-500" />
+                                    <Check className="w-4 h-4 text-success" />
                                     Clean, professional design
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <Check className="w-4 h-4 text-emerald-500" />
+                                    <Check className="w-4 h-4 text-success" />
                                     Shows period and context
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <Check className="w-4 h-4 text-emerald-500" />
+                                    <Check className="w-4 h-4 text-success" />
                                     Beautiful link previews
                                 </li>
                             </ul>

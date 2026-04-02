@@ -36,7 +36,7 @@ export function PersonalStatsCard() {
                             {stats.best_day_date ? new Date(stats.best_day_date).toLocaleDateString() : "-"}
                         </p>
                     </div>
-                    <div className="rounded-lg bg-yellow-500/10 p-2 text-2xl">
+                    <div className="rounded-lg bg-warning/10 p-2 text-2xl">
                         🏆
                     </div>
                 </div>
@@ -52,7 +52,7 @@ export function PersonalStatsCard() {
                         </p>
                         <p className="mt-1 text-xs text-muted-foreground">days</p>
                     </div>
-                    <div className="rounded-lg bg-orange-500/10 p-2 text-2xl">
+                    <div className="rounded-lg bg-warning/10 p-2 text-2xl">
                         🔥
                     </div>
                 </div>
@@ -68,7 +68,7 @@ export function PersonalStatsCard() {
                         </p>
                         <p className="mt-1 text-xs text-muted-foreground">days</p>
                     </div>
-                    <div className="rounded-lg bg-red-500/10 p-2 text-2xl">
+                    <div className="rounded-lg bg-destructive/10 p-2 text-2xl">
                         ⚡
                     </div>
                 </div>
@@ -86,7 +86,7 @@ export function PersonalStatsCard() {
                             {stats.total_steps_lifetime.toLocaleString()} total
                         </p>
                     </div>
-                    <div className="rounded-lg bg-sky-500/10 p-2 text-2xl">
+                    <div className="rounded-lg bg-info/10 p-2 text-2xl">
                         👣
                     </div>
                 </div>

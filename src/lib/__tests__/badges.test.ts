@@ -191,17 +191,17 @@ describe('badges - BADGE_CONFIG Structure', () => {
 describe('badges - getBadgeClass', () => {
     it('returns className for valid type', () => {
         const className = getBadgeClass('type', 'bug');
-        expect(className).toBe('bg-rose-500/20 text-rose-400 border-rose-500/30');
+        expect(className).toBe('bg-destructive/20 text-destructive border-destructive/30');
     });
 
     it('returns className for valid status', () => {
         const className = getBadgeClass('status', 'done');
-        expect(className).toBe('bg-emerald-500/20 text-emerald-400');
+        expect(className).toBe('bg-success/20 text-success');
     });
 
     it('returns className for valid release', () => {
         const className = getBadgeClass('release', 'now');
-        expect(className).toBe('bg-rose-500/20 text-rose-400');
+        expect(className).toBe('bg-destructive/20 text-destructive');
     });
 
     it('returns className for valid achievement', () => {
@@ -235,7 +235,7 @@ describe('badges - getBadgeConfig', () => {
         expect(config).toBeDefined();
         expect(config?.label).toBe('🐛 Bug');
         expect(config?.icon).toBe('🐛');
-        expect(config?.className).toContain('bg-rose');
+        expect(config?.className).toContain('bg-destructive');
     });
 
     it('returns config with pulse property', () => {

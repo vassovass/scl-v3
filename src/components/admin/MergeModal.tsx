@@ -103,7 +103,7 @@ export default function MergeModal({ items, isOpen, onClose, onSuccess }: MergeM
                 <div className="p-6 border-b border-border flex items-center justify-between">
                     <div>
                         <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 text-sm">
+                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-info/20 text-info text-sm">
                                 {items.length}
                             </span>
                             Merge Items
@@ -136,12 +136,12 @@ export default function MergeModal({ items, isOpen, onClose, onSuccess }: MergeM
                                     }
                                 }}
                                 className={`p - 3 rounded - lg border transition - all cursor - pointer relative ${primaryId === item.id
-                                        ? 'bg-blue-500/10 border-blue-500/50'
+                                        ? 'bg-info/10 border-info/50'
                                         : 'bg-white/5 border-white/5 hover:bg-white/10'
                                     } `}
                             >
                                 <div className="flex items-start gap-3">
-                                    <div className={`mt - 1 w - 4 h - 4 rounded - full border flex items - center justify - center ${primaryId === item.id ? 'border-blue-400 bg-blue-400' : 'border-white/30'
+                                    <div className={`mt - 1 w - 4 h - 4 rounded - full border flex items - center justify - center ${primaryId === item.id ? 'border-info bg-info' : 'border-white/30'
                                         } `}>
                                         {primaryId === item.id && (
                                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="text-black">
@@ -155,7 +155,7 @@ export default function MergeModal({ items, isOpen, onClose, onSuccess }: MergeM
                                             {item.type} • {item.board_status}
                                         </p>
                                         {item.screenshot_url && (
-                                            <div className="mt-2 text-[10px] flex items-center gap-1 text-blue-300 bg-blue-500/10 px-1.5 py-0.5 rounded w-fit">
+                                            <div className="mt-2 text-[10px] flex items-center gap-1 text-info bg-info/10 px-1.5 py-0.5 rounded w-fit">
                                                 <span>Has screenshot</span>
                                             </div>
                                         )}
@@ -182,7 +182,7 @@ export default function MergeModal({ items, isOpen, onClose, onSuccess }: MergeM
                             <button
                                 onClick={handleGenerateAI}
                                 disabled={isGenerating}
-                                className="flex items-center gap-2 px-3 py-1.5 bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 rounded-lg text-xs font-medium transition-colors disabled:opacity-50"
+                                className="flex items-center gap-2 px-3 py-1.5 bg-[hsl(var(--brand-accent))]/20 text-[hsl(var(--brand-accent))] hover:bg-[hsl(var(--brand-accent))]/30 rounded-lg text-xs font-medium transition-colors disabled:opacity-50"
                             >
                                 {isGenerating ? (
                                     <span className="animate-pulse">Analyzing images...</span>
@@ -198,7 +198,7 @@ export default function MergeModal({ items, isOpen, onClose, onSuccess }: MergeM
                         </div>
 
                         {error && (
-                            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-300 text-sm flex items-start gap-2">
+                            <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm flex items-start gap-2">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0">
                                     <circle cx="12" cy="12" r="10"></circle>
                                     <line x1="12" y1="8" x2="12" y2="12"></line>
@@ -230,9 +230,9 @@ export default function MergeModal({ items, isOpen, onClose, onSuccess }: MergeM
                                             </div>
                                         )}
                                         {secondaryItems.filter(i => i.screenshot_url).map(item => (
-                                            <div key={item.id} className="relative shrink-0 w-20 h-20 rounded border border-border overflow-hidden group border-blue-500/30">
+                                            <div key={item.id} className="relative shrink-0 w-20 h-20 rounded border border-border overflow-hidden group border-info/30">
                                                 <img src={item.screenshot_url!} className="w-full h-full object-cover" alt={`Attachment from ${item.subject} `} />
-                                                <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center text-[8px] text-white shadow-sm">+</div>
+                                                <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-info flex items-center justify-center text-[8px] text-info-foreground shadow-sm">+</div>
                                             </div>
                                         ))}
                                     </div>
@@ -253,7 +253,7 @@ export default function MergeModal({ items, isOpen, onClose, onSuccess }: MergeM
                     <button
                         onClick={handleConfirmMerge}
                         disabled={isMerging}
-                        className="flex items-center gap-2 px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-all shadow-lg shadow-blue-500/20 disabled:opacity-50"
+                        className="flex items-center gap-2 px-6 py-2 bg-info hover:bg-info/90 text-info-foreground rounded-lg text-sm font-medium transition-all shadow-lg shadow-info/20 disabled:opacity-50"
                     >
                         {isMerging ? 'Merging...' : (
                             <>

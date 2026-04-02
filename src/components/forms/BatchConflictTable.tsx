@@ -219,13 +219,13 @@ export function BatchConflictTable({
                                     <td className="px-3 py-2 text-right">
                                         <div className="flex items-center justify-end gap-1">
                                             <span className={`font-mono ${action === "keep_existing"
-                                                    ? "text-emerald-400"
+                                                    ? "text-success"
                                                     : "text-muted-foreground"
                                                 }`}>
                                                 {conflict.existing.steps.toLocaleString()}
                                             </span>
                                             {existingVerified && (
-                                                <span className="text-emerald-400" title="Verified">✓</span>
+                                                <span className="text-success" title="Verified">✓</span>
                                             )}
                                             {existingHasProof && (
                                                 <span className="text-[hsl(var(--info))]" title="Has Screenshot">📷</span>
@@ -235,7 +235,7 @@ export function BatchConflictTable({
                                     <td className="px-3 py-2 text-right">
                                         <div className="flex items-center justify-end gap-1">
                                             <span className={`font-mono ${action === "use_incoming"
-                                                    ? "text-emerald-400"
+                                                    ? "text-success"
                                                     : "text-muted-foreground"
                                                 }`}>
                                                 {conflict.incoming.steps.toLocaleString()}
@@ -268,7 +268,7 @@ export function BatchConflictTable({
 
             {/* Legend */}
             <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
-                <span><span className="text-emerald-400">✓</span> = Verified</span>
+                <span><span className="text-success">✓</span> = Verified</span>
                 <span><span className="text-[hsl(var(--info))]">📷</span> = Has Screenshot</span>
             </div>
 

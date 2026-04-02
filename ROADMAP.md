@@ -37,7 +37,7 @@
 
 ### User Experience
 - [ ] Achievement badges (streaks, milestones)
-- [ ] **Light/Dark mode toggle** - Theme switcher using CSS custom properties (infrastructure ready in `globals.css`)
+- [x] **Light/Dark mode toggle** - Theme switcher using CSS custom properties (implemented, tokens improved 2026-04-03)
 
 ---
 

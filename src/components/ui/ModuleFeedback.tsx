@@ -61,7 +61,7 @@ export function ModuleFeedback({
                         <button
                             onClick={() => handleFeedback("positive")}
                             disabled={isSubmitting}
-                            className="p-1 rounded text-muted-foreground hover:text-emerald-500 hover:bg-card/80 backdrop-blur-sm transition-colors disabled:opacity-50"
+                            className="p-1 rounded text-muted-foreground hover:text-success hover:bg-card/80 backdrop-blur-sm transition-colors disabled:opacity-50"
                             aria-label={`Like ${moduleName}`}
                         >
                             <ThumbsUp className="h-3 w-3" />
@@ -69,7 +69,7 @@ export function ModuleFeedback({
                         <button
                             onClick={() => handleFeedback("negative")}
                             disabled={isSubmitting}
-                            className="p-1 rounded text-muted-foreground hover:text-rose-500 hover:bg-card/80 backdrop-blur-sm transition-colors disabled:opacity-50"
+                            className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-card/80 backdrop-blur-sm transition-colors disabled:opacity-50"
                             aria-label={`Dislike ${moduleName}`}
                         >
                             <ThumbsDown className="h-3 w-3" />

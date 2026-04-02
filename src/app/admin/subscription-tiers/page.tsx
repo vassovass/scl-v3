@@ -484,7 +484,7 @@ export default function SubscriptionTiersPage() {
                 <p className="text-xs text-muted-foreground mt-0.5">
                   Enforce pay gate across all leagues. Per-league overrides take precedence.
                   {!payGateEnabled && (
-                    <span className="text-amber-500 ml-1">(Requires master switch to be on)</span>
+                    <span className="text-warning ml-1">(Requires master switch to be on)</span>
                   )}
                 </p>
               </div>
@@ -586,7 +586,7 @@ export default function SubscriptionTiersPage() {
                         <td className="px-4 py-3 text-center">
                           <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
                             tier.is_active
-                              ? "bg-emerald-500/10 text-emerald-500"
+                              ? "bg-success/10 text-success"
                               : "bg-muted text-muted-foreground"
                           }`}>
                             {tier.is_active ? "Active" : "Inactive"}
@@ -605,7 +605,7 @@ export default function SubscriptionTiersPage() {
                               <button
                                 type="button"
                                 onClick={() => setDeactivateTarget(tier)}
-                                className="text-xs text-rose-500 hover:text-rose-400 transition"
+                                className="text-xs text-destructive hover:text-destructive/80 transition"
                               >
                                 Deactivate
                               </button>
@@ -613,7 +613,7 @@ export default function SubscriptionTiersPage() {
                               <button
                                 type="button"
                                 onClick={() => handleActivate(tier)}
-                                className="text-xs text-emerald-500 hover:text-emerald-400 transition"
+                                className="text-xs text-success hover:text-success/80 transition"
                               >
                                 Activate
                               </button>
@@ -637,7 +637,7 @@ export default function SubscriptionTiersPage() {
                       </div>
                       <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium shrink-0 ${
                         tier.is_active
-                          ? "bg-emerald-500/10 text-emerald-500"
+                          ? "bg-success/10 text-success"
                           : "bg-muted text-muted-foreground"
                       }`}>
                         {tier.is_active ? "Active" : "Inactive"}
@@ -662,7 +662,7 @@ export default function SubscriptionTiersPage() {
                         <button
                           type="button"
                           onClick={() => setDeactivateTarget(tier)}
-                          className="text-xs text-rose-500 hover:text-rose-400 transition"
+                          className="text-xs text-destructive hover:text-destructive/80 transition"
                         >
                           Deactivate
                         </button>
@@ -670,7 +670,7 @@ export default function SubscriptionTiersPage() {
                         <button
                           type="button"
                           onClick={() => handleActivate(tier)}
-                          className="text-xs text-emerald-500 hover:text-emerald-400 transition"
+                          className="text-xs text-success hover:text-success/80 transition"
                         >
                           Activate
                         </button>

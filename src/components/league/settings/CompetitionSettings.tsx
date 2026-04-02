@@ -77,7 +77,7 @@ export function CompetitionSettings({ league, onChange, disabled }: CompetitionS
                         value={league.max_members || 50}
                         onChange={(e) => onChange({ max_members: parseInt(e.target.value) || 50 })}
                         disabled={disabled}
-                        className="block w-full max-w-xs rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 disabled:opacity-50 transition"
+                        className="block w-full max-w-xs rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-info focus:outline-none focus:ring-1 focus:ring-info disabled:opacity-50 transition"
                     />
                     <div className="pointer-events-none absolute inset-y-0 left-[160px] flex items-center pr-4">
                         {/* Adjust positioning or just use text after? Using max-w-xs roughly 320px */}

@@ -20,9 +20,9 @@ export function LeagueQuickStats({
 }: LeagueQuickStatsProps) {
     const getRankBadgeColor = (rank: number | null) => {
         if (!rank) return "text-muted-foreground";
-        if (rank === 1) return "text-yellow-500";
+        if (rank === 1) return "text-warning";
         if (rank === 2) return "text-muted-foreground";
-        if (rank === 3) return "text-amber-600";
+        if (rank === 3) return "text-warning";
         return "text-primary";
     };
 
@@ -69,9 +69,9 @@ export function LeagueQuickStats({
                 <div className="text-center">
                     <div className="text-2xl font-bold">
                         {hasSubmittedYesterday ? (
-                            <span className="text-emerald-500">✅</span>
+                            <span className="text-success">✅</span>
                         ) : (
-                            <span className="text-amber-500">⚠️</span>
+                            <span className="text-warning">⚠️</span>
                         )}
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">

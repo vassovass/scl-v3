@@ -256,7 +256,7 @@ export default function ClaimPage() {
                             </div>
                             <div className="flex items-center justify-between">
                                 <span className="text-sm text-muted-foreground">Submissions</span>
-                                <span className="font-medium text-emerald-400">
+                                <span className="font-medium text-success">
                                     {claimData.proxy.submission_count} entries
                                 </span>
                             </div>

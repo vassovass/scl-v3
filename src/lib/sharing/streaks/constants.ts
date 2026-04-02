@@ -31,8 +31,8 @@ export const STREAK_TIERS: Record<StreakTier, StreakTierConfig> = {
         minDays: 7,
         label: 'Bronze Sharer',
         emoji: '🔥',
-        colorClass: 'text-orange-500',
-        bgClass: 'bg-orange-500/10',
+        colorClass: 'text-warning',
+        bgClass: 'bg-warning/10',
     },
     silver: {
         tier: 'silver',
@@ -47,16 +47,16 @@ export const STREAK_TIERS: Record<StreakTier, StreakTierConfig> = {
         minDays: 30,
         label: 'Gold Sharer',
         emoji: '🔥',
-        colorClass: 'text-yellow-500',
-        bgClass: 'bg-yellow-500/10',
+        colorClass: 'text-warning',
+        bgClass: 'bg-warning/10',
     },
     diamond: {
         tier: 'diamond',
         minDays: 100,
         label: 'Diamond Sharer',
         emoji: '💎',
-        colorClass: 'text-cyan-400',
-        bgClass: 'bg-cyan-400/10',
+        colorClass: 'text-info',
+        bgClass: 'bg-info/10',
     },
 };
 

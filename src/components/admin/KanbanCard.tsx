@@ -95,7 +95,7 @@ const KanbanCard = memo(function KanbanCard({
                             <button
                                 onClick={() => onTogglePublic(item.id, item.is_public)}
                                 className={`text-xs px-1.5 py-0.5 rounded transition-colors ${item.is_public
-                                    ? "bg-emerald-500/20 text-emerald-400"
+                                    ? "bg-success/20 text-success"
                                     : "bg-secondary text-muted-foreground hover:text-foreground"
                                     }`}
                                 title={item.is_public ? "Public on roadmap" : "Private"}
@@ -108,14 +108,14 @@ const KanbanCard = memo(function KanbanCard({
                                     <div className="flex items-center gap-0.5 animate-fade-in">
                                         <button
                                             onClick={(e) => { e.stopPropagation(); onDelete(item.id, false); setShowDeleteConfirm(false); }}
-                                            className="text-[9px] px-1 py-0.5 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 rounded transition-colors"
+                                            className="text-[9px] px-1 py-0.5 bg-warning/20 text-warning hover:bg-warning/30 rounded transition-colors"
                                             title="Archive (can restore later)"
                                         >
                                             📦
                                         </button>
                                         <button
                                             onClick={(e) => { e.stopPropagation(); onDelete(item.id, true); setShowDeleteConfirm(false); }}
-                                            className="text-[9px] px-1 py-0.5 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded transition-colors"
+                                            className="text-[9px] px-1 py-0.5 bg-destructive/20 text-destructive hover:bg-destructive/30 rounded transition-colors"
                                             title="Delete forever"
                                         >
                                             🗑️
@@ -131,7 +131,7 @@ const KanbanCard = memo(function KanbanCard({
                                 ) : (
                                     <button
                                         onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(true); }}
-                                        className="text-xs px-1.5 py-0.5 rounded bg-secondary/50 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                                        className="text-xs px-1.5 py-0.5 rounded bg-secondary/50 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                                         title="Delete or archive"
                                     >
                                         🗑️
@@ -200,7 +200,7 @@ const KanbanCard = memo(function KanbanCard({
                                     href={item.screenshot_url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-emerald-400 hover:text-emerald-300 transition-colors"
+                                    className="text-success hover:text-success/80 transition-colors"
                                     title="View Screenshot"
                                     onClick={(e) => e.stopPropagation()}
                                 >

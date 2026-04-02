@@ -692,11 +692,11 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
     const getStatusColor = (status: ImageFile["status"]) => {
         switch (status) {
             case "pending": return "border-border";
-            case "extracting": return "border-amber-600";
+            case "extracting": return "border-warning";
             case "review": return "border-primary";
-            case "submitting": return "border-amber-600";
-            case "success": return "border-emerald-600";
-            case "error": return "border-rose-600";
+            case "submitting": return "border-warning";
+            case "success": return "border-success";
+            case "error": return "border-destructive";
         }
     };
 
@@ -784,7 +784,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                             {!processing && (img.status === "pending" || img.status === "review") && (
                                 <button
                                     onClick={() => removeImage(img.id)}
-                                    className="absolute right-1 top-1 rounded-full bg-rose-600 p-1 text-xs text-white hover:bg-rose-500"
+                                    className="absolute right-1 top-1 rounded-full bg-destructive p-1 text-xs text-white hover:bg-destructive/90"
                                     title="Remove"
                                 >
                                     ✕
@@ -794,8 +794,8 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                             {/* Status & Data */}
                             <div className="bg-secondary p-2 space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <span className={`text-xs font-medium ${img.status === "success" ? "text-emerald-400" :
-                                        img.status === "error" ? "text-rose-400" :
+                                    <span className={`text-xs font-medium ${img.status === "success" ? "text-success" :
+                                        img.status === "error" ? "text-destructive" :
                                             img.status === "review" ? "text-primary" :
                                                 "text-muted-foreground"
                                         }`}>
@@ -837,9 +837,9 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                         {/* Confidence indicator */}
                                         {img.extractedData?.confidence && (
                                             <div className="flex items-center gap-2">
-                                                <span className={`text-xs ${img.extractedData.confidence === "high" ? "text-emerald-400" :
-                                                    img.extractedData.confidence === "medium" ? "text-amber-400" :
-                                                        "text-rose-400"
+                                                <span className={`text-xs ${img.extractedData.confidence === "high" ? "text-success" :
+                                                    img.extractedData.confidence === "medium" ? "text-warning" :
+                                                        "text-destructive"
                                                     }`}>
                                                     {img.extractedData.confidence === "high" ? "✓ High Confidence" :
                                                         img.extractedData.confidence === "medium" ? "⚠️ Medium Confidence" :
@@ -873,7 +873,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
 
                                         {/* Low confidence confirmation checkbox */}
                                         {img.extractedData?.confidence === "low" && (
-                                            <div className="bg-rose-500/10 border border-rose-500/30 rounded p-2">
+                                            <div className="bg-destructive/10 border border-destructive/30 rounded p-2">
                                                 <label className="flex items-start gap-2 cursor-pointer">
                                                     <input
                                                         id={`batch-confirm-${img.id}`}
@@ -891,7 +891,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                                         }}
                                                         className="mt-0.5"
                                                     />
-                                                    <span className="text-xs text-rose-300">
+                                                    <span className="text-xs text-destructive">
                                                         I confirm these values are correct despite low AI confidence
                                                     </span>
                                                 </label>
@@ -902,14 +902,14 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
 
                                 {/* Success display */}
                                 {img.status === "success" && img.editedSteps && (
-                                    <p className="text-xs text-emerald-400">
+                                    <p className="text-xs text-success">
                                         {img.editedSteps.toLocaleString()} steps on {img.editedDate}
                                     </p>
                                 )}
 
                                 {/* Auto-retry countdown display */}
                                 {img.autoRetrying && img.nextRetryAt && (
-                                    <div className="text-xs text-amber-400 flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 rounded p-2">
+                                    <div className="text-xs text-warning flex items-center gap-1 bg-warning/10 border border-warning/30 rounded p-2">
                                         <span className="animate-spin">⟳</span>
                                         Retrying in {Math.max(0, Math.ceil((img.nextRetryAt.getTime() - Date.now()) / 1000))}s
                                         (Attempt {img.retryCount}/{MAX_AUTO_RETRIES})
@@ -920,8 +920,8 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                 {img.error && (
                                     <div className="space-y-2">
                                         <div className="flex items-start gap-2">
-                                            <span className="text-rose-400 text-xs">⚠️</span>
-                                            <p className="text-xs text-rose-400 flex-1">
+                                            <span className="text-destructive text-xs">⚠️</span>
+                                            <p className="text-xs text-destructive flex-1">
                                                 {img.error}
                                             </p>
                                         </div>
@@ -951,7 +951,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                                             <button
                                                 onClick={() => retryImage(img.id)}
                                                 disabled={processing}
-                                                className="w-full text-xs py-1.5 rounded bg-amber-600/20 text-amber-400 border border-amber-600/50 hover:bg-amber-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                                                className="w-full text-xs py-1.5 rounded bg-warning/20 text-warning border border-warning/50 hover:bg-warning/30 disabled:opacity-50 disabled:cursor-not-allowed transition"
                                             >
                                                 🔄 Retry Extraction
                                             </button>
@@ -994,7 +994,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                     <button
                         onClick={handleRetryAllFailed}
                         disabled={processing}
-                        className="flex-1 rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="flex-1 rounded-md bg-warning px-4 py-2 text-sm font-semibold text-warning-foreground transition hover:bg-warning/90 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         🔄 Retry All Failed ({images.filter(i => i.status === "error" && i.retryable).length})
                     </button>
@@ -1014,7 +1014,7 @@ export function BatchSubmissionForm({ leagueId, proxyMemberId, onSubmitted }: Ba
                 {allCompleted && (
                     <button
                         onClick={handleReset}
-                        className="flex-1 rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500"
+                        className="flex-1 rounded-md bg-success px-4 py-2 text-sm font-semibold text-success-foreground transition hover:bg-success/90"
                     >
                         ➕ Submit Another Batch
                     </button>

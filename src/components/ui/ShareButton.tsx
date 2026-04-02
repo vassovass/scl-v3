@@ -51,7 +51,7 @@ export function ShareButton({
         <div className="relative inline-block">
             <button
                 onClick={() => supportsNativeShare ? handleShareClick("native") : setShowMenu(!showMenu)}
-                className={`inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-sky-500 transition ${className}`}
+                className={`inline-flex items-center gap-2 rounded-lg bg-info px-4 py-2 text-sm font-medium text-info-foreground hover:bg-info/90 transition ${className}`}
             >
                 <span>📤</span>
                 {children || "Share"}

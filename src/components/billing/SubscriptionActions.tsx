@@ -196,15 +196,15 @@ function StatusBadge({ status }: { status: SubscriptionStatus | "free" }) {
     },
     active: {
       label: "Active",
-      className: "bg-green-500/10 text-green-700 dark:text-green-400",
+      className: "bg-success/10 text-success",
     },
     trialing: {
       label: "Trial",
-      className: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
+      className: "bg-info/10 text-info",
     },
     past_due: {
       label: "Past Due",
-      className: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
+      className: "bg-warning/10 text-warning",
     },
     paused: {
       label: "Paused",
@@ -212,11 +212,11 @@ function StatusBadge({ status }: { status: SubscriptionStatus | "free" }) {
     },
     canceled: {
       label: "Canceled",
-      className: "bg-red-500/10 text-red-700 dark:text-red-400",
+      className: "bg-destructive/10 text-destructive",
     },
     expired: {
       label: "Expired",
-      className: "bg-red-500/10 text-red-700 dark:text-red-400",
+      className: "bg-destructive/10 text-destructive",
     },
   };
 

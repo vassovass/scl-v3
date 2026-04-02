@@ -19,9 +19,9 @@ interface VisibilityControlsProps {
 }
 
 const ROLES = [
-  { value: "superadmin", label: "SuperAdmin", color: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
+  { value: "superadmin", label: "SuperAdmin", color: "bg-[hsl(var(--brand-accent))]/20 text-[hsl(var(--brand-accent))] border-[hsl(var(--brand-accent))]/30" },
   { value: "owner", label: "Owner", color: "bg-[hsl(var(--info)/0.2)] text-[hsl(var(--info))] border-[hsl(var(--info)/0.3)]" },
-  { value: "admin", label: "Admin", color: "bg-green-500/20 text-green-400 border-green-500/30" },
+  { value: "admin", label: "Admin", color: "bg-success/20 text-success border-success/30" },
   { value: "member", label: "Member", color: "bg-muted text-muted-foreground border-border" },
 ];
 

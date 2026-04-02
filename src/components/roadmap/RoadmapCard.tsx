@@ -145,7 +145,7 @@ export default function RoadmapCard({ item, isLoggedIn, isCompleted }: RoadmapCa
                         {/* Metadata row */}
                         <div className="flex flex-wrap items-center gap-3 text-sm">
                             {isCompleted ? (
-                                <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-xs">
+                                <span className="px-2 py-0.5 rounded bg-success/20 text-success text-xs">
                                     ✅ Completed
                                 </span>
                             ) : (

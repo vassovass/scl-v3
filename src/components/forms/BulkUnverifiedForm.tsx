@@ -145,7 +145,7 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
                 <div className="mt-4 space-y-3">
                     {/* Success count */}
                     {result.inserted > 0 && (
-                        <div className="flex items-center gap-2 text-emerald-400">
+                        <div className="flex items-center gap-2 text-success">
                             <span className="text-lg">✓</span>
                             <span>
                                 {result.inserted} {result.inserted === 1 ? "entry" : "entries"} submitted successfully
@@ -178,7 +178,7 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
                                     <li key={i}>
                                         <span className="font-mono">{c.date}</span>
                                         <span className="text-muted-foreground"> — existing: </span>
-                                        <span className="font-medium text-emerald-400">{c.existing_steps.toLocaleString()} steps (verified)</span>
+                                        <span className="font-medium text-success">{c.existing_steps.toLocaleString()} steps (verified)</span>
                                     </li>
                                 ))}
                             </ul>
@@ -187,8 +187,8 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
 
                     {/* Errors */}
                     {result.errors.length > 0 && (
-                        <div className="mt-4 rounded-md border border-rose-500/30 bg-rose-500/10 p-4">
-                            <h4 className="flex items-center gap-2 font-medium text-rose-400">
+                        <div className="mt-4 rounded-md border border-destructive/30 bg-destructive/10 p-4">
+                            <h4 className="flex items-center gap-2 font-medium text-destructive">
                                 <span>✗</span>
                                 Some entries could not be submitted
                             </h4>
@@ -197,7 +197,7 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
                                     <li key={i}>
                                         <span className="font-mono">{e.date}</span>
                                         <span className="text-muted-foreground"> — </span>
-                                        <span className="text-rose-300">{e.reason}</span>
+                                        <span className="text-destructive">{e.reason}</span>
                                     </li>
                                 ))}
                             </ul>
@@ -207,7 +207,7 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
 
                 <button
                     onClick={resetForm}
-                    className="mt-6 rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-500"
+                    className="mt-6 rounded-lg bg-info px-4 py-2 text-sm font-medium text-info-foreground transition hover:bg-info/90"
                 >
                     Submit More
                 </button>
@@ -220,7 +220,7 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
             {/* Reason field */}
             <div className="mb-6">
                 <label className="block text-sm font-medium text-foreground">
-                    Reason for Manual Entry <span className="text-rose-400">*</span>
+                    Reason for Manual Entry <span className="text-destructive">*</span>
                 </label>
                 <p className="mt-1 text-xs text-muted-foreground">
                     This will be visible to league administrators.
@@ -229,7 +229,7 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
                     placeholder="e.g., Forgot to submit last week, tracking app was broken, etc."
-                    className="mt-2 w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                    className="mt-2 w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-info focus:outline-none focus:ring-1 focus:ring-info"
                     rows={2}
                     required
                 />
@@ -258,7 +258,7 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
                                 type="date"
                                 value={entry.date}
                                 onChange={(e) => updateEntry(entry.id, "date", e.target.value)}
-                                className="rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                                className="rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground focus:border-info focus:outline-none focus:ring-1 focus:ring-info"
                                 required
                             />
                             <input
@@ -269,14 +269,14 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
                                 onChange={(e) => updateEntry(entry.id, "steps", e.target.value)}
                                 placeholder="Steps"
                                 min={1}
-                                className="w-32 rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                                className="w-32 rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-info focus:outline-none focus:ring-1 focus:ring-info"
                                 required
                             />
                             <button
                                 type="button"
                                 onClick={() => removeRow(entry.id)}
                                 disabled={entries.length <= 1}
-                                className="rounded-md px-2 py-1 text-sm text-muted-foreground transition hover:text-rose-400 disabled:opacity-30 disabled:hover:text-muted-foreground"
+                                className="rounded-md px-2 py-1 text-sm text-muted-foreground transition hover:text-destructive disabled:opacity-30 disabled:hover:text-muted-foreground"
                             >
                                 ✕
                             </button>
@@ -287,7 +287,7 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
 
             {/* Error display */}
             {error && (
-                <div className="mb-4 rounded-md border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-400">
+                <div className="mb-4 rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
                     {error}
                 </div>
             )}
@@ -301,7 +301,7 @@ export function BulkUnverifiedForm({ leagueId, proxyMemberId, onSubmitted }: Bul
             <button
                 type="submit"
                 disabled={submitting}
-                className="w-full rounded-lg bg-sky-600 py-3 text-sm font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full rounded-lg bg-info py-3 text-sm font-semibold text-info-foreground transition hover:bg-info/90 disabled:cursor-not-allowed disabled:opacity-50"
             >
                 {submitting ? "Submitting..." : `Submit ${entries.filter(e => e.date && e.steps).length} Entries`}
             </button>
