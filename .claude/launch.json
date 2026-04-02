@@ -6,6 +6,12 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["node_modules/next/dist/bin/next", "dev"],
       "port": 3000
+    },
+    {
+      "name": "docs-static",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "docs/artifacts", "-p", "4001", "--no-clipboard"],
+      "port": 4001
     }
   ]
 }

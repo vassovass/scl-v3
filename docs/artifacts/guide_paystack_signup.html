@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paystack Signup Guide — StepLeague</title>
+<style>
+  :root {
+    --paystack: #00C3F7;
+    --paystack-dark: #0099c2;
+    --paystack-light: #e6f9fe;
+    --accent: #00C3F7;
+    --critical: #dc2626;
+    --critical-bg: #fef2f2;
+    --critical-border: #fca5a5;
+    --warning-bg: #fffbeb;
+    --warning-border: #fcd34d;
+    --note-bg: #eff6ff;
+    --note-border: #93c5fd;
+    --success: #16a34a;
+    --success-bg: #f0fdf4;
+    --code-bg: #1e293b;
+    --code-text: #e2e8f0;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+    --card-bg: #ffffff;
+    --header-bg: #0f172a;
+    --nav-height: 52px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--header-bg);
+    color: #fff;
+    padding: 24px 16px 20px;
+    text-align: center;
+  }
+  .site-header .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--paystack);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .site-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .site-header p {
+    font-size: 13px;
+    color: #94a3b8;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-wrap {
+    background: var(--header-bg);
+    padding: 12px 16px;
+    border-bottom: 1px solid #1e293b;
+  }
+  .progress-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .progress-track {
+    flex: 1;
+    height: 6px;
+    background: #334155;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--paystack);
+    border-radius: 99px;
+    transition: width 0.3s ease;
+    width: 0%;
+  }
+  .progress-label {
+    font-size: 12px;
+    color: #94a3b8;
+    white-space: nowrap;
+  }
+  .reset-btn {
+    font-size: 11px;
+    color: #64748b;
+    background: none;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    padding: 3px 8px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .reset-btn:hover { color: var(--critical); border-color: var(--critical); }
+
+  /* ── NAV ── */
+  .sticky-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--card-bg);
+    border-bottom: 2px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .sticky-nav::-webkit-scrollbar { display: none; }
+  .nav-sidebar-header { display: none; }
+  .nav-inner {
+    display: flex;
+    gap: 0;
+    min-width: max-content;
+    padding: 0 8px;
+  }
+  .nav-btn {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    padding: 12px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .nav-btn:hover { color: var(--text); }
+  .nav-btn.active { color: var(--paystack-dark); border-bottom-color: var(--paystack); }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 20px 12px 60px;
+  }
+
+  /* ── SECTION CARD ── */
+  .section-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: #f8fafc;
+  }
+  .step-badge {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--paystack);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-badge.badge-0 { background: #64748b; }
+  .section-head h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .section-body { padding: 20px; }
+
+  /* ── TYPOGRAPHY ── */
+  h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 20px 0 8px;
+  }
+  h3:first-child { margin-top: 0; }
+  p { margin-bottom: 12px; }
+  p:last-child { margin-bottom: 0; }
+  strong { font-weight: 600; }
+  code {
+    font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+    font-size: 12.5px;
+    background: #f1f5f9;
+    color: #be185d;
+    padding: 1px 5px;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+  }
+
+  /* ── CODE BLOCKS ── */
+  .code-wrap {
+    position: relative;
+    margin: 12px 0;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: 8px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+    font-size: 12.5px;
+    line-height: 1.6;
+    scrollbar-width: thin;
+    scrollbar-color: #475569 transparent;
+  }
+  pre code { background: none; color: inherit; border: none; padding: 0; font-size: inherit; }
+  .copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #334155;
+    color: #94a3b8;
+    border: 1px solid #475569;
+    border-radius: 5px;
+    padding: 3px 9px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .copy-btn:hover { background: #475569; color: #e2e8f0; }
+  .copy-btn.copied { background: var(--success); color: #fff; border-color: var(--success); }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 12px 0;
+    font-size: 13.5px;
+    border-left: 4px solid;
+  }
+  .callout-critical {
+    background: var(--critical-bg);
+    border-color: var(--critical);
+    color: #7f1d1d;
+  }
+  .callout-critical strong { color: var(--critical); }
+  .callout-warning {
+    background: var(--warning-bg);
+    border-color: #f59e0b;
+    color: #78350f;
+  }
+  .callout-note {
+    background: var(--note-bg);
+    border-color: #3b82f6;
+    color: #1e3a5f;
+  }
+  .callout-success {
+    background: var(--success-bg);
+    border-color: var(--success);
+    color: #14532d;
+  }
+  .callout-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+
+  /* ── TABLES ── */
+  .table-wrap { overflow-x: auto; margin: 12px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; min-width: 400px; font-size: 13px; }
+  th {
+    background: #f1f5f9;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f8fafc; }
+  tr.highlight td { background: var(--paystack-light); font-weight: 600; }
+  tr.highlight td:first-child::before {
+    content: '★ ';
+    color: var(--paystack-dark);
+  }
+
+  /* ── CHECKLISTS ── */
+  .checklist { list-style: none; margin: 8px 0; }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 5px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    margin-top: 2px;
+    flex-shrink: 0;
+    accent-color: var(--paystack-dark);
+    cursor: pointer;
+  }
+  .checklist label {
+    cursor: pointer;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .checklist input[type="checkbox"]:checked + label {
+    text-decoration: line-through;
+    color: var(--text-muted);
+  }
+
+  /* ── ORDERED STEPS ── */
+  ol.steps {
+    margin: 8px 0 12px 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step-counter;
+  }
+  ol.steps li {
+    counter-increment: step-counter;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    align-items: flex-start;
+  }
+  ol.steps li::before {
+    content: counter(step-counter);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--paystack-light);
+    color: var(--paystack-dark);
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    border: 1px solid #93d9ef;
+  }
+
+  /* ── KEY-VALUE ROWS ── */
+  .kv-list { margin: 8px 0; }
+  .kv-row {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+    align-items: start;
+  }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-weight: 600; color: var(--text-muted); font-size: 12.5px; }
+
+  /* ── TIMELINE ── */
+  .timeline { margin: 8px 0; }
+  .tl-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 4px;
+    align-items: flex-start;
+    font-size: 13.5px;
+  }
+  .tl-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .tl-dot.instant { background: var(--success); }
+  .tl-dot.days { background: #f59e0b; }
+  .tl-dot.prod { background: #94a3b8; }
+
+  /* ── GOTCHA CARDS ── */
+  .gotcha-grid { display: flex; flex-direction: column; gap: 12px; }
+  .gotcha-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13.5px;
+  }
+  .gotcha-item h4 {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .gotcha-num {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: var(--critical);
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .gotcha-item.arch { border-color: var(--critical-border); background: var(--critical-bg); }
+
+  /* ── ENV FILE DISPLAY ── */
+  .env-block { background: var(--code-bg); border-radius: 8px; padding: 14px 16px; margin: 10px 0; }
+  .env-line { font-family: 'SF Mono', Consolas, monospace; font-size: 12.5px; margin-bottom: 5px; }
+  .env-line:last-child { margin-bottom: 0; }
+  .env-comment { color: #64748b; }
+  .env-key { color: #7dd3fc; }
+  .env-val { color: #86efac; }
+
+  /* ── SCHEMA MAP ── */
+  .schema-map { display: flex; flex-direction: column; gap: 8px; margin: 8px 0; }
+  .schema-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 13px;
+  }
+  .schema-col { flex: 1; padding: 6px 10px; border-radius: 6px; }
+  .schema-col.db { background: #f0fdf4; border: 1px solid #bbf7d0; color: #14532d; font-family: monospace; font-size: 12px; }
+  .schema-col.ps { background: var(--paystack-light); border: 1px solid #93d9ef; color: #0c4a6e; }
+  .schema-arrow { color: var(--text-muted); font-size: 14px; flex-shrink: 0; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 24px 16px;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+
+  /* ── RESPONSIVE: TABLET 640px ── */
+  @media (min-width: 640px) {
+    body { font-size: 15.5px; }
+    main { padding: 28px 28px 80px; max-width: 840px; }
+    .site-header { padding: 36px 32px 28px; }
+    .site-header h1 { font-size: 28px; }
+    .section-body { padding: 24px 28px; }
+    h3 { font-size: 15px; }
+    .kv-row { grid-template-columns: 160px 1fr; }
+    .gotcha-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .gotcha-item.arch { grid-column: 1 / -1; }
+    .schema-map { gap: 10px; }
+    .schema-row { gap: 10px; }
+  }
+
+  /* ── RESPONSIVE: DESKTOP 1024px ── */
+  @media (min-width: 1024px) {
+    body { font-size: 16px; }
+
+    /* Sidebar nav */
+    .sticky-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 100vh;
+      border-bottom: none;
+      border-right: 1px solid var(--border);
+      background: var(--card-bg);
+      overflow-y: auto;
+      overflow-x: hidden;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      padding-top: 16px;
+    }
+    .nav-inner {
+      display: flex;
+      flex-direction: column;
+      min-width: unset;
+      padding: 0;
+      gap: 2px;
+    }
+    .nav-btn {
+      text-align: left;
+      border-bottom: none;
+      border-left: 3px solid transparent;
+      margin-bottom: 0;
+      padding: 10px 16px;
+      font-size: 13px;
+      border-radius: 0;
+      white-space: normal;
+    }
+    .nav-btn:hover { background: var(--bg); }
+    .nav-btn.active {
+      border-left-color: var(--paystack);
+      border-bottom-color: transparent;
+      background: var(--paystack-light);
+      color: var(--paystack-dark);
+    }
+    .nav-sidebar-header {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 0 16px 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+
+    /* Offset everything for sidebar */
+    .site-header { padding-left: 260px; padding-right: 40px; text-align: left; padding-top: 48px; padding-bottom: 36px; }
+    .site-header h1 { font-size: 30px; }
+    .site-header p { font-size: 14px; margin: 0; }
+    .site-header .logo { display: inline-flex; }
+    .progress-wrap { padding-left: 236px; }
+    main { margin-left: 220px; max-width: unset; width: calc(100% - 220px); padding: 32px 48px 80px; }
+    footer { margin-left: 220px; }
+
+    /* Constrain content within main */
+    .section-card { max-width: 900px; }
+
+    /* Wider cards */
+    .section-body { padding: 28px 32px; }
+    .section-head { padding: 18px 32px; }
+
+    /* Better typography */
+    h3 { font-size: 16px; margin: 24px 0 10px; }
+    pre { font-size: 13px; }
+    .callout { font-size: 14px; }
+    td, th { padding: 10px 14px; }
+    .gotcha-item { font-size: 14px; }
+  }
+
+  /* ── RESPONSIVE: WIDE 1400px ── */
+  @media (min-width: 1400px) {
+    .sticky-nav { width: 240px; }
+    .site-header { padding-left: 280px; }
+    .progress-wrap { padding-left: 256px; }
+    main { margin-left: 240px; width: calc(100% - 240px); padding: 36px 64px 80px; }
+    footer { margin-left: 240px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="site-header">
+  <div class="logo">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"/><path d="M12 6V12L16 14"/></svg>
+    StepLeague · PRD 76 Prerequisite
+  </div>
+  <h1>Paystack Signup Guide</h1>
+  <p>South African developer · FNB bank account · Located in Vietnam · Sole Proprietorship path</p>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-row">
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <span class="progress-label" id="progress-label">0 / 0 items</span>
+    <button class="reset-btn" onclick="resetProgress()">Reset</button>
+  </div>
+</div>
+
+<!-- STICKY NAV -->
+<nav class="sticky-nav">
+  <span class="nav-sidebar-header">Sections</span>
+  <div class="nav-inner">
+    <button class="nav-btn" onclick="scrollTo('s0')">0 · Timeline</button>
+    <button class="nav-btn" onclick="scrollTo('s1')">1 · Pre-Flight</button>
+    <button class="nav-btn" onclick="scrollTo('s2')">2 · Signup</button>
+    <button class="nav-btn" onclick="scrollTo('s3')">3 · KYC</button>
+    <button class="nav-btn" onclick="scrollTo('s4')">4 · Intl Payments</button>
+    <button class="nav-btn" onclick="scrollTo('s5')">5 · Test Keys</button>
+    <button class="nav-btn" onclick="scrollTo('s6')">6 · Webhooks</button>
+    <button class="nav-btn" onclick="scrollTo('s7')">7 · Gotchas</button>
+    <button class="nav-btn" onclick="scrollTo('s8')">8 · PRD 76</button>
+    <button class="nav-btn" onclick="scrollTo('s9')">9 · Verify</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- ── SECTION 0: TIMELINE ── -->
+<div class="section-card" id="s0">
+  <div class="section-head">
+    <div class="step-badge badge-0">0</div>
+    <h2>Timeline Summary</h2>
+  </div>
+  <div class="section-body">
+    <div class="callout callout-success">
+      <div class="callout-label">Key Insight</div>
+      PRD 76 development can begin <strong>the same day you sign up</strong>. Test mode is fully functional without KYC approval.
+    </div>
+    <div class="timeline">
+      <div class="tl-item"><div class="tl-dot instant"></div><div><strong>Instant</strong> — Account creation (5 min), email verification (2 min), test API keys available</div></div>
+      <div class="tl-item"><div class="tl-dot instant"></div><div><strong>Instant</strong> — Test payments with test cards work immediately</div></div>
+      <div class="tl-item"><div class="tl-dot days"></div><div><strong>10–15 min</strong> — KYC document upload (once you have files ready)</div></div>
+      <div class="tl-item"><div class="tl-dot days"></div><div><strong>1–3 business days</strong> — KYC review &amp; approval (only blocks <em>live</em> payments)</div></div>
+      <div class="tl-item"><div class="tl-dot days"></div><div><strong>After KYC</strong> — Live API keys unlocked for production</div></div>
+      <div class="tl-item"><div class="tl-dot prod"></div><div><strong>T+1</strong> after first live payment — First FNB settlement (next business day)</div></div>
+    </div>
+    <div class="table-wrap" style="margin-top:16px">
+      <table>
+        <thead><tr><th>Step</th><th>Time</th><th>Blocks Development?</th></tr></thead>
+        <tbody>
+          <tr><td>Account creation</td><td>5 min</td><td>No — test keys immediate</td></tr>
+          <tr><td>Email verification</td><td>1–2 min</td><td>No</td></tr>
+          <tr class="highlight"><td>Test API keys</td><td>Instant</td><td><strong>No — PRD 76 dev starts here</strong></td></tr>
+          <tr><td>KYC document upload</td><td>10–15 min</td><td>No</td></tr>
+          <tr><td>KYC review &amp; approval</td><td>1–3 business days</td><td>Only blocks live payments</td></tr>
+          <tr><td>Live API keys</td><td>After KYC</td><td>Only for production</td></tr>
+          <tr><td>First FNB settlement</td><td>T+1</td><td>Only relevant in production</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── SECTION 1: PRE-FLIGHT ── -->
+<div class="section-card" id="s1">
+  <div class="section-head">
+    <div class="step-badge">1</div>
+    <h2>Pre-Flight Checklist</h2>
+  </div>
+  <div class="section-body">
+    <p>Gather everything below <strong>before</strong> opening Paystack. Having files ready avoids mid-signup delays.</p>
+
+    <h3>1.1 — SA Identity Document</h3>
+    <ul class="checklist">
+      <li><input type="checkbox" id="c1_1"><label for="c1_1">Valid SA ID book/card, passport, or driver's licence</label></li>
+      <li><input type="checkbox" id="c1_2"><label for="c1_2">Digital copy ready — photo or scan, clear and legible, all corners visible</label></li>
+      <li><input type="checkbox" id="c1_3"><label for="c1_3">File format: JPG, PNG, or PDF</label></li>
+    </ul>
+
+    <h3>1.2 — FNB Bank Account Details</h3>
+    <ul class="checklist">
+      <li><input type="checkbox" id="c1_4"><label for="c1_4">Account number (your FNB cheque or savings account)</label></li>
+      <li><input type="checkbox" id="c1_5"><label for="c1_5">Branch code: <code>250655</code> — universal FNB branch code</label></li>
+      <li><input type="checkbox" id="c1_6"><label for="c1_6">Account type: cheque or savings</label></li>
+    </ul>
+
+    <h3>1.3 — FNB Bank Confirmation Letter</h3>
+    <ul class="checklist">
+      <li><input type="checkbox" id="c1_7"><label for="c1_7">Letter generated — must be less than 6 months old</label></li>
+      <li><input type="checkbox" id="c1_8"><label for="c1_8">Saved as PDF on your device, ready to upload</label></li>
+    </ul>
+
+    <div class="callout callout-note">
+      <div class="callout-label">Free — no bank visit needed</div>
+      <strong>FNB App (recommended):</strong> Accounts → Select account → <em>Account Confirmation Letter</em> → Download<br><br>
+      <strong>FNB Online Banking:</strong> Log in → Accounts → Select account → Settings → Bank Letters → Account Confirmation Letter → Download
+    </div>
+
+    <h3>1.4 — Proof of Address</h3>
+    <ul class="checklist">
+      <li><input type="checkbox" id="c1_9"><label for="c1_9">Utility bill, bank statement, or municipal account — less than 6 months old</label></li>
+      <li><input type="checkbox" id="c1_10"><label for="c1_10">Shows your full name and physical address clearly</label></li>
+      <li><input type="checkbox" id="c1_11"><label for="c1_11">Digital copy ready (JPG, PNG, or PDF)</label></li>
+    </ul>
+
+    <h3>1.5 — Contact Information</h3>
+    <ul class="checklist">
+      <li><input type="checkbox" id="c1_12"><label for="c1_12">South African mobile number — required for OTP (see note below)</label></li>
+      <li><input type="checkbox" id="c1_13"><label for="c1_13">Email address ready</label></li>
+    </ul>
+    <div class="callout callout-warning">
+      <div class="callout-label">Vietnam Location Note</div>
+      You need an SA number that can receive SMS. Options: keep your SA SIM active with international roaming · use a VoIP service that receives SA SMS · or contact <code>support@paystack.com</code> to discuss alternatives before starting.
+    </div>
+
+    <h3>1.6 — Business Information</h3>
+    <ul class="checklist">
+      <li><input type="checkbox" id="c1_14"><label for="c1_14">Business name ready: <strong>StepLeague</strong></label></li>
+      <li><input type="checkbox" id="c1_15"><label for="c1_15">Category: <strong>Software / Technology</strong></label></li>
+      <li><input type="checkbox" id="c1_16"><label for="c1_16">Description: <em>"Fitness competition platform with per-league subscriptions"</em></label></li>
+      <li><input type="checkbox" id="c1_17"><label for="c1_17">Website URL: your StepLeague domain (or placeholder if not live)</label></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ── SECTION 2: SIGNUP ── -->
+<div class="section-card" id="s2">
+  <div class="section-head">
+    <div class="step-badge">2</div>
+    <h2>Signup Flow</h2>
+  </div>
+  <div class="section-body">
+
+    <h3>Step 2.1 — Open Registration</h3>
+    <div class="callout callout-note">
+      Navigate to: <code>https://dashboard.paystack.com/#/signup</code>
+    </div>
+
+    <h3>Step 2.2 — Fill Registration Form</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>First name</td><td>Your legal first name — <strong>must match ID exactly</strong></td></tr>
+          <tr><td>Last name</td><td>Your legal last name — <strong>must match ID exactly</strong></td></tr>
+          <tr><td>Email</td><td>Your email address</td></tr>
+          <tr><td>Password</td><td>Strong password — save in your password manager</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Step 2.3 — Select Country</h3>
+    <p>Select: <strong>South Africa</strong></p>
+
+    <h3>Step 2.4 — Business Details</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Business name</td><td>StepLeague</td></tr>
+          <tr><td>What does your business do?</td><td>Fitness competition platform with per-league subscriptions</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Step 2.5 — International Customers</h3>
+    <div class="callout callout-critical">
+      <div class="callout-label">⚠ Critical Action</div>
+      When asked <em>"Do you want to accept payments from international customers?"</em> — select <strong>Yes</strong>.<br><br>
+      This enables Visa/Mastercard/Amex from customers worldwide. Skipping this limits you to SA-domiciled cards only. Enabling it later requires additional compliance review.
+    </div>
+
+    <h3>Step 2.6 — Email Verification</h3>
+    <ol class="steps">
+      <li>Check your inbox for the Paystack verification email</li>
+      <li>Click the verification link in the email</li>
+      <li>You'll be redirected to the Paystack Dashboard</li>
+    </ol>
+    <div class="callout callout-success">
+      <div class="callout-label">Done</div>
+      You now have a Paystack account with <strong>test mode access</strong>. Test API keys are available immediately.
+    </div>
+  </div>
+</div>
+
+<!-- ── SECTION 3: KYC ── -->
+<div class="section-card" id="s3">
+  <div class="section-head">
+    <div class="step-badge">3</div>
+    <h2>Business Verification / KYC</h2>
+  </div>
+  <div class="section-body">
+
+    <h3>Recommended Business Type: Sole Proprietorship</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Type</th><th>Collection Limit</th><th>Documents Needed</th><th>Best For</th></tr></thead>
+        <tbody>
+          <tr><td>Starter Business</td><td>Low limit</td><td>ID, bank details, confirmation letter</td><td>Testing only</td></tr>
+          <tr class="highlight"><td>Sole Proprietorship</td><td>Higher limit</td><td>ID + bank + confirmation letter + proof of address</td><td>StepLeague launch</td></tr>
+          <tr><td>Registered Business</td><td>No limit</td><td>All above + CIPC certificate + director info</td><td>Scale — upgrade later</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>Sole Proprietorship</strong> wins: higher collection limits than Starter, no CIPC company registration needed unlike Registered Business. Upgrade later when revenue justifies it.</p>
+
+    <h3>Step 3.1 — Navigate to Compliance</h3>
+    <p>Dashboard → <strong>Settings</strong> → <strong>Business Settings</strong> (or <em>Compliance → Profile</em>)</p>
+
+    <h3>Step 3.2 — Set Business Type</h3>
+    <p>Select: <strong>Sole Proprietorship</strong></p>
+
+    <h3>Step 3.3 — Upload Identity Document</h3>
+    <p>Upload your SA ID / passport / driver's licence. Ensure the image is clear, all corners visible, not expired.</p>
+
+    <h3>Step 3.4 — Enter Bank Details</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Bank</td><td>First National Bank (FNB)</td></tr>
+          <tr><td>Account number</td><td>Your FNB account number</td></tr>
+          <tr><td>Branch code</td><td><code>250655</code></td></tr>
+          <tr><td>Account type</td><td>Cheque or Savings — match your actual account</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Step 3.5 — Upload Bank Confirmation Letter</h3>
+    <p>Upload the FNB confirmation letter from Section 1.3. Must be less than 6 months old.</p>
+
+    <h3>Step 3.6 — Upload Proof of Address</h3>
+    <p>Upload the document from Section 1.4. Less than 6 months old. Name and address must be clearly visible.</p>
+
+    <h3>Step 3.7 — Submit for Review</h3>
+    <p>Review all details, then click <strong>Submit</strong>. KYC review takes <strong>1–3 business days</strong>.</p>
+
+    <div class="callout callout-critical">
+      <div class="callout-label">⚠ Critical — Name Matching</div>
+      The name on your <strong>Paystack account</strong>, your <strong>ID document</strong>, and your <strong>FNB bank account</strong> must all match exactly. Any difference — including middle name present/absent or abbreviations — causes KYC rejection.
+    </div>
+  </div>
+</div>
+
+<!-- ── SECTION 4: INTERNATIONAL PAYMENTS ── -->
+<div class="section-card" id="s4">
+  <div class="section-head">
+    <div class="step-badge">4</div>
+    <h2>International Payments</h2>
+  </div>
+  <div class="section-body">
+    <p>If you selected "Yes" during Step 2.5, this is already enabled. If not:</p>
+
+    <h3>Fallback: Enable After Signup</h3>
+    <ol class="steps">
+      <li>Dashboard → <strong>Settings</strong> → <strong>Preferences</strong></li>
+      <li>Find <strong>International Payments</strong></li>
+      <li>Toggle to <strong>Enable</strong></li>
+      <li>May require additional compliance review</li>
+    </ol>
+
+    <h3>How International Payments Work for SA Businesses</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Aspect</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td>Accepted cards</td><td>Visa, Mastercard, American Express</td></tr>
+          <tr><td>Customer experience</td><td>Customer pays in their local currency (USD, EUR, GBP…)</td></tr>
+          <tr><td>Conversion</td><td>Paystack auto-converts to ZAR</td></tr>
+          <tr><td>Settlement</td><td>ZAR deposited directly to your FNB account</td></tr>
+          <tr><td>Settlement time</td><td>T+1 (next business day)</td></tr>
+          <tr><td>Fees</td><td>3.1% + R1 per international transaction</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-note">
+      <div class="callout-label">ZAR Only — SA Limitation</div>
+      SA businesses cannot accept USD directly — only Nigeria and Kenya can. Customers always pay in their own currency, Paystack converts, and you always receive <strong>ZAR</strong>. This is fine — your FNB account is ZAR.
+    </div>
+  </div>
+</div>
+
+<!-- ── SECTION 5: TEST API KEYS ── -->
+<div class="section-card" id="s5">
+  <div class="section-head">
+    <div class="step-badge">5</div>
+    <h2>Getting Test API Keys</h2>
+  </div>
+  <div class="section-body">
+    <div class="callout callout-success">
+      <div class="callout-label">Available Immediately</div>
+      No KYC approval needed. Test keys are available the moment your account is created.
+    </div>
+
+    <h3>Step 5.1 — Navigate to API Settings</h3>
+    <p>Dashboard → <strong>Settings</strong> → <strong>API Keys &amp; Webhooks</strong></p>
+
+    <h3>Step 5.2 — Ensure Test Mode</h3>
+    <p>Look for the <strong>Test / Live</strong> toggle at the top of the dashboard. Ensure it shows <strong>Test Mode</strong> (orange/yellow indicator). The section should show "API Configuration — Test Mode".</p>
+
+    <h3>Step 5.3 — Copy Keys</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Key</th><th>Prefix</th><th>Use</th></tr></thead>
+        <tbody>
+          <tr><td>Test Public Key</td><td><code>pk_test_...</code></td><td>Client-side — Paystack.js checkout</td></tr>
+          <tr><td>Test Secret Key</td><td><code>sk_test_...</code></td><td>Server-side — API calls, webhook verification</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Step 5.4 — Store in Environment</h3>
+    <p>Add to <code>.env.local</code> in the StepLeague project root:</p>
+    <div class="code-wrap">
+      <pre><code># Paystack — Test Mode
+NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_test_xxxxxxxxxxxxxxxxxxxxxxxx
+PAYSTACK_SECRET_KEY=sk_test_YOUR_SECRET_KEY_HERE
+PAYSTACK_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxxxxx</code></pre>
+    </div>
+    <div class="callout callout-warning">
+      <div class="callout-label">Security</div>
+      Never commit <code>.env.local</code> to git. It's already in <code>.gitignore</code>.
+    </div>
+
+    <h3>Step 5.5 — Test Card Numbers</h3>
+    <p>Use these in test mode — no real charges:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Card Number</th><th>Type</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr class="highlight"><td><code>4084 0840 8408 4081</code></td><td>Visa (SA)</td><td>Success</td></tr>
+          <tr><td><code>5060 6666 6666 6666 666</code></td><td>Verve</td><td>Success</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="kv-list">
+      <div class="kv-row"><span class="kv-key">Expiry</span><span>Any future date</span></div>
+      <div class="kv-row"><span class="kv-key">CVV</span><span>Any 3 digits</span></div>
+      <div class="kv-row"><span class="kv-key">PIN (if prompted)</span><span>Any 4 digits</span></div>
+      <div class="kv-row"><span class="kv-key">OTP (if prompted)</span><span>Any value — test mode auto-approves</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SECTION 6: WEBHOOKS ── -->
+<div class="section-card" id="s6">
+  <div class="section-head">
+    <div class="step-badge">6</div>
+    <h2>Webhook Configuration (for PRD 76)</h2>
+  </div>
+  <div class="section-body">
+    <p>Webhooks notify StepLeague about payment events. Configure the URL now so it's ready when PRD 76 implements the handler.</p>
+
+    <h3>Step 6.1 — Set Webhook URL</h3>
+    <ol class="steps">
+      <li>Dashboard → <strong>Settings</strong> → <strong>API Keys &amp; Webhooks</strong></li>
+      <li>Scroll to <strong>Webhook URL</strong></li>
+      <li>Enter: <code>https://[your-domain]/api/webhooks/paystack</code></li>
+    </ol>
+    <div class="callout callout-note">
+      For local dev: use ngrok (<code>npx ngrok http 3000</code>) and set the ngrok URL. For Vercel preview: <code>https://[branch].your-project.vercel.app/api/webhooks/paystack</code>
+    </div>
+
+    <h3>Step 6.2 — Copy Webhook Secret</h3>
+    <p>Below the webhook URL, find the <strong>Webhook Secret Key</strong>. Copy it to <code>.env.local</code> as <code>PAYSTACK_WEBHOOK_SECRET</code>. Used for HMAC signature verification via the <code>x-paystack-signature</code> header.</p>
+
+    <h3>Step 6.3 — Local Development</h3>
+    <div class="code-wrap">
+      <pre><code># Use ngrok to expose local dev server to Paystack webhooks
+npx ngrok http 3000
+# Then set the ngrok HTTPS URL as your webhook URL in the dashboard</code></pre>
+    </div>
+
+    <h3>Step 6.4 — Events to Listen For</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Event</th><th>When It Fires</th><th>StepLeague Action</th></tr></thead>
+        <tbody>
+          <tr><td><code>charge.success</code></td><td>Payment succeeds</td><td>Record in payment_history, activate subscription</td></tr>
+          <tr><td><code>subscription.create</code></td><td>Subscription created</td><td>Set league_subscriptions status → active</td></tr>
+          <tr><td><code>subscription.not_renew</code></td><td>Customer cancels renewal</td><td>Set cancel_at_period_end = true</td></tr>
+          <tr><td><code>subscription.disable</code></td><td>Subscription deactivated</td><td>Status → canceled or expired</td></tr>
+          <tr><td><code>invoice.create</code></td><td>New invoice generated</td><td>Log upcoming charge</td></tr>
+          <tr><td><code>invoice.update</code></td><td>Invoice status changes</td><td>Update payment tracking</td></tr>
+          <tr><td><code>invoice.payment_failed</code></td><td>Renewal payment fails</td><td>Start dunning / grace period flow</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Step 6.5 — Webhook Handler Pattern (PRD 76 Reference)</h3>
+    <div class="code-wrap">
+      <pre><code>// POST /api/webhooks/paystack — implemented in PRD 76
+export const POST = withApiHandler({
+  auth: 'none',  // Webhooks are unauthenticated — verify via HMAC
+  handler: async (req) => {
+    // 1. Verify signature using PAYSTACK_WEBHOOK_SECRET
+    // 2. Parse event type from request body
+    // 3. Route to appropriate handler
+    // 4. Update league_subscriptions / payment_history
+    // 5. Return 200 (Paystack retries on non-200)
+  }
+});</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ── SECTION 7: GOTCHAS ── -->
+<div class="section-card" id="s7">
+  <div class="section-head">
+    <div class="step-badge">7</div>
+    <h2>Gotchas &amp; Warnings</h2>
+  </div>
+  <div class="section-body">
+    <div class="gotcha-grid">
+
+      <div class="gotcha-item arch">
+        <h4><span class="gotcha-num">!</span>Name Matching — KYC Blocker</h4>
+        <p>Paystack account name, ID document name, and FNB account name must all match <strong>exactly</strong>. Middle name present/absent, abbreviations, or nicknames cause rejection.</p>
+      </div>
+
+      <div class="gotcha-item">
+        <h4><span class="gotcha-num">2</span>SA Phone for OTP</h4>
+        <p>Paystack sends OTP to your SA number during signup and dashboard actions while you're in Vietnam. Options: <strong>best</strong> — SA SIM with international roaming · <strong>alternative</strong> — VoIP receiving SA SMS · <strong>fallback</strong> — email <code>support@paystack.com</code> before starting.</p>
+      </div>
+
+      <div class="gotcha-item">
+        <h4><span class="gotcha-num">3</span>Vietnamese IP is Fine</h4>
+        <p>Paystack verifies your business based on <strong>registration country</strong> (South Africa), not physical location. No VPN needed. Logging in from Vietnam works.</p>
+      </div>
+
+      <div class="gotcha-item">
+        <h4><span class="gotcha-num">4</span>ZAR Settlement Only</h4>
+        <p>Paystack always settles in ZAR to your FNB account. The PRD 74 schema's <code>amount_cents</code> field stores ZAR cents for Paystack transactions. Tier prices shown to users in USD are a display concern — PRD 76 must decide how to handle the display price (USD) vs settlement amount (ZAR) split.</p>
+      </div>
+
+      <div class="gotcha-item arch">
+        <h4><span class="gotcha-num">!</span>Two-Step Subscription Flow — Architecturally Significant</h4>
+        <p>Paystack requires at least one <strong>completed transaction</strong> before a subscription can be created (subscriptions use card authorizations from prior transactions). This differs from Stripe/Paddle where first payment + subscription creation are atomic.</p>
+        <p style="margin-top:8px"><strong>PRD 76 checkout flow must be:</strong></p>
+        <ol class="steps" style="margin-top:6px">
+          <li>Initialize a one-time transaction (first payment)</li>
+          <li>Customer completes payment on Paystack checkout</li>
+          <li><code>charge.success</code> webhook fires with <code>authorization_code</code></li>
+          <li>Backend creates subscription using that authorization</li>
+        </ol>
+      </div>
+
+      <div class="gotcha-item">
+        <h4><span class="gotcha-num">6</span>Sole Proprietorship Collection Limits</h4>
+        <p>Higher limits than Starter, but still capped. Monitor in the dashboard. When approaching the limit: Compliance → Profile → change to <strong>Registered Business</strong> → upload CIPC certificate and director info.</p>
+      </div>
+
+      <div class="gotcha-item">
+        <h4><span class="gotcha-num">7</span>Test Mode ≠ Live Mode</h4>
+        <p>Completely separate environments. Plans, customers, subscriptions, and keys in test mode don't exist in live mode. When switching to production: re-create all subscription plans, update <code>.env</code> to <code>pk_live_</code> and <code>sk_live_</code> keys, update webhook URL.</p>
+      </div>
+
+      <div class="gotcha-item">
+        <h4><span class="gotcha-num">8</span>No Paystack MCP Server</h4>
+        <p>Unlike Paddle and Stripe, Paystack has no MCP server. All billing management is via Dashboard UI or direct API calls. A lightweight MCP could be built later when needed.</p>
+      </div>
+
+      <div class="gotcha-item">
+        <h4><span class="gotcha-num">9</span>Webhook Idempotency</h4>
+        <p>Paystack retries webhooks on non-200 responses, so the same event may arrive multiple times. The PRD 76 handler must be idempotent — use <code>external_subscription_id</code> and <code>external_payment_id</code> as deduplication keys.</p>
+      </div>
+
+      <div class="gotcha-item">
+        <h4><span class="gotcha-num">10</span>Bank Confirmation Letter Expiry</h4>
+        <p>The FNB confirmation letter must be <strong>less than 6 months old</strong> at KYC submission time. If delayed, generate a fresh one via the FNB App.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── SECTION 8: PRD 76 CONNECTION ── -->
+<div class="section-card" id="s8">
+  <div class="section-head">
+    <div class="step-badge">8</div>
+    <h2>Connection to PRD 76</h2>
+  </div>
+  <div class="section-body">
+
+    <h3>Signup Outputs → PRD 76 Consumption</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Signup Output</th><th>PRD 76 Use</th></tr></thead>
+        <tbody>
+          <tr><td>Test public key (<code>pk_test_...</code>)</td><td>Paystack.js checkout initialization on client</td></tr>
+          <tr><td>Test secret key (<code>sk_test_...</code>)</td><td>Server-side API calls — create plan, create subscription</td></tr>
+          <tr><td>Webhook secret</td><td>HMAC verification in <code>/api/webhooks/paystack</code></td></tr>
+          <tr><td>Webhook URL configured</td><td>Receives lifecycle events for subscription state machine</td></tr>
+          <tr><td>International payments enabled</td><td>Global customers can subscribe to leagues</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>3 Environment Variables Needed</h3>
+    <div class="code-wrap">
+      <pre><code>NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_test_...  # or pk_live_... in production
+PAYSTACK_SECRET_KEY=sk_test_...              # or sk_live_... in production
+PAYSTACK_WEBHOOK_SECRET=whsec_...</code></pre>
+    </div>
+
+    <h3>Provider Adapter Pattern</h3>
+    <p>All Paystack-specific code lives in a provider adapter to preserve the migration path to Paddle:</p>
+    <div class="code-wrap">
+      <pre><code>src/lib/payments/paystack.ts   ← Paystack-specific API calls
+src/lib/payments/types.ts      ← Provider-agnostic interfaces</code></pre>
+    </div>
+    <p>The <code>league_subscriptions.metadata</code> JSONB column stores Paystack-specific data (plan codes, authorization codes), keeping core columns provider-agnostic.</p>
+
+    <h3>Schema Mapping (PRD 74 → Paystack)</h3>
+    <div class="schema-map">
+      <div class="schema-row">
+        <div class="schema-col db">league_subscriptions.external_subscription_id</div>
+        <span class="schema-arrow">→</span>
+        <div class="schema-col ps">Paystack subscription code</div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-col db">league_subscriptions.external_customer_id</div>
+        <span class="schema-arrow">→</span>
+        <div class="schema-col ps">Paystack customer code</div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-col db">payment_history.external_payment_id</div>
+        <span class="schema-arrow">→</span>
+        <div class="schema-col ps">Paystack transaction reference</div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-col db">league_subscriptions.metadata</div>
+        <span class="schema-arrow">→</span>
+        <div class="schema-col ps">{ "paystack_plan_code": "PLN_xxx" }</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SECTION 9: VERIFICATION CHECKLIST ── -->
+<div class="section-card" id="s9">
+  <div class="section-head">
+    <div class="step-badge">9</div>
+    <h2>Post-Signup Verification Checklist</h2>
+  </div>
+  <div class="section-body">
+    <p>After completing signup, verify each item:</p>
+    <ul class="checklist">
+      <li><input type="checkbox" id="v1"><label for="v1">Can log in to Paystack Dashboard at <code>dashboard.paystack.com</code></label></li>
+      <li><input type="checkbox" id="v2"><label for="v2">Dashboard shows <strong>Test Mode</strong> toggle</label></li>
+      <li><input type="checkbox" id="v3"><label for="v3">Test public key (<code>pk_test_...</code>) visible in Settings → API Keys</label></li>
+      <li><input type="checkbox" id="v4"><label for="v4">Test secret key (<code>sk_test_...</code>) visible in Settings → API Keys</label></li>
+      <li><input type="checkbox" id="v5"><label for="v5">International payments enabled (Settings → Preferences)</label></li>
+      <li><input type="checkbox" id="v6"><label for="v6">Webhook URL configured (Settings → API Keys &amp; Webhooks)</label></li>
+      <li><input type="checkbox" id="v7"><label for="v7">Webhook secret copied to <code>.env.local</code></label></li>
+      <li><input type="checkbox" id="v8"><label for="v8">All 3 env vars in <code>.env.local</code> and dev server loads them without errors</label></li>
+      <li><input type="checkbox" id="v9"><label for="v9">Test transaction initialized using test card <code>4084 0840 8408 4081</code></label></li>
+      <li><input type="checkbox" id="v10"><label for="v10">KYC documents submitted — ID, bank confirmation, proof of address</label></li>
+      <li><input type="checkbox" id="v11"><label for="v11">Business type shows <strong>Sole Proprietorship</strong> in Compliance settings</label></li>
+    </ul>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  StepLeague · Paystack Signup Guide · Last verified 2026-03-31 · PRD 72 decision: <code>docs/artifacts/decisions_payment_provider.md</code>
+</footer>
+
+<script>
+  // ── CHECKBOX PERSISTENCE ──
+  function initCheckboxes() {
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      const key = 'psg_' + cb.id;
+      cb.checked = localStorage.getItem(key) === 'true';
+      cb.addEventListener('change', () => {
+        localStorage.setItem(key, cb.checked);
+        updateProgress();
+      });
+    });
+    updateProgress();
+  }
+
+  // ── PROGRESS BAR ──
+  function updateProgress() {
+    const all = document.querySelectorAll('input[type="checkbox"]');
+    const done = [...all].filter(cb => cb.checked).length;
+    const pct = all.length ? (done / all.length * 100) : 0;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-label').textContent = done + ' / ' + all.length + ' items';
+  }
+
+  // ── RESET ──
+  function resetProgress() {
+    if (!confirm('Reset all checklist progress?')) return;
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.checked = false;
+      localStorage.removeItem('psg_' + cb.id);
+    });
+    updateProgress();
+  }
+
+  // ── COPY BUTTONS ──
+  function initCopyButtons() {
+    document.querySelectorAll('.code-wrap').forEach(wrap => {
+      const pre = wrap.querySelector('pre');
+      if (!pre) return;
+      const btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.textContent = 'Copy';
+      btn.addEventListener('click', () => {
+        const text = pre.innerText || pre.textContent;
+        function flash() {
+          btn.textContent = 'Copied!';
+          btn.classList.add('copied');
+          setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+        }
+        function fallback() {
+          try {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none';
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            flash();
+          } catch(e) {
+            btn.textContent = 'Long-press to copy';
+            setTimeout(() => { btn.textContent = 'Copy'; }, 3000);
+          }
+        }
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).then(flash).catch(fallback);
+        } else {
+          fallback();
+        }
+      });
+      wrap.appendChild(btn);
+    });
+  }
+
+  // ── SCROLL TO SECTION ──
+  function scrollTo(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const offset = 60; // nav height
+    const y = el.getBoundingClientRect().top + window.pageYOffset - offset;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  }
+
+  // ── ACTIVE NAV HIGHLIGHT ──
+  function initNavHighlight() {
+    const sections = ['s0','s1','s2','s3','s4','s5','s6','s7','s8','s9'];
+    const btns = document.querySelectorAll('.nav-btn');
+
+    if (!('IntersectionObserver' in window)) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const idx = sections.indexOf(entry.target.id);
+          if (idx === -1) return;
+          btns.forEach((b, i) => b.classList.toggle('active', i === idx));
+          // Scroll nav pill into view
+          btns[idx]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      });
+    }, { rootMargin: '-20% 0px -60% 0px', threshold: 0 });
+
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+  }
+
+  // ── INIT ──
+  document.addEventListener('DOMContentLoaded', () => {
+    initCheckboxes();
+    initCopyButtons();
+    initNavHighlight();
+  });
+</script>
+</body>
+</html>
