@@ -18,7 +18,7 @@
 | `memberships` | league_id, user_id, role |
 | `submissions` | league_id, user_id, for_date, steps, verified, `flagged` |
 | `feedback` | type, subject, description, screenshot_url, board_status, is_public |
-| `module_feedback` | module_id, feedback_type, comment, screenshot_url |
+| `module_feedback` | module_id, feedback_type, comment, screenshot_url (RLS: own insert/read, superadmin read all) |
 | `user_records` | user_id, best_day_steps, best_day_date, current_streak, total_steps_lifetime |
 | `app_settings` | key, value (jsonb), category, value_type, visible_to, editable_by |
 
